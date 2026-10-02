@@ -1,0 +1,113 @@
+# ==============================================================================
+# SmartProcure-Pay - Docker Compose Infrastructure Skeleton (Phase 0)
+# ==============================================================================
+# In Phase 0, this file defines the core network and skeleton definitions.
+# Heavy infrastructure services are documented with clear integration milestones
+# to avoid spinning up unused containers prior to actual application implementation.
+# ==============================================================================
+
+version: '3.8'
+
+networks:
+  smartprocure-network:
+    name: smartprocure-network
+    driver: bridge
+
+volumes:
+  postgres_data:
+    name: smartprocure_postgres_data
+
+services:
+  # ----------------------------------------------------------------------------
+  # Primary Relational Store: PostgreSQL (Domain Entities & Application State)
+  # Planned for activation in Phase 1 / Issue #2
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: smartprocure-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-smartprocure_db}
+      POSTGRES_USER: ${POSTGRES_USER:-smartprocure_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d:ro
+    networks:
+      - smartprocure-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-smartprocure_user} -d ${POSTGRES_DB:-smartprocure_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================================
+  # FUTURE INTEGRATION SERVICES (Planned for Subsequent Phases)
+  # ============================================================================
+
+  # [Phase 2 / Issue #3] Identity & Access Management: Keycloak
+  # keycloak:
+  #   image: quay.io/keycloak/keycloak:24.0
+  #   container_name: smartprocure-keycloak
+  #   command: start-dev
+  #   environment:
+  #     KC_DB: postgres
+  #     KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-smartprocure_db}
+  #     KC_DB_USERNAME: ${POSTGRES_USER:-smartprocure_user}
+  #     KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres_password}
+  #     KEYCLOAK_ADMIN: admin
+  #     KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+  #   ports:
+  #     - "8080:8080"
+  #   networks:
+  #     - smartprocure-network
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+
+  # [Phase 2 / Issue #4] API Gateway: Apache APISIX
+  # apisix:
+  #   image: apache/apisix:3.9.0-debian
+  #   container_name: smartprocure-apisix
+  #   volumes:
+  #     - ./infra/apisix/config.yaml:/usr/local/apisix/conf/config.yaml:ro
+  #   ports:
+  #     - "9080:9080"
+  #     - "9180:9180"
+  #   networks:
+  #     - smartprocure-network
+
+  # [Phase 3 / Issue #7] Object Storage: MinIO (Raw Invoices: XML, PDF)
+  # minio:
+  #   image: minio/minio:RELEASE.2024-03-30T09-41-56Z
+  #   container_name: smartprocure-minio
+  #   command: server /data --console-address ":9001"
+  #   environment:
+  #     MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+  #     MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+  #   ports:
+  #     - "9000:9000"
+  #     - "9001:9001"
+  #   networks:
+  #     - smartprocure-network
+
+  # [Phase 4 / Issue #9] BPMN Workflow Engine: Flowable
+  # flowable:
+  #   image: flowable/flowable-ui:6.8.0
+  #   container_name: smartprocure-flowable
+  #   ports:
+  #     - "8088:8080"
+  #   networks:
+  #     - smartprocure-network
+
+  # [Phase 5 / Issue #10] Cryptographic Immutable Ledger: ImmuDB
+  # immudb:
+  #   image: codenotary/immudb:v1.9.2
+  #   container_name: smartprocure-immudb
+  #   ports:
+  #     - "3322:3322"
+  #     - "9497:9497"
+  #   networks:
+  #     - smartprocure-network
