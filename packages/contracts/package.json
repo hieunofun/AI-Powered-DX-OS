@@ -1,0 +1,9 @@
+{
+  "name": "@smartprocure/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API contracts and DTO specifications for SmartProcure-Pay",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "license": "MIT"
+}

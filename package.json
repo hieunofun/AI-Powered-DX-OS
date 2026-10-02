@@ -1,0 +1,36 @@
+{
+  "name": "smartprocure-pay-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open-Source Smart Procure-to-Pay & 3-Way e-Invoice Reconciliation Platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:api": "npm run start:dev --workspace=apps/api",
+    "build:web": "npm run build --workspace=apps/web",
+    "build:api": "npm run build --workspace=apps/api",
+    "build": "npm run build:api && npm run build:web",
+    "test:web": "npm run test --workspace=apps/web --if-present",
+    "test:api": "npm run test --workspace=apps/api",
+    "test": "npm run test:api",
+    "lint:web": "npm run lint --workspace=apps/web --if-present",
+    "lint:api": "npm run lint --workspace=apps/api --if-present",
+    "lint": "npm run lint:api --if-present && npm run lint:web --if-present"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "keywords": [
+    "procure-to-pay",
+    "3-way-matching",
+    "open-source",
+    "dx-os",
+    "olp-2026"
+  ],
+  "author": "SmartProcure-Pay Contributors",
+  "license": "MIT"
+}
