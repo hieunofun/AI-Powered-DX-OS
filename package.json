@@ -20,6 +20,10 @@
     "lint:api": "npm run lint --workspace=apps/api --if-present",
     "lint": "npm run lint:api --if-present && npm run lint:web --if-present"
   },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "ts-node": "^10.9.2"
+  },
   "engines": {
     "node": ">=20.0.0",
     "npm": ">=10.0.0"
