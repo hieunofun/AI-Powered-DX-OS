@@ -102,11 +102,15 @@ The system design aligns with the **Human - Process - Data - Intelligence (H-P-D
 
 To ensure project transparency, system capabilities are explicitly categorized into currently implemented baseline foundation versus planned future milestones:
 
-### Implemented (Phase 0 Baseline)
-- [x] Monorepo workspace structure (`apps/`, `services/`, `packages/`, `infra/`, `database/`, `docs/`).
-- [x] Strict Git branching model (`main`, `develop`, `feature/*`, `fix/*`, `docs/*`).
+### Implemented (Issue #1 Foundation)
+- [x] Monorepo foundation with npm workspaces (`apps/web`, `apps/api`, `packages/*`).
+- [x] React + TypeScript + Vite frontend bootstrap application (`apps/web`).
+- [x] NestJS + TypeScript backend API bootstrap service (`apps/api`).
+- [x] Health endpoint (`GET /health`) with automated unit & Supertest e2e tests.
+- [x] PostgreSQL infrastructure service defined in `docker-compose.yml` with health check.
+- [x] Docker foundation: Multi-stage Dockerfiles for web & api, plus container orchestration config.
 - [x] Open-source licensing compliance and verified dependency inventory.
-- [x] Initial Docker Compose environment and networking skeleton.
+- [x] Strict Git branching model (`main`, `develop`, `feature/*`, `fix/*`, `docs/*`).
 - [x] Ten foundational project backlog issues created and tracked on GitHub.
 
 ### Planned (Subsequent Implementation Phases)
@@ -116,9 +120,10 @@ To ensure project transparency, system capabilities are explicitly categorized i
 - [ ] **Purchase Order Service**: Full lifecycle PO management and validation (*Planned - Issue #5*).
 - [ ] **Goods Receipt Service**: Receiving intake and partial shipment tracking (*Planned - Issue #6*).
 - [ ] **Invoice Ingestion Pipeline**: XML parsing, PDF upload, and MinIO storage (*Planned - Issue #7*).
-- [ ] **3-Way Matching Engine**: High-performance multi-attribute reconciliation (*Planned - Issue #8*).
+- [ ] **3-Way Matching Engine**: Deterministic multi-attribute reconciliation engine (*Planned - Issue #8*).
 - [ ] **Exception Workflow**: Flowable BPMN discrepancy review and approvals (*Planned - Issue #9*).
 - [ ] **Immutable Audit Sealing**: Cryptographic package hashing and ImmuDB integration (*Planned - Issue #10*).
+- [ ] **Intelligence & AI**: Semantic matching embeddings, anomaly detection, AI mismatch explanation (*Planned*).
 - [ ] **Business Dashboard**: Unified web analytics UI for procurement and finance (*Planned - Phase 6*).
 
 ---
@@ -211,34 +216,74 @@ Detailed guidelines are documented in [CONTRIBUTING.md](file:///d:/dự%20án%20
 ### Prerequisites
 - [Git](https://git-scm.com/) (>= 2.40)
 - [Node.js](https://nodejs.org/) (>= 20.x LTS)
-- [Docker](https://www.docker.com/) & Docker Compose (optional for Phase 0 verification)
+- [npm](https://www.npmjs.com/) (>= 10.x)
+- [Docker](https://www.docker.com/) & Docker Compose (optional for containerized runtime)
 
-### Setup Instructions
+---
 
-1. **Clone the repository**:
+### Option A: Local Development (Host Environment)
+
+1. **Clone the repository and switch to develop**:
    ```bash
    git clone https://github.com/hieunofun/SmartProcure-Pay.git
    cd SmartProcure-Pay
-   ```
-
-2. **Switch to integration branch**:
-   ```bash
    git checkout develop
    ```
 
-3. **Configure environment variables**:
+2. **Configure environment variables**:
    ```bash
    cp .env.example .env
-   # Edit .env with local configuration parameters
    ```
 
-4. **Inspect infrastructure skeleton**:
+3. **Install monorepo dependencies**:
    ```bash
-   # Verify docker-compose skeleton syntax
-   docker compose config
+   npm install
    ```
 
-*(Note: Business logic, web UI, and backend services will be deployed in subsequent milestones according to the project roadmap).*
+4. **Build and test all workspaces**:
+   ```bash
+   npm run build
+   npm run test
+   ```
+
+5. **Start development servers**:
+   - Backend API (Port 4000):
+     ```bash
+     npm run dev:api
+     ```
+     Verify health endpoint: `curl http://localhost:4000/health`
+   - Frontend Web Client (Port 3000):
+     ```bash
+     npm run dev:web
+     ```
+     Access UI in browser at: `http://localhost:3000`
+
+---
+
+### Option B: Docker Container Orchestration
+
+> [!NOTE]
+> **Container Validation Status**: Docker Compose and Dockerfile specifications are structured and ready. Local runtime validation on this machine is currently **Pending / Blocked** due to Docker CLI unavailability on the host development workstation.
+
+1. **Build and start services**:
+   ```bash
+   docker compose up --build -d
+   ```
+
+2. **Verify container status**:
+   ```bash
+   docker compose ps
+   ```
+
+3. **Check endpoints**:
+   - Web Client: `http://localhost:3000`
+   - API Health: `http://localhost:4000/health`
+   - PostgreSQL: `localhost:5432`
+
+4. **Stop containers**:
+   ```bash
+   docker compose down
+   ```
 
 ---
 
