@@ -243,5 +243,230 @@ BEGIN
 
     RAISE NOTICE '[OK] Quantity math confirmed: Ordered=100, Received=%, Invoiced=%, Available=%',
         v_received_qty, v_invoiced_qty, v_available_qty;
+END $$;
+
+-- 9. Cross-PO GRN Item Consistency Test
+DO $$
+DECLARE
+    v_sup_id UUID;
+    v_po_b_id UUID;
+    v_po_b_item_id UUID;
+    v_grn_a_id UUID;
+    failed boolean := false;
+BEGIN
+    RAISE NOTICE '=== [Test 9] GRN for PO-A referencing PO item from PO-B must fail ===';
+    SELECT id INTO v_sup_id FROM suppliers WHERE supplier_code = 'SUP-ABC-001' LIMIT 1;
+    SELECT id INTO v_grn_a_id FROM goods_receipts WHERE grn_number = 'GRN-2026-001' LIMIT 1;
+
+    -- Create temporary PO-B
+    INSERT INTO purchase_orders (
+        po_number, supplier_id, currency, status, order_date, subtotal, tax_amount, total_amount
+    ) VALUES (
+        'PO-TEST-B', v_sup_id, 'VND', 'ISSUED', CURRENT_DATE, 5000000.00, 500000.00, 5500000.00
+    ) RETURNING id INTO v_po_b_id;
+
+    INSERT INTO purchase_order_items (
+        purchase_order_id, line_number, sku, description, ordered_quantity, unit_price, tax_rate, line_subtotal, tax_amount, line_total
+    ) VALUES (
+        v_po_b_id, 1, 'SKU-TEST-B', 'Test Item B', 10.0000, 500000.0000, 0.1000, 5000000.00, 500000.00, 5500000.00
+    ) RETURNING id INTO v_po_b_item_id;
+
+    -- Attempt to insert GRN item for GRN-2026-001 (which belongs to PO-2026-001) using v_po_b_item_id
+    BEGIN
+        INSERT INTO goods_receipt_items (
+            goods_receipt_id, purchase_order_item_id, line_number, received_quantity, accepted_quantity, rejected_quantity
+        ) VALUES (
+            v_grn_a_id, v_po_b_item_id, 999, 5.0000, 5.0000, 0.0000
+        );
+    EXCEPTION WHEN check_violation THEN
+        failed := true;
+    END;
+
+    -- Clean up temporary records
+    DELETE FROM purchase_order_items WHERE id = v_po_b_item_id;
+    DELETE FROM purchase_orders WHERE id = v_po_b_id;
+
+    IF NOT failed THEN
+        RAISE EXCEPTION 'Assertion Failed: Cross-PO GRN item did NOT trigger check_violation!';
+    END IF;
+    RAISE NOTICE '[OK] Cross-PO GRN item correctly rejected by trigger.';
+END $$;
+
+-- 10. Cross-PO Invoice Item Consistency Test
+DO $$
+DECLARE
+    v_sup_id UUID;
+    v_po_b_id UUID;
+    v_po_b_item_id UUID;
+    v_inv_a_id UUID;
+    failed boolean := false;
+BEGIN
+    RAISE NOTICE '=== [Test 10] Invoice for PO-A referencing po_item_id from PO-B must fail ===';
+    SELECT id INTO v_sup_id FROM suppliers WHERE supplier_code = 'SUP-ABC-001' LIMIT 1;
+    SELECT id INTO v_inv_a_id FROM invoices WHERE invoice_number = 'INV-2026-001' LIMIT 1;
+
+    -- Create temporary PO-B
+    INSERT INTO purchase_orders (
+        po_number, supplier_id, currency, status, order_date, subtotal, tax_amount, total_amount
+    ) VALUES (
+        'PO-TEST-B2', v_sup_id, 'VND', 'ISSUED', CURRENT_DATE, 5000000.00, 500000.00, 5500000.00
+    ) RETURNING id INTO v_po_b_id;
+
+    INSERT INTO purchase_order_items (
+        purchase_order_id, line_number, sku, description, ordered_quantity, unit_price, tax_rate, line_subtotal, tax_amount, line_total
+    ) VALUES (
+        v_po_b_id, 1, 'SKU-TEST-B2', 'Test Item B2', 10.0000, 500000.0000, 0.1000, 5000000.00, 500000.00, 5500000.00
+    ) RETURNING id INTO v_po_b_item_id;
+
+    -- Attempt to insert Invoice item for INV-2026-001 (which belongs to PO-2026-001) using v_po_b_item_id
+    BEGIN
+        INSERT INTO invoice_items (
+            invoice_id, line_number, po_item_id, sku, description,
+            quantity, unit_price, tax_rate, line_subtotal, tax_amount, line_total
+        ) VALUES (
+            v_inv_a_id, 999, v_po_b_item_id, 'SKU-TEST-B2', 'Cross-PO Item',
+            5.0000, 500000.0000, 0.1000, 2500000.00, 250000.00, 2750000.00
+        );
+    EXCEPTION WHEN check_violation THEN
+        failed := true;
+    END;
+
+    -- Clean up temporary records
+    DELETE FROM purchase_order_items WHERE id = v_po_b_item_id;
+    DELETE FROM purchase_orders WHERE id = v_po_b_id;
+
+    IF NOT failed THEN
+        RAISE EXCEPTION 'Assertion Failed: Cross-PO invoice item did NOT trigger check_violation!';
+    END IF;
+    RAISE NOTICE '[OK] Cross-PO invoice item correctly rejected by trigger.';
+END $$;
+
+-- 11. Cross-Document Match Results Consistency Test
+DO $$
+DECLARE
+    v_sup_id UUID;
+    v_po_b_id UUID;
+    v_inv_a_id UUID;
+    failed boolean := false;
+BEGIN
+    RAISE NOTICE '=== [Test 11] match_results linking invoice(PO-A) with PO-B must fail ===';
+    SELECT id INTO v_sup_id FROM suppliers WHERE supplier_code = 'SUP-ABC-001' LIMIT 1;
+    SELECT id INTO v_inv_a_id FROM invoices WHERE invoice_number = 'INV-2026-001' LIMIT 1;
+
+    INSERT INTO purchase_orders (
+        po_number, supplier_id, currency, status, order_date, subtotal, tax_amount, total_amount
+    ) VALUES (
+        'PO-TEST-B3', v_sup_id, 'VND', 'ISSUED', CURRENT_DATE, 1000000.00, 100000.00, 1100000.00
+    ) RETURNING id INTO v_po_b_id;
+
+    BEGIN
+        INSERT INTO match_results (
+            invoice_id, purchase_order_id, status, overall_confidence
+        ) VALUES (
+            v_inv_a_id, v_po_b_id, 'PENDING', 90.00
+        );
+    EXCEPTION WHEN check_violation THEN
+        failed := true;
+    END;
+
+    DELETE FROM purchase_orders WHERE id = v_po_b_id;
+
+    IF NOT failed THEN
+        RAISE EXCEPTION 'Assertion Failed: Cross-document match_results did NOT trigger check_violation!';
+    END IF;
+    RAISE NOTICE '[OK] Cross-document match_results correctly rejected by trigger.';
+END $$;
+
+-- 12. Cross-Document Approval Cases Consistency Test
+DO $$
+DECLARE
+    v_inv_a_id UUID;
+    v_inv_b_id UUID;
+    v_po_a_id UUID;
+    v_sup_id UUID;
+    v_match_res_b_id UUID;
+    failed boolean := false;
+BEGIN
+    RAISE NOTICE '=== [Test 12] approval_cases linking invoice A with match_result of invoice B must fail ===';
+    SELECT id INTO v_sup_id FROM suppliers WHERE supplier_code = 'SUP-ABC-001' LIMIT 1;
+    SELECT id INTO v_po_a_id FROM purchase_orders WHERE po_number = 'PO-2026-001' LIMIT 1;
+    SELECT id INTO v_inv_a_id FROM invoices WHERE invoice_number = 'INV-2026-001' LIMIT 1;
+
+    -- Create temporary invoice B for PO-A
+    INSERT INTO invoices (
+        invoice_number, supplier_id, purchase_order_id, invoice_date, currency, status,
+        subtotal, tax_amount, total_amount
+    ) VALUES (
+        'INV-TEST-TEMP-B', v_sup_id, v_po_a_id, CURRENT_DATE, 'VND', 'RECEIVED',
+        1000000.00, 100000.00, 1100000.00
+    ) RETURNING id INTO v_inv_b_id;
+
+    -- Create match_result for invoice B
+    INSERT INTO match_results (
+        invoice_id, purchase_order_id, status, overall_confidence
+    ) VALUES (
+        v_inv_b_id, v_po_a_id, 'FAILED', 40.00
+    ) RETURNING id INTO v_match_res_b_id;
+
+    -- Attempt to create approval_case for invoice A referencing match_result of invoice B
+    BEGIN
+        INSERT INTO approval_cases (
+            invoice_id, match_result_id, status
+        ) VALUES (
+            v_inv_a_id, v_match_res_b_id, 'PENDING'
+        );
+    EXCEPTION WHEN check_violation THEN
+        failed := true;
+    END;
+
+    -- Clean up
+    DELETE FROM match_results WHERE id = v_match_res_b_id;
+    DELETE FROM invoices WHERE id = v_inv_b_id;
+
+    IF NOT failed THEN
+        RAISE EXCEPTION 'Assertion Failed: Cross-document approval_cases did NOT trigger check_violation!';
+    END IF;
+    RAISE NOTICE '[OK] Cross-document approval_cases correctly rejected by trigger.';
+END $$;
+
+-- 13. Matching Policy Tolerance Range Test (0 <= tolerance <= 100)
+DO $$
+DECLARE
+    failed_high boolean := false;
+    failed_low boolean := false;
+BEGIN
+    RAISE NOTICE '=== [Test 13] matching_policies tolerance out-of-range (>100 or <0) must fail ===';
+
+    -- Test > 100
+    BEGIN
+        INSERT INTO matching_policies (
+            policy_code, description, quantity_tolerance_percent
+        ) VALUES (
+            'POL-INVALID-HIGH', 'Invalid tolerance > 100', 105.00
+        );
+    EXCEPTION WHEN check_violation THEN
+        failed_high := true;
+    END;
+
+    -- Test < 0
+    BEGIN
+        INSERT INTO matching_policies (
+            policy_code, description, price_tolerance_percent
+        ) VALUES (
+            'POL-INVALID-LOW', 'Invalid tolerance < 0', -5.00
+        );
+    EXCEPTION WHEN check_violation THEN
+        failed_low := true;
+    END;
+
+    IF NOT failed_high THEN
+        RAISE EXCEPTION 'Assertion Failed: tolerance > 100 did NOT trigger check_violation!';
+    END IF;
+
+    IF NOT failed_low THEN
+        RAISE EXCEPTION 'Assertion Failed: tolerance < 0 did NOT trigger check_violation!';
+    END IF;
+
+    RAISE NOTICE '[OK] Matching policy tolerance range constraint (0-100) correctly enforced.';
     RAISE NOTICE '=== ALL SCHEMA INTEGRITY TESTS PASSED SUCCESSFULLY ===';
 END $$;
