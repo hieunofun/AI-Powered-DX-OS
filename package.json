@@ -31,6 +31,10 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.63.6",
+    "@rollup/rollup-linux-x64-musl": "4.63.6"
+  },
   "engines": {
     "node": ">=20.0.0",
     "npm": ">=10.0.0"
