@@ -14,9 +14,15 @@ COPY packages/ ./packages/
 # Install build dependencies
 RUN npm install
 
-# Build-time argument for API Base URL
+# Build-time argument for API Base URL and Keycloak
 ARG VITE_API_BASE_URL=http://localhost:4000
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ARG VITE_KEYCLOAK_URL=http://localhost:8080
+ENV VITE_KEYCLOAK_URL=$VITE_KEYCLOAK_URL
+ARG VITE_KEYCLOAK_REALM=smartprocure
+ENV VITE_KEYCLOAK_REALM=$VITE_KEYCLOAK_REALM
+ARG VITE_KEYCLOAK_CLIENT_ID=smartprocure-web
+ENV VITE_KEYCLOAK_CLIENT_ID=$VITE_KEYCLOAK_CLIENT_ID
 
 # Copy web source and compile production bundle
 COPY apps/web/ ./apps/web/

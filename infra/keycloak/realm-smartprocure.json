@@ -1,0 +1,203 @@
+{
+  "realm": "smartprocure",
+  "displayName": "SmartProcure-Pay Identity Realm",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "System Administrator with global configuration access"
+      },
+      {
+        "name": "buyer",
+        "description": "Procurement Buyer authorized for Purchase Orders"
+      },
+      {
+        "name": "warehouse",
+        "description": "Warehouse Receiving Staff authorized for Goods Receipts"
+      },
+      {
+        "name": "accountant",
+        "description": "Accountant authorized for Invoice Ingestion and Matching Review"
+      },
+      {
+        "name": "finance_manager",
+        "description": "Finance Manager / CFO authorized for Exception Approvals and Payment Clearance"
+      }
+    ]
+  },
+  "defaultRoles": [
+    "offline_access",
+    "uma_authorization"
+  ],
+  "clients": [
+    {
+      "clientId": "smartprocure-web",
+      "name": "SmartProcure-Pay Web Application (SPA)",
+      "description": "Single-Page Application frontend authenticating via Authorization Code + PKCE",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "frontchannelLogout": true,
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "redirectUris": [
+        "http://localhost:3000/*",
+        "http://localhost:80/*",
+        "http://127.0.0.1:3000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000",
+        "http://localhost:80",
+        "http://127.0.0.1:3000",
+        "+"
+      ],
+      "protocolMappers": [
+        {
+          "name": "smartprocure-api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "smartprocure-api",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        },
+        {
+          "name": "realm roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "smartprocure-api",
+      "name": "SmartProcure-Pay Backend API",
+      "description": "Resource server validating JWT Bearer tokens issued by Keycloak",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "bearerOnly": true,
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false
+    }
+  ],
+  "users": [
+    {
+      "username": "admin.demo",
+      "enabled": true,
+      "email": "admin.demo@smartprocure.local",
+      "firstName": "Admin",
+      "lastName": "User",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "DemoPassword123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "admin"
+      ]
+    },
+    {
+      "username": "buyer.demo",
+      "enabled": true,
+      "email": "buyer.demo@smartprocure.local",
+      "firstName": "Buyer",
+      "lastName": "User",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "DemoPassword123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "buyer"
+      ]
+    },
+    {
+      "username": "warehouse.demo",
+      "enabled": true,
+      "email": "warehouse.demo@smartprocure.local",
+      "firstName": "Warehouse",
+      "lastName": "User",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "DemoPassword123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "warehouse"
+      ]
+    },
+    {
+      "username": "accountant.demo",
+      "enabled": true,
+      "email": "accountant.demo@smartprocure.local",
+      "firstName": "Accountant",
+      "lastName": "User",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "DemoPassword123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "accountant"
+      ]
+    },
+    {
+      "username": "finance.demo",
+      "enabled": true,
+      "email": "finance.demo@smartprocure.local",
+      "firstName": "Finance",
+      "lastName": "Manager",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "DemoPassword123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "finance_manager"
+      ]
+    }
+  ]
+}

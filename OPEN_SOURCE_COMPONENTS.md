@@ -10,7 +10,7 @@ Every license listed below has been verified against the official upstream repos
 
 | Component | Repository | Version | License | Role | Integration Type | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Keycloak** | [keycloak/keycloak](https://github.com/keycloak/keycloak) | `24.0.x` | Apache-2.0 | Identity & Access Management (SSO, OIDC, RBAC) | Docker Service | Planned |
+| **Keycloak** | [keycloak/keycloak](https://github.com/keycloak/keycloak) | `24.0.5` | Apache-2.0 | Identity & Access Management (SSO, OIDC, RBAC) | Docker Service | Integrated |
 | **Apache APISIX** | [apache/apisix](https://github.com/apache/apisix) | `3.9.x` | Apache-2.0 | API Gateway (Reverse proxy, rate limiting, routing, JWT validation) | Docker Service | Planned |
 | **PostgreSQL** | [postgres/postgres](https://github.com/postgres/postgres) | `16-alpine` | PostgreSQL License | Primary Relational Data Store (Domain models, ledger transactions) | Docker Service | Service Defined |
 | **MinIO** | [minio/minio](https://github.com/minio/minio) | `RELEASE.2024-03-30` | GNU AGPLv3 | S3-Compatible Object Storage (Raw invoices: PDF, XML, images) | Docker Service | Planned |
@@ -19,7 +19,11 @@ Every license listed below has been verified against the official upstream repos
 | **Prometheus** | [prometheus/prometheus](https://github.com/prometheus/prometheus) | `v2.51.x` | Apache-2.0 | System & Business Metrics Monitoring | Docker Service | Planned |
 | **Grafana** | [grafana/grafana](https://github.com/grafana/grafana) | `10.4.x` | GNU AGPLv3 | Operational & Observability Dashboards | Docker Service | Planned |
 | **React** | [facebook/react](https://github.com/facebook/react) | `^18.3.1` | MIT | Web UI Frontend Application Framework | Dependency | Integrated |
+| **keycloak-js** | [keycloak/keycloak](https://github.com/keycloak/keycloak/tree/main/packages/keycloak-js) | `24.0.5` | Apache-2.0 | Frontend OIDC Client Adapter with PKCE Authorization | Dependency | Integrated |
 | **NestJS** | [nestjs/nest](https://github.com/nestjs/nest) | `^10.3.9` | MIT | Backend Application Framework & Modular Services | Dependency | Integrated |
+| **jsonwebtoken** | [auth0/node-jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) | `^9.0.2` | MIT | JSON Web Token (JWT) Verification and Claims Extraction | Dependency | Integrated |
+| **jwks-rsa** | [auth0/node-jwks-rsa](https://github.com/auth0/node-jwks-rsa) | `^3.1.0` | MIT | Retrieval and Caching of RSA Signing Keys from JWKS Endpoints | Dependency | Integrated |
+| **@types/jsonwebtoken** | [DefinitelyTyped/DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped) | `^9.0.8` | MIT | TypeScript Type Definitions for jsonwebtoken | Dependency | Integrated |
 | **Vite** | [vitejs/vite](https://github.com/vitejs/vite) | `^5.3.1` | MIT | Frontend Build Tooling & Development Server | Dependency | Integrated |
 | **TypeScript** | [microsoft/TypeScript](https://github.com/microsoft/TypeScript) | `^5.4.5` | Apache-2.0 | Static Type Checking and Code Compilation | Dependency | Integrated |
 | **Supertest** | [ladjs/supertest](https://github.com/ladjs/supertest) | `^7.0.0` | MIT | HTTP Assertions for E2E Health Testing | Dependency | Integrated |
