@@ -14,7 +14,7 @@ As an open-source project participating in the Vietnam National Olympiad in Info
 
 ## 2. Dependency Management & Inventory
 
-- Every significant external software component, runtime service, or major dependency MUST be recorded in [OPEN_SOURCE_COMPONENTS.md](file:///d:/dự%20án%20đi%20thi/OPEN_SOURCE_COMPONENTS.md).
+- Every significant external software component, runtime service, or major dependency MUST be recorded in [OPEN_SOURCE_COMPONENTS.md](../../OPEN_SOURCE_COMPONENTS.md).
 - Before introducing any new dependency:
   - Verify upstream repository and its primary `LICENSE` file.
   - Check transitive dependencies for restrictive or viral copyleft constraints.
@@ -27,7 +27,7 @@ As an open-source project participating in the Vietnam National Olympiad in Info
 When reusing snippets, algorithms, or forking code from public repositories:
 1. **Source Attribution**: Always cite the original author, upstream repository URL, and commit hash in the code comments or module header.
 2. **License Preservation**: The original license text and copyright headers of upstream code must remain intact. NEVER delete or alter upstream copyright statements.
-3. **Tracking in Documentation**: Reused and modified code must be explicitly listed in [OUR_CONTRIBUTIONS.md](file:///d:/dự%20án%20đi%20thi/OUR_CONTRIBUTIONS.md) under the appropriate section.
+3. **Tracking in Documentation**: Reused and modified code must be explicitly listed in [OUR_CONTRIBUTIONS.md](../../OUR_CONTRIBUTIONS.md) under the appropriate section.
 
 ---
 

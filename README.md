@@ -132,20 +132,21 @@ To ensure project transparency, system capabilities are explicitly categorized i
 
 All external open-source platforms and planned framework components are listed with verified licenses:
 
-| Layer | Technology | Version | License | Role |
-| :--- | :--- | :--- | :--- | :--- |
-| **Gateway** | [Apache APISIX](https://apisix.apache.org/) | `3.9.x` | Apache-2.0 | API Gateway & Traffic Policy Controller |
-| **Auth** | [Keycloak](https://www.keycloak.org/) | `24.0.x` | Apache-2.0 | Identity Provider, SSO, and RBAC |
-| **Database** | [PostgreSQL](https://www.postgresql.org/) | `16-alpine` | PostgreSQL License | Primary Relational Transactional Database |
-| **Object Store** | [MinIO](https://min.io/) | `RELEASE.2024-03-30` | GNU AGPLv3 | S3-Compatible Storage for Invoices |
-| **BPMN Engine** | [Flowable](https://www.flowable.com/open-source/) | `6.8.x` | Apache-2.0 | Business Process & Exception Workflow Engine |
-| **Ledger** | [ImmuDB](https://immudb.io/) | `v1.9.x` | Apache-2.0 | Cryptographically Verifiable Immutable Ledger |
-| **Monitoring** | [Prometheus](https://prometheus.io/) | `v2.51.x` | Apache-2.0 | Telemetry & Performance Metrics |
-| **Dashboard** | [Grafana](https://grafana.com/) | `10.4.x` | GNU AGPLv3 | Observability & Metrics Visualization |
-| **Frontend UI** | [React](https://react.dev/) *(Planned)* | `18.x / 19.x` | MIT | Web User Interface |
-| **Backend API** | [NestJS](https://nestjs.com/) *(Planned)* | `10.x` | MIT | Backend Application Framework |
+| Layer | Technology | Version | License | Role | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Gateway** | [Apache APISIX](https://apisix.apache.org/) | `3.9.x` | Apache-2.0 | API Gateway & Traffic Policy Controller | Planned |
+| **Auth** | [Keycloak](https://www.keycloak.org/) | `24.0.x` | Apache-2.0 | Identity Provider, SSO, and RBAC | Planned |
+| **Database** | [PostgreSQL](https://www.postgresql.org/) | `16-alpine` | PostgreSQL License | Primary Relational Transactional Database | Service Defined |
+| **Object Store** | [MinIO](https://min.io/) | `RELEASE.2024-03-30` | GNU AGPLv3 | S3-Compatible Storage for Invoices | Planned |
+| **BPMN Engine** | [Flowable](https://www.flowable.com/open-source/) | `6.8.x` | Apache-2.0 | Business Process & Exception Workflow Engine | Planned |
+| **Ledger** | [ImmuDB](https://immudb.io/) | `v1.9.x` | Apache-2.0 | Cryptographically Verifiable Immutable Ledger | Planned |
+| **Monitoring** | [Prometheus](https://prometheus.io/) | `v2.51.x` | Apache-2.0 | Telemetry & Performance Metrics | Planned |
+| **Dashboard** | [Grafana](https://grafana.com/) | `10.4.x` | GNU AGPLv3 | Observability & Metrics Visualization | Planned |
+| **Frontend UI** | [React](https://react.dev/) | `^18.3.1` | MIT | Web User Interface | Integrated |
+| **Frontend Tooling** | [Vite](https://vitejs.dev/) | `^5.3.1` | MIT | Frontend Build Tooling & Dev Server | Integrated |
+| **Backend API** | [NestJS](https://nestjs.com/) | `^10.3.9` | MIT | Backend Application Framework | Integrated |
 
-For complete licensing details and integration classifications, refer to [OPEN_SOURCE_COMPONENTS.md](file:///d:/dự%20án%20đi%20thi/OPEN_SOURCE_COMPONENTS.md).
+For complete licensing details and integration classifications, refer to [OPEN_SOURCE_COMPONENTS.md](OPEN_SOURCE_COMPONENTS.md).
 
 ---
 
@@ -155,7 +156,7 @@ For complete licensing details and integration classifications, refer to [OPEN_S
 SmartProcure-Pay/
 ├── apps/                         # User-facing applications
 │   ├── web/                      # Web frontend client
-│   └── api/                      # Main API gateway service
+│   └── api/                      # Backend application API service
 ├── services/                     # Domain-specific backend microservices
 ├── packages/                     # Reusable monorepo shared packages
 │   ├── contracts/                # API contracts, DTOs & OpenAPI definitions
@@ -207,7 +208,7 @@ We enforce an issue-driven, peer-reviewed development methodology:
 2. **Commit Standard**: Conventional Commits format (`feat(procurement): implement PO creation`).
 3. **Pull Requests**: Pull Requests must target `develop` and link issues via `Closes #<issue>`.
 
-Detailed guidelines are documented in [CONTRIBUTING.md](file:///d:/dự%20án%20đi%20thi/CONTRIBUTING.md).
+Detailed guidelines are documented in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
@@ -289,9 +290,9 @@ Detailed guidelines are documented in [CONTRIBUTING.md](file:///d:/dự%20án%20
 
 ## 11. Open Source & Licensing
 
-- **Original Code**: Code developed by the SmartProcure-Pay team is licensed under the [MIT License](file:///d:/dự%20án%20đi%20thi/LICENSE).
+- **Original Code**: Code developed by the SmartProcure-Pay team is licensed under the [MIT License](LICENSE).
 - **Third-Party Open Source**: Upstream components (Keycloak, APISIX, PostgreSQL, MinIO, Flowable, ImmuDB, Prometheus, Grafana) are utilized under their respective open-source licenses.
-- **Compliance Policy**: Full open-source governance and compliance rules are defined in [LICENSE_POLICY.md](file:///d:/dự%20án%20đi%20thi/docs/open-source/LICENSE_POLICY.md).
+- **Compliance Policy**: Full open-source governance and compliance rules are defined in [LICENSE_POLICY.md](docs/open-source/LICENSE_POLICY.md).
 
 ---
 

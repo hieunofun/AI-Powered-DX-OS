@@ -36,4 +36,4 @@ Every license listed below has been verified against the official upstream repos
 2. **AGPL-3.0 Components (MinIO, Grafana)**:
    - MinIO and Grafana are used as unmodified external services (deployed via container orchestration).
    - Any distribution or deployment license obligations must be respected in accordance with their respective upstream licenses.
-   - For internal guidelines on adding new dependencies, see [License Policy](file:///d:/dự%20án%20đi%20thi/docs/open-source/LICENSE_POLICY.md).
+   - For internal guidelines on adding new dependencies, see [License Policy](docs/open-source/LICENSE_POLICY.md).
