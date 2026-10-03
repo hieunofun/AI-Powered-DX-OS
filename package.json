@@ -16,13 +16,18 @@
     "test:web": "npm run test --workspace=apps/web --if-present",
     "test:api": "npm run test --workspace=apps/api",
     "test": "npm run test:api",
-    "lint:web": "npm run lint --workspace=apps/web --if-present",
-    "lint:api": "npm run lint --workspace=apps/api --if-present",
-    "lint": "npm run lint:api --if-present && npm run lint:web --if-present"
+    "lint:web": "npm run lint --workspace=apps/web",
+    "lint:api": "npm run lint --workspace=apps/api",
+    "lint": "npm run lint:api && npm run lint:web"
   },
   "devDependencies": {
-    "typescript": "^5.4.5",
-    "ts-node": "^10.9.2"
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
   },
   "engines": {
     "node": ">=20.0.0",

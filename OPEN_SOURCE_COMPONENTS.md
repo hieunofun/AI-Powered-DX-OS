@@ -24,6 +24,9 @@ Every license listed below has been verified against the official upstream repos
 | **TypeScript** | [microsoft/TypeScript](https://github.com/microsoft/TypeScript) | `^5.4.5` | Apache-2.0 | Static Type Checking and Code Compilation | Dependency | Integrated |
 | **Supertest** | [ladjs/supertest](https://github.com/ladjs/supertest) | `^7.0.0` | MIT | HTTP Assertions for E2E Health Testing | Dependency | Integrated |
 | **Jest** | [jestjs/jest](https://github.com/jestjs/jest) | `^29.7.0` | MIT | Test Runner and Assertion Framework | Dependency | Integrated |
+| **ESLint** | [eslint/eslint](https://github.com/eslint/eslint) | `^8.57.1` | MIT | Pluggable JavaScript & TypeScript Linter | Dependency | Integrated |
+| **typescript-eslint** | [typescript-eslint/typescript-eslint](https://github.com/typescript-eslint/typescript-eslint) | `^7.18.0` | BSD-2-Clause | Tooling for TypeScript Linting Integration | Dependency | Integrated |
+| **eslint-plugin-react-hooks** | [facebook/react](https://github.com/facebook/react/tree/main/packages/eslint-plugin-react-hooks) | `^4.6.2` | MIT | React Hooks Rules Enforcement | Dependency | Integrated |
 
 ---
 
