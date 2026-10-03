@@ -212,11 +212,11 @@ erDiagram
 | **`goods_receipt_items`** | Line-level item inspection logging accepted and rejected goods. | UUID (`gen_random_uuid()`) | `UNIQUE(goods_receipt_id, line_number)`, `received_quantity > 0`, `accepted + rejected <= received` |
 | **`invoices`** | Supplier invoices ingested via digital e-invoice or OCR extraction. | UUID (`gen_random_uuid()`) | `UNIQUE(supplier_id, invoice_number)`, `FK -> purchase_orders (RESTRICT)`, `CHECK(status)` |
 | **`invoice_items`** | Line items on the invoice with progressive resolution to PO items. | UUID (`gen_random_uuid()`) | `UNIQUE(invoice_id, line_number)`, `quantity > 0`, `unit_price >= 0`, `po_item_id NULLABLE` |
-| **`matching_policies`** | Configurable reconciliation tolerance parameters. | UUID (`gen_random_uuid()`) | `UNIQUE(policy_code)`, Non-negative tolerance percentages |
+| **`matching_policies`** | Configurable reconciliation tolerance parameters. | UUID (`gen_random_uuid()`) | `UNIQUE(policy_code)`, Tolerance percentages bounded between 0% and 100% |
 | **`match_results`** | Header-level evaluation outcomes of 3-Way Matching runs. | UUID (`gen_random_uuid()`) | `FK -> invoices (RESTRICT)`, `FK -> purchase_orders (RESTRICT)`, `CHECK(status)` |
 | **`match_result_items`** | Item-level reconciliation results with variance calculations. | UUID (`gen_random_uuid()`) | `FK -> match_results (RESTRICT)`, `FK -> invoice_items (RESTRICT)`, `confidence BETWEEN 0 AND 100` |
 | **`approval_cases`** | Exception cases escalated to finance managers for authorization. | UUID (`gen_random_uuid()`) | `FK -> invoices (RESTRICT)`, `FK -> match_results (RESTRICT)`, `CHECK(status)` |
-| **`audit_records`** | Append-only event log capturing domain state modifications. | UUID (`gen_random_uuid()`) | Immutable structure, `JSONB` metadata payload |
+| **`audit_records`** | Relational audit persistence foundation capturing domain state events and metadata payloads (cryptographic sealing via ImmuDB in Issue #10). | UUID (`gen_random_uuid()`) | Structured event log, `JSONB` metadata payload |
 
 ---
 
@@ -278,6 +278,8 @@ $$\text{CONSTRAINT uq\_supplier\_invoice UNIQUE (supplier\_id, invoice\_number)}
 
 - Uniqueness is scoped to the **supplier**, acknowledging that different suppliers may independently issue the same invoice number (e.g., `INV-001`).
 - The same supplier cannot issue two invoices with identical numbers.
+- **Current Issue #2 Guarantee**: The PostgreSQL `UNIQUE (supplier_id, invoice_number)` constraint enforces exact binary (case-sensitive and whitespace-sensitive) uniqueness at the database level. Submitting `INV-001` twice for the same supplier is blocked, while case or whitespace variations (e.g. `inv-001` or `INV 001`) are distinct in standard SQL binary equality.
+- **Planned Normalization (Issue #7)**: Comprehensive string canonicalization (such as collapsing whitespace or normalizing `INV-001` / `inv-001` / `INV 001`) will be implemented during the ingestion pipeline phase in Issue #7 once the canonicalization policy is finalized.
 
 ---
 
@@ -293,3 +295,24 @@ The schema directly supports complex partial fulfillment workflows:
    - When a new invoice arrives, the Matching Engine verifies that the invoiced quantity does not exceed the remaining uninvoiced goods:
      $$\text{Available to Invoice} = \sum (\text{GRN.accepted\_quantity}) - \sum (\text{Previous Invoices.quantity})$$
    - If an invoice requests more than the available quantity, the system flags a **Quantity Discrepancy Exception**.
+
+---
+
+## 9. Cross-Document Relational Integrity Architecture
+
+To prevent disjoint document mappings, the database enforces relational consistency at the storage layer via automated validation triggers:
+
+1. **GRN Item $\rightarrow$ PO Item Consistency**:
+   - Triggers: `trg_check_grn_item_po_consistency` on `goods_receipt_items` (BEFORE INSERT OR UPDATE) and `trg_check_grn_parent_po_consistency` on `goods_receipts` (BEFORE UPDATE OF purchase_order_id).
+   - **Rule**: Every `goods_receipt_item` must reference a `purchase_order_item` that belongs to the exact same `purchase_order` referenced by its parent `goods_receipt`. Attempting to link items across different Purchase Orders raises an exception (`ERRCODE = 'check_violation'`).
+2. **Invoice Item $\rightarrow$ PO Item Consistency**:
+   - Triggers: `trg_check_invoice_item_po_consistency` on `invoice_items` (BEFORE INSERT OR UPDATE) and `trg_check_invoice_parent_po_consistency` on `invoices` (BEFORE UPDATE OF purchase_order_id).
+   - **Rule**: When `invoice_items.po_item_id` is NOT NULL, it must reference a `purchase_order_item` that belongs to the exact same `purchase_order` referenced by its parent `invoice`. Unresolved items (`po_item_id IS NULL`) remain valid for progressive ingestion.
+3. **Reconciliation & Match Results Consistency**:
+   - Triggers: `trg_check_match_result_document_consistency` on `match_results` and `trg_check_match_result_item_consistency` on `match_result_items`.
+   - **Rule**: `match_results.purchase_order_id` must match the parent invoice's `purchase_order_id`. Furthermore, item-level match items must belong to the respective document headers.
+4. **Approval Escalations Consistency**:
+   - Trigger: `trg_check_approval_case_document_consistency` on `approval_cases`.
+   - **Rule**: When `match_result_id` is specified on an approval case, its referenced match result must belong to the exact same `invoice_id` as the approval case.
+5. **Tolerance Boundary Constraints**:
+   - `matching_policies` enforces `CHECK (quantity_tolerance_percent >= 0 AND quantity_tolerance_percent <= 100)` (and identically for `price_tolerance_percent` and `tax_tolerance_percent`).

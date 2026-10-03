@@ -1,6 +1,6 @@
 # SmartProcure-Pay Domain Business Rules (v1)
 
-This document establishes the official business domain rules governing the Procure-to-Pay (P2P) lifecycle, 3-Way Reconciliation, Exception Approval, and Immutable Audit tracking for the **SmartProcure-Pay** platform.
+This document establishes the official business domain rules governing the Procure-to-Pay (P2P) lifecycle, 3-Way Reconciliation, Exception Approval, and Audit Persistence tracking for the **SmartProcure-Pay** platform.
 
 ---
 
@@ -30,7 +30,7 @@ This document establishes the official business domain rules governing the Procu
 
 1. **PO Reference & Line Association**:
    - Every GRN is linked to a single Purchase Order (`purchase_order_id`).
-   - Each GRN line item (`goods_receipt_items`) MUST reference a specific PO line item (`purchase_order_item_id`).
+   - Each GRN line item (`goods_receipt_items`) MUST reference a specific PO line item (`purchase_order_item_id`) that belongs to the exact same Purchase Order as the parent GRN. Cross-PO item references are strictly rejected at the database level by validation triggers (`trg_check_grn_item_po_consistency` and `trg_check_grn_parent_po_consistency`).
 2. **Quantity Integrity**:
    - `received_quantity` must be strictly positive (`> 0`). Negative or zero receipt entries are rejected.
    - `accepted_quantity` (`>= 0`) represents undamaged goods accepted into inventory.
@@ -50,10 +50,12 @@ This document establishes the official business domain rules governing the Procu
 2. **Line Item Association**:
    - At raw ingestion / OCR extraction, an invoice item may not yet be deterministically mapped to a PO line item.
    - Therefore, `po_item_id` in `invoice_items` is **nullable**, allowing progressive resolution via automatic exact matching, semantic embedding matching, or manual accountant reconciliation.
+   - When `po_item_id` IS provided, database triggers (`trg_check_invoice_item_po_consistency` and `trg_check_invoice_parent_po_consistency`) guarantee that the referenced PO line item belongs to the exact same Purchase Order as the parent Invoice.
 3. **Duplicate Prevention**:
-   - To prevent duplicate disbursement fraud and double-entry errors, the combination of `(supplier_id, invoice_number)` MUST be globally unique across active records:
+   - Invoices are uniquely identified per supplier by exact database constraint:
      $$\text{UNIQUE}(\text{supplier\_id}, \text{invoice\_number})$$
-   - Duplicate invoice checks must reject redundant submissions regardless of case or whitespace.
+   - **Current Issue #2 Guarantee**: The PostgreSQL `UNIQUE (supplier_id, invoice_number)` constraint enforces exact binary (case-sensitive and whitespace-sensitive) uniqueness at the database level. For example, submitting `INV-001` twice for the same supplier is blocked, while `inv-001` or `INV 001` would not be considered identical by PostgreSQL's standard binary equality.
+   - **Planned Ingestion Normalization (Issue #7)**: Comprehensive string canonicalization (such as collapsing whitespace or normalizing `INV-001` / `inv-001` / `INV 001`) will be implemented during the ingestion pipeline phase in Issue #7 once the canonicalization policy is finalized.
 4. **Invoice Status Lifecycle**:
    - `RECEIVED`: Document ingested (raw PDF, XML, or e-invoice payload).
    - `PARSED`: Line items extracted into structured relational entities.
@@ -137,5 +139,6 @@ The relational schema stores structured discrepancy vectors evaluated during 3-W
 2. **Soft Deletion & Cancellation**:
    - Business cancellations preserve document records for regulatory auditability.
    - Cancellation metadata: `status = 'CANCELLED'`, `cancelled_at TIMESTAMPTZ`, `cancelled_reason TEXT`.
-3. **Audit Trail Persistence**:
+3. **Audit Trail Persistence Foundation**:
    - All state transitions and reconciliation decisions generate persistent audit entries in `audit_records`.
+   - *Note on Immutability*: Issue #2 provides the relational database persistence foundation (`payload_hash`, `actor_subject`, `entity_type`, `metadata`). Cryptographic sealing and tamper-evident append-only guarantees will be integrated in Issue #10 using ImmuDB.
