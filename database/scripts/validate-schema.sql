@@ -49,8 +49,11 @@ DECLARE
         'uq_grn_item_line',
         'uq_invoice_item_line',
         'chk_po_status',
+        'chk_po_cancellation',
         'chk_grn_status',
-        'chk_invoice_status'
+        'chk_grn_cancellation',
+        'chk_invoice_status',
+        'chk_invoice_cancellation'
     ];
     cnt integer;
 BEGIN
@@ -468,5 +471,191 @@ BEGIN
     END IF;
 
     RAISE NOTICE '[OK] Matching policy tolerance range constraint (0-100) correctly enforced.';
+END $$;
+
+-- 14. PO Item Deletion Restriction Test (ON DELETE RESTRICT on invoice_items and match_result_items)
+DO $$
+DECLARE
+    v_sup_id UUID;
+    v_po_id UUID;
+    v_po_item_id UUID;
+    v_inv_id UUID;
+    v_inv_item_id UUID;
+    v_match_res_id UUID;
+    v_match_item_id UUID;
+    failed_inv boolean := false;
+    failed_match boolean := false;
+BEGIN
+    RAISE NOTICE '=== [Test 14] Deleting a purchase_order_item referenced by invoice_items or match_result_items must fail ===';
+    SELECT id INTO v_sup_id FROM suppliers WHERE supplier_code = 'SUP-ABC-001' LIMIT 1;
+
+    -- Create temporary PO with item
+    INSERT INTO purchase_orders (
+        po_number, supplier_id, currency, status, order_date, subtotal, tax_amount, total_amount
+    ) VALUES (
+        'PO-TEST-RESTRICT', v_sup_id, 'VND', 'ISSUED', CURRENT_DATE, 1000000.00, 100000.00, 1100000.00
+    ) RETURNING id INTO v_po_id;
+
+    INSERT INTO purchase_order_items (
+        purchase_order_id, line_number, sku, description, ordered_quantity, unit_price, tax_rate, line_subtotal, tax_amount, line_total
+    ) VALUES (
+        v_po_id, 1, 'SKU-RESTRICT', 'Item to test restrict deletion', 10.0000, 100000.0000, 0.1000, 1000000.00, 100000.00, 1100000.00
+    ) RETURNING id INTO v_po_item_id;
+
+    -- Create invoice linking to this PO
+    INSERT INTO invoices (
+        invoice_number, supplier_id, purchase_order_id, invoice_date, currency, status, subtotal, tax_amount, total_amount
+    ) VALUES (
+        'INV-TEST-RESTRICT', v_sup_id, v_po_id, CURRENT_DATE, 'VND', 'RECEIVED', 1000000.00, 100000.00, 1100000.00
+    ) RETURNING id INTO v_inv_id;
+
+    -- Insert invoice_item referencing v_po_item_id
+    INSERT INTO invoice_items (
+        invoice_id, line_number, po_item_id, sku, description, quantity, unit_price, tax_rate, line_subtotal, tax_amount, line_total
+    ) VALUES (
+        v_inv_id, 1, v_po_item_id, 'SKU-RESTRICT', 'Item linked to PO item', 10.0000, 100000.0000, 0.1000, 1000000.00, 100000.00, 1100000.00
+    ) RETURNING id INTO v_inv_item_id;
+
+    -- 1. Attempt to delete v_po_item_id while referenced by invoice_items -> must fail
+    BEGIN
+        DELETE FROM purchase_order_items WHERE id = v_po_item_id;
+    EXCEPTION WHEN foreign_key_violation THEN
+        failed_inv := true;
+    END;
+
+    -- Create match_result
+    INSERT INTO match_results (
+        invoice_id, purchase_order_id, status, overall_confidence
+    ) VALUES (
+        v_inv_id, v_po_id, 'PASSED', 100.00
+    ) RETURNING id INTO v_match_res_id;
+
+    -- Insert match_result_item referencing v_po_item_id
+    INSERT INTO match_result_items (
+        match_result_id, invoice_item_id, purchase_order_item_id, matched_received_quantity, status
+    ) VALUES (
+        v_match_res_id, v_inv_item_id, v_po_item_id, 10.0000, 'MATCHED'
+    ) RETURNING id INTO v_match_item_id;
+
+    -- 2. Attempt to delete v_po_item_id while referenced by match_result_items -> must fail
+    BEGIN
+        DELETE FROM purchase_order_items WHERE id = v_po_item_id;
+    EXCEPTION WHEN foreign_key_violation THEN
+        failed_match := true;
+    END;
+
+    -- Clean up test records in reverse dependency order
+    DELETE FROM match_result_items WHERE id = v_match_item_id;
+    DELETE FROM match_results WHERE id = v_match_res_id;
+    DELETE FROM invoice_items WHERE id = v_inv_item_id;
+    DELETE FROM invoices WHERE id = v_inv_id;
+    DELETE FROM purchase_order_items WHERE id = v_po_item_id;
+    DELETE FROM purchase_orders WHERE id = v_po_id;
+
+    IF NOT failed_inv THEN
+        RAISE EXCEPTION 'Assertion Failed: Deleting PO item referenced by invoice_item did NOT trigger foreign_key_violation!';
+    END IF;
+
+    IF NOT failed_match THEN
+        RAISE EXCEPTION 'Assertion Failed: Deleting PO item referenced by match_result_item did NOT trigger foreign_key_violation!';
+    END IF;
+
+    RAISE NOTICE '[OK] ON DELETE RESTRICT on purchase_order_item correctly enforced for invoices and match results.';
+END $$;
+
+-- 15. Cancellation Metadata Consistency Test
+DO $$
+DECLARE
+    v_sup_id UUID;
+    v_po_id UUID;
+    v_grn_id UUID;
+    v_inv_id UUID;
+    failed_po_null_at boolean := false;
+    failed_po_empty_reason boolean := false;
+    failed_grn_null_reason boolean := false;
+    failed_inv_null_at boolean := false;
+BEGIN
+    RAISE NOTICE '=== [Test 15] Cancellation metadata consistency: status CANCELLED requires non-null timestamp and non-blank reason ===';
+    SELECT id INTO v_sup_id FROM suppliers WHERE supplier_code = 'SUP-ABC-001' LIMIT 1;
+
+    -- Test PO: CANCELLED with NULL cancelled_at must fail
+    BEGIN
+        INSERT INTO purchase_orders (
+            po_number, supplier_id, currency, status, order_date, subtotal, tax_amount, total_amount,
+            cancelled_at, cancelled_reason
+        ) VALUES (
+            'PO-CAN-FAIL-1', v_sup_id, 'VND', 'CANCELLED', CURRENT_DATE, 1000.00, 100.00, 1100.00,
+            NULL, 'Valid reason but null timestamp'
+        );
+    EXCEPTION WHEN check_violation THEN
+        failed_po_null_at := true;
+    END;
+
+    -- Test PO: CANCELLED with empty/whitespace cancelled_reason must fail
+    BEGIN
+        INSERT INTO purchase_orders (
+            po_number, supplier_id, currency, status, order_date, subtotal, tax_amount, total_amount,
+            cancelled_at, cancelled_reason
+        ) VALUES (
+            'PO-CAN-FAIL-2', v_sup_id, 'VND', 'CANCELLED', CURRENT_DATE, 1000.00, 100.00, 1100.00,
+            CURRENT_TIMESTAMP, '   '
+        );
+    EXCEPTION WHEN check_violation THEN
+        failed_po_empty_reason := true;
+    END;
+
+    -- Test valid PO cancellation must succeed
+    INSERT INTO purchase_orders (
+        po_number, supplier_id, currency, status, order_date, subtotal, tax_amount, total_amount,
+        cancelled_at, cancelled_reason
+    ) VALUES (
+        'PO-CAN-VALID', v_sup_id, 'VND', 'CANCELLED', CURRENT_DATE, 1000.00, 100.00, 1100.00,
+        CURRENT_TIMESTAMP, 'Commercial cancellation agreed with supplier'
+    ) RETURNING id INTO v_po_id;
+
+    -- Test GRN: CANCELLED with NULL reason must fail
+    BEGIN
+        INSERT INTO goods_receipts (
+            grn_number, purchase_order_id, status, cancelled_at, cancelled_reason
+        ) VALUES (
+            'GRN-CAN-FAIL', v_po_id, 'CANCELLED', CURRENT_TIMESTAMP, NULL
+        );
+    EXCEPTION WHEN check_violation THEN
+        failed_grn_null_reason := true;
+    END;
+
+    -- Test Invoice: CANCELLED with NULL cancelled_at must fail
+    BEGIN
+        INSERT INTO invoices (
+            invoice_number, supplier_id, purchase_order_id, invoice_date, currency, status,
+            subtotal, tax_amount, total_amount, cancelled_at, cancelled_reason
+        ) VALUES (
+            'INV-CAN-FAIL', v_sup_id, v_po_id, CURRENT_DATE, 'VND', 'CANCELLED',
+            1000.00, 100.00, 1100.00, NULL, 'Reason without timestamp'
+        );
+    EXCEPTION WHEN check_violation THEN
+        failed_inv_null_at := true;
+    END;
+
+    -- Clean up temporary valid cancelled PO
+    DELETE FROM purchase_orders WHERE id = v_po_id;
+
+    IF NOT failed_po_null_at THEN
+        RAISE EXCEPTION 'Assertion Failed: PO status=CANCELLED with NULL cancelled_at did NOT trigger check_violation!';
+    END IF;
+
+    IF NOT failed_po_empty_reason THEN
+        RAISE EXCEPTION 'Assertion Failed: PO status=CANCELLED with blank cancelled_reason did NOT trigger check_violation!';
+    END IF;
+
+    IF NOT failed_grn_null_reason THEN
+        RAISE EXCEPTION 'Assertion Failed: GRN status=CANCELLED with NULL cancelled_reason did NOT trigger check_violation!';
+    END IF;
+
+    IF NOT failed_inv_null_at THEN
+        RAISE EXCEPTION 'Assertion Failed: Invoice status=CANCELLED with NULL cancelled_at did NOT trigger check_violation!';
+    END IF;
+
+    RAISE NOTICE '[OK] Cancellation metadata constraints correctly enforced across PO, GRN, and Invoice.';
     RAISE NOTICE '=== ALL SCHEMA INTEGRITY TESTS PASSED SUCCESSFULLY ===';
 END $$;
