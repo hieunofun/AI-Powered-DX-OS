@@ -258,15 +258,17 @@ Floating-point types (`REAL`, `FLOAT`, `DOUBLE PRECISION`) are **strictly prohib
 In compliance with financial auditability and regulatory compliance standards:
 
 1. **Foreign Key Protection (`ON DELETE RESTRICT`)**:
-   - Deleting a parent entity (e.g. a `supplier` referenced by a `purchase_order`, or a `purchase_order` referenced by a `goods_receipt` or `invoice`) is **blocked** by database foreign key constraints (`ON DELETE RESTRICT`).
-2. **Soft Deletion & Document Cancellation**:
+   - 100% of foreign keys across the schema enforce `ON DELETE RESTRICT`.
+   - Deleting a master entity (e.g. a `supplier` referenced by a `purchase_order`, or a `purchase_order` referenced by a `goods_receipt` or `invoice`) is blocked.
+   - Deleting a `purchase_order_item` that has already been linked to an `invoice_item` (via `po_item_id`) or a reconciliation result (`match_result_items.purchase_order_item_id`) is strictly rejected by `ON DELETE RESTRICT` to preserve historical financial auditability.
+2. **Soft Deletion & Document Cancellation Constraints**:
    - Documents are cancelled through explicit state transitions:
      - `purchase_orders.status = 'CANCELLED'`
      - `goods_receipts.status = 'CANCELLED'`
      - `invoices.status = 'CANCELLED'`
-   - Cancellation requires audit metadata:
-     - `cancelled_at TIMESTAMPTZ`: Exact UTC timestamp of cancellation.
-     - `cancelled_reason TEXT`: Mandatory business justification.
+   - Cancellation requires metadata consistency enforced by database CHECK constraints (`chk_po_cancellation`, `chk_grn_cancellation`, `chk_invoice_cancellation`):
+     - When `status = 'CANCELLED'`: `cancelled_at TIMESTAMPTZ` MUST NOT be NULL, and `cancelled_reason TEXT` MUST NOT be NULL or blank (`trim(cancelled_reason) != ''`).
+     - When `status != 'CANCELLED'`: `cancelled_at` and `cancelled_reason` MUST be NULL.
 
 ---
 

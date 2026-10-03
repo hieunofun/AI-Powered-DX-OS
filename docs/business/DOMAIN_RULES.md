@@ -134,11 +134,14 @@ The relational schema stores structured discrepancy vectors evaluated during 3-W
 ## 8. Data Retention & Integrity (Non-Destructive Governance)
 
 1. **No Cascading Deletions on Business Records**:
-   - `ON DELETE RESTRICT` is enforced on foreign keys linking `suppliers`, `purchase_orders`, `goods_receipts`, `invoices`, `match_results`, `approval_cases`, and `audit_records`.
+   - `ON DELETE RESTRICT` is enforced across 100% of foreign keys linking `suppliers`, `purchase_orders`, `purchase_order_items`, `goods_receipts`, `goods_receipt_items`, `invoices`, `invoice_items`, `match_results`, `match_result_items`, `approval_cases`, and `audit_records`.
    - Deleting a supplier with linked purchase orders is rejected by the database engine.
-2. **Soft Deletion & Cancellation**:
+   - Deleting a `purchase_order_item` referenced by an `invoice_item` (via `po_item_id`) or `match_result_items` is strictly rejected by `ON DELETE RESTRICT`.
+2. **Soft Deletion & Cancellation Metadata Integrity**:
    - Business cancellations preserve document records for regulatory auditability.
-   - Cancellation metadata: `status = 'CANCELLED'`, `cancelled_at TIMESTAMPTZ`, `cancelled_reason TEXT`.
+   - Mandatory cancellation metadata enforced by database CHECK constraints (`chk_po_cancellation`, `chk_grn_cancellation`, `chk_invoice_cancellation`):
+     - When `status = 'CANCELLED'`: `cancelled_at TIMESTAMPTZ` MUST NOT be NULL, and `cancelled_reason TEXT` MUST NOT be NULL or blank (`trim(cancelled_reason) != ''`).
+     - When `status != 'CANCELLED'`: `cancelled_at` and `cancelled_reason` MUST be NULL.
 3. **Audit Trail Persistence Foundation**:
    - All state transitions and reconciliation decisions generate persistent audit entries in `audit_records`.
    - *Note on Immutability*: Issue #2 provides the relational database persistence foundation (`payload_hash`, `actor_subject`, `entity_type`, `metadata`). Cryptographic sealing and tamper-evident append-only guarantees will be integrated in Issue #10 using ImmuDB.
