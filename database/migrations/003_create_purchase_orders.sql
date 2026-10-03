@@ -20,6 +20,11 @@ CREATE TABLE IF NOT EXISTS purchase_orders (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uq_purchase_orders_po_number UNIQUE (po_number),
     CONSTRAINT chk_po_status CHECK (status IN ('DRAFT', 'ISSUED', 'PARTIALLY_RECEIVED', 'FULLY_RECEIVED', 'CLOSED', 'CANCELLED')),
+    CONSTRAINT chk_po_cancellation CHECK (
+        (status != 'CANCELLED' AND cancelled_at IS NULL AND cancelled_reason IS NULL)
+        OR
+        (status = 'CANCELLED' AND cancelled_at IS NOT NULL AND trim(COALESCE(cancelled_reason, '')) != '')
+    ),
     CONSTRAINT chk_po_subtotal CHECK (subtotal >= 0),
     CONSTRAINT chk_po_tax_amount CHECK (tax_amount >= 0),
     CONSTRAINT chk_po_total_amount CHECK (total_amount >= 0)

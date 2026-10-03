@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS match_result_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     match_result_id UUID NOT NULL REFERENCES match_results(id) ON DELETE RESTRICT,
     invoice_item_id UUID NOT NULL REFERENCES invoice_items(id) ON DELETE RESTRICT,
-    purchase_order_item_id UUID REFERENCES purchase_order_items(id) ON DELETE SET NULL,
+    purchase_order_item_id UUID REFERENCES purchase_order_items(id) ON DELETE RESTRICT,
     matched_received_quantity NUMERIC(18,4) NOT NULL DEFAULT 0.0000,
     quantity_variance NUMERIC(18,4) NOT NULL DEFAULT 0.0000,
     unit_price_variance NUMERIC(18,4) NOT NULL DEFAULT 0.0000,

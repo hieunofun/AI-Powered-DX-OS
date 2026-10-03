@@ -15,7 +15,12 @@ CREATE TABLE IF NOT EXISTS goods_receipts (
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uq_goods_receipts_grn_number UNIQUE (grn_number),
-    CONSTRAINT chk_grn_status CHECK (status IN ('DRAFT', 'RECEIVED', 'CANCELLED'))
+    CONSTRAINT chk_grn_status CHECK (status IN ('DRAFT', 'RECEIVED', 'CANCELLED')),
+    CONSTRAINT chk_grn_cancellation CHECK (
+        (status != 'CANCELLED' AND cancelled_at IS NULL AND cancelled_reason IS NULL)
+        OR
+        (status = 'CANCELLED' AND cancelled_at IS NOT NULL AND trim(COALESCE(cancelled_reason, '')) != '')
+    )
 );
 
 CREATE TRIGGER trg_goods_receipts_updated_at

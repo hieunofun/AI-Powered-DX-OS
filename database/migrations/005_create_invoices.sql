@@ -25,6 +25,11 @@ CREATE TABLE IF NOT EXISTS invoices (
         'RECEIVED', 'PARSED', 'PENDING_MATCH', 'MATCHED',
         'EXCEPTION', 'APPROVED', 'READY_FOR_PAYMENT', 'REJECTED', 'CANCELLED'
     )),
+    CONSTRAINT chk_invoice_cancellation CHECK (
+        (status != 'CANCELLED' AND cancelled_at IS NULL AND cancelled_reason IS NULL)
+        OR
+        (status = 'CANCELLED' AND cancelled_at IS NOT NULL AND trim(COALESCE(cancelled_reason, '')) != '')
+    ),
     CONSTRAINT chk_invoice_subtotal CHECK (subtotal >= 0),
     CONSTRAINT chk_invoice_tax_amount CHECK (tax_amount >= 0),
     CONSTRAINT chk_invoice_total_amount CHECK (total_amount >= 0)
@@ -39,7 +44,7 @@ CREATE TABLE IF NOT EXISTS invoice_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     invoice_id UUID NOT NULL REFERENCES invoices(id) ON DELETE RESTRICT,
     line_number INTEGER NOT NULL,
-    po_item_id UUID REFERENCES purchase_order_items(id) ON DELETE SET NULL,
+    po_item_id UUID REFERENCES purchase_order_items(id) ON DELETE RESTRICT,
     sku VARCHAR(100),
     description TEXT NOT NULL,
     quantity NUMERIC(18,4) NOT NULL,
