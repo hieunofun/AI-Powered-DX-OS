@@ -264,7 +264,9 @@ Detailed guidelines are documented in [CONTRIBUTING.md](CONTRIBUTING.md).
 ### Option B: Docker Container Orchestration
 
 > [!NOTE]
-> **Container Validation Status**: Docker Compose and Dockerfile specifications are structured and ready. Local runtime validation on this machine is currently **Pending / Blocked** due to Docker CLI unavailability on the host development workstation.
+> **Container Validation Matrix**:
+> - **Local Workstation**: Docker CLI is unavailable on the local host OS (status: **Not Verified / Host Blocked**).
+> - **Continuous Integration (CI)**: Full containerized stack validation (`docker compose config`, `build`, `up -d`, retry healthcheck polling, `GET /health` verification, and shutdown) is automated via [GitHub Actions CI](.github/workflows/ci.yml).
 
 1. **Build and start services**:
    ```bash

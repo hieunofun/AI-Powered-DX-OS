@@ -27,6 +27,7 @@ ENV PORT=4000
 # Copy manifests and install production-only dependencies
 COPY package.json package-lock.json ./
 COPY apps/api/package.json ./apps/api/
+COPY packages/ ./packages/
 RUN npm install --omit=dev
 
 # Copy compiled artifacts from builder

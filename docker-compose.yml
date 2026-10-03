@@ -58,6 +58,7 @@ services:
     environment:
       PORT: ${API_PORT:-4000}
       NODE_ENV: ${NODE_ENV:-production}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
       POSTGRES_HOST: smartprocure-postgres
       POSTGRES_PORT: 5432
       POSTGRES_DB: ${POSTGRES_DB:-smartprocure_db}
