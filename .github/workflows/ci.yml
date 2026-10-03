@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  build-and-test:
+    name: Build, Lint, Test & Validate Docker Stack
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build monorepo applications
+        run: npm run build
+
+      - name: Run code linter
+        run: npm run lint
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Run e2e tests
+        run: npm run test:e2e --workspace=apps/api
+
+      - name: Validate Docker Compose configuration
+        run: docker compose config
+
+      - name: Build Docker containers
+        run: docker compose build
+
+      - name: Start Docker containers
+        run: docker compose up -d
+
+      - name: Wait for services & verify health endpoints
+        run: |
+          echo "Waiting for API health endpoint (http://localhost:4000/health)..."
+          READY=0
+          for i in {1..30}; do
+            if curl -s -f http://localhost:4000/health > /tmp/health.json; then
+              echo "API is responding!"
+              cat /tmp/health.json
+              echo ""
+              READY=1
+              break
+            fi
+            echo "Attempt $i/30: API not ready yet. Waiting 2s..."
+            sleep 2
+          done
+
+          if [ $READY -ne 1 ]; then
+            echo "Error: Timed out waiting for API /health endpoint."
+            docker compose ps
+            docker compose logs smartprocure-api
+            exit 1
+          fi
+
+          echo "Verifying API health response structure..."
+          HTTP_STATUS=$(curl -s -o /tmp/health_resp.json -w "%{http_code}" http://localhost:4000/health)
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "Error: Expected HTTP 200 from API /health, got $HTTP_STATUS"
+            cat /tmp/health_resp.json
+            exit 1
+          fi
+
+          grep -q '"status":"ok"' /tmp/health_resp.json || { echo "Error: Missing 'status: ok' in /health response"; exit 1; }
+          grep -q '"service":"smartprocure-api"' /tmp/health_resp.json || { echo "Error: Missing 'service: smartprocure-api' in /health response"; exit 1; }
+          echo "API /health response verified successfully."
+
+          echo "Waiting for Web client (http://localhost:3000)..."
+          WEB_READY=0
+          for i in {1..15}; do
+            if curl -s -f http://localhost:3000 > /dev/null; then
+              echo "Web client is responding!"
+              WEB_READY=1
+              break
+            fi
+            echo "Attempt $i/15: Web client not ready yet. Waiting 2s..."
+            sleep 2
+          done
+
+          if [ $WEB_READY -ne 1 ]; then
+            echo "Error: Timed out waiting for Web client at http://localhost:3000."
+            docker compose ps
+            docker compose logs smartprocure-web
+            exit 1
+          fi
+
+          WEB_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000)
+          if [ "$WEB_STATUS" != "200" ]; then
+            echo "Error: Expected HTTP 200 from Web client, got $WEB_STATUS"
+            exit 1
+          fi
+          echo "Web client verified successfully."
+
+      - name: Check container status
+        run: docker compose ps
+
+      - name: Print Docker container logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Cleanup Docker containers
+        if: always()
+        run: docker compose down -v

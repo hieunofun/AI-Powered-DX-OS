@@ -82,12 +82,12 @@ When submitting a Pull Request:
 2. Link the corresponding issue in the PR description:
    - `Closes #<issue-number>` or `Fixes #<issue-number>`
 3. Ensure no secrets, tokens, credentials, or `.env` files are included.
-4. Verify that any new third-party dependency is evaluated for license compatibility and documented in [OPEN_SOURCE_COMPONENTS.md](file:///d:/dự%20án%20đi%20thi/OPEN_SOURCE_COMPONENTS.md).
+4. Verify that any new third-party dependency is evaluated for license compatibility and documented in [OPEN_SOURCE_COMPONENTS.md](OPEN_SOURCE_COMPONENTS.md).
 5. Ensure automated linter, formatting, and unit tests pass locally before opening PR.
 
 ---
 
 ## 5. Licensing and Attribution
 
-By contributing to SmartProcure-Pay, you agree that your contributions will be licensed under the project's [MIT License](file:///d:/dự%20án%20đi%20thi/LICENSE).
-For third-party libraries and reused code, please review our [License Policy](file:///d:/dự%20án%20đi%20thi/docs/open-source/LICENSE_POLICY.md).
+By contributing to SmartProcure-Pay, you agree that your contributions will be licensed under the project's [MIT License](LICENSE).
+For third-party libraries and reused code, please review our [License Policy](docs/open-source/LICENSE_POLICY.md).

@@ -102,11 +102,15 @@ The system design aligns with the **Human - Process - Data - Intelligence (H-P-D
 
 To ensure project transparency, system capabilities are explicitly categorized into currently implemented baseline foundation versus planned future milestones:
 
-### Implemented (Phase 0 Baseline)
-- [x] Monorepo workspace structure (`apps/`, `services/`, `packages/`, `infra/`, `database/`, `docs/`).
-- [x] Strict Git branching model (`main`, `develop`, `feature/*`, `fix/*`, `docs/*`).
+### Implemented (Issue #1 Foundation)
+- [x] Monorepo foundation with npm workspaces (`apps/web`, `apps/api`, `packages/*`).
+- [x] React + TypeScript + Vite frontend bootstrap application (`apps/web`).
+- [x] NestJS + TypeScript backend API bootstrap service (`apps/api`).
+- [x] Health endpoint (`GET /health`) with automated unit & Supertest e2e tests.
+- [x] PostgreSQL infrastructure service defined in `docker-compose.yml` with health check.
+- [x] Docker foundation: Multi-stage Dockerfiles for web & api, plus container orchestration config.
 - [x] Open-source licensing compliance and verified dependency inventory.
-- [x] Initial Docker Compose environment and networking skeleton.
+- [x] Strict Git branching model (`main`, `develop`, `feature/*`, `fix/*`, `docs/*`).
 - [x] Ten foundational project backlog issues created and tracked on GitHub.
 
 ### Planned (Subsequent Implementation Phases)
@@ -116,9 +120,10 @@ To ensure project transparency, system capabilities are explicitly categorized i
 - [ ] **Purchase Order Service**: Full lifecycle PO management and validation (*Planned - Issue #5*).
 - [ ] **Goods Receipt Service**: Receiving intake and partial shipment tracking (*Planned - Issue #6*).
 - [ ] **Invoice Ingestion Pipeline**: XML parsing, PDF upload, and MinIO storage (*Planned - Issue #7*).
-- [ ] **3-Way Matching Engine**: High-performance multi-attribute reconciliation (*Planned - Issue #8*).
+- [ ] **3-Way Matching Engine**: Deterministic multi-attribute reconciliation engine (*Planned - Issue #8*).
 - [ ] **Exception Workflow**: Flowable BPMN discrepancy review and approvals (*Planned - Issue #9*).
 - [ ] **Immutable Audit Sealing**: Cryptographic package hashing and ImmuDB integration (*Planned - Issue #10*).
+- [ ] **Intelligence & AI**: Semantic matching embeddings, anomaly detection, AI mismatch explanation (*Planned*).
 - [ ] **Business Dashboard**: Unified web analytics UI for procurement and finance (*Planned - Phase 6*).
 
 ---
@@ -127,20 +132,21 @@ To ensure project transparency, system capabilities are explicitly categorized i
 
 All external open-source platforms and planned framework components are listed with verified licenses:
 
-| Layer | Technology | Version | License | Role |
-| :--- | :--- | :--- | :--- | :--- |
-| **Gateway** | [Apache APISIX](https://apisix.apache.org/) | `3.9.x` | Apache-2.0 | API Gateway & Traffic Policy Controller |
-| **Auth** | [Keycloak](https://www.keycloak.org/) | `24.0.x` | Apache-2.0 | Identity Provider, SSO, and RBAC |
-| **Database** | [PostgreSQL](https://www.postgresql.org/) | `16-alpine` | PostgreSQL License | Primary Relational Transactional Database |
-| **Object Store** | [MinIO](https://min.io/) | `RELEASE.2024-03-30` | GNU AGPLv3 | S3-Compatible Storage for Invoices |
-| **BPMN Engine** | [Flowable](https://www.flowable.com/open-source/) | `6.8.x` | Apache-2.0 | Business Process & Exception Workflow Engine |
-| **Ledger** | [ImmuDB](https://immudb.io/) | `v1.9.x` | Apache-2.0 | Cryptographically Verifiable Immutable Ledger |
-| **Monitoring** | [Prometheus](https://prometheus.io/) | `v2.51.x` | Apache-2.0 | Telemetry & Performance Metrics |
-| **Dashboard** | [Grafana](https://grafana.com/) | `10.4.x` | GNU AGPLv3 | Observability & Metrics Visualization |
-| **Frontend UI** | [React](https://react.dev/) *(Planned)* | `18.x / 19.x` | MIT | Web User Interface |
-| **Backend API** | [NestJS](https://nestjs.com/) *(Planned)* | `10.x` | MIT | Backend Application Framework |
+| Layer | Technology | Version | License | Role | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Gateway** | [Apache APISIX](https://apisix.apache.org/) | `3.9.x` | Apache-2.0 | API Gateway & Traffic Policy Controller | Planned |
+| **Auth** | [Keycloak](https://www.keycloak.org/) | `24.0.x` | Apache-2.0 | Identity Provider, SSO, and RBAC | Planned |
+| **Database** | [PostgreSQL](https://www.postgresql.org/) | `16-alpine` | PostgreSQL License | Primary Relational Transactional Database | Service Defined |
+| **Object Store** | [MinIO](https://min.io/) | `RELEASE.2024-03-30` | GNU AGPLv3 | S3-Compatible Storage for Invoices | Planned |
+| **BPMN Engine** | [Flowable](https://www.flowable.com/open-source/) | `6.8.x` | Apache-2.0 | Business Process & Exception Workflow Engine | Planned |
+| **Ledger** | [ImmuDB](https://immudb.io/) | `v1.9.x` | Apache-2.0 | Cryptographically Verifiable Immutable Ledger | Planned |
+| **Monitoring** | [Prometheus](https://prometheus.io/) | `v2.51.x` | Apache-2.0 | Telemetry & Performance Metrics | Planned |
+| **Dashboard** | [Grafana](https://grafana.com/) | `10.4.x` | GNU AGPLv3 | Observability & Metrics Visualization | Planned |
+| **Frontend UI** | [React](https://react.dev/) | `^18.3.1` | MIT | Web User Interface | Integrated |
+| **Frontend Tooling** | [Vite](https://vitejs.dev/) | `^5.3.1` | MIT | Frontend Build Tooling & Dev Server | Integrated |
+| **Backend API** | [NestJS](https://nestjs.com/) | `^10.3.9` | MIT | Backend Application Framework | Integrated |
 
-For complete licensing details and integration classifications, refer to [OPEN_SOURCE_COMPONENTS.md](file:///d:/dự%20án%20đi%20thi/OPEN_SOURCE_COMPONENTS.md).
+For complete licensing details and integration classifications, refer to [OPEN_SOURCE_COMPONENTS.md](OPEN_SOURCE_COMPONENTS.md).
 
 ---
 
@@ -150,7 +156,7 @@ For complete licensing details and integration classifications, refer to [OPEN_S
 SmartProcure-Pay/
 ├── apps/                         # User-facing applications
 │   ├── web/                      # Web frontend client
-│   └── api/                      # Main API gateway service
+│   └── api/                      # Backend application API service
 ├── services/                     # Domain-specific backend microservices
 ├── packages/                     # Reusable monorepo shared packages
 │   ├── contracts/                # API contracts, DTOs & OpenAPI definitions
@@ -202,7 +208,7 @@ We enforce an issue-driven, peer-reviewed development methodology:
 2. **Commit Standard**: Conventional Commits format (`feat(procurement): implement PO creation`).
 3. **Pull Requests**: Pull Requests must target `develop` and link issues via `Closes #<issue>`.
 
-Detailed guidelines are documented in [CONTRIBUTING.md](file:///d:/dự%20án%20đi%20thi/CONTRIBUTING.md).
+Detailed guidelines are documented in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
@@ -211,42 +217,84 @@ Detailed guidelines are documented in [CONTRIBUTING.md](file:///d:/dự%20án%20
 ### Prerequisites
 - [Git](https://git-scm.com/) (>= 2.40)
 - [Node.js](https://nodejs.org/) (>= 20.x LTS)
-- [Docker](https://www.docker.com/) & Docker Compose (optional for Phase 0 verification)
+- [npm](https://www.npmjs.com/) (>= 10.x)
+- [Docker](https://www.docker.com/) & Docker Compose (optional for containerized runtime)
 
-### Setup Instructions
+---
 
-1. **Clone the repository**:
+### Option A: Local Development (Host Environment)
+
+1. **Clone the repository and switch to develop**:
    ```bash
    git clone https://github.com/hieunofun/SmartProcure-Pay.git
    cd SmartProcure-Pay
-   ```
-
-2. **Switch to integration branch**:
-   ```bash
    git checkout develop
    ```
 
-3. **Configure environment variables**:
+2. **Configure environment variables**:
    ```bash
    cp .env.example .env
-   # Edit .env with local configuration parameters
    ```
 
-4. **Inspect infrastructure skeleton**:
+3. **Install monorepo dependencies**:
    ```bash
-   # Verify docker-compose skeleton syntax
-   docker compose config
+   npm install
    ```
 
-*(Note: Business logic, web UI, and backend services will be deployed in subsequent milestones according to the project roadmap).*
+4. **Build and test all workspaces**:
+   ```bash
+   npm run build
+   npm run test
+   ```
+
+5. **Start development servers**:
+   - Backend API (Port 4000):
+     ```bash
+     npm run dev:api
+     ```
+     Verify health endpoint: `curl http://localhost:4000/health`
+   - Frontend Web Client (Port 3000):
+     ```bash
+     npm run dev:web
+     ```
+     Access UI in browser at: `http://localhost:3000`
+
+---
+
+### Option B: Docker Container Orchestration
+
+> [!NOTE]
+> **Container Validation Matrix**:
+> - **Local Workstation**: Docker CLI is unavailable on the local host OS (status: **Not Verified / Host Blocked**).
+> - **Continuous Integration (CI)**: Full containerized stack validation (`docker compose config`, `build`, `up -d`, retry healthcheck polling, `GET /health` verification, and shutdown) is automated via [GitHub Actions CI](.github/workflows/ci.yml).
+
+1. **Build and start services**:
+   ```bash
+   docker compose up --build -d
+   ```
+
+2. **Verify container status**:
+   ```bash
+   docker compose ps
+   ```
+
+3. **Check endpoints**:
+   - Web Client: `http://localhost:3000`
+   - API Health: `http://localhost:4000/health`
+   - PostgreSQL: `localhost:5432`
+
+4. **Stop containers**:
+   ```bash
+   docker compose down
+   ```
 
 ---
 
 ## 11. Open Source & Licensing
 
-- **Original Code**: Code developed by the SmartProcure-Pay team is licensed under the [MIT License](file:///d:/dự%20án%20đi%20thi/LICENSE).
+- **Original Code**: Code developed by the SmartProcure-Pay team is licensed under the [MIT License](LICENSE).
 - **Third-Party Open Source**: Upstream components (Keycloak, APISIX, PostgreSQL, MinIO, Flowable, ImmuDB, Prometheus, Grafana) are utilized under their respective open-source licenses.
-- **Compliance Policy**: Full open-source governance and compliance rules are defined in [LICENSE_POLICY.md](file:///d:/dự%20án%20đi%20thi/docs/open-source/LICENSE_POLICY.md).
+- **Compliance Policy**: Full open-source governance and compliance rules are defined in [LICENSE_POLICY.md](docs/open-source/LICENSE_POLICY.md).
 
 ---
 

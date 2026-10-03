@@ -12,14 +12,22 @@ Every license listed below has been verified against the official upstream repos
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Keycloak** | [keycloak/keycloak](https://github.com/keycloak/keycloak) | `24.0.x` | Apache-2.0 | Identity & Access Management (SSO, OIDC, RBAC) | Docker Service | Planned |
 | **Apache APISIX** | [apache/apisix](https://github.com/apache/apisix) | `3.9.x` | Apache-2.0 | API Gateway (Reverse proxy, rate limiting, routing, JWT validation) | Docker Service | Planned |
-| **PostgreSQL** | [postgres/postgres](https://github.com/postgres/postgres) | `16-alpine` | PostgreSQL License | Primary Relational Data Store (Domain models, ledger transactions) | Docker Service | Planned |
+| **PostgreSQL** | [postgres/postgres](https://github.com/postgres/postgres) | `16-alpine` | PostgreSQL License | Primary Relational Data Store (Domain models, ledger transactions) | Docker Service | Service Defined |
 | **MinIO** | [minio/minio](https://github.com/minio/minio) | `RELEASE.2024-03-30` | GNU AGPLv3 | S3-Compatible Object Storage (Raw invoices: PDF, XML, images) | Docker Service | Planned |
 | **Flowable** | [flowable/flowable-engine](https://github.com/flowable/flowable-engine) | `6.8.x` | Apache-2.0 | BPMN 2.0 Business Process Engine (Discrepancy & approval workflows) | Docker Service | Planned |
 | **ImmuDB** | [codenotary/immudb](https://github.com/codenotary/immudb) | `v1.9.x` | Apache-2.0 | Cryptographic Immutable Ledger (Tamper-evident audit trail sealing) | Docker Service | Planned |
 | **Prometheus** | [prometheus/prometheus](https://github.com/prometheus/prometheus) | `v2.51.x` | Apache-2.0 | System & Business Metrics Monitoring | Docker Service | Planned |
 | **Grafana** | [grafana/grafana](https://github.com/grafana/grafana) | `10.4.x` | GNU AGPLv3 | Operational & Observability Dashboards | Docker Service | Planned |
-| **React** | [facebook/react](https://github.com/facebook/react) | `18.x / 19.x` | MIT | Web UI Frontend Application Framework | Dependency | Planned |
-| **NestJS** | [nestjs/nest](https://github.com/nestjs/nest) | `10.x` | MIT | Backend Application Framework & Modular Services | Dependency | Planned |
+| **React** | [facebook/react](https://github.com/facebook/react) | `^18.3.1` | MIT | Web UI Frontend Application Framework | Dependency | Integrated |
+| **NestJS** | [nestjs/nest](https://github.com/nestjs/nest) | `^10.3.9` | MIT | Backend Application Framework & Modular Services | Dependency | Integrated |
+| **Vite** | [vitejs/vite](https://github.com/vitejs/vite) | `^5.3.1` | MIT | Frontend Build Tooling & Development Server | Dependency | Integrated |
+| **TypeScript** | [microsoft/TypeScript](https://github.com/microsoft/TypeScript) | `^5.4.5` | Apache-2.0 | Static Type Checking and Code Compilation | Dependency | Integrated |
+| **Supertest** | [ladjs/supertest](https://github.com/ladjs/supertest) | `^7.0.0` | MIT | HTTP Assertions for E2E Health Testing | Dependency | Integrated |
+| **Jest** | [jestjs/jest](https://github.com/jestjs/jest) | `^29.7.0` | MIT | Test Runner and Assertion Framework | Dependency | Integrated |
+| **ESLint** | [eslint/eslint](https://github.com/eslint/eslint) | `^8.57.1` | MIT | Pluggable JavaScript & TypeScript Linter | Dependency | Integrated |
+| **typescript-eslint** | [typescript-eslint/typescript-eslint](https://github.com/typescript-eslint/typescript-eslint) | `^7.18.0` | BSD-2-Clause | Tooling for TypeScript Linting Integration | Dependency | Integrated |
+| **eslint-plugin-react-hooks** | [facebook/react](https://github.com/facebook/react/tree/main/packages/eslint-plugin-react-hooks) | `^4.6.2` | MIT | React Hooks Rules Enforcement | Dependency | Integrated |
+| **eslint-plugin-react** | [jsx-eslint/eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) | `^7.37.5` | MIT | React-Specific Linting Rules | Dependency | Integrated |
 
 ---
 
@@ -32,4 +40,4 @@ Every license listed below has been verified against the official upstream repos
 2. **AGPL-3.0 Components (MinIO, Grafana)**:
    - MinIO and Grafana are used as unmodified external services (deployed via container orchestration).
    - Any distribution or deployment license obligations must be respected in accordance with their respective upstream licenses.
-   - For internal guidelines on adding new dependencies, see [License Policy](file:///d:/dự%20án%20đi%20thi/docs/open-source/LICENSE_POLICY.md).
+   - For internal guidelines on adding new dependencies, see [License Policy](docs/open-source/LICENSE_POLICY.md).
