@@ -22,6 +22,36 @@ BEFORE UPDATE ON approval_cases
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
 
+-- -----------------------------------------------------------------------------
+-- Consistency Check: approval_cases match_result_id must belong to the same invoice
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION check_approval_case_document_consistency()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_match_inv_id UUID;
+BEGIN
+    IF NEW.match_result_id IS NOT NULL THEN
+        SELECT invoice_id INTO v_match_inv_id
+        FROM match_results
+        WHERE id = NEW.match_result_id;
+
+        IF v_match_inv_id IS DISTINCT FROM NEW.invoice_id THEN
+            RAISE EXCEPTION 'Cross-document integrity violation: approval_cases match_result_id (%) belongs to invoice %, not %',
+                NEW.match_result_id, v_match_inv_id, NEW.invoice_id
+                USING ERRCODE = 'check_violation';
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_check_approval_case_document_consistency
+BEFORE INSERT OR UPDATE OF invoice_id, match_result_id
+ON approval_cases
+FOR EACH ROW
+EXECUTE FUNCTION check_approval_case_document_consistency();
+
 CREATE TABLE IF NOT EXISTS audit_records (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     entity_type VARCHAR(50) NOT NULL,

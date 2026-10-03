@@ -46,3 +46,61 @@ CREATE TRIGGER trg_goods_receipt_items_updated_at
 BEFORE UPDATE ON goods_receipt_items
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
+
+-- -----------------------------------------------------------------------------
+-- Consistency Check: GRN Item must reference PO Item of the same Purchase Order
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION check_grn_item_po_consistency()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_grn_po_id UUID;
+    v_po_item_po_id UUID;
+BEGIN
+    SELECT purchase_order_id INTO v_grn_po_id
+    FROM goods_receipts
+    WHERE id = NEW.goods_receipt_id;
+
+    SELECT purchase_order_id INTO v_po_item_po_id
+    FROM purchase_order_items
+    WHERE id = NEW.purchase_order_item_id;
+
+    IF v_grn_po_id IS DISTINCT FROM v_po_item_po_id THEN
+        RAISE EXCEPTION 'Cross-PO integrity violation: goods_receipt_item (PO item %) does not belong to parent goods_receipt purchase_order (%)',
+            NEW.purchase_order_item_id, v_grn_po_id
+            USING ERRCODE = 'check_violation';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_check_grn_item_po_consistency
+BEFORE INSERT OR UPDATE OF goods_receipt_id, purchase_order_item_id
+ON goods_receipt_items
+FOR EACH ROW
+EXECUTE FUNCTION check_grn_item_po_consistency();
+
+CREATE OR REPLACE FUNCTION check_grn_parent_po_consistency()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.purchase_order_id IS DISTINCT FROM OLD.purchase_order_id THEN
+        IF EXISTS (
+            SELECT 1
+            FROM goods_receipt_items gri
+            JOIN purchase_order_items poi ON gri.purchase_order_item_id = poi.id
+            WHERE gri.goods_receipt_id = NEW.id
+              AND poi.purchase_order_id IS DISTINCT FROM NEW.purchase_order_id
+        ) THEN
+            RAISE EXCEPTION 'Cross-PO integrity violation: cannot change goods_receipt purchase_order_id because child items reference another purchase_order'
+                USING ERRCODE = 'check_violation';
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_check_grn_parent_po_consistency
+BEFORE UPDATE OF purchase_order_id
+ON goods_receipts
+FOR EACH ROW
+EXECUTE FUNCTION check_grn_parent_po_consistency();

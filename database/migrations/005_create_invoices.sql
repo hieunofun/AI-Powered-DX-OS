@@ -64,3 +64,64 @@ CREATE TRIGGER trg_invoice_items_updated_at
 BEFORE UPDATE ON invoice_items
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
+
+-- -----------------------------------------------------------------------------
+-- Consistency Check: Invoice Item must reference PO Item of the same Purchase Order
+-- (when po_item_id IS NOT NULL)
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION check_invoice_item_po_consistency()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_inv_po_id UUID;
+    v_po_item_po_id UUID;
+BEGIN
+    IF NEW.po_item_id IS NOT NULL THEN
+        SELECT purchase_order_id INTO v_inv_po_id
+        FROM invoices
+        WHERE id = NEW.invoice_id;
+
+        SELECT purchase_order_id INTO v_po_item_po_id
+        FROM purchase_order_items
+        WHERE id = NEW.po_item_id;
+
+        IF v_inv_po_id IS DISTINCT FROM v_po_item_po_id THEN
+            RAISE EXCEPTION 'Cross-PO integrity violation: invoice_item (po_item_id %) does not belong to parent invoice purchase_order (%)',
+                NEW.po_item_id, v_inv_po_id
+                USING ERRCODE = 'check_violation';
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_check_invoice_item_po_consistency
+BEFORE INSERT OR UPDATE OF invoice_id, po_item_id
+ON invoice_items
+FOR EACH ROW
+EXECUTE FUNCTION check_invoice_item_po_consistency();
+
+CREATE OR REPLACE FUNCTION check_invoice_parent_po_consistency()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.purchase_order_id IS DISTINCT FROM OLD.purchase_order_id THEN
+        IF EXISTS (
+            SELECT 1
+            FROM invoice_items ii
+            JOIN purchase_order_items poi ON ii.po_item_id = poi.id
+            WHERE ii.invoice_id = NEW.id
+              AND poi.purchase_order_id IS DISTINCT FROM NEW.purchase_order_id
+        ) THEN
+            RAISE EXCEPTION 'Cross-PO integrity violation: cannot change invoice purchase_order_id because child items reference another purchase_order'
+                USING ERRCODE = 'check_violation';
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_check_invoice_parent_po_consistency
+BEFORE UPDATE OF purchase_order_id
+ON invoices
+FOR EACH ROW
+EXECUTE FUNCTION check_invoice_parent_po_consistency();
