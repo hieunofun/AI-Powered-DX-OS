@@ -2,7 +2,7 @@
   "name": "@smartprocure/api",
   "version": "0.1.0",
   "private": true,
-  "description": "SmartProcure-Pay Backend API Gateway Service",
+  "description": "SmartProcure-Pay Backend Application API",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/main.js",

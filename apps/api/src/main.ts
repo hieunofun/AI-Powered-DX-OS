@@ -6,9 +6,14 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
-  // Enable Cross-Origin Resource Sharing for frontend client
+  // Configure CORS using environment variable with a safe localhost default
+  const corsOriginEnv = process.env.CORS_ORIGIN || 'http://localhost:3000';
+  const corsOrigins = corsOriginEnv.includes(',')
+    ? corsOriginEnv.split(',').map((origin) => origin.trim())
+    : corsOriginEnv;
+
   app.enableCors({
-    origin: '*',
+    origin: corsOrigins,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
@@ -16,6 +21,7 @@ async function bootstrap() {
   const port = process.env.API_PORT || process.env.PORT || 4000;
   await app.listen(port);
   logger.log(`SmartProcure-Pay API running on port ${port} (Health: http://localhost:${port}/health)`);
+  logger.log(`CORS allowed origins: ${JSON.stringify(corsOrigins)}`);
 }
 
 bootstrap();
