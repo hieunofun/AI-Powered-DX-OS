@@ -14,6 +14,10 @@ COPY packages/ ./packages/
 # Install build dependencies
 RUN npm install
 
+# Build-time argument for API Base URL
+ARG VITE_API_BASE_URL=http://localhost:4000
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+
 # Copy web source and compile production bundle
 COPY apps/web/ ./apps/web/
 RUN npm run build:web
