@@ -109,6 +109,11 @@ jobs:
           fi
           echo "Web client verified successfully."
 
+      - name: Validate PostgreSQL domain schema & constraints
+        run: |
+          chmod +x database/scripts/validate-schema.sh
+          bash database/scripts/validate-schema.sh
+
       - name: Check container status
         run: docker compose ps
 
