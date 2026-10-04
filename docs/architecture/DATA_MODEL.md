@@ -103,10 +103,20 @@ erDiagram
         uuid goods_receipt_id FK
         uuid purchase_order_item_id FK
         integer line_number
+        varchar lot_number
         numeric received_quantity
         numeric accepted_quantity
         numeric rejected_quantity
         text damage_note
+    }
+
+    goods_receipt_policies {
+        uuid id PK
+        varchar policy_code UK
+        numeric over_delivery_tolerance_percent
+        boolean is_active
+        timestamptz created_at
+        timestamptz updated_at
     }
     
     invoices {
@@ -297,6 +307,10 @@ The schema directly supports complex partial fulfillment workflows:
    - When a new invoice arrives, the Matching Engine verifies that the invoiced quantity does not exceed the remaining uninvoiced goods:
      $$\text{Available to Invoice} = \sum (\text{GRN.accepted\_quantity}) - \sum (\text{Previous Invoices.quantity})$$
    - If an invoice requests more than the available quantity, the system flags a **Quantity Discrepancy Exception**.
+3. **Goods Receipt Schema Extensions (Issue #6 - Migration 010)**:
+   - **Lot / Batch Tracking**: Nullable `lot_number VARCHAR(100)` added to `goods_receipt_items`. Multiple GRN lines can reference the same PO item across distinct lots.
+   - **GRN Numbering Sequence**: Concurrency-safe sequence `goods_receipt_number_seq` generates formatted identifiers `GRN-YYYY-XXXXXX`.
+   - **Warehouse Receipt Policy**: Dedicated table `goods_receipt_policies` controls warehouse over-delivery tolerance (`over_delivery_tolerance_percent NUMERIC(5,2)` between 0.00% and 100.00%). A partial unique index `uq_goods_receipt_policies_active` (`WHERE is_active = true`) guarantees exactly one active warehouse receipt policy deterministically.
 
 ---
 
