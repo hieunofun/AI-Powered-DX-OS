@@ -36,9 +36,9 @@ describe('PurchaseOrdersService', () => {
     status: PurchaseOrderStatus.DRAFT,
     orderDate: '2026-10-04',
     expectedDeliveryDate: '2026-10-20',
-    subtotal: 1000,
-    taxAmount: 100,
-    totalAmount: 1100,
+    subtotal: '1000.00',
+    taxAmount: '100.00',
+    totalAmount: '1100.00',
     version: 1,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -49,12 +49,12 @@ describe('PurchaseOrdersService', () => {
         lineNumber: 1,
         sku: 'ITEM-1',
         description: 'Test Item',
-        orderedQuantity: 10,
-        unitPrice: 100,
-        taxRate: 0.1,
-        lineSubtotal: 1000,
-        taxAmount: 100,
-        lineTotal: 1100,
+        orderedQuantity: '10',
+        unitPrice: '100.00',
+        taxRate: '0.10',
+        lineSubtotal: '1000.00',
+        taxAmount: '100.00',
+        lineTotal: '1100.00',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -76,7 +76,10 @@ describe('PurchaseOrdersService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PurchaseOrdersService,
-        { provide: PurchaseOrdersRepository, useValue: mockRepo },
+        {
+          provide: PurchaseOrdersRepository,
+          useValue: mockRepo,
+        },
       ],
     }).compile();
 
@@ -85,210 +88,244 @@ describe('PurchaseOrdersService', () => {
   });
 
   describe('create', () => {
-    it('creates a new Purchase Order when supplier is active and items are valid', async () => {
-      repository.getSupplier.mockResolvedValue(mockActiveSupplier);
-      repository.createPO.mockResolvedValue(mockDraftPO as any);
-
-      const result = await service.create(
+    const validDto = {
+      supplierId: mockActiveSupplier.id,
+      currency: 'vnd',
+      orderDate: '2026-10-04',
+      expectedDeliveryDate: '2026-10-15',
+      items: [
         {
-          supplierId: mockActiveSupplier.id,
-          currency: 'VND',
-          orderDate: '2026-10-04',
-          expectedDeliveryDate: '2026-10-20',
-          items: [
-            {
-              sku: 'ITEM-1',
-              description: 'Test Item',
-              orderedQuantity: 10,
-              unitPrice: 100,
-              taxRate: 0.1,
-            },
-          ],
+          sku: 'ITM-1',
+          description: 'High Precision Sensor',
+          orderedQuantity: '10',
+          unitPrice: '150.50',
+          taxRate: '0.10',
         },
-        mockUser,
-      );
+      ],
+    };
 
-      expect(result).toBeDefined();
-      expect(result.poNumber).toBe('PO-2026-000001');
-      expect(repository.createPO).toHaveBeenCalled();
+    it('creates a PO successfully with active supplier and server-calculated totals', async () => {
+      repository.getSupplier.mockResolvedValue(mockActiveSupplier);
+      repository.createPO.mockResolvedValue(mockDraftPO);
+
+      const result = await service.create(validDto, mockUser);
+
+      expect(repository.getSupplier).toHaveBeenCalledWith(mockActiveSupplier.id);
+      expect(repository.generatePoNumber).toHaveBeenCalled();
+      expect(repository.createPO).toHaveBeenCalledWith(
+        expect.objectContaining({
+          currency: 'VND', // uppercase normalized
+          subtotal: '1505.00',
+          taxAmount: '150.50',
+          totalAmount: '1655.50',
+        }),
+        expect.arrayContaining([
+          expect.objectContaining({
+            lineSubtotal: '1505.00',
+            taxAmount: '150.50',
+            lineTotal: '1655.50',
+          }),
+        ]),
+        { subject: mockUser.sub, roles: mockUser.roles },
+      );
+      expect(result).toEqual(mockDraftPO);
     });
 
-    it('throws BadRequestException when supplier does not exist', async () => {
+    it('throws BadRequestException if supplier does not exist', async () => {
       repository.getSupplier.mockResolvedValue(null);
 
-      await expect(
-        service.create(
-          {
-            supplierId: 'non-existent-uuid',
-            currency: 'VND',
-            orderDate: '2026-10-04',
-            items: [{ description: 'Test', orderedQuantity: 1, unitPrice: 10 }],
-          },
-          mockUser,
-        ),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.create(validDto, mockUser)).rejects.toThrow(BadRequestException);
     });
 
-    it('throws BadRequestException when supplier is not active', async () => {
+    it('throws BadRequestException if supplier is INACTIVE', async () => {
       repository.getSupplier.mockResolvedValue(mockInactiveSupplier);
 
-      await expect(
-        service.create(
-          {
-            supplierId: mockInactiveSupplier.id,
-            currency: 'VND',
-            orderDate: '2026-10-04',
-            items: [{ description: 'Test', orderedQuantity: 1, unitPrice: 10 }],
-          },
-          mockUser,
-        ),
-      ).rejects.toThrow(/not active/);
+      await expect(service.create(validDto, mockUser)).rejects.toThrow(
+        /is not active/,
+      );
     });
 
-    it('throws BadRequestException when items array is empty', async () => {
+    it('throws BadRequestException if expectedDeliveryDate is earlier than orderDate', async () => {
       repository.getSupplier.mockResolvedValue(mockActiveSupplier);
 
       await expect(
         service.create(
           {
-            supplierId: mockActiveSupplier.id,
-            currency: 'VND',
-            orderDate: '2026-10-04',
-            items: [],
+            ...validDto,
+            orderDate: '2026-10-10',
+            expectedDeliveryDate: '2026-10-05',
           },
           mockUser,
         ),
-      ).rejects.toThrow(/at least one line item/);
+      ).rejects.toThrow(/cannot be earlier than orderDate/);
+    });
+
+    it('throws BadRequestException if items array is empty', async () => {
+      repository.getSupplier.mockResolvedValue(mockActiveSupplier);
+
+      await expect(service.create({ ...validDto, items: [] }, mockUser)).rejects.toThrow(
+        /must contain at least one line item/,
+      );
     });
   });
 
   describe('update', () => {
-    it('updates a DRAFT Purchase Order successfully', async () => {
-      repository.findById.mockResolvedValue(mockDraftPO as any);
-      const updatedPO = { ...mockDraftPO, version: 2 };
-      repository.updateDraftPO.mockResolvedValue(updatedPO as any);
+    it('updates a DRAFT PO successfully', async () => {
+      repository.findById.mockResolvedValue(mockDraftPO);
+      repository.updateDraftPO.mockResolvedValue({
+        ...mockDraftPO,
+        currency: 'USD',
+        version: 2,
+      });
 
       const result = await service.update(
         mockDraftPO.id,
-        {
-          expectedVersion: 1,
-          orderDate: '2026-10-05',
-        },
+        { expectedVersion: 1, currency: 'usd' },
         mockUser,
       );
 
-      expect(result.version).toBe(2);
       expect(repository.updateDraftPO).toHaveBeenCalledWith(
         mockDraftPO.id,
         1,
-        expect.objectContaining({ orderDate: '2026-10-05' }),
+        expect.objectContaining({ currency: 'USD' }),
         undefined,
-        expect.objectContaining({ subject: mockUser.sub }),
+        { subject: mockUser.sub, roles: mockUser.roles },
       );
+      expect(result.version).toBe(2);
     });
 
-    it('throws ConflictException when updating an order not in DRAFT', async () => {
+    it('throws ConflictException if attempting to update non-DRAFT PO', async () => {
       repository.findById.mockResolvedValue({
         ...mockDraftPO,
         status: PurchaseOrderStatus.ISSUED,
-      } as any);
+      });
 
       await expect(
-        service.update(
-          mockDraftPO.id,
-          { expectedVersion: 1, orderDate: '2026-10-05' },
-          mockUser,
-        ),
+        service.update(mockDraftPO.id, { expectedVersion: 1, currency: 'USD' }, mockUser),
       ).rejects.toThrow(ConflictException);
     });
 
-    it('throws ConflictException when expectedVersion does not match current version', async () => {
-      repository.findById.mockResolvedValue(mockDraftPO as any);
-      repository.updateDraftPO.mockRejectedValue(
-        new ConflictException('Optimistic lock conflict'),
-      );
+    it('throws BadRequestException if updating with inactive supplier', async () => {
+      repository.findById.mockResolvedValue(mockDraftPO);
+      repository.getSupplier.mockResolvedValue(mockInactiveSupplier);
 
       await expect(
         service.update(
           mockDraftPO.id,
-          { expectedVersion: 99, orderDate: '2026-10-05' },
+          { expectedVersion: 1, supplierId: mockInactiveSupplier.id },
           mockUser,
         ),
-      ).rejects.toThrow(ConflictException);
+      ).rejects.toThrow(/is inactive/);
+    });
+
+    it('throws BadRequestException if updated expectedDeliveryDate < orderDate', async () => {
+      repository.findById.mockResolvedValue(mockDraftPO);
+
+      await expect(
+        service.update(
+          mockDraftPO.id,
+          { expectedVersion: 1, expectedDeliveryDate: '2026-10-01' },
+          mockUser,
+        ),
+      ).rejects.toThrow(/cannot be earlier than orderDate/);
     });
   });
 
   describe('issue', () => {
-    it('issues a DRAFT Purchase Order transitioning to ISSUED', async () => {
-      repository.findById.mockResolvedValue(mockDraftPO as any);
+    it('issues a DRAFT PO when supplier is ACTIVE, items exist, and totals reconcile', async () => {
+      repository.findById.mockResolvedValue(mockDraftPO);
       repository.getSupplier.mockResolvedValue(mockActiveSupplier);
       repository.issuePO.mockResolvedValue({
         ...mockDraftPO,
         status: PurchaseOrderStatus.ISSUED,
         version: 2,
-      } as any);
+      });
 
       const result = await service.issue(mockDraftPO.id, { expectedVersion: 1 }, mockUser);
+
+      expect(repository.issuePO).toHaveBeenCalledWith(mockDraftPO.id, 1, {
+        subject: mockUser.sub,
+        roles: mockUser.roles,
+      });
       expect(result.status).toBe(PurchaseOrderStatus.ISSUED);
-      expect(result.version).toBe(2);
     });
 
-    it('throws ConflictException when issuing an order not in DRAFT', async () => {
+    it('throws ConflictException if stored totals do not reconcile with item-derived totals', async () => {
+      // Mock PO with manipulated/corrupted stored subtotal
+      const corruptedPO = {
+        ...mockDraftPO,
+        subtotal: '9999.00', // Does not equal 10 * 100 = 1000.00
+      };
+      repository.findById.mockResolvedValue(corruptedPO);
+      repository.getSupplier.mockResolvedValue(mockActiveSupplier);
+
+      await expect(
+        service.issue(mockDraftPO.id, { expectedVersion: 1 }, mockUser),
+      ).rejects.toThrow(ConflictException);
+      expect(repository.issuePO).not.toHaveBeenCalled();
+    });
+
+    it('throws ConflictException if PO is not in DRAFT', async () => {
       repository.findById.mockResolvedValue({
         ...mockDraftPO,
         status: PurchaseOrderStatus.ISSUED,
-      } as any);
+      });
 
       await expect(
         service.issue(mockDraftPO.id, { expectedVersion: 1 }, mockUser),
       ).rejects.toThrow(ConflictException);
     });
+
+    it('throws BadRequestException if supplier became INACTIVE before issue', async () => {
+      repository.findById.mockResolvedValue(mockDraftPO);
+      repository.getSupplier.mockResolvedValue(mockInactiveSupplier);
+
+      await expect(
+        service.issue(mockDraftPO.id, { expectedVersion: 1 }, mockUser),
+      ).rejects.toThrow(/not active/);
+    });
   });
 
   describe('cancel', () => {
-    it('cancels a DRAFT Purchase Order with mandatory reason', async () => {
-      repository.findById.mockResolvedValue(mockDraftPO as any);
+    it('cancels a DRAFT or ISSUED PO with non-blank reason', async () => {
+      repository.findById.mockResolvedValue(mockDraftPO);
       repository.cancelPO.mockResolvedValue({
         ...mockDraftPO,
         status: PurchaseOrderStatus.CANCELLED,
-        cancelledReason: 'Specifications revised',
         version: 2,
-      } as any);
+      });
 
       const result = await service.cancel(
         mockDraftPO.id,
-        { expectedVersion: 1, reason: 'Specifications revised' },
+        { expectedVersion: 1, reason: '  Vendor could not meet schedule  ' },
         mockUser,
       );
 
+      expect(repository.cancelPO).toHaveBeenCalledWith(
+        mockDraftPO.id,
+        1,
+        'Vendor could not meet schedule', // trimmed
+        { subject: mockUser.sub, roles: mockUser.roles },
+      );
       expect(result.status).toBe(PurchaseOrderStatus.CANCELLED);
-      expect(result.cancelledReason).toBe('Specifications revised');
     });
 
-    it('throws BadRequestException when cancellation reason is blank', async () => {
-      repository.findById.mockResolvedValue(mockDraftPO as any);
+    it('throws BadRequestException if cancellation reason is blank', async () => {
+      repository.findById.mockResolvedValue(mockDraftPO);
 
       await expect(
-        service.cancel(
-          mockDraftPO.id,
-          { expectedVersion: 1, reason: '   ' },
-          mockUser,
-        ),
-      ).rejects.toThrow(BadRequestException);
+        service.cancel(mockDraftPO.id, { expectedVersion: 1, reason: '   ' }, mockUser),
+      ).rejects.toThrow(/cannot be blank/);
     });
 
-    it('throws ConflictException when trying to cancel a CLOSED order', async () => {
+    it('throws ConflictException if attempting to cancel a CLOSED PO', async () => {
       repository.findById.mockResolvedValue({
         ...mockDraftPO,
         status: PurchaseOrderStatus.CLOSED,
-      } as any);
+      });
 
       await expect(
-        service.cancel(
-          mockDraftPO.id,
-          { expectedVersion: 1, reason: 'Too late' },
-          mockUser,
-        ),
+        service.cancel(mockDraftPO.id, { expectedVersion: 1, reason: 'Late delivery' }, mockUser),
       ).rejects.toThrow(ConflictException);
     });
   });

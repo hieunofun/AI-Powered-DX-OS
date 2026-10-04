@@ -117,12 +117,12 @@ describe('PurchaseOrdersController (e2e)', () => {
           lineNumber: it.lineNumber,
           sku: it.sku || null,
           description: it.description,
-          orderedQuantity: it.orderedQuantity,
-          unitPrice: it.unitPrice,
-          taxRate: it.taxRate,
-          lineSubtotal: it.lineSubtotal,
-          taxAmount: it.taxAmount,
-          lineTotal: it.lineTotal,
+          orderedQuantity: String(it.orderedQuantity),
+          unitPrice: String(it.unitPrice),
+          taxRate: String(it.taxRate),
+          lineSubtotal: String(it.lineSubtotal),
+          taxAmount: String(it.taxAmount),
+          lineTotal: String(it.lineTotal),
           createdAt: new Date(),
           updatedAt: new Date(),
         })),
@@ -363,7 +363,7 @@ describe('PurchaseOrdersController (e2e)', () => {
         .expect(400);
 
       expect(Array.isArray(res.body.message) ? res.body.message.join(' ') : res.body.message).toContain(
-        'orderedQuantity must be a positive number',
+        'orderedQuantity must be a valid strictly positive decimal',
       );
     });
   });
@@ -419,13 +419,13 @@ describe('PurchaseOrdersController (e2e)', () => {
       // Subtotal: 300.75 + 99.00 = 399.75
       // Tax: 30.08 + 7.92 = 38.00
       // Total: 399.75 + 38.00 = 437.75
-      expect(res.body.subtotal).toBe(399.75);
-      expect(res.body.taxAmount).toBe(38);
-      expect(res.body.totalAmount).toBe(437.75);
+      expect(res.body.subtotal).toBe('399.75');
+      expect(res.body.taxAmount).toBe('38.00');
+      expect(res.body.totalAmount).toBe('437.75');
       expect(res.body.items).toHaveLength(2);
-      expect(res.body.items[0].lineSubtotal).toBe(300.75);
-      expect(res.body.items[0].taxAmount).toBe(30.08);
-      expect(res.body.items[0].lineTotal).toBe(330.83);
+      expect(res.body.items[0].lineSubtotal).toBe('300.75');
+      expect(res.body.items[0].taxAmount).toBe('30.08');
+      expect(res.body.items[0].lineTotal).toBe('330.83');
     });
   });
 
