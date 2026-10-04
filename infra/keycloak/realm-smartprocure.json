@@ -58,11 +58,15 @@
       },
       "redirectUris": [
         "http://localhost:3000/*",
-        "http://127.0.0.1:3000/*"
+        "http://127.0.0.1:3000/*",
+        "http://localhost:9080/*",
+        "http://127.0.0.1:9080/*"
       ],
       "webOrigins": [
         "http://localhost:3000",
-        "http://127.0.0.1:3000"
+        "http://127.0.0.1:3000",
+        "http://localhost:9080",
+        "http://127.0.0.1:9080"
       ],
       "protocolMappers": [
         {
@@ -72,6 +76,17 @@
           "consentRequired": false,
           "config": {
             "included.client.audience": "smartprocure-api",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        },
+        {
+          "name": "smartprocure-gateway-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "smartprocure-gateway",
             "id.token.claim": "false",
             "access.token.claim": "true"
           }
@@ -116,6 +131,17 @@
           }
         },
         {
+          "name": "smartprocure-gateway-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "smartprocure-gateway",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        },
+        {
           "name": "realm roles",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usermodel-realm-role-mapper",
@@ -132,6 +158,20 @@
       ]
     },
     {
+      "clientId": "smartprocure-gateway",
+      "name": "SmartProcure-Pay API Gateway (APISIX)",
+      "description": "DEV ONLY - Dedicated gateway infrastructure client for APISIX OIDC token validation",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "gateway_dev_secret_123",
+      "bearerOnly": false,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true
+    },
+    {
       "clientId": "smartprocure-api",
       "name": "SmartProcure-Pay Backend API",
       "description": "Resource server validating JWT Bearer tokens issued by Keycloak",
@@ -139,6 +179,7 @@
       "protocol": "openid-connect",
       "bearerOnly": true,
       "publicClient": false,
+      "secret": "api_dev_secret_123",
       "standardFlowEnabled": false,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false
