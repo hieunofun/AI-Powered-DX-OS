@@ -156,6 +156,11 @@ jobs:
           chmod +x infra/procurement/validate-purchase-orders.sh
           bash infra/procurement/validate-purchase-orders.sh
 
+      - name: Validate Goods Receipt Module against Real PostgreSQL & Gateway
+        run: |
+          chmod +x infra/warehouse/validate-goods-receipts.sh
+          bash infra/warehouse/validate-goods-receipts.sh
+
       - name: Check container status
         run: docker compose ps
 
