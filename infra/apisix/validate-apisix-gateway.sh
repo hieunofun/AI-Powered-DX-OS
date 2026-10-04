@@ -342,7 +342,7 @@ echo "Direct NestJS container health and JWT validation verified."
 # ------------------------------------------------------------------------------
 # 14. Anti-Spoofing: Gateway Strips Injected Identity Headers
 # ------------------------------------------------------------------------------
-echo "[14/14] Verifying anti-spoofing header stripping..."
+echo "[14/15] Verifying anti-spoofing header stripping..."
 SPOOF_STATUS=$(curl -s -o /tmp/spoof_resp.json -w "%{http_code}" \
   -H "Authorization: Bearer $BUYER_TOKEN" \
   -H "X-User-Sub: spoofed_admin_sub" \
@@ -356,6 +356,28 @@ if [ "$SPOOF_STATUS" != "403" ]; then
 fi
 echo "Injected identity headers safely ignored/stripped. NestJS cryptographic JWT remains source of truth."
 
+# ------------------------------------------------------------------------------
+# 15. Purchase Order Routing Through APISIX Gateway (Issue #5)
+# ------------------------------------------------------------------------------
+echo "[15/15] Verifying Purchase Order API routing through APISIX Gateway..."
+PO_UNAUTH=$(curl -s -o /tmp/po_unauth.json -w "%{http_code}" "$GATEWAY_URL/api/purchase-orders")
+if [ "$PO_UNAUTH" != "401" ]; then
+  echo "ERROR: Expected HTTP 401 for unauthenticated PO request via gateway, got $PO_UNAUTH"
+  cat /tmp/po_unauth.json
+  exit 1
+fi
+
+PO_AUTH=$(curl -s -o /tmp/po_auth.json -w "%{http_code}" \
+  -H "Authorization: Bearer $BUYER_TOKEN" "$GATEWAY_URL/api/purchase-orders")
+if [ "$PO_AUTH" != "200" ]; then
+  echo "ERROR: Expected HTTP 200 for buyer token accessing PO list via gateway, got $PO_AUTH"
+  cat /tmp/po_auth.json
+  exit 1
+fi
+echo "Purchase Order API routing through APISIX Gateway verified successfully."
+
 echo "=========================================================="
-echo "SUCCESS: All 14 Apache APISIX Gateway tests passed!"
+echo "SUCCESS: All 15 Apache APISIX Gateway tests passed!"
 echo "=========================================================="
+
+
