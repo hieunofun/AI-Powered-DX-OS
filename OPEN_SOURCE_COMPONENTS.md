@@ -11,7 +11,7 @@ Every license listed below has been verified against the official upstream repos
 | Component | Repository | Version | License | Role | Integration Type | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Keycloak** | [keycloak/keycloak](https://github.com/keycloak/keycloak) | `24.0.5` | Apache-2.0 | Identity & Access Management (SSO, OIDC, RBAC) | Docker Service | Integrated (Pinned known-working version) |
-| **Apache APISIX** | [apache/apisix](https://github.com/apache/apisix) | `3.9.x` | Apache-2.0 | API Gateway (Reverse proxy, rate limiting, routing, JWT validation) | Docker Service | Planned |
+| **Apache APISIX** | [apache/apisix](https://github.com/apache/apisix) | `3.19.0` | Apache-2.0 | API Gateway (Reverse proxy, rate limiting, routing, JWT validation) | Docker Service | Integrated (Issue #4) |
 | **PostgreSQL** | [postgres/postgres](https://github.com/postgres/postgres) | `16-alpine` | PostgreSQL License | Primary Relational Data Store (Domain models, ledger transactions) | Docker Service | Service Defined |
 | **MinIO** | [minio/minio](https://github.com/minio/minio) | `RELEASE.2024-03-30` | GNU AGPLv3 | S3-Compatible Object Storage (Raw invoices: PDF, XML, images) | Docker Service | Planned |
 | **Flowable** | [flowable/flowable-engine](https://github.com/flowable/flowable-engine) | `6.8.x` | Apache-2.0 | BPMN 2.0 Business Process Engine (Discrepancy & approval workflows) | Docker Service | Planned |
@@ -42,7 +42,12 @@ Every license listed below has been verified against the official upstream repos
    - Keycloak `26.8.0` (released October 2026) was evaluated. Keycloak 26 introduced substantial breaking changes in realm JSON export format, role mapping locations, Infinispan Marshalling, and session persistence requirements. Furthermore, `keycloak-js` on npm currently only extends up to `26.2.4`.
    - To avoid unnecessary pipeline flakiness and maintain reproducible zero-configuration realm import, `24.0.5` is pinned as the known-working baseline. Upgrading to the 26.x series is cataloged as a planned security-hardening follow-up.
 
-2. **Permissive Licenses (Apache-2.0, MIT, PostgreSQL License)**:
+2. **Apache APISIX Versioning & Architecture Review**:
+   - Pinned exact stable upstream release: `3.19.0` (Docker image: `apache/apisix:3.19.0-debian`, released September 28, 2026, licensed under Apache-2.0).
+   - Upstream evaluation confirmed `3.19.0` fixes previous batch request DoS vulnerabilities, introduces enhanced `claim_validator.audience` enforcement, and provides mature standalone mode (`config_provider: yaml`).
+   - Deployment mode: **Standalone data plane**. By declaring routes, upstreams, and plugins directly in Git (`infra/apisix/apisix.yaml`), we avoid the operational overhead and failure points of a dedicated etcd cluster for single-node development and CI while ensuring complete infrastructure reproducibility.
+
+3. **Permissive Licenses (Apache-2.0, MIT, PostgreSQL License)**:
    - Permissive licenses allow distribution, modification, and integration with minimal obligations beyond preserving copyright notices and disclaimers.
    - SmartProcure-Pay's MIT License is fully compatible with consuming these upstream projects.
 
