@@ -160,7 +160,7 @@
     {
       "clientId": "smartprocure-gateway",
       "name": "SmartProcure-Pay API Gateway (APISIX)",
-      "description": "DEV ONLY - Dedicated gateway infrastructure client for APISIX OIDC token validation",
+      "description": "DEV ONLY - Dedicated gateway infrastructure client for APISIX OIDC token validation. In production, this client secret must be managed and rotated via external secret management.",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
@@ -169,7 +169,7 @@
       "standardFlowEnabled": false,
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": true
+      "serviceAccountsEnabled": false
     },
     {
       "clientId": "smartprocure-api",
