@@ -32,6 +32,11 @@ Every license listed below has been verified against the official upstream repos
 | **typescript-eslint** | [typescript-eslint/typescript-eslint](https://github.com/typescript-eslint/typescript-eslint) | `^7.18.0` | BSD-2-Clause | Tooling for TypeScript Linting Integration | Dependency | Integrated |
 | **eslint-plugin-react-hooks** | [facebook/react](https://github.com/facebook/react/tree/main/packages/eslint-plugin-react-hooks) | `^4.6.2` | MIT | React Hooks Rules Enforcement | Dependency | Integrated |
 | **eslint-plugin-react** | [jsx-eslint/eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) | `^7.37.5` | MIT | React-Specific Linting Rules | Dependency | Integrated |
+| **pg** | [brianc/node-postgres](https://github.com/brianc/node-postgres) | `^8.23.1` | MIT | PostgreSQL Client for Node.js (Connection pooling, transactional SQL) | Dependency | Integrated (Issue #5) |
+| **class-validator** | [typestack/class-validator](https://github.com/typestack/class-validator) | `^0.14.4` | MIT | Decorator-based DTO validation | Dependency | Integrated (Issue #5) |
+| **class-transformer** | [typestack/class-transformer](https://github.com/typestack/class-transformer) | `^0.5.1` | MIT | Object transformation and type conversion | Dependency | Integrated (Issue #5) |
+| **@nestjs/swagger** | [nestjs/swagger](https://github.com/nestjs/swagger) | `^7.4.2` | MIT | OpenAPI (Swagger) module for NestJS | Dependency | Integrated (Issue #5) |
+| **swagger-ui-express** | [scottie1984/swagger-ui-express](https://github.com/scottie1984/swagger-ui-express) | `^5.0.1` | MIT | Serve Swagger UI assets from Express | Dependency | Integrated (Issue #5) |
 
 ---
 

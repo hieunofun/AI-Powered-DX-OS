@@ -657,5 +657,62 @@ BEGIN
     END IF;
 
     RAISE NOTICE '[OK] Cancellation metadata constraints correctly enforced across PO, GRN, and Invoice.';
+END $$;
+
+-- 20. Optimistic Locking Version & Atomic Sequence Validation (Issue #5)
+DO $$
+DECLARE
+    v_col_count integer;
+    v_seq_val bigint;
+    v_sup_id UUID;
+    v_po_id UUID;
+    v_failed_version_check boolean := false;
+BEGIN
+    RAISE NOTICE '=== [Test 20] Verifying PO optimistic locking version & atomic sequence ===';
+
+    -- Assert version column exists
+    SELECT count(*) INTO v_col_count
+    FROM information_schema.columns
+    WHERE table_name = 'purchase_orders' AND column_name = 'version';
+
+    IF v_col_count != 1 THEN
+        RAISE EXCEPTION 'Assertion Failed: Column "version" missing from purchase_orders';
+    END IF;
+
+    -- Assert sequence exists and generates values
+    SELECT nextval('purchase_order_number_seq') INTO v_seq_val;
+    IF v_seq_val < 1 THEN
+        RAISE EXCEPTION 'Assertion Failed: Sequence purchase_order_number_seq returned non-positive value: %', v_seq_val;
+    END IF;
+
+    -- Get active supplier
+    SELECT id INTO v_sup_id FROM suppliers WHERE status = 'ACTIVE' LIMIT 1;
+
+    -- Insert test PO and verify default version is 1
+    INSERT INTO purchase_orders (
+        po_number, supplier_id, currency, status, order_date, subtotal, tax_amount, total_amount
+    ) VALUES (
+        'PO-TEST-OPT-LOCK', v_sup_id, 'VND', 'DRAFT', CURRENT_DATE, 1000.00, 100.00, 1100.00
+    ) RETURNING id INTO v_po_id;
+
+    IF (SELECT version FROM purchase_orders WHERE id = v_po_id) != 1 THEN
+        RAISE EXCEPTION 'Assertion Failed: PO default version is not 1';
+    END IF;
+
+    -- Test version check constraint: version < 1 must fail
+    BEGIN
+        UPDATE purchase_orders SET version = 0 WHERE id = v_po_id;
+    EXCEPTION WHEN check_violation THEN
+        v_failed_version_check := true;
+    END;
+
+    IF NOT v_failed_version_check THEN
+        RAISE EXCEPTION 'Assertion Failed: Updating version to 0 did NOT trigger check_violation!';
+    END IF;
+
+    -- Clean up test PO
+    DELETE FROM purchase_orders WHERE id = v_po_id;
+
+    RAISE NOTICE '[OK] PO optimistic locking version column and atomic sequence validated.';
     RAISE NOTICE '=== ALL SCHEMA INTEGRITY TESTS PASSED SUCCESSFULLY ===';
 END $$;
