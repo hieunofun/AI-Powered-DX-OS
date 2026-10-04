@@ -114,6 +114,34 @@ describe('Goods Receipt DTO Validation', () => {
       });
       expect(invalidLot.find((e) => e.property === 'lotNumber')).toBeDefined();
     });
+
+    it('trims whitespace from lotNumber and damageNote', async () => {
+      const { instance, errors } = await transformAndValidateItem({
+        purchaseOrderItemId: 'c2b5bc99-9c0b-4ef8-bb6d-6bb9bd380a33',
+        lotNumber: '   LOT-TRIMMED-99   ',
+        receivedQuantity: '10.0000',
+        acceptedQuantity: '8.0000',
+        rejectedQuantity: '2.0000',
+        damageNote: '   Package crushed in transit   ',
+      });
+      expect(errors.length).toBe(0);
+      expect(instance.lotNumber).toBe('LOT-TRIMMED-99');
+      expect(instance.damageNote).toBe('Package crushed in transit');
+    });
+
+    it('trims whitespace-only lotNumber and damageNote to empty string', async () => {
+      const { instance, errors } = await transformAndValidateItem({
+        purchaseOrderItemId: 'c2b5bc99-9c0b-4ef8-bb6d-6bb9bd380a33',
+        lotNumber: '     ',
+        receivedQuantity: '10.0000',
+        acceptedQuantity: '10.0000',
+        rejectedQuantity: '0.0000',
+        damageNote: '     ',
+      });
+      expect(errors.length).toBe(0);
+      expect(instance.lotNumber).toBe('');
+      expect(instance.damageNote).toBe('');
+    });
   });
 
   describe('Policy DTO Validation', () => {

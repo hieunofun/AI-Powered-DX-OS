@@ -94,7 +94,7 @@ describe('GoodsReceiptsController (e2e)', () => {
 
     getActivePolicy: jest.fn(async () => currentPolicy),
 
-    updateActivePolicy: jest.fn(async (tolerance: string) => {
+    updateActivePolicy: jest.fn(async (tolerance: string, _actor?: any) => {
       currentPolicy = {
         ...currentPolicy,
         overDeliveryTolerancePercent: tolerance,
@@ -216,6 +216,15 @@ describe('GoodsReceiptsController (e2e)', () => {
       const grn = grnStore.get(id);
       if (!grn) throw new Error('Not found');
       if (grn.status === GrnStatus.CANCELLED) throw new ConflictException('Already cancelled');
+
+      const po = poStore.get(grn.purchaseOrderId);
+      if (
+        grn.status === GrnStatus.RECEIVED &&
+        po &&
+        (po.status === PurchaseOrderStatus.CLOSED || po.status === PurchaseOrderStatus.CANCELLED)
+      ) {
+        throw new ConflictException('Cannot cancel GRN on terminal PO');
+      }
 
       grn.status = GrnStatus.CANCELLED;
       grn.cancelledAt = new Date();
@@ -373,6 +382,25 @@ describe('GoodsReceiptsController (e2e)', () => {
         .expect(400);
     });
 
+    it('rejects rejectedQuantity > 0 with whitespace-only damageNote -> 400 Bad Request', async () => {
+      await request(app.getHttpServer())
+        .post('/goods-receipts')
+        .set('Authorization', 'Bearer warehouse-token')
+        .send({
+          purchaseOrderId: PO_ISSUED_ID,
+          items: [
+            {
+              purchaseOrderItemId: PO_ITEM_1_ID,
+              receivedQuantity: '10.0000',
+              acceptedQuantity: '8.0000',
+              rejectedQuantity: '2.0000',
+              damageNote: '    ',
+            },
+          ],
+        })
+        .expect(400);
+    });
+
     it('rejects native JavaScript numbers -> 400 Bad Request', async () => {
       await request(app.getHttpServer())
         .post('/goods-receipts')
@@ -436,6 +464,28 @@ describe('GoodsReceiptsController (e2e)', () => {
 
       expect(res.body.grn.status).toBe('RECEIVED');
       expect(res.body.poStatus).toBe('PARTIALLY_RECEIVED');
+    });
+
+    it('rejects cancelling a RECEIVED GRN when parent PO is CLOSED or CANCELLED -> 409 Conflict', async () => {
+      const po = poStore.get(PO_ISSUED_ID);
+      const originalStatus = po.status;
+      try {
+        po.status = PurchaseOrderStatus.CLOSED;
+        await request(app.getHttpServer())
+          .post(`/goods-receipts/${createdGrnId}/cancel`)
+          .set('Authorization', 'Bearer warehouse-token')
+          .send({ reason: 'Attempt cancel on closed PO' })
+          .expect(409);
+
+        po.status = PurchaseOrderStatus.CANCELLED;
+        await request(app.getHttpServer())
+          .post(`/goods-receipts/${createdGrnId}/cancel`)
+          .set('Authorization', 'Bearer warehouse-token')
+          .send({ reason: 'Attempt cancel on cancelled PO' })
+          .expect(409);
+      } finally {
+        po.status = originalStatus;
+      }
     });
 
     it('cancels GRN with required reason -> 200 OK', async () => {

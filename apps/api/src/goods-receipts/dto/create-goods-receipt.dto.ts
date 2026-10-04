@@ -126,6 +126,7 @@ export class CreateGoodsReceiptItemDto {
     example: 'LOT-2026-X99',
     maxLength: 100,
   })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @MaxLength(100)
   @IsOptional()
@@ -162,6 +163,7 @@ export class CreateGoodsReceiptItemDto {
     description: 'Mandatory explanation note if rejectedQuantity > 0',
     example: '5 units packaging broken and water damaged',
   })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsString()
   @IsOptional()
   damageNote?: string;

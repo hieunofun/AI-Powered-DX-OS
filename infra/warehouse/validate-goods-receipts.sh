@@ -298,6 +298,44 @@ fi
 echo "Cumulative accepted quantities verified in PostgreSQL: Item A = $CUMULATIVE_A, Item B = $CUMULATIVE_B."
 
 # ------------------------------------------------------------------------------
+# 1b. TERMINAL PO PROTECTION REGRESSION TEST (CLOSED PO)
+# ------------------------------------------------------------------------------
+echo "[1b/10] Testing Terminal PO Protection: Rejection of cancelling RECEIVED GRN on CLOSED PO..."
+
+# Transition PO 1 to CLOSED in PostgreSQL
+run_sql "UPDATE purchase_orders SET status = 'CLOSED' WHERE id = '$PO_1_ID';"
+PO_1_VER_BEFORE=$(run_sql "SELECT version FROM purchase_orders WHERE id = '$PO_1_ID';")
+
+# Attempt to cancel GRN 2 on the CLOSED PO
+TERMINAL_CANCEL_RESP=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts/$GRN_2_ID/cancel" \
+  -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"reason": "Attempting cancellation on closed contract"}')
+
+HTTP_CODE=$(echo "$TERMINAL_CANCEL_RESP" | tail -n 1)
+BODY=$(echo "$TERMINAL_CANCEL_RESP" | sed '$d')
+
+if [ "$HTTP_CODE" != "409" ]; then
+  echo "ERROR: Expected HTTP 409 for cancelling RECEIVED GRN on CLOSED PO, got $HTTP_CODE"
+  echo "$BODY"
+  exit 1
+fi
+echo "Cancellation correctly rejected with HTTP 409 on CLOSED PO."
+
+# Verify state remains completely intact in PostgreSQL
+GRN_2_STATUS_AFTER=$(run_sql "SELECT status FROM goods_receipts WHERE id = '$GRN_2_ID';")
+PO_1_STATUS_AFTER=$(run_sql "SELECT status FROM purchase_orders WHERE id = '$PO_1_ID';")
+PO_1_VER_AFTER=$(run_sql "SELECT version FROM purchase_orders WHERE id = '$PO_1_ID';")
+AUDIT_CANCEL_COUNT=$(run_sql "SELECT count(*) FROM audit_records WHERE entity_id = '$GRN_2_ID' AND event_type = 'GRN_CANCELLED';")
+
+if [ "$GRN_2_STATUS_AFTER" != "RECEIVED" ] || [ "$PO_1_STATUS_AFTER" != "CLOSED" ] || [ "$PO_1_VER_AFTER" != "$PO_1_VER_BEFORE" ] || [ "$AUDIT_CANCEL_COUNT" != "0" ]; then
+  echo "ERROR: State was mutated after terminal PO cancellation rejection!"
+  echo "GRN status: $GRN_2_STATUS_AFTER, PO status: $PO_1_STATUS_AFTER, PO version: $PO_1_VER_AFTER vs $PO_1_VER_BEFORE, Audit count: $AUDIT_CANCEL_COUNT"
+  exit 1
+fi
+echo "Verified PostgreSQL state unchanged: GRN remains RECEIVED, PO remains CLOSED, version unchanged, no audit logged."
+
+# ------------------------------------------------------------------------------
 # 2. OVER-DELIVERY TEST (Section 30)
 # ------------------------------------------------------------------------------
 echo "[2/10] Testing Over-Delivery Policy (0.00% vs 10.00% tolerance)..."
@@ -348,6 +386,19 @@ if [ "$HTTP_CODE" != "200" ]; then
   exit 1
 fi
 echo "Policy updated to 10.00% tolerance (Allowed = 110.0000)."
+
+# Verify audit_records entry for GRN_POLICY_UPDATED
+ADMIN_SUB=$(curl -s "$KEYCLOAK_URL/realms/$REALM/protocol/openid-connect/userinfo" -H "Authorization: Bearer $ADMIN_TOKEN" | jq -r '.sub')
+POLICY_AUDIT=$(run_sql "SELECT event_type || '|' || actor_subject || '|' || (metadata->>'previousTolerancePercent') || '|' || (metadata->>'newTolerancePercent') FROM audit_records WHERE event_type = 'GRN_POLICY_UPDATED' ORDER BY created_at DESC LIMIT 1;")
+echo "Policy audit entry in DB: $POLICY_AUDIT"
+EXPECTED_POLICY_AUDIT="GRN_POLICY_UPDATED|$ADMIN_SUB|0.00|10.00"
+if [ "$POLICY_AUDIT" != "$EXPECTED_POLICY_AUDIT" ]; then
+  echo "ERROR: Policy audit mismatch in PostgreSQL!"
+  echo "Expected: $EXPECTED_POLICY_AUDIT"
+  echo "Actual:   $POLICY_AUDIT"
+  exit 1
+fi
+echo "Verified GRN_POLICY_UPDATED audit record in PostgreSQL with actor ($ADMIN_SUB) and previous/new tolerance."
 
 # Test proposed cumulative 111 (accepted = 21 -> 90 + 21 = 111 > 110): expect reject HTTP 409
 GRN_5_RESP=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts" \
@@ -460,6 +511,18 @@ if [ "$HTTP_CODE" != "400" ]; then
 fi
 echo "Rejection without damageNote correctly rejected (HTTP 400)."
 
+# Case A2: rejectedQuantity > 0 with whitespace-only damageNote -> HTTP 400
+WHITESPACE_NOTE_RESP=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts" \
+  -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"purchaseOrderId\": \"$PO_4_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_E_ID\", \"receivedQuantity\": \"10.0000\", \"acceptedQuantity\": \"8.0000\", \"rejectedQuantity\": \"2.0000\", \"damageNote\": \"   \"}]}")
+HTTP_CODE=$(echo "$WHITESPACE_NOTE_RESP" | tail -n 1)
+if [ "$HTTP_CODE" != "400" ]; then
+  echo "ERROR: Expected HTTP 400 for rejectedQuantity with whitespace-only damageNote, got $HTTP_CODE"
+  exit 1
+fi
+echo "Rejection with whitespace-only damageNote correctly rejected (HTTP 400)."
+
 # Case B: accepted + rejected > received -> HTTP 400
 OVER_CONSERV_RESP=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts" \
   -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
@@ -500,6 +563,48 @@ curl -s -X POST "$GATEWAY_URL/api/goods-receipts/$UNCLASS_GRN_ID/cancel" \
   -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"reason": "Abandon unclassified draft"}' > /dev/null
+
+# Case D: Lot number & damage note trimming in PostgreSQL
+TRIM_RESP=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts" \
+  -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"purchaseOrderId\": \"$PO_4_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_E_ID\", \"lotNumber\": \"  LOT-NORM-99  \", \"receivedQuantity\": \"10.0000\", \"acceptedQuantity\": \"10.0000\", \"rejectedQuantity\": \"0.0000\", \"damageNote\": \"  Clean receipt  \"}]}")
+HTTP_CODE=$(echo "$TRIM_RESP" | tail -n 1)
+if [ "$HTTP_CODE" != "201" ]; then
+  echo "ERROR: Expected HTTP 201 for trimmed lot creation, got $HTTP_CODE"
+  exit 1
+fi
+TRIM_GRN_ID=$(echo "$TRIM_RESP" | sed '$d' | jq -r '.id')
+DB_LOT=$(run_sql "SELECT lot_number FROM goods_receipt_items WHERE goods_receipt_id = '$TRIM_GRN_ID';")
+DB_DAMAGE=$(run_sql "SELECT damage_note FROM goods_receipt_items WHERE goods_receipt_id = '$TRIM_GRN_ID';")
+if [ "$DB_LOT" != "LOT-NORM-99" ] || [ "$DB_DAMAGE" != "Clean receipt" ]; then
+  echo "ERROR: Lot or damage note was not trimmed before persisting to DB!"
+  echo "Stored lot: '$DB_LOT', stored damage: '$DB_DAMAGE'"
+  exit 1
+fi
+echo "Verified lotNumber ('$DB_LOT') and damageNote ('$DB_DAMAGE') trimmed in PostgreSQL."
+
+# Case E: Whitespace-only lotNumber normalizes to NULL
+WS_LOT_RESP=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts" \
+  -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"purchaseOrderId\": \"$PO_4_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_E_ID\", \"lotNumber\": \"   \", \"receivedQuantity\": \"5.0000\", \"acceptedQuantity\": \"5.0000\", \"rejectedQuantity\": \"0.0000\"}]}")
+HTTP_CODE=$(echo "$WS_LOT_RESP" | tail -n 1)
+if [ "$HTTP_CODE" != "201" ]; then
+  echo "ERROR: Expected HTTP 201 for whitespace lot creation, got $HTTP_CODE"
+  exit 1
+fi
+WS_GRN_ID=$(echo "$WS_LOT_RESP" | sed '$d' | jq -r '.id')
+DB_WS_LOT=$(run_sql "SELECT COALESCE(lot_number, 'IS_NULL') FROM goods_receipt_items WHERE goods_receipt_id = '$WS_GRN_ID';")
+if [ "$DB_WS_LOT" != "IS_NULL" ]; then
+  echo "ERROR: Whitespace-only lotNumber was not normalized to NULL! Stored: '$DB_WS_LOT'"
+  exit 1
+fi
+echo "Verified whitespace-only lotNumber normalized to NULL in PostgreSQL."
+
+# Cleanup temporary drafts
+curl -s -X POST "$GATEWAY_URL/api/goods-receipts/$TRIM_GRN_ID/cancel" -H "Authorization: Bearer $WAREHOUSE_TOKEN" -H "Content-Type: application/json" -d '{"reason": "Clean test draft"}' > /dev/null
+curl -s -X POST "$GATEWAY_URL/api/goods-receipts/$WS_GRN_ID/cancel" -H "Authorization: Bearer $WAREHOUSE_TOKEN" -H "Content-Type: application/json" -d '{"reason": "Clean test draft"}' > /dev/null
 
 # ------------------------------------------------------------------------------
 # 5. CROSS-PO INTEGRITY (Section 33)

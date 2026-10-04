@@ -65,26 +65,95 @@ export class GoodsReceiptsRepository {
   }
 
   /**
-   * Updates the active over-delivery tolerance policy percentage.
+   * Updates the active over-delivery tolerance policy percentage inside an atomic transaction.
+   * Locks the active policy FOR UPDATE, captures previous tolerance, updates tolerance,
+   * inserts GRN_POLICY_UPDATED into audit_records, and commits.
+   * If any step fails, rolls back completely.
    */
   async updateActivePolicy(
     tolerancePercent: string,
-    client?: PoolClient,
+    actor?: { subject?: string; roles?: string[] },
+    existingClient?: PoolClient,
   ): Promise<GoodsReceiptPolicyEntity> {
-    const query = `
-      UPDATE goods_receipt_policies
-      SET over_delivery_tolerance_percent = $1, updated_at = CURRENT_TIMESTAMP
-      WHERE is_active = true
-      RETURNING id, policy_code AS "policyCode",
-                over_delivery_tolerance_percent::text AS "overDeliveryTolerancePercent",
-                is_active AS "isActive",
-                created_at AS "createdAt", updated_at AS "updatedAt"
-    `;
-    const res = await this.executeQuery<GoodsReceiptPolicyEntity>(query, [tolerancePercent], client);
-    if (!res.rows[0]) {
-      throw new NotFoundException('Active goods receipt policy not found');
+    const client = existingClient || (await this.db.getClient());
+    const isOwnerOfClient = !existingClient;
+
+    try {
+      if (isOwnerOfClient) {
+        await client.query('BEGIN');
+      }
+
+      // 1. SELECT active policy FOR UPDATE and capture previous tolerance
+      const selectRes = await client.query<{
+        id: string;
+        policy_code: string;
+        over_delivery_tolerance_percent: string;
+      }>(
+        `SELECT id, policy_code, over_delivery_tolerance_percent::text
+         FROM goods_receipt_policies
+         WHERE is_active = true
+         FOR UPDATE`,
+      );
+
+      if (!selectRes.rows[0]) {
+        throw new NotFoundException('Active goods receipt policy not found');
+      }
+
+      const activePolicyRow = selectRes.rows[0];
+      const previousTolerancePercent = activePolicyRow.over_delivery_tolerance_percent;
+
+      // 2. UPDATE policy
+      const updateQuery = `
+        UPDATE goods_receipt_policies
+        SET over_delivery_tolerance_percent = $1, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $2
+        RETURNING id, policy_code AS "policyCode",
+                  over_delivery_tolerance_percent::text AS "overDeliveryTolerancePercent",
+                  is_active AS "isActive",
+                  created_at AS "createdAt", updated_at AS "updatedAt"
+      `;
+      const updateRes = await client.query<GoodsReceiptPolicyEntity>(updateQuery, [
+        tolerancePercent,
+        activePolicyRow.id,
+      ]);
+      const updatedPolicy = updateRes.rows[0];
+
+      // 3. INSERT audit_records event: GRN_POLICY_UPDATED
+      const auditQuery = `
+        INSERT INTO audit_records (
+          entity_type, entity_id, event_type, actor_subject, metadata
+        ) VALUES (
+          'GOODS_RECEIPT_POLICY', $1, 'GRN_POLICY_UPDATED', $2, $3::jsonb
+        )
+      `;
+      await client.query(auditQuery, [
+        updatedPolicy.id,
+        actor?.subject || null,
+        JSON.stringify({
+          policyCode: updatedPolicy.policyCode,
+          previousTolerancePercent,
+          newTolerancePercent: updatedPolicy.overDeliveryTolerancePercent,
+          previousTolerance: previousTolerancePercent,
+          newTolerance: updatedPolicy.overDeliveryTolerancePercent,
+          roles: actor?.roles || [],
+        }),
+      ]);
+
+      if (isOwnerOfClient) {
+        await client.query('COMMIT');
+      }
+
+      return updatedPolicy;
+    } catch (error) {
+      if (isOwnerOfClient) {
+        await client.query('ROLLBACK');
+      }
+      throw error;
+    } finally {
+      if (isOwnerOfClient) {
+        client.release();
+      }
     }
-    return res.rows[0];
   }
 
   /**
@@ -231,15 +300,21 @@ export class GoodsReceiptsRepository {
       const insertedItems: GoodsReceiptItemEntity[] = [];
       let lineNum = 1;
       for (const item of itemsData) {
+        const trimmedLot = item.lotNumber !== undefined && item.lotNumber !== null ? String(item.lotNumber).trim() : null;
+        const normalizedLot = trimmedLot && trimmedLot.length > 0 ? trimmedLot : null;
+
+        const trimmedDamage = item.damageNote !== undefined && item.damageNote !== null ? String(item.damageNote).trim() : null;
+        const normalizedDamage = trimmedDamage && trimmedDamage.length > 0 ? trimmedDamage : null;
+
         const itemRes = await client.query<GoodsReceiptItemEntity>(insertItemQuery, [
           createdGrn.id,
           item.purchaseOrderItemId,
           lineNum++,
-          item.lotNumber || null,
+          normalizedLot,
           item.receivedQuantity,
           item.acceptedQuantity,
           item.rejectedQuantity,
-          item.damageNote || null,
+          normalizedDamage,
         ]);
         insertedItems.push(itemRes.rows[0]);
       }
@@ -390,15 +465,21 @@ export class GoodsReceiptsRepository {
         const insertedItems: GoodsReceiptItemEntity[] = [];
         let lineNum = 1;
         for (const item of itemsData) {
+          const trimmedLot = item.lotNumber !== undefined && item.lotNumber !== null ? String(item.lotNumber).trim() : null;
+          const normalizedLot = trimmedLot && trimmedLot.length > 0 ? trimmedLot : null;
+
+          const trimmedDamage = item.damageNote !== undefined && item.damageNote !== null ? String(item.damageNote).trim() : null;
+          const normalizedDamage = trimmedDamage && trimmedDamage.length > 0 ? trimmedDamage : null;
+
           const itemRes = await client.query<GoodsReceiptItemEntity>(insertItemQuery, [
             id,
             item.purchaseOrderItemId,
             lineNum++,
-            item.lotNumber || null,
+            normalizedLot,
             item.receivedQuantity,
             item.acceptedQuantity,
             item.rejectedQuantity,
-            item.damageNote || null,
+            normalizedDamage,
           ]);
           insertedItems.push(itemRes.rows[0]);
         }
@@ -733,6 +814,16 @@ export class GoodsReceiptsRepository {
         throw new NotFoundException(`Parent Purchase Order '${grnRow.purchase_order_id}' not found`);
       }
       const poRow = poLockRes.rows[0];
+
+      // Terminal PO protection: RECEIVED GRN cannot be cancelled if parent PO is CLOSED or CANCELLED
+      if (
+        grnRow.status === GrnStatus.RECEIVED &&
+        (poRow.status === PurchaseOrderStatus.CLOSED || poRow.status === PurchaseOrderStatus.CANCELLED)
+      ) {
+        throw new ConflictException(
+          `Cannot cancel Goods Receipt '${grnRow.grn_number}' because parent Purchase Order '${poRow.po_number}' is in terminal status '${poRow.status}'.`,
+        );
+      }
 
       // 3. Update GRN status to CANCELLED
       const updateGrnRes = await client.query<GoodsReceiptEntity>(

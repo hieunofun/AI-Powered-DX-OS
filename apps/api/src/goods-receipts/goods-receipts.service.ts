@@ -5,7 +5,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { GoodsReceiptsRepository } from './goods-receipts.repository';
-import { CreateGoodsReceiptDto } from './dto/create-goods-receipt.dto';
+import { CreateGoodsReceiptDto, CreateGoodsReceiptItemDto } from './dto/create-goods-receipt.dto';
 import { UpdateGoodsReceiptDto } from './dto/update-goods-receipt.dto';
 import { CancelGoodsReceiptDto } from './dto/cancel-goods-receipt.dto';
 import { QueryGoodsReceiptDto } from './dto/query-goods-receipt.dto';
@@ -77,6 +77,21 @@ export class GoodsReceiptsService {
     // 5. Generate concurrency-safe GRN number
     const grnNumber = await this.repository.generateGrnNumber();
 
+    // Normalize lotNumber and damageNote
+    const normalizedItems = dto.items.map((item) => {
+      const trimmedLot = item.lotNumber !== undefined && item.lotNumber !== null ? item.lotNumber.trim() : null;
+      const normalizedLot = trimmedLot && trimmedLot.length > 0 ? trimmedLot : undefined;
+
+      const trimmedDamage = item.damageNote !== undefined && item.damageNote !== null ? item.damageNote.trim() : null;
+      const normalizedDamage = trimmedDamage && trimmedDamage.length > 0 ? trimmedDamage : undefined;
+
+      return {
+        ...item,
+        lotNumber: normalizedLot,
+        damageNote: normalizedDamage,
+      };
+    });
+
     // 6. Atomically persist DRAFT GRN
     return this.repository.createGRN(
       {
@@ -85,7 +100,7 @@ export class GoodsReceiptsService {
         receivedAt: dto.receivedAt,
         referenceNote: dto.referenceNote,
       },
-      dto.items,
+      normalizedItems,
       {
         subject: user.sub,
         roles: user.roles,
@@ -126,6 +141,7 @@ export class GoodsReceiptsService {
       );
     }
 
+    let normalizedItems: CreateGoodsReceiptItemDto[] | undefined;
     if (dto.items && dto.items.length > 0) {
       const po = await this.repository.getPurchaseOrder(grn.purchaseOrderId);
       if (!po) {
@@ -133,7 +149,7 @@ export class GoodsReceiptsService {
       }
       const poItemIds = new Set(po.items.map((i) => i.id));
 
-      for (const item of dto.items) {
+      normalizedItems = dto.items.map((item) => {
         if (!poItemIds.has(item.purchaseOrderItemId)) {
           throw new BadRequestException(
             `Purchase Order Item '${item.purchaseOrderItemId}' does not belong to parent PO '${po.poNumber}'`,
@@ -152,7 +168,19 @@ export class GoodsReceiptsService {
         } catch (err: any) {
           throw new BadRequestException(err.message);
         }
-      }
+
+        const trimmedLot = item.lotNumber !== undefined && item.lotNumber !== null ? item.lotNumber.trim() : null;
+        const normalizedLot = trimmedLot && trimmedLot.length > 0 ? trimmedLot : undefined;
+
+        const trimmedDamage = item.damageNote !== undefined && item.damageNote !== null ? item.damageNote.trim() : null;
+        const normalizedDamage = trimmedDamage && trimmedDamage.length > 0 ? trimmedDamage : undefined;
+
+        return {
+          ...item,
+          lotNumber: normalizedLot,
+          damageNote: normalizedDamage,
+        };
+      });
     }
 
     const updated = await this.repository.updateDraftGRN(
@@ -161,7 +189,7 @@ export class GoodsReceiptsService {
         receivedAt: dto.receivedAt,
         referenceNote: dto.referenceNote,
       },
-      dto.items,
+      normalizedItems,
       {
         subject: user.sub,
         roles: user.roles,
@@ -207,6 +235,19 @@ export class GoodsReceiptsService {
       throw new ConflictException(`Goods Receipt '${grn.grnNumber}' is already CANCELLED`);
     }
 
+    // Terminal PO protection
+    if (grn.status === GrnStatus.RECEIVED) {
+      const po = await this.repository.getPurchaseOrder(grn.purchaseOrderId);
+      if (
+        po &&
+        (po.status === PurchaseOrderStatus.CLOSED || po.status === PurchaseOrderStatus.CANCELLED)
+      ) {
+        throw new ConflictException(
+          `Cannot cancel Goods Receipt '${grn.grnNumber}' because parent Purchase Order '${po.poNumber}' is in terminal status '${po.status}'.`,
+        );
+      }
+    }
+
     return this.repository.cancelGRN(id, dto.reason, {
       subject: user.sub,
       roles: user.roles,
@@ -225,8 +266,11 @@ export class GoodsReceiptsService {
    */
   async updateActivePolicy(
     dto: UpdateGoodsReceiptPolicyDto,
-    _user: AuthenticatedUser,
+    user: AuthenticatedUser,
   ): Promise<GoodsReceiptPolicyEntity> {
-    return this.repository.updateActivePolicy(dto.overDeliveryTolerancePercent);
+    return this.repository.updateActivePolicy(dto.overDeliveryTolerancePercent, {
+      subject: user.sub,
+      roles: user.roles,
+    });
   }
 }

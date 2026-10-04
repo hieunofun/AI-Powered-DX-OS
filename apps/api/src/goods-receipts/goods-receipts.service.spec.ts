@@ -183,7 +183,7 @@ describe('GoodsReceiptsService', () => {
       ).rejects.toThrow(/does not belong to parent PO/);
     });
 
-    it('throws BadRequestException if rejectedQuantity > 0 without damageNote', async () => {
+    it('throws BadRequestException if rejectedQuantity > 0 without damageNote or whitespace-only damageNote', async () => {
       mockRepository.getPurchaseOrder.mockResolvedValue(mockPo);
 
       await expect(
@@ -197,6 +197,24 @@ describe('GoodsReceiptsService', () => {
                 acceptedQuantity: '8.0000',
                 rejectedQuantity: '2.0000',
                 damageNote: '',
+              },
+            ],
+          },
+          mockUser,
+        ),
+      ).rejects.toThrow(/damageNote is mandatory/);
+
+      await expect(
+        service.create(
+          {
+            purchaseOrderId: 'po-uuid-1',
+            items: [
+              {
+                purchaseOrderItemId: 'item-1',
+                receivedQuantity: '10.0000',
+                acceptedQuantity: '8.0000',
+                rejectedQuantity: '2.0000',
+                damageNote: '    ',
               },
             ],
           },
@@ -291,6 +309,37 @@ describe('GoodsReceiptsService', () => {
         service.cancel('grn-uuid-1', { reason: 'Retry cancel' }, mockUser),
       ).rejects.toThrow(ConflictException);
     });
+
+    it('throws ConflictException if cancelling a RECEIVED GRN on CLOSED or CANCELLED PO', async () => {
+      mockRepository.findById.mockResolvedValue({
+        ...mockGrn,
+        status: GrnStatus.RECEIVED,
+        purchaseOrderId: 'po-uuid-1',
+      });
+      mockRepository.getPurchaseOrder.mockResolvedValue({
+        id: 'po-uuid-1',
+        poNumber: 'PO-2026-000001',
+        status: PurchaseOrderStatus.CLOSED,
+        version: 2,
+        items: [],
+      });
+
+      await expect(
+        service.cancel('grn-uuid-1', { reason: 'Defect' }, mockUser),
+      ).rejects.toThrow(ConflictException);
+
+      mockRepository.getPurchaseOrder.mockResolvedValue({
+        id: 'po-uuid-1',
+        poNumber: 'PO-2026-000001',
+        status: PurchaseOrderStatus.CANCELLED,
+        version: 2,
+        items: [],
+      });
+
+      await expect(
+        service.cancel('grn-uuid-1', { reason: 'Defect' }, mockUser),
+      ).rejects.toThrow(ConflictException);
+    });
   });
 
   describe('policy', () => {
@@ -309,7 +358,7 @@ describe('GoodsReceiptsService', () => {
       expect(result).toEqual(policy);
     });
 
-    it('updates active policy tolerance', async () => {
+    it('updates active policy tolerance and passes actor credentials for audit', async () => {
       const updated = {
         id: 'pol-1',
         policyCode: 'DEFAULT',
@@ -325,6 +374,10 @@ describe('GoodsReceiptsService', () => {
         mockUser,
       );
       expect(result.overDeliveryTolerancePercent).toBe('5.00');
+      expect(mockRepository.updateActivePolicy).toHaveBeenCalledWith('5.00', {
+        subject: mockUser.sub,
+        roles: mockUser.roles,
+      });
     });
   });
 });
