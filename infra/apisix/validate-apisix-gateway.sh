@@ -140,6 +140,38 @@ if [ -z "$ADMIN_TOKEN" ] || [ "$ADMIN_TOKEN" = "null" ]; then
 fi
 echo "Test tokens acquired successfully."
 
+# Verify layered audiences in Keycloak token payload
+echo "Verifying token contains layered audiences (smartprocure-gateway and smartprocure-api)..."
+PAYLOAD=$(echo "$BUYER_TOKEN" | awk -F. '{print $2}' | tr -d '\r\n')
+# Pad base64 string if needed
+REM=$(( ${#PAYLOAD} % 4 ))
+if [ $REM -eq 2 ]; then PAYLOAD="${PAYLOAD}=="; elif [ $REM -eq 3 ]; then PAYLOAD="${PAYLOAD}="; fi
+DECODED_PAYLOAD=$(echo "$PAYLOAD" | base64 -d 2>/dev/null || echo "$PAYLOAD" | base64 --decode 2>/dev/null || true)
+
+if [ -n "$DECODED_PAYLOAD" ]; then
+  echo "$DECODED_PAYLOAD" | grep -q "smartprocure-gateway" || {
+    echo "ERROR: Token audience missing smartprocure-gateway"
+    echo "$DECODED_PAYLOAD"
+    exit 1
+  }
+  echo "$DECODED_PAYLOAD" | grep -q "smartprocure-api" || {
+    echo "ERROR: Token audience missing smartprocure-api"
+    echo "$DECODED_PAYLOAD"
+    exit 1
+  }
+  echo "Token payload audience verified: contains both smartprocure-gateway and smartprocure-api."
+fi
+
+# Verify APISIX is configured with smartprocure-gateway client
+if command -v docker >/dev/null 2>&1 && docker ps --format '{{.Names}}' | grep -q "smartprocure-apisix"; then
+  GATEWAY_CLIENT=$(docker exec smartprocure-apisix printenv APISIX_OIDC_CLIENT_ID || true)
+  if [ -n "$GATEWAY_CLIENT" ] && [ "$GATEWAY_CLIENT" != "smartprocure-gateway" ]; then
+    echo "ERROR: Expected APISIX_OIDC_CLIENT_ID to be smartprocure-gateway, got: $GATEWAY_CLIENT"
+    exit 1
+  fi
+  echo "Verified APISIX is operating with dedicated smartprocure-gateway client."
+fi
+
 # ------------------------------------------------------------------------------
 # 5. GET /api/auth/me with valid buyer token -> 200 OK
 # ------------------------------------------------------------------------------
@@ -198,13 +230,19 @@ fi
 echo "Admin access to /api/auth/admin-test verified (HTTP 200)."
 
 # ------------------------------------------------------------------------------
-# 9. CORS Preflight with allowed origin
+# 9. CORS Preflight on Protected Route (/api/auth/me) with allowed origin
 # ------------------------------------------------------------------------------
-echo "[9/14] Verifying CORS preflight request with allowed origin (http://localhost:3000)..."
-CORS_HEADERS=$(curl -s -I -X OPTIONS "$GATEWAY_URL/api/health" \
+echo "[9/14] Verifying CORS preflight on protected route (/api/auth/me) with allowed origin..."
+CORS_HEADERS=$(curl -s -i -X OPTIONS "$GATEWAY_URL/api/auth/me" \
   -H "Origin: http://localhost:3000" \
   -H "Access-Control-Request-Method: GET" \
   -H "Access-Control-Request-Headers: Authorization,Content-Type")
+
+echo "$CORS_HEADERS" | grep -iqE "HTTP/.* (200|204)" || {
+  echo "ERROR: Expected HTTP 200/204 for OPTIONS preflight, got:"
+  echo "$CORS_HEADERS"
+  exit 1
+}
 
 echo "$CORS_HEADERS" | grep -iq "access-control-allow-origin: http://localhost:3000" || {
   echo "ERROR: Missing or incorrect Access-Control-Allow-Origin for allowed origin"
@@ -217,22 +255,34 @@ echo "$CORS_HEADERS" | grep -iq "access-control-allow-credentials: true" || {
   echo "$CORS_HEADERS"
   exit 1
 }
-echo "CORS preflight for allowed origin verified successfully."
+
+echo "$CORS_HEADERS" | grep -iqE "access-control-allow-methods:.*GET" || {
+  echo "ERROR: Missing GET in Access-Control-Allow-Methods"
+  echo "$CORS_HEADERS"
+  exit 1
+}
+
+echo "$CORS_HEADERS" | grep -iqE "access-control-allow-headers:.*(authorization|content-type)" || {
+  echo "ERROR: Missing expected headers in Access-Control-Allow-Headers"
+  echo "$CORS_HEADERS"
+  exit 1
+}
+echo "Protected route CORS preflight verified successfully (no Bearer token required)."
 
 # ------------------------------------------------------------------------------
-# 10. CORS Preflight with disallowed origin
+# 10. CORS Preflight on Protected Route (/api/auth/me) with disallowed origin
 # ------------------------------------------------------------------------------
-echo "[10/14] Verifying CORS preflight request with disallowed origin..."
-DISALLOWED_CORS=$(curl -s -I -X OPTIONS "$GATEWAY_URL/api/health" \
+echo "[10/14] Verifying CORS preflight on protected route (/api/auth/me) with disallowed origin..."
+DISALLOWED_CORS=$(curl -s -i -X OPTIONS "$GATEWAY_URL/api/auth/me" \
   -H "Origin: http://unauthorized-hacker-domain.com" \
   -H "Access-Control-Request-Method: GET")
 
 if echo "$DISALLOWED_CORS" | grep -iq "access-control-allow-origin: http://unauthorized-hacker-domain.com"; then
-  echo "ERROR: Gateway permissively allowed an unauthorized origin!"
+  echo "ERROR: Gateway permissively allowed an unauthorized origin on protected route!"
   echo "$DISALLOWED_CORS"
   exit 1
 fi
-echo "Disallowed origin correctly rejected from CORS response."
+echo "Disallowed origin correctly rejected from CORS response on protected route."
 
 # ------------------------------------------------------------------------------
 # 11. Rate Limiting Enforcement (exceed quota -> HTTP 429)
