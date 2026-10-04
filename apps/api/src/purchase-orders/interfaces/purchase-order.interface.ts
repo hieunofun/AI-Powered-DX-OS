@@ -6,12 +6,12 @@ export interface PurchaseOrderItemEntity {
   lineNumber: number;
   sku?: string | null;
   description: string;
-  orderedQuantity: number;
-  unitPrice: number;
-  taxRate: number;
-  lineSubtotal: number;
-  taxAmount: number;
-  lineTotal: number;
+  orderedQuantity: string;
+  unitPrice: string;
+  taxRate: string;
+  lineSubtotal: string;
+  taxAmount: string;
+  lineTotal: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -24,9 +24,9 @@ export interface PurchaseOrderEntity {
   status: PurchaseOrderStatus;
   orderDate: string; // YYYY-MM-DD
   expectedDeliveryDate?: string | null;
-  subtotal: number;
-  taxAmount: number;
-  totalAmount: number;
+  subtotal: string;
+  taxAmount: string;
+  totalAmount: string;
   version: number;
   cancelledAt?: Date | null;
   cancelledReason?: string | null;

@@ -4,6 +4,7 @@ import {
   BadRequestException,
   ConflictException,
 } from '@nestjs/common';
+import Decimal from 'decimal.js';
 import { PurchaseOrdersRepository } from './purchase-orders.repository';
 import { POCalculator } from './domain/po-calculator';
 import { POStateMachine } from './domain/po-state-machine';
@@ -45,31 +46,38 @@ export class PurchaseOrdersService {
       throw new BadRequestException('A Purchase Order must contain at least one line item.');
     }
 
-    // 3. Compute deterministic calculations for each line item (server-calculated, never trust client totals)
+    // 3. Validate logical date sequencing
+    if (dto.expectedDeliveryDate && dto.orderDate && dto.expectedDeliveryDate < dto.orderDate) {
+      throw new BadRequestException(
+        `expectedDeliveryDate (${dto.expectedDeliveryDate}) cannot be earlier than orderDate (${dto.orderDate})`,
+      );
+    }
+
+    // 4. Compute deterministic calculations for each line item (server-calculated, never trust client totals)
     const calculatedItems = dto.items.map((item, idx) => {
       const lineMath = POCalculator.calculateLine(
         item.orderedQuantity,
         item.unitPrice,
-        item.taxRate ?? 0,
+        item.taxRate ?? '0',
       );
       return {
         lineNumber: idx + 1,
         sku: item.sku || null,
         description: item.description,
-        orderedQuantity: item.orderedQuantity,
-        unitPrice: item.unitPrice,
-        taxRate: item.taxRate ?? 0,
+        orderedQuantity: new Decimal(item.orderedQuantity).toString(),
+        unitPrice: new Decimal(item.unitPrice).toString(),
+        taxRate: new Decimal(item.taxRate ?? '0').toString(),
         ...lineMath,
       };
     });
 
-    // 4. Compute cumulative totals
+    // 5. Compute cumulative totals
     const totals = POCalculator.calculateTotals(calculatedItems);
 
-    // 5. Generate concurrency-safe PO number
+    // 6. Generate concurrency-safe PO number
     const poNumber = await this.repository.generatePoNumber();
 
-    // 6. Atomically persist PO header, items, and audit trail
+    // 7. Atomically persist PO header, items, and audit trail
     return this.repository.createPO(
       {
         poNumber,
@@ -122,6 +130,22 @@ export class PurchaseOrdersService {
       throw new ConflictException(err.message);
     }
 
+    // Logical date sequencing validation
+    const effectiveOrderDate = dto.orderDate || po.orderDate;
+    const effectiveDeliveryDate =
+      dto.expectedDeliveryDate !== undefined
+        ? dto.expectedDeliveryDate
+        : po.expectedDeliveryDate;
+    if (
+      effectiveDeliveryDate &&
+      effectiveOrderDate &&
+      effectiveDeliveryDate < effectiveOrderDate
+    ) {
+      throw new BadRequestException(
+        `expectedDeliveryDate (${effectiveDeliveryDate}) cannot be earlier than orderDate (${effectiveOrderDate})`,
+      );
+    }
+
     // If supplier updated, verify supplier is ACTIVE
     if (dto.supplierId && dto.supplierId !== po.supplierId) {
       const supplier = await this.repository.getSupplier(dto.supplierId);
@@ -136,22 +160,22 @@ export class PurchaseOrdersService {
     }
 
     let calculatedItems;
-    let totals: { subtotal?: number; taxAmount?: number; totalAmount?: number } = {};
+    let totals: { subtotal?: string; taxAmount?: string; totalAmount?: string } = {};
 
     if (dto.items && dto.items.length > 0) {
       calculatedItems = dto.items.map((item, idx) => {
         const lineMath = POCalculator.calculateLine(
           item.orderedQuantity,
           item.unitPrice,
-          item.taxRate ?? 0,
+          item.taxRate ?? '0',
         );
         return {
           lineNumber: idx + 1,
           sku: item.sku || null,
           description: item.description,
-          orderedQuantity: item.orderedQuantity,
-          unitPrice: item.unitPrice,
-          taxRate: item.taxRate ?? 0,
+          orderedQuantity: new Decimal(item.orderedQuantity).toString(),
+          unitPrice: new Decimal(item.unitPrice).toString(),
+          taxRate: new Decimal(item.taxRate ?? '0').toString(),
           ...lineMath,
         };
       });
@@ -179,6 +203,7 @@ export class PurchaseOrdersService {
 
   /**
    * Issues a Purchase Order: Transitions DRAFT -> ISSUED.
+   * Enforces total reconciliation, active supplier status, and item presence.
    */
   async issue(
     id: string,
@@ -193,7 +218,7 @@ export class PurchaseOrdersService {
       throw new ConflictException(err.message);
     }
 
-    // Verify supplier is still active before issuing
+    // 1. Verify supplier is still active before issuing
     const supplier = await this.repository.getSupplier(po.supplierId);
     if (!supplier || supplier.status !== 'ACTIVE') {
       throw new BadRequestException(
@@ -201,8 +226,29 @@ export class PurchaseOrdersService {
       );
     }
 
+    // 2. Verify >= 1 item exists
     if (!po.items || po.items.length === 0) {
       throw new BadRequestException('Cannot issue Purchase Order with zero line items.');
+    }
+
+    // 3. Exact decimal reconciliation: stored totals must exactly match item-derived totals
+    const calculatedItems = po.items.map((item) =>
+      POCalculator.calculateLine(item.orderedQuantity, item.unitPrice, item.taxRate),
+    );
+    const expectedTotals = POCalculator.calculateTotals(calculatedItems);
+
+    const storedSubtotal = new Decimal(po.subtotal).toFixed(2);
+    const storedTaxAmount = new Decimal(po.taxAmount).toFixed(2);
+    const storedTotalAmount = new Decimal(po.totalAmount).toFixed(2);
+
+    if (
+      storedSubtotal !== expectedTotals.subtotal ||
+      storedTaxAmount !== expectedTotals.taxAmount ||
+      storedTotalAmount !== expectedTotals.totalAmount
+    ) {
+      throw new ConflictException(
+        `Cannot issue Purchase Order: Stored totals (subtotal=${storedSubtotal}, tax=${storedTaxAmount}, total=${storedTotalAmount}) do not equal item-derived totals (subtotal=${expectedTotals.subtotal}, tax=${expectedTotals.taxAmount}, total=${expectedTotals.totalAmount}).`,
+      );
     }
 
     return this.repository.issuePO(id, dto.expectedVersion, {

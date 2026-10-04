@@ -37,6 +37,7 @@ Every license listed below has been verified against the official upstream repos
 | **class-transformer** | [typestack/class-transformer](https://github.com/typestack/class-transformer) | `^0.5.1` | MIT | Object transformation and type conversion | Dependency | Integrated (Issue #5) |
 | **@nestjs/swagger** | [nestjs/swagger](https://github.com/nestjs/swagger) | `^7.4.2` | MIT | OpenAPI (Swagger) module for NestJS | Dependency | Integrated (Issue #5) |
 | **swagger-ui-express** | [scottie1984/swagger-ui-express](https://github.com/scottie1984/swagger-ui-express) | `^5.0.1` | MIT | Serve Swagger UI assets from Express | Dependency | Integrated (Issue #5) |
+| **decimal.js** | [MikeMcl/decimal.js](https://github.com/MikeMcl/decimal.js) | `^10.6.0` | MIT | Arbitrary-precision decimal arithmetic for financial calculations | Dependency | Integrated (Issue #5) |
 
 ---
 

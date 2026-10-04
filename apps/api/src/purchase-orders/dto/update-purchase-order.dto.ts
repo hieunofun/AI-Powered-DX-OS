@@ -5,7 +5,7 @@ import {
   IsInt,
   Min,
   IsUUID,
-  Length,
+  Matches,
   IsDateString,
   IsArray,
   ArrayNotEmpty,
@@ -29,9 +29,9 @@ export class UpdatePurchaseOrderDto {
   @IsOptional()
   supplierId?: string;
 
-  @ApiPropertyOptional({ description: 'Updated ISO 4217 currency', example: 'VND' })
+  @ApiPropertyOptional({ description: 'Updated 3-character transaction currency code', example: 'VND' })
   @IsString()
-  @Length(3, 3)
+  @Matches(/^[A-Za-z]{3}$/, { message: 'currency must be a 3-character alphabetic code' })
   @IsOptional()
   currency?: string;
 

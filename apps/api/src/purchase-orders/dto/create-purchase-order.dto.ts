@@ -3,17 +3,68 @@ import {
   IsString,
   IsNotEmpty,
   IsOptional,
-  IsNumber,
-  IsPositive,
-  Min,
   IsUUID,
-  Length,
+  Matches,
   IsDateString,
   IsArray,
   ArrayNotEmpty,
   ValidateNested,
+  registerDecorator,
+  ValidationOptions,
+  ValidationArguments,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import Decimal from 'decimal.js';
+
+export function IsPositiveDecimalString(validationOptions?: ValidationOptions) {
+  return function (object: object, propertyName: string) {
+    registerDecorator({
+      name: 'isPositiveDecimalString',
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: any) {
+          if (value === undefined || value === null || value === '') return false;
+          try {
+            const d = new Decimal(value);
+            return !d.isNaN() && d.gt(0);
+          } catch {
+            return false;
+          }
+        },
+        defaultMessage(args: ValidationArguments) {
+          return `${args.property} must be a valid strictly positive decimal number or string`;
+        },
+      },
+    });
+  };
+}
+
+export function IsNonNegativeDecimalString(validationOptions?: ValidationOptions) {
+  return function (object: object, propertyName: string) {
+    registerDecorator({
+      name: 'isNonNegativeDecimalString',
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: any) {
+          if (value === undefined || value === null || value === '') return false;
+          try {
+            const d = new Decimal(value);
+            return !d.isNaN() && d.gte(0);
+          } catch {
+            return false;
+          }
+        },
+        defaultMessage(args: ValidationArguments) {
+          return `${args.property} must be a valid non-negative decimal number or string`;
+        },
+      },
+    });
+  };
+}
 
 export class CreatePurchaseOrderItemDto {
   @ApiPropertyOptional({ description: 'Stock Keeping Unit (SKU) identifier', example: 'LAPTOP-PRO-15' })
@@ -26,21 +77,31 @@ export class CreatePurchaseOrderItemDto {
   @IsNotEmpty()
   description: string;
 
-  @ApiProperty({ description: 'Ordered quantity (must be strictly positive)', example: 10, minimum: 0.0001 })
-  @IsNumber()
-  @IsPositive()
-  orderedQuantity: number;
+  @ApiProperty({
+    description: 'Ordered quantity NUMERIC(18,4) (strictly positive decimal string or number)',
+    example: '10',
+    type: 'string',
+  })
+  @IsPositiveDecimalString()
+  orderedQuantity: string | number;
 
-  @ApiProperty({ description: 'Unit price per quantity unit', example: 15000000, minimum: 0 })
-  @IsNumber()
-  @Min(0)
-  unitPrice: number;
+  @ApiProperty({
+    description: 'Unit price per quantity unit NUMERIC(18,4) (non-negative decimal string or number)',
+    example: '15000000.00',
+    type: 'string',
+  })
+  @IsNonNegativeDecimalString()
+  unitPrice: string | number;
 
-  @ApiPropertyOptional({ description: 'Tax rate expressed as decimal fraction (0.10 = 10%)', example: 0.1, default: 0 })
-  @IsNumber()
-  @Min(0)
+  @ApiPropertyOptional({
+    description: 'Tax rate expressed as decimal fraction NUMERIC(7,4) (0.10 = 10%)',
+    example: '0.10',
+    default: '0',
+    type: 'string',
+  })
   @IsOptional()
-  taxRate?: number;
+  @IsNonNegativeDecimalString()
+  taxRate?: string | number;
 }
 
 export class CreatePurchaseOrderDto {
@@ -48,9 +109,9 @@ export class CreatePurchaseOrderDto {
   @IsUUID()
   supplierId: string;
 
-  @ApiProperty({ description: 'ISO 4217 3-character transaction currency', example: 'VND', default: 'VND' })
+  @ApiProperty({ description: '3-character transaction currency code', example: 'VND', default: 'VND' })
   @IsString()
-  @Length(3, 3)
+  @Matches(/^[A-Za-z]{3}$/, { message: 'currency must be a 3-character alphabetic code' })
   currency: string;
 
   @ApiProperty({ description: 'Order issuance date in YYYY-MM-DD format', example: '2026-10-04' })
@@ -63,7 +124,7 @@ export class CreatePurchaseOrderDto {
   expectedDeliveryDate?: string;
 
   @ApiProperty({
-    description: 'List of order line items (at least 1 item required)',
+    description: 'List of line items (at least 1 item required)',
     type: [CreatePurchaseOrderItemDto],
   })
   @IsArray()

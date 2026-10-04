@@ -1,92 +1,133 @@
-/**
- * Financial calculation helper for Purchase Order line items and aggregate totals.
- * Ensures numerical stability and exact rounding conforming to PostgreSQL NUMERIC(18,2).
- */
+import Decimal from 'decimal.js';
+
+// Configure Decimal globally for standard accounting/business half-up rounding
+Decimal.set({ precision: 30, rounding: Decimal.ROUND_HALF_UP });
 
 export interface CalculatedLineItem {
-  lineSubtotal: number;
-  taxAmount: number;
-  lineTotal: number;
+  lineSubtotal: string;
+  taxAmount: string;
+  lineTotal: string;
 }
 
 export interface CalculatedOrderTotals {
-  subtotal: number;
-  taxAmount: number;
-  totalAmount: number;
+  subtotal: string;
+  taxAmount: string;
+  totalAmount: string;
 }
 
+/**
+ * Arbitrary-precision financial calculator for Purchase Order line items and aggregate totals.
+ * Implements strict decimal arithmetic via Decimal.js conforming to PostgreSQL NUMERIC constraints.
+ * Eliminates all binary floating-point representation anomalies.
+ */
 export class POCalculator {
   /**
-   * Rounds a number to a specified number of decimal places using half-up rounding.
-   * Mitigates standard IEEE 754 binary floating-point representation anomalies.
+   * Rounds a Decimal or numeric string to fixed decimal places using ROUND_HALF_UP.
    */
-  static round(value: number, decimals = 2): number {
-    const factor = Math.pow(10, decimals);
-    return Math.round((value + Number.EPSILON) * factor) / factor;
+  static round(value: Decimal.Value, decimalPlaces = 2): string {
+    return new Decimal(value).toFixed(decimalPlaces, Decimal.ROUND_HALF_UP);
   }
 
   /**
    * Calculates financial totals for an individual line item.
    *
-   * Formula:
-   *   lineSubtotal = round(orderedQuantity * unitPrice, 2)
-   *   taxAmount    = round(lineSubtotal * taxRate, 2)
-   *   lineTotal    = round(lineSubtotal + taxAmount, 2)
+   * Formulas:
+   *   lineSubtotal = ROUND(orderedQuantity * unitPrice, 2)
+   *   taxAmount    = ROUND(lineSubtotal * taxRate, 2)
+   *   lineTotal    = lineSubtotal + taxAmount
+   *
+   * @param orderedQuantity NUMERIC(18,4) strictly positive
+   * @param unitPrice       NUMERIC(18,4) non-negative
+   * @param taxRate         NUMERIC(7,4)  non-negative decimal fraction (e.g. 0.08 = 8%)
    */
   static calculateLine(
-    orderedQuantity: number,
-    unitPrice: number,
-    taxRate: number,
+    orderedQuantity: Decimal.Value,
+    unitPrice: Decimal.Value,
+    taxRate: Decimal.Value = 0,
   ): CalculatedLineItem {
-    if (orderedQuantity <= 0) {
-      throw new Error(`Invalid orderedQuantity: ${orderedQuantity}. Must be strictly positive.`);
-    }
-    if (unitPrice < 0) {
-      throw new Error(`Invalid unitPrice: ${unitPrice}. Cannot be negative.`);
-    }
-    if (taxRate < 0) {
-      throw new Error(`Invalid taxRate: ${taxRate}. Cannot be negative.`);
+    let qty: Decimal;
+    let price: Decimal;
+    let tax: Decimal;
+
+    try {
+      qty = new Decimal(orderedQuantity);
+    } catch {
+      throw new Error(`Invalid orderedQuantity '${orderedQuantity}': Not a valid decimal number`);
     }
 
-    const rawSubtotal = orderedQuantity * unitPrice;
-    const lineSubtotal = this.round(rawSubtotal, 2);
+    try {
+      price = new Decimal(unitPrice);
+    } catch {
+      throw new Error(`Invalid unitPrice '${unitPrice}': Not a valid decimal number`);
+    }
 
-    const rawTax = lineSubtotal * taxRate;
-    const taxAmount = this.round(rawTax, 2);
+    try {
+      tax = new Decimal(taxRate);
+    } catch {
+      throw new Error(`Invalid taxRate '${taxRate}': Not a valid decimal number`);
+    }
 
-    const lineTotal = this.round(lineSubtotal + taxAmount, 2);
+    if (qty.lte(0)) {
+      throw new Error(`Invalid orderedQuantity: ${qty.toString()}. Must be strictly positive.`);
+    }
+    if (price.lt(0)) {
+      throw new Error(`Invalid unitPrice: ${price.toString()}. Cannot be negative.`);
+    }
+    if (tax.lt(0)) {
+      throw new Error(`Invalid taxRate: ${tax.toString()}. Cannot be negative.`);
+    }
+
+    // lineSubtotal = ROUND(orderedQuantity * unitPrice, 2)
+    const rawSubtotal = qty.times(price);
+    const lineSubtotalDec = new Decimal(rawSubtotal.toFixed(2, Decimal.ROUND_HALF_UP));
+
+    // taxAmount = ROUND(lineSubtotal * taxRate, 2)
+    const rawTax = lineSubtotalDec.times(tax);
+    const taxAmountDec = new Decimal(rawTax.toFixed(2, Decimal.ROUND_HALF_UP));
+
+    // lineTotal = lineSubtotal + taxAmount
+    const lineTotalDec = lineSubtotalDec.plus(taxAmountDec);
 
     return {
-      lineSubtotal,
-      taxAmount,
-      lineTotal,
+      lineSubtotal: lineSubtotalDec.toFixed(2),
+      taxAmount: taxAmountDec.toFixed(2),
+      lineTotal: lineTotalDec.toFixed(2),
     };
   }
 
   /**
    * Calculates cumulative financial totals across all line items of a Purchase Order.
+   *
+   * Formulas:
+   *   PO subtotal    = SUM(lineSubtotal)
+   *   PO taxAmount   = SUM(line taxAmount)
+   *   PO totalAmount = subtotal + taxAmount
    */
   static calculateTotals(
-    lines: { lineSubtotal: number; taxAmount: number; lineTotal: number }[],
+    lines: Array<{ lineSubtotal: Decimal.Value; taxAmount: Decimal.Value }>,
   ): CalculatedOrderTotals {
-    if (!lines || lines.length === 0) {
-      return { subtotal: 0, taxAmount: 0, totalAmount: 0 };
+    if (lines.length === 0) {
+      return {
+        subtotal: '0.00',
+        taxAmount: '0.00',
+        totalAmount: '0.00',
+      };
     }
 
-    let subtotalAcc = 0;
-    let taxAcc = 0;
-    let totalAcc = 0;
+    let subtotalDec = new Decimal(0);
+    let taxAmountDec = new Decimal(0);
 
     for (const line of lines) {
-      subtotalAcc += line.lineSubtotal;
-      taxAcc += line.taxAmount;
-      totalAcc += line.lineTotal;
+      subtotalDec = subtotalDec.plus(new Decimal(line.lineSubtotal));
+      taxAmountDec = taxAmountDec.plus(new Decimal(line.taxAmount));
     }
 
+    const totalAmountDec = subtotalDec.plus(taxAmountDec);
+
     return {
-      subtotal: this.round(subtotalAcc, 2),
-      taxAmount: this.round(taxAcc, 2),
-      totalAmount: this.round(totalAcc, 2),
+      subtotal: subtotalDec.toFixed(2),
+      taxAmount: taxAmountDec.toFixed(2),
+      totalAmount: totalAmountDec.toFixed(2),
     };
   }
 }
