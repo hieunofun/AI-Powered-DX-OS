@@ -46,15 +46,16 @@ export class PurchaseOrdersRepository {
 
   /**
    * Finds a Purchase Order by ID, including its line items.
+   * Returns exact decimal values as strings to prevent floating-point inaccuracy.
    */
   async findById(id: string, client?: PoolClient): Promise<PurchaseOrderEntity | null> {
     const poQuery = `
       SELECT id, po_number AS "poNumber", supplier_id AS "supplierId", currency, status,
              to_char(order_date, 'YYYY-MM-DD') AS "orderDate",
              to_char(expected_delivery_date, 'YYYY-MM-DD') AS "expectedDeliveryDate",
-             subtotal::numeric::float8 AS subtotal,
-             tax_amount::numeric::float8 AS "taxAmount",
-             total_amount::numeric::float8 AS "totalAmount",
+             subtotal::text AS subtotal,
+             tax_amount::text AS "taxAmount",
+             total_amount::text AS "totalAmount",
              version,
              cancelled_at AS "cancelledAt",
              cancelled_reason AS "cancelledReason",
@@ -73,12 +74,12 @@ export class PurchaseOrdersRepository {
     const itemsQuery = `
       SELECT id, purchase_order_id AS "purchaseOrderId", line_number AS "lineNumber",
              sku, description,
-             ordered_quantity::numeric::float8 AS "orderedQuantity",
-             unit_price::numeric::float8 AS "unitPrice",
-             tax_rate::numeric::float8 AS "taxRate",
-             line_subtotal::numeric::float8 AS "lineSubtotal",
-             tax_amount::numeric::float8 AS "taxAmount",
-             line_total::numeric::float8 AS "lineTotal",
+             ordered_quantity::text AS "orderedQuantity",
+             unit_price::text AS "unitPrice",
+             tax_rate::text AS "taxRate",
+             line_subtotal::text AS "lineSubtotal",
+             tax_amount::text AS "taxAmount",
+             line_total::text AS "lineTotal",
              created_at AS "createdAt",
              updated_at AS "updatedAt"
       FROM purchase_order_items
@@ -125,9 +126,9 @@ export class PurchaseOrdersRepository {
       SELECT id, po_number AS "poNumber", supplier_id AS "supplierId", currency, status,
              to_char(order_date, 'YYYY-MM-DD') AS "orderDate",
              to_char(expected_delivery_date, 'YYYY-MM-DD') AS "expectedDeliveryDate",
-             subtotal::numeric::float8 AS subtotal,
-             tax_amount::numeric::float8 AS "taxAmount",
-             total_amount::numeric::float8 AS "totalAmount",
+             subtotal::text AS subtotal,
+             tax_amount::text AS "taxAmount",
+             total_amount::text AS "totalAmount",
              version,
              cancelled_at AS "cancelledAt",
              cancelled_reason AS "cancelledReason",
@@ -151,6 +152,8 @@ export class PurchaseOrdersRepository {
 
   /**
    * Creates a Purchase Order, its line items, and an audit record in a single atomic transaction.
+   * Conforms strictly to Issue #2 audit_records schema:
+   * (id, entity_type, entity_id, event_type, actor_subject, payload_hash, metadata, created_at)
    */
   async createPO(
     poData: {
@@ -159,20 +162,20 @@ export class PurchaseOrdersRepository {
       currency: string;
       orderDate: string;
       expectedDeliveryDate?: string | null;
-      subtotal: number;
-      taxAmount: number;
-      totalAmount: number;
+      subtotal: string;
+      taxAmount: string;
+      totalAmount: string;
     },
     itemsData: Array<{
       lineNumber: number;
       sku?: string | null;
       description: string;
-      orderedQuantity: number;
-      unitPrice: number;
-      taxRate: number;
-      lineSubtotal: number;
-      taxAmount: number;
-      lineTotal: number;
+      orderedQuantity: string;
+      unitPrice: string;
+      taxRate: string;
+      lineSubtotal: string;
+      taxAmount: string;
+      lineTotal: string;
     }>,
     actor: { subject: string; roles: string[] },
   ): Promise<PurchaseOrderEntity> {
@@ -187,9 +190,9 @@ export class PurchaseOrdersRepository {
         ) RETURNING id, po_number AS "poNumber", supplier_id AS "supplierId", currency, status,
                     to_char(order_date, 'YYYY-MM-DD') AS "orderDate",
                     to_char(expected_delivery_date, 'YYYY-MM-DD') AS "expectedDeliveryDate",
-                    subtotal::numeric::float8 AS subtotal,
-                    tax_amount::numeric::float8 AS "taxAmount",
-                    total_amount::numeric::float8 AS "totalAmount",
+                    subtotal::text AS subtotal,
+                    tax_amount::text AS "taxAmount",
+                    total_amount::text AS "totalAmount",
                     version, created_at AS "createdAt", updated_at AS "updatedAt"
       `;
       const poRes = await client.query<PurchaseOrderEntity>(insertPoQuery, [
@@ -216,12 +219,12 @@ export class PurchaseOrdersRepository {
             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
           ) RETURNING id, purchase_order_id AS "purchaseOrderId", line_number AS "lineNumber",
                       sku, description,
-                      ordered_quantity::numeric::float8 AS "orderedQuantity",
-                      unit_price::numeric::float8 AS "unitPrice",
-                      tax_rate::numeric::float8 AS "taxRate",
-                      line_subtotal::numeric::float8 AS "lineSubtotal",
-                      tax_amount::numeric::float8 AS "taxAmount",
-                      line_total::numeric::float8 AS "lineTotal",
+                      ordered_quantity::text AS "orderedQuantity",
+                      unit_price::text AS "unitPrice",
+                      tax_rate::text AS "taxRate",
+                      line_subtotal::text AS "lineSubtotal",
+                      tax_amount::text AS "taxAmount",
+                      line_total::text AS "lineTotal",
                       created_at AS "createdAt", updated_at AS "updatedAt"
         `;
         const itemRes = await client.query<PurchaseOrderItemEntity>(insertItemQuery, [
@@ -240,19 +243,19 @@ export class PurchaseOrdersRepository {
       }
       createdPo.items = insertedItems;
 
-      // 3. Insert Audit Record
+      // 3. Insert Audit Record (conforming strictly to Issue #2 audit_records schema)
       const auditQuery = `
         INSERT INTO audit_records (
-          entity_type, entity_id, event_type, actor_subject, actor_roles, payload
+          entity_type, entity_id, event_type, actor_subject, metadata
         ) VALUES (
-          'PURCHASE_ORDER', $1, 'PO_CREATED', $2, $3, $4
+          'PURCHASE_ORDER', $1, 'PO_CREATED', $2, $3::jsonb
         )
       `;
       await client.query(auditQuery, [
         createdPo.id,
         actor.subject,
-        JSON.stringify(actor.roles),
         JSON.stringify({
+          actorRoles: actor.roles,
           poNumber: createdPo.poNumber,
           status: createdPo.status,
           totalAmount: createdPo.totalAmount,
@@ -267,6 +270,7 @@ export class PurchaseOrdersRepository {
 
   /**
    * Updates an existing DRAFT Purchase Order using optimistic locking.
+   * Conforms strictly to Issue #2 audit_records schema.
    */
   async updateDraftPO(
     id: string,
@@ -276,20 +280,20 @@ export class PurchaseOrdersRepository {
       currency?: string;
       orderDate?: string;
       expectedDeliveryDate?: string | null;
-      subtotal?: number;
-      taxAmount?: number;
-      totalAmount?: number;
+      subtotal?: string;
+      taxAmount?: string;
+      totalAmount?: string;
     },
     itemsData?: Array<{
       lineNumber: number;
       sku?: string | null;
       description: string;
-      orderedQuantity: number;
-      unitPrice: number;
-      taxRate: number;
-      lineSubtotal: number;
-      taxAmount: number;
-      lineTotal: number;
+      orderedQuantity: string;
+      unitPrice: string;
+      taxRate: string;
+      lineSubtotal: string;
+      taxAmount: string;
+      lineTotal: string;
     }>,
     actor?: { subject: string; roles: string[] },
   ): Promise<PurchaseOrderEntity> {
@@ -382,20 +386,20 @@ export class PurchaseOrdersRepository {
         }
       }
 
-      // 4. Audit Record
+      // 4. Audit Record (conforming strictly to Issue #2 audit_records schema)
       if (actor) {
         const auditQuery = `
           INSERT INTO audit_records (
-            entity_type, entity_id, event_type, actor_subject, actor_roles, payload
+            entity_type, entity_id, event_type, actor_subject, metadata
           ) VALUES (
-            'PURCHASE_ORDER', $1, 'PO_UPDATED', $2, $3, $4
+            'PURCHASE_ORDER', $1, 'PO_UPDATED', $2, $3::jsonb
           )
         `;
         await client.query(auditQuery, [
           id,
           actor.subject,
-          JSON.stringify(actor.roles),
           JSON.stringify({
+            actorRoles: actor.roles,
             previousVersion: expectedVersion,
             newVersion: expectedVersion + 1,
             updatedFields: Object.keys(poData),
@@ -409,6 +413,7 @@ export class PurchaseOrdersRepository {
 
   /**
    * Issues a DRAFT Purchase Order using optimistic locking.
+   * Conforms strictly to Issue #2 audit_records schema.
    */
   async issuePO(
     id: string,
@@ -441,19 +446,19 @@ export class PurchaseOrdersRepository {
         );
       }
 
-      // Audit Record
+      // Audit Record (conforming strictly to Issue #2 audit_records schema)
       const auditQuery = `
         INSERT INTO audit_records (
-          entity_type, entity_id, event_type, actor_subject, actor_roles, payload
+          entity_type, entity_id, event_type, actor_subject, metadata
         ) VALUES (
-          'PURCHASE_ORDER', $1, 'PO_ISSUED', $2, $3, $4
+          'PURCHASE_ORDER', $1, 'PO_ISSUED', $2, $3::jsonb
         )
       `;
       await client.query(auditQuery, [
         id,
         actor.subject,
-        JSON.stringify(actor.roles),
         JSON.stringify({
+          actorRoles: actor.roles,
           previousStatus: 'DRAFT',
           newStatus: 'ISSUED',
           version: expectedVersion + 1,
@@ -466,6 +471,7 @@ export class PurchaseOrdersRepository {
 
   /**
    * Cancels a DRAFT or ISSUED Purchase Order with a mandatory reason.
+   * Conforms strictly to Issue #2 audit_records schema.
    */
   async cancelPO(
     id: string,
@@ -501,19 +507,19 @@ export class PurchaseOrdersRepository {
         );
       }
 
-      // Audit Record
+      // Audit Record (conforming strictly to Issue #2 audit_records schema)
       const auditQuery = `
         INSERT INTO audit_records (
-          entity_type, entity_id, event_type, actor_subject, actor_roles, payload
+          entity_type, entity_id, event_type, actor_subject, metadata
         ) VALUES (
-          'PURCHASE_ORDER', $1, 'PO_CANCELLED', $2, $3, $4
+          'PURCHASE_ORDER', $1, 'PO_CANCELLED', $2, $3::jsonb
         )
       `;
       await client.query(auditQuery, [
         id,
         actor.subject,
-        JSON.stringify(actor.roles),
         JSON.stringify({
+          actorRoles: actor.roles,
           previousStatus: current.status,
           newStatus: 'CANCELLED',
           reason,
