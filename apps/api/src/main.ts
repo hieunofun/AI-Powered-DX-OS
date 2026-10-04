@@ -36,8 +36,13 @@ async function bootstrap() {
     logger.log('CORS disabled on backend; APISIX API Gateway acts as external CORS authority');
   }
 
-  // Swagger OpenAPI documentation (DEV/CI enabled by default; disabled in hardened production)
-  const enableSwagger = process.env.ENABLE_SWAGGER !== 'false';
+  // Swagger OpenAPI documentation:
+  // Hardened production default: OFF unless explicitly ENABLE_SWAGGER=true.
+  // In development and test environments: ON unless explicitly disabled.
+  const isProduction = process.env.NODE_ENV === 'production';
+  const enableSwagger =
+    process.env.ENABLE_SWAGGER === 'true' ||
+    (!isProduction && process.env.ENABLE_SWAGGER !== 'false');
   if (enableSwagger) {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('SmartProcure-Pay Core API')
