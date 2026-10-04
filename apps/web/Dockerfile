@@ -14,8 +14,8 @@ COPY packages/ ./packages/
 # Install build dependencies
 RUN npm install
 
-# Build-time argument for API Base URL and Keycloak
-ARG VITE_API_BASE_URL=http://localhost:4000
+# Build-time argument for API Base URL and Keycloak (routes via APISIX gateway)
+ARG VITE_API_BASE_URL=/api
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 ARG VITE_KEYCLOAK_URL=http://localhost:8080
 ENV VITE_KEYCLOAK_URL=$VITE_KEYCLOAK_URL

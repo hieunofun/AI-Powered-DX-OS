@@ -16,7 +16,8 @@ interface ApiResponseState {
 }
 
 export const App: React.FC = () => {
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+  const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+  const apiBaseUrl = rawApiBaseUrl.replace(/\/$/, '');
   const { isAuthenticated, isLoading, user, roles, login, logout, getToken } = useAuth();
 
   const [apiHealth, setApiHealth] = useState<ApiHealthState>({ status: 'checking' });
@@ -69,7 +70,9 @@ export const App: React.FC = () => {
           }
         }
 
-        const res = await fetch(`${apiBaseUrl}${endpoint}`, { headers });
+        const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+        const targetUrl = `${apiBaseUrl}${normalizedEndpoint}`;
+        const res = await fetch(targetUrl, { headers });
         let data: unknown;
         try {
           data = await res.json();
@@ -78,7 +81,7 @@ export const App: React.FC = () => {
         }
 
         setApiResponse({
-          endpoint,
+          endpoint: targetUrl,
           statusCode: res.status,
           data,
         });
@@ -171,10 +174,10 @@ export const App: React.FC = () => {
       <section className="card">
         <h2>
           <span>Backend RBAC Technical Validation</span>
-          <span className="tag">Issue #3 Endpoints</span>
+          <span className="tag">Gateway &amp; Auth Endpoints</span>
         </h2>
         <p>
-          Execute live calls against NestJS API authentication and role authorization guards.
+          Execute live calls against NestJS API authentication and role authorization guards routed via Apache APISIX Gateway.
         </p>
 
         <div className="btn-group">
@@ -183,28 +186,28 @@ export const App: React.FC = () => {
             disabled={callingApi}
             onClick={() => callEndpoint('/auth/me', true)}
           >
-            GET /auth/me (Authenticated User)
+            GET /api/auth/me (Authenticated User)
           </button>
           <button
             className="btn btn-secondary"
             disabled={callingApi}
             onClick={() => callEndpoint('/auth/buyer-test', true)}
           >
-            GET /auth/buyer-test (buyer | admin)
+            GET /api/auth/buyer-test (buyer | admin)
           </button>
           <button
             className="btn btn-secondary"
             disabled={callingApi}
             onClick={() => callEndpoint('/auth/admin-test', true)}
           >
-            GET /auth/admin-test (admin only)
+            GET /api/auth/admin-test (admin only)
           </button>
           <button
             className="btn btn-secondary"
             disabled={callingApi}
             onClick={() => callEndpoint('/auth/me', false)}
           >
-            GET /auth/me (No Token &rarr; 401)
+            GET /api/auth/me (No Token &rarr; 401)
           </button>
         </div>
 
@@ -316,7 +319,7 @@ export const App: React.FC = () => {
             </li>
             <li className="service-item">
               <span>Apache APISIX (API Gateway)</span>
-              <span className="tag">Planned (Issue #4)</span>
+              <span className="tag tag-active">Integrated (Issue #4)</span>
             </li>
             <li className="service-item">
               <span>MinIO (Object Storage)</span>
