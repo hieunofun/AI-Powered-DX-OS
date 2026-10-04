@@ -45,7 +45,7 @@ run_sql() {
 # ------------------------------------------------------------------------------
 # 0. Acquire Authentic Keycloak Tokens
 # ------------------------------------------------------------------------------
-echo "[0/11] Retrieving authentic tokens from Keycloak..."
+echo "[0/10] Retrieving authentic tokens from Keycloak..."
 
 BUYER_TOKEN=$(curl -s -X POST "$KEYCLOAK_URL/realms/$REALM/protocol/openid-connect/token" \
   -H "Content-Type: application/x-www-form-urlencoded" \
@@ -95,7 +95,7 @@ fi
 run_sql "UPDATE goods_receipt_policies SET over_delivery_tolerance_percent = 0.00 WHERE is_active = true;"
 
 # ------------------------------------------------------------------------------
-# 1. Helper function to create and issue a test PO via APISIX
+# Helper function to create and issue a test PO via APISIX
 # ------------------------------------------------------------------------------
 create_and_issue_po() {
   local items_json="$1"
@@ -147,16 +147,16 @@ EOF
 }
 
 # ------------------------------------------------------------------------------
-# 2. REQUIRED REAL SCENARIO (Sections 28 & 29)
+# 1. REQUIRED REAL SCENARIO (Sections 28 & 29)
 # ------------------------------------------------------------------------------
 echo "[1/10] Running Required Real Scenario: Multiple GRNs fulfilling PO..."
 
-PO_ITEMS='[
+PO_ITEMS_1='[
   {"sku": "ITEM-A", "description": "High Precision Component A", "orderedQuantity": "100.0000", "unitPrice": "10.0000", "taxRate": "0.10"},
   {"sku": "ITEM-B", "description": "High Precision Component B", "orderedQuantity": "50.0000", "unitPrice": "20.0000", "taxRate": "0.10"}
 ]'
 
-PO_1_ID=$(create_and_issue_po "$PO_ITEMS")
+PO_1_ID=$(create_and_issue_po "$PO_ITEMS_1")
 ITEM_A_ID=$(run_sql "SELECT id FROM purchase_order_items WHERE purchase_order_id = '$PO_1_ID' AND line_number = 1;")
 ITEM_B_ID=$(run_sql "SELECT id FROM purchase_order_items WHERE purchase_order_id = '$PO_1_ID' AND line_number = 2;")
 
@@ -298,7 +298,7 @@ fi
 echo "Cumulative accepted quantities verified in PostgreSQL: Item A = $CUMULATIVE_A, Item B = $CUMULATIVE_B."
 
 # ------------------------------------------------------------------------------
-# 3. OVER-DELIVERY TEST (Section 30)
+# 2. OVER-DELIVERY TEST (Section 30)
 # ------------------------------------------------------------------------------
 echo "[2/10] Testing Over-Delivery Policy (0.00% vs 10.00% tolerance)..."
 
@@ -306,7 +306,7 @@ PO_ITEMS_2='[{"sku": "ITEM-C", "description": "Over-Delivery Test Item", "ordere
 PO_2_ID=$(create_and_issue_po "$PO_ITEMS_2")
 ITEM_C_ID=$(run_sql "SELECT id FROM purchase_order_items WHERE purchase_order_id = '$PO_2_ID' AND line_number = 1;")
 
-# Receipt 1: Accept 90.0000
+# Receipt 1: Accept 90.0000 (PO becomes PARTIALLY_RECEIVED)
 GRN_3_RESP=$(curl -s -X POST "$GATEWAY_URL/api/goods-receipts" \
   -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
   -H "Content-Type: application/json" \
@@ -314,7 +314,7 @@ GRN_3_RESP=$(curl -s -X POST "$GATEWAY_URL/api/goods-receipts" \
 GRN_3_ID=$(echo "$GRN_3_RESP" | jq -r '.id')
 curl -s -f -X POST "$GATEWAY_URL/api/goods-receipts/$GRN_3_ID/receive" -H "Authorization: Bearer $WAREHOUSE_TOKEN" > /dev/null
 
-# Attempt Receipt 2: Accept 11.0000 under 0.00% tolerance (Proposed = 101 > 100) -> 409 Conflict
+# Attempt Receipt 2: Accept 11.0000 under 0.00% tolerance (Proposed = 90 + 11 = 101 > 100) -> 409 Conflict
 GRN_4_RESP=$(curl -s -X POST "$GATEWAY_URL/api/goods-receipts" \
   -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
   -H "Content-Type: application/json" \
@@ -331,7 +331,13 @@ if [ "$HTTP_CODE" != "409" ]; then
 fi
 echo "Over-delivery correctly rejected with HTTP 409 at 0% tolerance."
 
-# Now update policy to 10.00% tolerance via admin
+# Clean up GRN 4 draft
+curl -s -X POST "$GATEWAY_URL/api/goods-receipts/$GRN_4_ID/cancel" \
+  -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"reason": "Cancel over-delivery attempt"}' > /dev/null
+
+# Now update policy to 10.00% tolerance via admin (Allowed accepted = 100 * 1.10 = 110.0000)
 POLICY_RESP=$(curl -s -w "\n%{http_code}" -X PATCH "$GATEWAY_URL/api/goods-receipts/policy" \
   -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
@@ -341,40 +347,55 @@ if [ "$HTTP_CODE" != "200" ]; then
   echo "ERROR: Admin failed to update policy (HTTP $HTTP_CODE)"
   exit 1
 fi
-echo "Policy updated to 10.00% tolerance."
+echo "Policy updated to 10.00% tolerance (Allowed = 110.0000)."
 
-# Allowed accepted is now 100 * 1.10 = 110.0000.
-# Current accepted = 90. Create GRN accepting 15.0000 -> Total = 105.0000 <= 110.0000 -> Expect success!
-GRN_5_RESP=$(curl -s -X POST "$GATEWAY_URL/api/goods-receipts" \
+# Test proposed cumulative 111 (accepted = 21 -> 90 + 21 = 111 > 110): expect reject HTTP 409
+GRN_5_RESP=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts" \
   -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"purchaseOrderId\": \"$PO_2_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_C_ID\", \"receivedQuantity\": \"15.0000\", \"acceptedQuantity\": \"15.0000\", \"rejectedQuantity\": \"0.0000\"}]}")
-GRN_5_ID=$(echo "$GRN_5_RESP" | jq -r '.id')
-
-SUCCESS_OVERDELIV=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts/$GRN_5_ID/receive" \
-  -H "Authorization: Bearer $WAREHOUSE_TOKEN")
-HTTP_CODE=$(echo "$SUCCESS_OVERDELIV" | tail -n 1)
-if [ "$HTTP_CODE" != "200" ]; then
-  echo "ERROR: Expected HTTP 200 for receipt within 10% tolerance, got $HTTP_CODE"
+  -d "{\"purchaseOrderId\": \"$PO_2_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_C_ID\", \"receivedQuantity\": \"21.0000\", \"acceptedQuantity\": \"21.0000\", \"rejectedQuantity\": \"0.0000\"}]}")
+HTTP_CODE=$(echo "$GRN_5_RESP" | tail -n 1)
+if [ "$HTTP_CODE" != "201" ]; then
+  echo "ERROR: Expected HTTP 201 for creating draft GRN with 21 qty, got $HTTP_CODE"
   exit 1
 fi
-echo "Receipt within 10.00% tolerance succeeded (total 105 / 110 allowed)."
+GRN_5_ID=$(echo "$GRN_5_RESP" | sed '$d' | jq -r '.id')
 
-# Now try accepting 6.0000 more -> Total = 111.0000 > 110.0000 -> Expect 409 Conflict!
-GRN_6_RESP=$(curl -s -X POST "$GATEWAY_URL/api/goods-receipts" \
-  -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d "{\"purchaseOrderId\": \"$PO_2_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_C_ID\", \"receivedQuantity\": \"6.0000\", \"acceptedQuantity\": \"6.0000\", \"rejectedQuantity\": \"0.0000\"}]}")
-GRN_6_ID=$(echo "$GRN_6_RESP" | jq -r '.id')
-
-FAIL_OVERDELIV=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts/$GRN_6_ID/receive" \
+FAIL_OVERDELIV=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts/$GRN_5_ID/receive" \
   -H "Authorization: Bearer $WAREHOUSE_TOKEN")
 HTTP_CODE=$(echo "$FAIL_OVERDELIV" | tail -n 1)
 if [ "$HTTP_CODE" != "409" ]; then
-  echo "ERROR: Expected HTTP 409 for exceeding 10% tolerance, got $HTTP_CODE"
+  echo "ERROR: Expected HTTP 409 for exceeding 10% tolerance (111 > 110), got $HTTP_CODE"
   exit 1
 fi
-echo "Receipt exceeding 10.00% tolerance correctly rejected with HTTP 409."
+echo "Receipt exceeding 10.00% tolerance correctly rejected with HTTP 409 (proposed 111 > 110 allowed)."
+
+# Cancel GRN 5
+curl -s -X POST "$GATEWAY_URL/api/goods-receipts/$GRN_5_ID/cancel" \
+  -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"reason": "Exceeded 10% tolerance threshold"}' > /dev/null
+
+# Test proposed cumulative 105 (accepted = 15 -> 90 + 15 = 105 <= 110): expect success HTTP 200
+GRN_6_RESP=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts" \
+  -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"purchaseOrderId\": \"$PO_2_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_C_ID\", \"receivedQuantity\": \"15.0000\", \"acceptedQuantity\": \"15.0000\", \"rejectedQuantity\": \"0.0000\"}]}")
+HTTP_CODE=$(echo "$GRN_6_RESP" | tail -n 1)
+if [ "$HTTP_CODE" != "201" ]; then
+  echo "ERROR: Expected HTTP 201 for creating draft GRN with 15 qty, got $HTTP_CODE"
+  exit 1
+fi
+GRN_6_ID=$(echo "$GRN_6_RESP" | sed '$d' | jq -r '.id')
+
+SUCCESS_OVERDELIV=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts/$GRN_6_ID/receive" \
+  -H "Authorization: Bearer $WAREHOUSE_TOKEN")
+HTTP_CODE=$(echo "$SUCCESS_OVERDELIV" | tail -n 1)
+if [ "$HTTP_CODE" != "200" ]; then
+  echo "ERROR: Expected HTTP 200 for receipt within 10% tolerance (105 <= 110), got $HTTP_CODE"
+  exit 1
+fi
+echo "Receipt within 10.00% tolerance succeeded (total 105 / 110 allowed). PO status is now FULLY_RECEIVED."
 
 # Reset policy back to 0.00%
 curl -s -X PATCH "$GATEWAY_URL/api/goods-receipts/policy" \
@@ -383,7 +404,7 @@ curl -s -X PATCH "$GATEWAY_URL/api/goods-receipts/policy" \
   -d '{"overDeliveryTolerancePercent": "0.00"}' > /dev/null
 
 # ------------------------------------------------------------------------------
-# 4. RECEIVED VS ACCEPTED TEST (Section 31)
+# 3. RECEIVED VS ACCEPTED TEST (Section 31)
 # ------------------------------------------------------------------------------
 echo "[3/10] Testing Received vs Accepted Quantity (Physical: 110, Accepted: 100, Rejected: 10 with damageNote)..."
 
@@ -419,15 +440,19 @@ fi
 echo "Received vs Accepted validated: Gross received 110, accepted 100 resulted in FULLY_RECEIVED."
 
 # ------------------------------------------------------------------------------
-# 5. REJECTION & CONSERVATION VALIDATION (Section 32)
+# 4. REJECTION & CONSERVATION VALIDATION (Section 32)
 # ------------------------------------------------------------------------------
 echo "[4/10] Testing Rejection validation and quantity conservation..."
+
+PO_ITEMS_4='[{"sku": "ITEM-E", "description": "Validation Inspection Item", "orderedQuantity": "100.0000", "unitPrice": "30.0000", "taxRate": "0.10"}]'
+PO_4_ID=$(create_and_issue_po "$PO_ITEMS_4")
+ITEM_E_ID=$(run_sql "SELECT id FROM purchase_order_items WHERE purchase_order_id = '$PO_4_ID' AND line_number = 1;")
 
 # Case A: rejectedQuantity > 0 without damageNote -> HTTP 400
 NO_NOTE_RESP=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts" \
   -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"purchaseOrderId\": \"$PO_1_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_A_ID\", \"receivedQuantity\": \"10.0000\", \"acceptedQuantity\": \"8.0000\", \"rejectedQuantity\": \"2.0000\", \"damageNote\": \"\"}]}")
+  -d "{\"purchaseOrderId\": \"$PO_4_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_E_ID\", \"receivedQuantity\": \"10.0000\", \"acceptedQuantity\": \"8.0000\", \"rejectedQuantity\": \"2.0000\", \"damageNote\": \"\"}]}")
 HTTP_CODE=$(echo "$NO_NOTE_RESP" | tail -n 1)
 if [ "$HTTP_CODE" != "400" ]; then
   echo "ERROR: Expected HTTP 400 for rejectedQuantity without damageNote, got $HTTP_CODE"
@@ -439,7 +464,7 @@ echo "Rejection without damageNote correctly rejected (HTTP 400)."
 OVER_CONSERV_RESP=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts" \
   -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"purchaseOrderId\": \"$PO_1_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_A_ID\", \"receivedQuantity\": \"10.0000\", \"acceptedQuantity\": \"8.0000\", \"rejectedQuantity\": \"3.0000\", \"damageNote\": \"Damage\"}]}")
+  -d "{\"purchaseOrderId\": \"$PO_4_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_E_ID\", \"receivedQuantity\": \"10.0000\", \"acceptedQuantity\": \"8.0000\", \"rejectedQuantity\": \"3.0000\", \"damageNote\": \"Damage\"}]}")
 HTTP_CODE=$(echo "$OVER_CONSERV_RESP" | tail -n 1)
 if [ "$HTTP_CODE" != "400" ]; then
   echo "ERROR: Expected HTTP 400 when accepted + rejected > received, got $HTTP_CODE"
@@ -452,7 +477,7 @@ echo "accepted + rejected > received correctly rejected (HTTP 400)."
 UNCLASS_RESP=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts" \
   -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"purchaseOrderId\": \"$PO_1_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_A_ID\", \"receivedQuantity\": \"10.0000\", \"acceptedQuantity\": \"5.0000\", \"rejectedQuantity\": \"0.0000\"}]}")
+  -d "{\"purchaseOrderId\": \"$PO_4_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_E_ID\", \"receivedQuantity\": \"10.0000\", \"acceptedQuantity\": \"5.0000\", \"rejectedQuantity\": \"0.0000\"}]}")
 HTTP_CODE=$(echo "$UNCLASS_RESP" | tail -n 1)
 if [ "$HTTP_CODE" != "201" ]; then
   echo "ERROR: Expected HTTP 201 for DRAFT GRN with partial classification, got $HTTP_CODE"
@@ -477,15 +502,15 @@ curl -s -X POST "$GATEWAY_URL/api/goods-receipts/$UNCLASS_GRN_ID/cancel" \
   -d '{"reason": "Abandon unclassified draft"}' > /dev/null
 
 # ------------------------------------------------------------------------------
-# 6. CROSS-PO INTEGRITY (Section 33)
+# 5. CROSS-PO INTEGRITY (Section 33)
 # ------------------------------------------------------------------------------
 echo "[5/10] Testing Cross-PO item reference integrity..."
 
-# Attempt: GRN parent = PO_2_ID, but item references ITEM_A_ID (belongs to PO_1_ID)
+# Attempt: GRN parent = PO_4_ID, but item references ITEM_D_ID (belongs to PO_3_ID)
 CROSS_RESP=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts" \
   -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"purchaseOrderId\": \"$PO_2_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_A_ID\", \"receivedQuantity\": \"10.0000\", \"acceptedQuantity\": \"10.0000\", \"rejectedQuantity\": \"0.0000\"}]}")
+  -d "{\"purchaseOrderId\": \"$PO_4_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_D_ID\", \"receivedQuantity\": \"10.0000\", \"acceptedQuantity\": \"10.0000\", \"rejectedQuantity\": \"0.0000\"}]}")
 HTTP_CODE=$(echo "$CROSS_RESP" | tail -n 1)
 
 if [ "$HTTP_CODE" != "400" ]; then
@@ -495,7 +520,7 @@ fi
 echo "Cross-PO item reference successfully rejected (HTTP 400)."
 
 # ------------------------------------------------------------------------------
-# 7. CONCURRENCY PROTECTION (Section 34)
+# 6. CONCURRENCY PROTECTION (Section 34)
 # ------------------------------------------------------------------------------
 echo "[6/10] Testing Concurrency Protection against race-condition over-delivery..."
 
@@ -570,7 +595,7 @@ fi
 echo "PO status successfully set to FULLY_RECEIVED."
 
 # ------------------------------------------------------------------------------
-# 8. CANCELLATION RECALCULATION (Section 35)
+# 7. CANCELLATION RECALCULATION (Section 35)
 # ------------------------------------------------------------------------------
 echo "[7/10] Testing Cancellation Recalculation (FULLY_RECEIVED -> PARTIALLY_RECEIVED -> ISSUED)..."
 
@@ -626,19 +651,31 @@ fi
 echo "Cancellation reversed PO from PARTIALLY_RECEIVED to ISSUED (cumulative: 0)."
 
 # ------------------------------------------------------------------------------
-# 9. TRANSACTION ATOMICITY (Section 36)
+# 8. TRANSACTION ATOMICITY (Section 36)
 # ------------------------------------------------------------------------------
 echo "[8/10] Verifying Database Transaction Atomicity on finalization failure..."
 
-# Create a draft that fails over-delivery on an already fulfilled line
+PO_ITEMS_6='[{"sku": "ITEM-ATOM", "description": "Atomicity Verification Item", "orderedQuantity": "100.0000", "unitPrice": "40.0000", "taxRate": "0.10"}]'
+PO_6_ID=$(create_and_issue_po "$PO_ITEMS_6")
+ITEM_ATOM_ID=$(run_sql "SELECT id FROM purchase_order_items WHERE purchase_order_id = '$PO_6_ID' AND line_number = 1;")
+
+# Initial intake: 90.0000 accepted
+GRN_ATOM_INIT=$(curl -s -X POST "$GATEWAY_URL/api/goods-receipts" \
+  -H "Authorization: Bearer $WAREHOUSE_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"purchaseOrderId\": \"$PO_6_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_ATOM_ID\", \"receivedQuantity\": \"90.0000\", \"acceptedQuantity\": \"90.0000\", \"rejectedQuantity\": \"0.0000\"}]}")
+GRN_ATOM_INIT_ID=$(echo "$GRN_ATOM_INIT" | jq -r '.id')
+curl -s -f -X POST "$GATEWAY_URL/api/goods-receipts/$GRN_ATOM_INIT_ID/receive" -H "Authorization: Bearer $WAREHOUSE_TOKEN" > /dev/null
+
+# Create a draft that fails over-delivery (accepts 15 -> 90 + 15 = 105 > 100 under 0% tolerance)
 GRN_FAIL_PAYLOAD=$(cat <<EOF
 {
-  "purchaseOrderId": "$PO_1_ID",
+  "purchaseOrderId": "$PO_6_ID",
   "items": [
     {
-      "purchaseOrderItemId": "$ITEM_A_ID",
-      "receivedQuantity": "5.0000",
-      "acceptedQuantity": "5.0000",
+      "purchaseOrderItemId": "$ITEM_ATOM_ID",
+      "receivedQuantity": "15.0000",
+      "acceptedQuantity": "15.0000",
       "rejectedQuantity": "0.0000"
     }
   ]
@@ -652,8 +689,8 @@ GRN_FAIL_RESP=$(curl -s -X POST "$GATEWAY_URL/api/goods-receipts" \
   -d "$GRN_FAIL_PAYLOAD")
 GRN_FAIL_ID=$(echo "$GRN_FAIL_RESP" | jq -r '.id')
 
-PO_VERSION_BEFORE=$(run_sql "SELECT version FROM purchase_orders WHERE id = '$PO_1_ID';")
-PO_STATUS_BEFORE=$(run_sql "SELECT status FROM purchase_orders WHERE id = '$PO_1_ID';")
+PO_VERSION_BEFORE=$(run_sql "SELECT version FROM purchase_orders WHERE id = '$PO_6_ID';")
+PO_STATUS_BEFORE=$(run_sql "SELECT status FROM purchase_orders WHERE id = '$PO_6_ID';")
 AUDIT_COUNT_BEFORE=$(run_sql "SELECT count(*) FROM audit_records WHERE entity_id = '$GRN_FAIL_ID';")
 
 # Attempt receipt: will throw 409
@@ -668,8 +705,8 @@ fi
 
 # Verify in DB: GRN remains DRAFT, PO version unchanged, PO status unchanged, no extra audit records
 GRN_STATUS_AFTER=$(run_sql "SELECT status FROM goods_receipts WHERE id = '$GRN_FAIL_ID';")
-PO_VERSION_AFTER=$(run_sql "SELECT version FROM purchase_orders WHERE id = '$PO_1_ID';")
-PO_STATUS_AFTER=$(run_sql "SELECT status FROM purchase_orders WHERE id = '$PO_1_ID';")
+PO_VERSION_AFTER=$(run_sql "SELECT version FROM purchase_orders WHERE id = '$PO_6_ID';")
+PO_STATUS_AFTER=$(run_sql "SELECT status FROM purchase_orders WHERE id = '$PO_6_ID';")
 AUDIT_COUNT_AFTER=$(run_sql "SELECT count(*) FROM audit_records WHERE entity_id = '$GRN_FAIL_ID';")
 
 if [ "$GRN_STATUS_AFTER" != "DRAFT" ] || [ "$PO_VERSION_AFTER" != "$PO_VERSION_BEFORE" ] || [ "$PO_STATUS_AFTER" != "$PO_STATUS_BEFORE" ] || [ "$AUDIT_COUNT_AFTER" != "$AUDIT_COUNT_BEFORE" ]; then
@@ -679,15 +716,19 @@ fi
 echo "Transaction atomicity verified: All tables rolled back cleanly with zero partial mutation."
 
 # ------------------------------------------------------------------------------
-# 10. RBAC MATRIX & AUDIT LOGGING (Sections 22 & 24)
+# 9. RBAC MATRIX & AUDIT LOGGING (Sections 22 & 24)
 # ------------------------------------------------------------------------------
 echo "[9/10] Verifying RBAC matrix and audit logging..."
+
+PO_ITEMS_7='[{"sku": "ITEM-RBAC", "description": "RBAC Verification Item", "orderedQuantity": "50.0000", "unitPrice": "20.0000", "taxRate": "0.10"}]'
+PO_7_ID=$(create_and_issue_po "$PO_ITEMS_7")
+ITEM_RBAC_ID=$(run_sql "SELECT id FROM purchase_order_items WHERE purchase_order_id = '$PO_7_ID' AND line_number = 1;")
 
 # Buyer cannot create GRN -> 403
 BUYER_CREATE=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/goods-receipts" \
   -H "Authorization: Bearer $BUYER_TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"purchaseOrderId\": \"$PO_1_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_A_ID\", \"receivedQuantity\": \"1.0000\", \"acceptedQuantity\": \"1.0000\", \"rejectedQuantity\": \"0.0000\"}]}")
+  -d "{\"purchaseOrderId\": \"$PO_7_ID\", \"items\": [{\"purchaseOrderItemId\": \"$ITEM_RBAC_ID\", \"receivedQuantity\": \"1.0000\", \"acceptedQuantity\": \"1.0000\", \"rejectedQuantity\": \"0.0000\"}]}")
 HTTP_CODE=$(echo "$BUYER_CREATE" | tail -n 1)
 if [ "$HTTP_CODE" != "403" ]; then
   echo "ERROR: Expected HTTP 403 for buyer creating GRN, got $HTTP_CODE"
@@ -728,7 +769,7 @@ fi
 echo "Audit records verified in PostgreSQL for GRN lifecycle."
 
 # ------------------------------------------------------------------------------
-# 11. MONOTONIC SEQUENCE NUMBERING (Section 19)
+# 10. MONOTONIC SEQUENCE NUMBERING (Section 19)
 # ------------------------------------------------------------------------------
 echo "[10/10] Verifying monotonic GRN sequence numbering..."
 CURRENT_SEQ=$(run_sql "SELECT last_value FROM goods_receipt_number_seq;")
