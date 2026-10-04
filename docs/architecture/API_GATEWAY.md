@@ -139,7 +139,7 @@ flowchart LR
 ### Dual Cryptographic Verification
 1. **APISIX Gateway Layer (`openid-connect` plugin)**:
    - Validates RS256 signature using public keys fetched from Keycloak JWKS endpoint (`/protocol/openid-connect/certs`).
-   - Validates standard claims: issuer (`iss`), expiration (`exp`), not-before (`nbf`).
+   - Validates standard claims: issuer (`iss` validated against trusted `claim_validator.issuer.valid_issuers`), expiration (`exp`), not-before (`nbf`).
    - Validates audience (`claim_validator.audience.required: true`, `match_with_client_id: true` matching `smartprocure-api`).
    - Rejects unauthenticated or invalid tokens immediately (`401 Unauthorized`), preventing unauthorized traffic from loading backend application workers.
 2. **NestJS Application Layer (`JwtAuthGuard` & `AuthService`)**:

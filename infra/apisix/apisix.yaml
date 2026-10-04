@@ -91,6 +91,11 @@ routes:
         use_jwks: true
         ssl_verify: false
         claim_validator:
+          issuer:
+            valid_issuers:
+              - "http://localhost:8080/realms/smartprocure"
+              - "http://127.0.0.1:8080/realms/smartprocure"
+              - "http://smartprocure-keycloak:8080/realms/smartprocure"
           audience:
             required: true
             match_with_client_id: true
