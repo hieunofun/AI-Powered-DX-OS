@@ -10,8 +10,8 @@ SmartProcure-Pay enforces a strict separation of concerns across authentication,
 
 - **Identity Provider (Keycloak)**: Sole authority managing identity records, authentication credentials, user sessions, OIDC token issuance, and realm roles.
 - **Relational Domain Store (PostgreSQL)**: Stores business domain entities (Purchase Orders, Goods Receipts, Invoices, Reconciliations, Audit Records). No password hashes or authentication credentials exist in PostgreSQL. The Keycloak subject identifier (`sub`) acts as the immutable foreign identity reference.
-- **Frontend SPA (React + Vite)**: Authenticates end users through OpenID Connect Authorization Code Flow with PKCE. Access tokens are held exclusively in memory runtime.
-- **Backend API (NestJS)**: Stateless Bearer token resource server. Validates cryptographically signed JWTs using Keycloak JSON Web Key Sets (JWKS), normalizes user principals, and enforces fine-grained Role-Based Access Control (RBAC).
+- **Frontend SPA (React + Vite)**: Authenticates end users through OpenID Connect Authorization Code Flow with PKCE (`S256`). Access tokens are held exclusively in memory runtime. Direct password grants are disabled on the SPA client.
+- **Backend API (NestJS)**: Stateless Bearer token resource server. Validates cryptographically signed JWTs using Keycloak JSON Web Key Sets (JWKS), enforces expected audience (`smartprocure-api`), normalizes user principals, and enforces fine-grained Role-Based Access Control (RBAC).
 
 ```mermaid
 sequenceDiagram
@@ -32,10 +32,10 @@ sequenceDiagram
     Web->>API: HTTP Request with Bearer Access Token
     critical JWT Validation
         API->>Keycloak: Retrieve Public Signing Keys (JWKS /certs - Cached)
-        API->>API: Verify Signature, Issuer, Expiration
+        API->>API: Cryptographically Verify RS256 Signature, Issuer, Audience (smartprocure-api), Expiration
         API->>API: Extract & Normalize Principal (sub, username, roles)
     end
-    alt Missing or Invalid Token
+    alt Missing, Invalid, or Expired Token / Wrong Audience
         API-->>Web: HTTP 401 Unauthorized
     else Insufficient Role Permissions
         API-->>Web: HTTP 403 Forbidden
@@ -51,6 +51,7 @@ sequenceDiagram
 - **Realm Name**: `smartprocure`
 - **Configuration File**: [`infra/keycloak/realm-smartprocure.json`](../../infra/keycloak/realm-smartprocure.json)
 - **Deployment Mode**: Automated import via Docker Compose (`start-dev --import-realm`).
+- **Version Baseline**: Pinned known-working version `24.0.5` (Quarkus-based). Version `26.8.0` was evaluated; migration to the 26.x series is planned as a dedicated follow-up due to breaking changes in realm JSON schemas and Infinispan session marshalling.
 - **Endpoints**:
   - OpenID Configuration: `http://localhost:8080/realms/smartprocure/.well-known/openid-configuration`
   - JWKS Endpoint: `http://localhost:8080/realms/smartprocure/protocol/openid-connect/certs`
@@ -61,21 +62,29 @@ sequenceDiagram
 
 ## 3. OIDC Clients
 
-The system establishes two logical clients adhering to OAuth 2.0 / OIDC specifications:
+The realm defines three logical clients adhering to OAuth 2.0 / OIDC specifications:
 
-| Client ID | Client Type | Authentication Flow | PKCE | Audience / Scope | Usage |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `smartprocure-web` | Public | Authorization Code | S256 | Web Application | React SPA browser sessions |
-| `smartprocure-api` | Bearer-Only | Bearer JWT Validation | N/A | Resource Server | NestJS backend API validation |
+| Client ID | Client Type | Authentication Flow | PKCE | Audience / Scope | Usage | Environment |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `smartprocure-web` | Public | Authorization Code | S256 | `smartprocure-api` | React SPA browser sessions | All Environments |
+| `smartprocure-ci` | Public | Direct Grant (Password) | N/A | `smartprocure-api` | Automated CI & local validation | DEV / CI ONLY |
+| `smartprocure-api` | Bearer-Only | Bearer JWT Validation | N/A | Resource Server | NestJS backend API validation | All Environments |
 
 ### Client Security Specifications:
 1. **Public Client (`smartprocure-web`)**:
    - `publicClient: true` — No client secret is ever stored or exposed in the client-side JavaScript bundle.
    - `standardFlowEnabled: true` — Standard Authorization Code Grant.
-   - `pkceCodeChallengeMethod: "S256"` — Cryptographically prevents authorization code injection and interception attacks.
-   - `redirectUris`: Strictly configured to `http://localhost:3000/*` and `http://127.0.0.1:3000/*` (no wildcards in production).
+   - `directAccessGrantsEnabled: false` — Password grant is disabled on the production SPA client.
+   - `pkceCodeChallengeMethod: "S256"` — Cryptographically prevents authorization code interception.
+   - `redirectUris`: Strictly configured to `http://localhost:3000/*` and `http://127.0.0.1:3000/*`.
    - `webOrigins`: Restricted to `http://localhost:3000` and `http://127.0.0.1:3000`.
-2. **Resource Server (`smartprocure-api`)**:
+   - Includes audience protocol mapper injecting `smartprocure-api` into the `aud` claim.
+2. **Dedicated CI Client (`smartprocure-ci`)**:
+   - `directAccessGrantsEnabled: true` — Dedicated exclusively to automated CI integration scripts.
+   - `standardFlowEnabled: false`, `implicitFlowEnabled: false`.
+   - Includes audience protocol mapper injecting `smartprocure-api` into the `aud` claim.
+   - **Must not be deployed or enabled in staging or production environments.**
+3. **Resource Server (`smartprocure-api`)**:
    - `bearerOnly: true` — Only verifies incoming tokens; never acts as a login initiator.
 
 ---
@@ -150,11 +159,12 @@ apps/api/src/auth/
 ```
 
 ### Verification Rules
-Each incoming token must satisfy all of the following criteria:
+Each incoming token must satisfy all of the following criteria cryptographically:
 1. **Signature Verification**: Validated against RSA public keys fetched from Keycloak JWKS (`/certs`). Keys are cached with rate limiting to prevent denial-of-service on the IdP.
-2. **Issuer Verification**: The `iss` claim must strictly match the configured `KEYCLOAK_ISSUER`.
-3. **Expiration**: The `exp` claim must be in the future.
-4. **Header Integrity**: The header must specify a valid Key ID (`kid`) corresponding to an active public key in the JWKS keystore.
+2. **Issuer Verification**: The `iss` claim must strictly match `KEYCLOAK_ISSUER`.
+3. **Audience Verification**: The `aud` claim must match or contain the configured `KEYCLOAK_AUDIENCE` (`smartprocure-api`). Enforced cryptographically by `jwt.verify`.
+4. **Expiration**: The `exp` claim must be in the future.
+5. **Header Integrity**: The header must specify a valid Key ID (`kid`) corresponding to an active public key in the JWKS keystore.
 
 ### Principal Normalization
 Upon successful cryptographic validation, the raw Keycloak payload is transformed into an application-neutral `AuthenticatedUser`:
@@ -177,6 +187,7 @@ The authentication and authorization layers maintain strict adherence to HTTP st
 | :--- | :--- | :--- | :--- |
 | Missing Authorization header | `401 Unauthorized` | `{ statusCode: 401, message: "Missing Authorization header", error: "Unauthorized" }` | Request lacked authentication credentials |
 | Invalid token format / signature | `401 Unauthorized` | `{ statusCode: 401, message: "...", error: "Unauthorized" }` | Token is invalid, malformed, or signature check failed |
+| Missing or wrong audience | `401 Unauthorized` | `{ statusCode: 401, message: "Token verification failed: jwt audience invalid...", error: "Unauthorized" }` | Token is not intended for smartprocure-api |
 | Expired access token | `401 Unauthorized` | `{ statusCode: 401, message: "Token has expired", error: "Unauthorized" }` | Token is past expiration time |
 | Valid token, missing role | `403 Forbidden` | `{ statusCode: 403, message: "Insufficient role permissions. Required one of: [...]", error: "Forbidden" }` | Identity is valid, but privileges are insufficient |
 | Valid token & authorized role | `200 OK` | Endpoint-specific response | Operation permitted |
@@ -187,7 +198,7 @@ The authentication and authorization layers maintain strict adherence to HTTP st
 
 The API provides dedicated technical endpoints to prove authentication and authorization correctness:
 
-- `GET /auth/me`: Requires authenticated user. Returns `{ sub, username, email, roles }`. Does not return raw tokens or internal secrets.
+- `GET /auth/me`: Requires authenticated user with audience `smartprocure-api`. Returns `{ sub, username, email, roles }`. Does not return raw tokens or internal secrets.
 - `GET /auth/buyer-test`: Protected by `@Roles('buyer', 'admin')`. Allows access to `buyer` or `admin`. Returns `403 Forbidden` for other roles.
 - `GET /auth/admin-test`: Protected by `@Roles('admin')`. Strictly accessible by `admin` only. Returns `403 Forbidden` for `buyer.demo`, `warehouse.demo`, etc.
 
@@ -204,8 +215,9 @@ The full stack operates seamlessly via Docker Compose:
 | `smartprocure-api` | Built from `apps/api/Dockerfile` | 4000 | 4000 | NestJS Application API |
 | `smartprocure-web` | Built from `apps/web/Dockerfile` | 80 | 3000 | React + Nginx Web Application |
 
-### Startup & Healthcheck
-Keycloak includes a Docker healthcheck probing `http://localhost:8080/health/ready`. The API depends on `smartprocure-keycloak` with `condition: service_healthy` to guarantee seamless boot sequencing.
+### Startup & Healthcheck Details
+- **Docker Compose TCP Healthcheck**: `smartprocure-keycloak` uses a TCP socket probe (`exec 3<>/dev/tcp/127.0.0.1/8080 || exit 1`) to ensure reliable daemon port readiness within the minimal container base image (which omits curl/wget).
+- **HTTP Realm & OIDC Readiness Validation**: Automated CI scripts (`infra/keycloak/validate-keycloak-auth.sh`) perform actual HTTP polling against `http://localhost:8080/realms/smartprocure` and `/.well-known/openid-configuration` before executing backend integration tests.
 
 ---
 
@@ -216,6 +228,8 @@ When transitioning from development to staging/production:
 1. **Disable Development Mode**: Switch Keycloak entrypoint from `start-dev` to `start --optimized`.
 2. **Enforce HTTPS / TLS**: Configure TLS certificates across all endpoints. Set Keycloak `sslRequired: "external"` or `"all"`.
 3. **Rotate Secrets**: Replace all development passwords and credentials with securely generated secrets managed via cloud key vaults or secrets managers.
-4. **Disable Direct Access Grants**: Disable `directAccessGrantsEnabled` on production clients; enforce browser-based Authorization Code with PKCE.
-5. **Restrict Admin Console**: Do not expose Keycloak master realm admin console (`/admin`) on public internet ingress. Bind to internal VPN/bastion network only.
-6. **Database Persistence for Keycloak**: In production, back Keycloak with a dedicated PostgreSQL database rather than ephemeral storage.
+4. **Disable CI Client**: Do not deploy or enable `smartprocure-ci` in staging/production environments.
+5. **Enforce SPA PKCE Only**: Verify `smartprocure-web` has `directAccessGrantsEnabled: false` in production.
+6. **Restrict Admin Console**: Do not expose Keycloak master realm admin console (`/admin`) on public internet ingress. Bind to internal VPN/bastion network only.
+7. **Database Persistence for Keycloak**: In production, back Keycloak with a dedicated PostgreSQL database rather than ephemeral storage.
+8. **Keycloak Version Upgrade**: Schedule migration from pinned known-working version `24.0.5` to the `26.x` series as a dedicated follow-up task.

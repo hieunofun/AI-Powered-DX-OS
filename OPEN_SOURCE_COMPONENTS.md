@@ -10,7 +10,7 @@ Every license listed below has been verified against the official upstream repos
 
 | Component | Repository | Version | License | Role | Integration Type | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Keycloak** | [keycloak/keycloak](https://github.com/keycloak/keycloak) | `24.0.5` | Apache-2.0 | Identity & Access Management (SSO, OIDC, RBAC) | Docker Service | Integrated |
+| **Keycloak** | [keycloak/keycloak](https://github.com/keycloak/keycloak) | `24.0.5` | Apache-2.0 | Identity & Access Management (SSO, OIDC, RBAC) | Docker Service | Integrated (Pinned known-working version) |
 | **Apache APISIX** | [apache/apisix](https://github.com/apache/apisix) | `3.9.x` | Apache-2.0 | API Gateway (Reverse proxy, rate limiting, routing, JWT validation) | Docker Service | Planned |
 | **PostgreSQL** | [postgres/postgres](https://github.com/postgres/postgres) | `16-alpine` | PostgreSQL License | Primary Relational Data Store (Domain models, ledger transactions) | Docker Service | Service Defined |
 | **MinIO** | [minio/minio](https://github.com/minio/minio) | `RELEASE.2024-03-30` | GNU AGPLv3 | S3-Compatible Object Storage (Raw invoices: PDF, XML, images) | Docker Service | Planned |
@@ -21,9 +21,9 @@ Every license listed below has been verified against the official upstream repos
 | **React** | [facebook/react](https://github.com/facebook/react) | `^18.3.1` | MIT | Web UI Frontend Application Framework | Dependency | Integrated |
 | **keycloak-js** | [keycloak/keycloak](https://github.com/keycloak/keycloak/tree/main/packages/keycloak-js) | `24.0.5` | Apache-2.0 | Frontend OIDC Client Adapter with PKCE Authorization | Dependency | Integrated |
 | **NestJS** | [nestjs/nest](https://github.com/nestjs/nest) | `^10.3.9` | MIT | Backend Application Framework & Modular Services | Dependency | Integrated |
-| **jsonwebtoken** | [auth0/node-jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) | `^9.0.2` | MIT | JSON Web Token (JWT) Verification and Claims Extraction | Dependency | Integrated |
-| **jwks-rsa** | [auth0/node-jwks-rsa](https://github.com/auth0/node-jwks-rsa) | `^3.1.0` | MIT | Retrieval and Caching of RSA Signing Keys from JWKS Endpoints | Dependency | Integrated |
-| **@types/jsonwebtoken** | [DefinitelyTyped/DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped) | `^9.0.8` | MIT | TypeScript Type Definitions for jsonwebtoken | Dependency | Integrated |
+| **jsonwebtoken** | [auth0/node-jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) | `^9.0.3` | MIT | JSON Web Token (JWT) Verification and Claims Extraction | Dependency | Integrated |
+| **jwks-rsa** | [auth0/node-jwks-rsa](https://github.com/auth0/node-jwks-rsa) | `^3.2.2` | MIT | Retrieval and Caching of RSA Signing Keys from JWKS Endpoints | Dependency | Integrated |
+| **@types/jsonwebtoken** | [DefinitelyTyped/DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped) | `^9.0.10` | MIT | TypeScript Type Definitions for jsonwebtoken | Dependency | Integrated |
 | **Vite** | [vitejs/vite](https://github.com/vitejs/vite) | `^5.3.1` | MIT | Frontend Build Tooling & Development Server | Dependency | Integrated |
 | **TypeScript** | [microsoft/TypeScript](https://github.com/microsoft/TypeScript) | `^5.4.5` | Apache-2.0 | Static Type Checking and Code Compilation | Dependency | Integrated |
 | **Supertest** | [ladjs/supertest](https://github.com/ladjs/supertest) | `^7.0.0` | MIT | HTTP Assertions for E2E Health Testing | Dependency | Integrated |
@@ -35,13 +35,18 @@ Every license listed below has been verified against the official upstream repos
 
 ---
 
-## License Compliance Notes
+## License Compliance & Version Notes
 
-1. **Permissive Licenses (Apache-2.0, MIT, PostgreSQL License)**:
+1. **Keycloak Versioning Review**:
+   - Pinned known-working version: `24.0.5`.
+   - Keycloak `26.8.0` (released October 2026) was evaluated. Keycloak 26 introduced substantial breaking changes in realm JSON export format, role mapping locations, Infinispan Marshalling, and session persistence requirements. Furthermore, `keycloak-js` on npm currently only extends up to `26.2.4`.
+   - To avoid unnecessary pipeline flakiness and maintain reproducible zero-configuration realm import, `24.0.5` is pinned as the known-working baseline. Upgrading to the 26.x series is cataloged as a planned security-hardening follow-up.
+
+2. **Permissive Licenses (Apache-2.0, MIT, PostgreSQL License)**:
    - Permissive licenses allow distribution, modification, and integration with minimal obligations beyond preserving copyright notices and disclaimers.
    - SmartProcure-Pay's MIT License is fully compatible with consuming these upstream projects.
 
-2. **AGPL-3.0 Components (MinIO, Grafana)**:
+3. **AGPL-3.0 Components (MinIO, Grafana)**:
    - MinIO and Grafana are used as unmodified external services (deployed via container orchestration).
    - Any distribution or deployment license obligations must be respected in accordance with their respective upstream licenses.
    - For internal guidelines on adding new dependencies, see [License Policy](docs/open-source/LICENSE_POLICY.md).
