@@ -25,8 +25,8 @@ routes:
         regex_uri: ["^/api/rate-limit-test", "/health"]
       cors:
         allow_origins: "http://localhost:9080,http://localhost:3000,http://127.0.0.1:9080,http://127.0.0.1:3000"
-        allow_methods: "**"
-        allow_headers: "**"
+        allow_methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+        allow_headers: "Authorization,Content-Type,Accept"
         allow_credential: true
       limit-count:
         count: 5
@@ -52,8 +52,8 @@ routes:
         regex_uri: ["^/api/(.*)", "/$1"]
       cors:
         allow_origins: "http://localhost:9080,http://localhost:3000,http://127.0.0.1:9080,http://127.0.0.1:3000"
-        allow_methods: "**"
-        allow_headers: "**"
+        allow_methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+        allow_headers: "Authorization,Content-Type,Accept"
         allow_credential: true
       limit-count:
         count: 100
@@ -83,13 +83,17 @@ routes:
             - "X-User-Name"
             - "X-User-Email"
             - "X-User-Roles"
+            - "X-Userinfo"
       openid-connect:
-        client_id: "${{APISIX_OIDC_CLIENT_ID:=smartprocure-api}}"
-        client_secret: "${{APISIX_OIDC_CLIENT_SECRET:=api_dev_secret_123}}"
+        client_id: "${{APISIX_OIDC_CLIENT_ID:=smartprocure-gateway}}"
+        client_secret: "${{APISIX_OIDC_CLIENT_SECRET:=gateway_dev_secret_123}}"
         discovery: "http://smartprocure-keycloak:8080/realms/smartprocure/.well-known/openid-configuration"
         bearer_only: true
         use_jwks: true
         ssl_verify: false
+        set_access_token_header: false
+        set_refresh_token_header: false
+        set_userinfo_header: false
         claim_validator:
           issuer:
             valid_issuers:
@@ -101,8 +105,8 @@ routes:
             match_with_client_id: true
       cors:
         allow_origins: "http://localhost:9080,http://localhost:3000,http://127.0.0.1:9080,http://127.0.0.1:3000"
-        allow_methods: "**"
-        allow_headers: "**"
+        allow_methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+        allow_headers: "Authorization,Content-Type,Accept"
         allow_credential: true
       limit-count:
         count: 100

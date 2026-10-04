@@ -144,11 +144,11 @@ services:
     restart: unless-stopped
     environment:
       APISIX_STAND_ALONE: "true"
-      APISIX_OIDC_CLIENT_ID: ${APISIX_OIDC_CLIENT_ID:-smartprocure-api}
-      APISIX_OIDC_CLIENT_SECRET: ${APISIX_OIDC_CLIENT_SECRET:-api_dev_secret_123}
+      APISIX_OIDC_CLIENT_ID: ${APISIX_OIDC_CLIENT_ID:-smartprocure-gateway}
+      APISIX_OIDC_CLIENT_SECRET: ${APISIX_OIDC_CLIENT_SECRET:-gateway_dev_secret_123}
     ports:
       - "${APISIX_PORT:-9080}:9080"
-      - "${APISIX_METRICS_PORT:-9091}:9091"
+      - "127.0.0.1:${APISIX_METRICS_PORT:-9091}:9091"
     volumes:
       - ./infra/apisix/config.yaml:/usr/local/apisix/conf/config.yaml:ro
       - ./infra/apisix/apisix.yaml:/usr/local/apisix/conf/apisix.yaml:ro
