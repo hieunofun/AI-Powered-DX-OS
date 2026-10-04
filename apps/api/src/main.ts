@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { isSwaggerEnabled } from './config/swagger.config';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -39,11 +40,7 @@ async function bootstrap() {
   // Swagger OpenAPI documentation:
   // Hardened production default: OFF unless explicitly ENABLE_SWAGGER=true.
   // In development and test environments: ON unless explicitly disabled.
-  const isProduction = process.env.NODE_ENV === 'production';
-  const enableSwagger =
-    process.env.ENABLE_SWAGGER === 'true' ||
-    (!isProduction && process.env.ENABLE_SWAGGER !== 'false');
-  if (enableSwagger) {
+  if (isSwaggerEnabled()) {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('SmartProcure-Pay Core API')
       .setDescription(
