@@ -32,6 +32,12 @@ describe('AuthController (e2e)', () => {
       if (token === 'expired-token') {
         throw new UnauthorizedException('Token has expired');
       }
+      if (token === 'wrong-audience-token') {
+        throw new UnauthorizedException('Token verification failed: jwt audience invalid. expected: smartprocure-api');
+      }
+      if (token === 'missing-audience-token') {
+        throw new UnauthorizedException('Token verification failed: jwt audience invalid. expected: smartprocure-api');
+      }
       throw new UnauthorizedException('Invalid or unknown token');
     }),
   };
@@ -79,13 +85,22 @@ describe('AuthController (e2e)', () => {
       expect(response.body.message).toContain('Token has expired');
     });
 
-    it('/auth/me (GET) with invalid token should return 401', async () => {
+    it('/auth/me (GET) with token having wrong audience should return 401', async () => {
       const response = await request(app.getHttpServer())
         .get('/auth/me')
-        .set('Authorization', 'Bearer bad-token')
+        .set('Authorization', 'Bearer wrong-audience-token')
         .expect(401);
 
-      expect(response.body.message).toContain('Invalid or unknown token');
+      expect(response.body.message).toContain('jwt audience invalid');
+    });
+
+    it('/auth/me (GET) with token missing audience should return 401', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/auth/me')
+        .set('Authorization', 'Bearer missing-audience-token')
+        .expect(401);
+
+      expect(response.body.message).toContain('jwt audience invalid');
     });
   });
 

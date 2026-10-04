@@ -8,6 +8,7 @@ import { KeycloakJwtPayload } from './interfaces/keycloak-jwt-payload.interface'
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
   private readonly expectedIssuer: string;
+  private readonly expectedAudience: string;
   private readonly jwksUri: string;
   private readonly jwksClient: jwksRsa.JwksClient;
 
@@ -21,6 +22,7 @@ export class AuthService {
   constructor() {
     this.expectedIssuer =
       process.env.KEYCLOAK_ISSUER || 'http://localhost:8080/realms/smartprocure';
+    this.expectedAudience = process.env.KEYCLOAK_AUDIENCE || 'smartprocure-api';
     this.jwksUri =
       process.env.KEYCLOAK_JWKS_URI ||
       `${this.expectedIssuer}/protocol/openid-connect/certs`;
@@ -73,6 +75,7 @@ export class AuthService {
 
       const payload = jwt.verify(token, publicKey, {
         issuer: this.expectedIssuer,
+        audience: this.expectedAudience,
         algorithms: ['RS256'],
       }) as KeycloakJwtPayload;
 
