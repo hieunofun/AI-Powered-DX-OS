@@ -103,9 +103,10 @@ services:
     depends_on:
       - smartprocure-api
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:80 || exit 1"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1/ || exit 1"]
       interval: 10s
       timeout: 5s
+      start_period: 5s
       retries: 3
 
   # ----------------------------------------------------------------------------
@@ -154,14 +155,11 @@ services:
     networks:
       - smartprocure-network
     depends_on:
-      smartprocure-web:
-        condition: service_healthy
-      smartprocure-api:
-        condition: service_healthy
-      smartprocure-keycloak:
-        condition: service_healthy
+      - smartprocure-web
+      - smartprocure-api
+      - smartprocure-keycloak
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://127.0.0.1:9080/ || exit 1"]
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/9080' || exit 1"]
       interval: 10s
       timeout: 5s
       start_period: 10s
