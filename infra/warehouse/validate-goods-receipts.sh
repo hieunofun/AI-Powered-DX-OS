@@ -388,7 +388,13 @@ fi
 echo "Policy updated to 10.00% tolerance (Allowed = 110.0000)."
 
 # Verify audit_records entry for GRN_POLICY_UPDATED
-ADMIN_SUB=$(curl -s "$KEYCLOAK_URL/realms/$REALM/protocol/openid-connect/userinfo" -H "Authorization: Bearer $ADMIN_TOKEN" | jq -r '.sub')
+ADMIN_PAYLOAD=$(echo "$ADMIN_TOKEN" | awk -F. '{print $2}' | tr -d '\r\n')
+REM=$(( ${#ADMIN_PAYLOAD} % 4 ))
+if [ $REM -eq 2 ]; then ADMIN_PAYLOAD="${ADMIN_PAYLOAD}=="; elif [ $REM -eq 3 ]; then ADMIN_PAYLOAD="${ADMIN_PAYLOAD}="; fi
+ADMIN_SUB=$(echo "$ADMIN_PAYLOAD" | base64 -d 2>/dev/null | jq -r '.sub // empty' || echo "$ADMIN_PAYLOAD" | base64 --decode 2>/dev/null | jq -r '.sub // empty' || true)
+if [ -z "$ADMIN_SUB" ]; then
+  ADMIN_SUB=$(curl -s "$KEYCLOAK_URL/realms/$REALM/protocol/openid-connect/userinfo" -H "Authorization: Bearer $ADMIN_TOKEN" | jq -r '.sub // empty')
+fi
 POLICY_AUDIT=$(run_sql "SELECT event_type || '|' || actor_subject || '|' || (metadata->>'previousTolerancePercent') || '|' || (metadata->>'newTolerancePercent') FROM audit_records WHERE event_type = 'GRN_POLICY_UPDATED' ORDER BY created_at DESC LIMIT 1;")
 echo "Policy audit entry in DB: $POLICY_AUDIT"
 EXPECTED_POLICY_AUDIT="GRN_POLICY_UPDATED|$ADMIN_SUB|0.00|10.00"
