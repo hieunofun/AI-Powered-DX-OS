@@ -115,6 +115,11 @@ jobs:
           chmod +x database/scripts/validate-schema.sh
           bash database/scripts/validate-schema.sh
 
+      - name: Validate Keycloak SSO & RBAC
+        run: |
+          chmod +x infra/keycloak/validate-keycloak-auth.sh
+          bash infra/keycloak/validate-keycloak-auth.sh
+
       - name: Check container status
         run: docker compose ps
 

@@ -64,6 +64,9 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-smartprocure_db}
       POSTGRES_USER: ${POSTGRES_USER:-smartprocure_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_password}
+      KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-http://localhost:8080/realms/smartprocure}
+      KEYCLOAK_JWKS_URI: ${KEYCLOAK_JWKS_URI:-http://smartprocure-keycloak:8080/realms/smartprocure/protocol/openid-connect/certs}
+      KEYCLOAK_AUDIENCE: ${KEYCLOAK_AUDIENCE:-smartprocure-api}
     ports:
       - "${API_PORT:-4000}:4000"
     networks:
@@ -87,6 +90,9 @@ services:
       dockerfile: apps/web/Dockerfile
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:4000}
+        VITE_KEYCLOAK_URL: ${VITE_KEYCLOAK_URL:-http://localhost:8080}
+        VITE_KEYCLOAK_REALM: ${VITE_KEYCLOAK_REALM:-smartprocure}
+        VITE_KEYCLOAK_CLIENT_ID: ${VITE_KEYCLOAK_CLIENT_ID:-smartprocure-web}
     container_name: smartprocure-web
     restart: unless-stopped
     ports:
@@ -101,31 +107,35 @@ services:
       timeout: 5s
       retries: 3
 
+  # ----------------------------------------------------------------------------
+  # 4. Identity & Access Management: Keycloak (OIDC / OAuth 2.0 / RBAC)
+  # ----------------------------------------------------------------------------
+  smartprocure-keycloak:
+    image: quay.io/keycloak/keycloak:24.0.5
+    container_name: smartprocure-keycloak
+    restart: unless-stopped
+    command: start-dev --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin_dev_password}
+      KC_HEALTH_ENABLED: "true"
+      KC_HTTP_PORT: 8080
+    ports:
+      - "${KEYCLOAK_PORT:-8080}:8080"
+    volumes:
+      - ./infra/keycloak/realm-smartprocure.json:/opt/keycloak/data/import/realm-smartprocure.json:ro
+    networks:
+      - smartprocure-network
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      start_period: 25s
+      retries: 5
+
   # ============================================================================
   # FUTURE INTEGRATION SERVICES (Planned for Subsequent Phases)
-  # ============================================================================
-
-  # [Phase 2 / Issue #3] Identity & Access Management: Keycloak
-  # keycloak:
-  #   image: quay.io/keycloak/keycloak:24.0
-  #   container_name: smartprocure-keycloak
-  #   command: start-dev
-  #   environment:
-  #     KC_DB: postgres
-  #     KC_DB_URL: jdbc:postgresql://smartprocure-postgres:5432/${POSTGRES_DB:-smartprocure_db}
-  #     KC_DB_USERNAME: ${POSTGRES_USER:-smartprocure_user}
-  #     KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres_password}
-  #     KEYCLOAK_ADMIN: admin
-  #     KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-  #   ports:
-  #     - "8080:8080"
-  #   networks:
-  #     - smartprocure-network
-  #   depends_on:
-  #     smartprocure-postgres:
-  #       condition: service_healthy
-
-  # [Phase 2 / Issue #4] API Gateway: Apache APISIX
+  # ============================================================================[Phase 2 / Issue #4] API Gateway: Apache APISIX
   # apisix:
   #   image: apache/apisix:3.9.0-debian
   #   container_name: smartprocure-apisix
