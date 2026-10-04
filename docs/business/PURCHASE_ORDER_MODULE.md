@@ -6,11 +6,11 @@ This document establishes the architectural, operational, and domain specificati
 
 ## 1. Module Overview & Responsibilities
 
-The Purchase Order module provides lifecycle management, state transition enforcement, optimistic concurrency control, line-item arithmetic, and auditable event tracking for purchasing documents within SmartProcure-Pay.
+The Purchase Order module provides lifecycle management, state transition enforcement, optimistic concurrency control, arbitrary-precision financial arithmetic, and auditable event tracking for purchasing documents within SmartProcure-Pay.
 
 ### Key Architectural Boundaries:
 - **Direct Ownership**: The module directly creates and governs the `DRAFT` ──► `ISSUED` transition and legitimate order cancellations (`DRAFT` ──► `CANCELLED`, `ISSUED` ──► `CANCELLED`).
-- **Downstream Ownership**: Transition to `PARTIALLY_RECEIVED` and `FULLY_RECEIVED` is explicitly owned by the Goods Receipt module ([Issue #6](https://github.com/hieunofun/SmartProcure-Pay/issues/6)). Transition to `CLOSED` is orchestrated upon settlement of all physical and financial obligations.
+- **Downstream Ownership**: Transition to `PARTIALLY_RECEIVED` and `FULLY_RECEIVED` is explicitly owned by the Goods Receipt module ([Issue #6](https://github.com/hieunofun/SmartProcure-Pay/issues/6)). Transition to `CLOSED` is orchestrated upon settlement of all physical and financial obligations ([Issue #8](https://github.com/hieunofun/SmartProcure-Pay/issues/8)).
 - **Workflow Decoupling**: Formal approval workflows (e.g. multi-tier managerial sign-off via Flowable BPMN) and the intermediate `PENDING_APPROVAL` status are deferred to [Issue #9](https://github.com/hieunofun/SmartProcure-Pay/issues/9). The module avoids premature internal workflow mocks.
 
 ---
@@ -38,7 +38,7 @@ stateDiagram-v2
 
 | From Status | To Status | Allowed? | Owning Component / Module | Business Rules / Constraints |
 |:---|:---|:---:|:---|:---|
-| *(none)* | `DRAFT` | **Yes** | Purchase Orders Module (`POST /purchase-orders`) | Requires active supplier, >= 1 item, positive quantities. |
+| *(none)* | `DRAFT` | **Yes** | Purchase Orders Module (`POST /purchase-orders`) | Requires active supplier, >= 1 item, strictly positive quantities. |
 | `DRAFT` | `ISSUED` | **Yes** | Purchase Orders Module (`POST /purchase-orders/:id/issue`) | Requires supplier active, items >= 1, internally consistent totals. |
 | `DRAFT` | `CANCELLED` | **Yes** | Purchase Orders Module (`POST /purchase-orders/:id/cancel`) | Requires non-empty `reason` string and matching `expectedVersion`. |
 | `ISSUED` | `CANCELLED` | **Yes** | Purchase Orders Module (`POST /purchase-orders/:id/cancel`) | Prohibited once physical goods receipt notes exist downstream. |
@@ -51,26 +51,34 @@ stateDiagram-v2
 
 ---
 
-## 3. Server-Side Calculations & Arithmetic Precision
+## 3. Server-Side Financial Arithmetic & Precision Strategy
 
-To prevent tampering and floating-point rounding inaccuracies:
-1. **Frontend Disregard**: The server **never** trusts client-submitted monetary totals (`subtotal`, `taxAmount`, `totalAmount`). Any such client values are rejected by input whitelisting or recalculated from atomic line items.
-2. **Fixed-Point Decimal Arithmetic**: Calculations enforce `NUMERIC(18,2)` rounding rules:
-   $$\text{lineSubtotal} = \text{round}(\text{orderedQuantity} \times \text{unitPrice}, 2)$$
-   $$\text{taxAmount} = \text{round}(\text{lineSubtotal} \times \text{taxRate}, 2)$$
-   $$\text{lineTotal} = \text{lineSubtotal} + \text{taxAmount}$$
-   $$\text{subtotal} = \sum \text{lineSubtotal}$$
-   $$\text{totalTax} = \sum \text{taxAmount}$$
-   $$\text{totalAmount} = \text{subtotal} + \text{totalTax}$$
-3. **Tax Rate Representation**: Expressed as decimal fractions (e.g. `0.08` represents 8%, `0.10` represents 10%).
+Binary floating-point arithmetic (IEEE 754) is strictly prohibited across all financial calculations and persistence boundaries.
+
+### Precision Engine: `decimal.js`
+- **Library**: `decimal.js` (MIT, pinned at `^10.6.0`).
+- **Rounding Mode**: `Decimal.ROUND_HALF_UP` (Standard accounting half-up rounding).
+- **Persistence Boundary**: PostgreSQL `NUMERIC` fields (`ordered_quantity`, `unit_price`, `tax_rate`, `line_subtotal`, `tax_amount`, `line_total`, `subtotal`, `total_amount`) are queried and returned as **exact decimal strings** (e.g. `'399.75'`). Binary floating-point casting (`::float8`) is eliminated.
+
+### Calculation Formulas:
+$$\text{lineSubtotal} = \text{ROUND}(\text{orderedQuantity} \times \text{unitPrice}, 2)$$
+$$\text{taxAmount} = \text{ROUND}(\text{lineSubtotal} \times \text{taxRate}, 2)$$
+$$\text{lineTotal} = \text{lineSubtotal} + \text{taxAmount}$$
+$$\text{PO subtotal} = \sum \text{lineSubtotal}$$
+$$\text{PO taxAmount} = \sum \text{line taxAmount}$$
+$$\text{PO totalAmount} = \text{subtotal} + \text{taxAmount}$$
+
+- **Edge Case Protection**: Correctly handles edge cases that native JS fails (e.g. `10.075` rounds to `10.08`, `1.005` rounds to `1.01`).
+- **Reconciliation Integrity**: Summing pre-rounded line values ensures that $\sum \text{lineSubtotal}$ exactly matches the sum of stored invoice lines without fractional drift.
+- **Pre-Issue Total Verification**: Before transitioning `DRAFT` ──► `ISSUED`, the service recalculates line items and asserts exact decimal string equality against persisted `subtotal`, `tax_amount`, and `total_amount`. Mismatches are rejected with HTTP 409 Conflict.
 
 ---
 
 ## 4. Optimistic Concurrency Control
 
-To guarantee database integrity and prevent lost updates in multi-user concurrent procurement workflows:
-1. **Schema**: The `purchase_orders` table includes a `version INTEGER NOT NULL DEFAULT 1` column with a non-negative constraint (`database/migrations/009_add_po_optimistic_lock.sql`).
-2. **Mutation Query Pattern**:
+To prevent lost updates under multi-user concurrent operations:
+1. **Schema**: `purchase_orders` contains `version INTEGER NOT NULL DEFAULT 1` (`database/migrations/009_add_po_optimistic_lock.sql`).
+2. **Atomic Update Query Pattern**:
    ```sql
    UPDATE purchase_orders
    SET ...,
@@ -78,7 +86,7 @@ To guarantee database integrity and prevent lost updates in multi-user concurren
    WHERE id = $id
      AND version = $expectedVersion;
    ```
-3. **Conflict Handling**: If zero rows are affected by the update (meaning another user concurrently modified the record), the repository immediately aborts the transaction and throws:
+3. **Conflict Handling**: If `rowCount === 0` (indicating concurrent mutation or stale version), throws HTTP 409 Conflict:
    ```json
    {
      "statusCode": 409,
@@ -99,36 +107,44 @@ PO numbers must be deterministic, auditable, and race-condition free:
 
 ## 6. Atomic Database Transactions & Audit Logging
 
-Every state mutation in the Purchase Order module is executed inside a true PostgreSQL database transaction (`BEGIN ... COMMIT / ROLLBACK`):
+Every state mutation executes inside an atomic PostgreSQL database transaction (`BEGIN ... COMMIT / ROLLBACK`):
 
 ### PO Creation:
-```
+```sql
 BEGIN;
   INSERT INTO purchase_orders (...) RETURNING ...;
   INSERT INTO purchase_order_items (...) [for each item];
   INSERT INTO audit_records (
-    entity_type = 'PURCHASE_ORDER',
-    entity_id = ...,
-    event_type = 'PO_CREATED',
-    actor_subject = <sub from Keycloak>,
-    actor_roles = <roles from Keycloak>,
-    payload = { poNumber, status, totalAmount, ... }
+    entity_type,
+    entity_id,
+    event_type,
+    actor_subject,
+    metadata
+  ) VALUES (
+    'PURCHASE_ORDER',
+    $1,
+    'PO_CREATED',
+    $2,
+    $3::jsonb
   );
 COMMIT;
 ```
-If item insertion fails, the entire transaction rollbacks, preventing orphan header rows.
 
-### Events Logged to `audit_records`:
-- `PO_CREATED`: Record creation with initial item count and financial totals.
-- `PO_UPDATED`: Line item or header updates, noting previous and new versions.
-- `PO_ISSUED`: Formal order issuance to vendor with timestamp.
-- `PO_CANCELLED`: Order cancellation with mandatory trimmed business reason.
+### Audit Schema Alignment (Issue #2):
+Conforms strictly to the canonical `audit_records` schema:
+- `id UUID PRIMARY KEY`
+- `entity_type VARCHAR(50) NOT NULL` ('PURCHASE_ORDER')
+- `entity_id UUID NOT NULL` (PO UUID)
+- `event_type VARCHAR(50) NOT NULL` (`PO_CREATED`, `PO_UPDATED`, `PO_ISSUED`, `PO_CANCELLED`)
+- `actor_subject VARCHAR(100)` (Authenticated Keycloak `sub`)
+- `payload_hash VARCHAR(128)` (NULL until Issue #10 ImmuDB integration)
+- `metadata JSONB` (Structured context: `actorRoles`, `poNumber`, `status`, `totalAmount`, etc.)
+- `created_at TIMESTAMPTZ NOT NULL`
 
 ---
 
 ## 7. Role-Based Access Control (RBAC)
 
-Integration with Keycloak OIDC and Apache APISIX Gateway:
 - **`buyer` / `admin`**: Full mutation authority (`POST /purchase-orders`, `PATCH /purchase-orders/:id`, `POST /purchase-orders/:id/issue`, `POST /purchase-orders/:id/cancel`).
 - **`warehouse`, `accountant`, `finance_manager`**: Read-only access (`GET /purchase-orders`, `GET /purchase-orders/:id`). Mutations return HTTP `403 Forbidden`.
 - **Unauthenticated**: Returns HTTP `401 Unauthorized`.
@@ -137,7 +153,7 @@ Integration with Keycloak OIDC and Apache APISIX Gateway:
 
 ## 8. REST API Reference
 
-All requests pass through the Apache APISIX Gateway (`http://localhost:9080/api/purchase-orders`) or directly to the NestJS backend during testing (`http://localhost:4000/purchase-orders`).
+All requests pass through Apache APISIX Gateway (`http://localhost:9080/api/purchase-orders`) or directly to NestJS backend (`http://localhost:4000/purchase-orders`).
 
 ### 1. Create Purchase Order
 - **Path**: `POST /purchase-orders`
@@ -151,29 +167,21 @@ All requests pass through the Apache APISIX Gateway (`http://localhost:9080/api/
     "expectedDeliveryDate": "2026-10-25",
     "items": [
       {
-        "sku": "IT-SRV-01",
-        "description": "Enterprise Rackmount Server 2U",
-        "orderedQuantity": 2,
-        "unitPrice": 4500.00,
-        "taxRate": 0.10
+        "sku": "SENS-OPT-01",
+        "description": "High Precision Optical Sensor",
+        "orderedQuantity": "3",
+        "unitPrice": "100.25",
+        "taxRate": "0.10"
       }
     ]
   }
   ```
-- **Response**: `201 Created` with full entity and server-computed totals.
+- **Response**: `201 Created` with full entity and server-computed exact decimal strings.
 
 ### 2. List Purchase Orders (Paginated)
 - **Path**: `GET /purchase-orders?page=1&limit=20&status=DRAFT`
 - **Roles**: `buyer`, `admin`, `warehouse`, `accountant`, `finance_manager`
 - **Response**: `200 OK`
-  ```json
-  {
-    "data": [...],
-    "page": 1,
-    "limit": 20,
-    "total": 45
-  }
-  ```
 
 ### 3. Get Purchase Order Details
 - **Path**: `GET /purchase-orders/:id`
@@ -198,10 +206,10 @@ All requests pass through the Apache APISIX Gateway (`http://localhost:9080/api/
 - **Request Body**:
   ```json
   {
-    "expectedVersion": 1
+    "expectedVersion": 2
   }
   ```
-- **Response**: `200 OK` (status set to `ISSUED`).
+- **Response**: `200 OK` (status set to `ISSUED`, version incremented to 3).
 
 ### 6. Cancel Purchase Order
 - **Path**: `POST /purchase-orders/:id/cancel`
@@ -209,8 +217,8 @@ All requests pass through the Apache APISIX Gateway (`http://localhost:9080/api/
 - **Request Body**:
   ```json
   {
-    "expectedVersion": 2,
-    "reason": "Supplier unable to meet strict delivery deadline."
+    "expectedVersion": 1,
+    "reason": "Supplier announced inability to fulfill delivery schedule"
   }
   ```
 - **Response**: `200 OK` (status set to `CANCELLED`, `cancelled_at` set, `cancelled_reason` recorded).
@@ -219,21 +227,19 @@ All requests pass through the Apache APISIX Gateway (`http://localhost:9080/api/
 
 ## 9. Swagger / OpenAPI Documentation
 
-Interactive Swagger documentation is exposed at:
-- **Local Dev / Docker**: `http://localhost:4000/docs`
-- **Gateway Dev**: `http://localhost:9080/docs` (when enabled via `ENABLE_SWAGGER=true`)
-
-The documentation includes:
-- Bearer token authentication schema
-- Complete DTO models with descriptions, validation bounds, and examples
-- Response schemas for `200`, `201`, `400`, `401`, `403`, `404`, and `409` status codes.
+- **Hardened Production Default**: Swagger documentation is **OFF by default** in production (`NODE_ENV=production`) to minimize attack surface.
+- **Activation**: Enabled if `ENABLE_SWAGGER=true` is explicitly set, or automatically enabled in non-production environments (`development`, `test`).
+- **Endpoint**: `/docs` when enabled.
 
 ---
 
-## 10. Future Integrations & Next Phases
+## 10. Testing & Verification Architecture
 
-1. **Issue #6 (Goods Receipt Notes)**:
-   - GRN creation will reference existing `purchase_orders` and `purchase_order_items`.
-   - Incoming delivery volume triggers state evolution: `ISSUED` ──► `PARTIALLY_RECEIVED` ──► `FULLY_RECEIVED`.
-2. **Issue #9 (Flowable BPMN Approval Workflow)**:
-   - If dynamic approval thresholds are enabled (e.g., PO amount > $10,000 requiring Finance Director approval), Flowable will intercept PO creation and maintain intermediate `PENDING_APPROVAL` status prior to `ISSUED`.
+The module is verified across two distinct testing tiers:
+
+1. **Unit & Controller E2E Tests** (`apps/api/test/`):
+   - Fast isolated validation with mocked repository.
+   - Asserts input validation, RBAC guards, lifecycle assertions, and Decimal arithmetic rounding edge cases.
+2. **Real PostgreSQL & Gateway Integration Validation** (`infra/procurement/validate-purchase-orders.sh`):
+   - Executed against the real running Docker stack (Keycloak + APISIX + NestJS + PostgreSQL).
+   - Validates live SQL execution, actual `audit_records` inserts, optimistic lock races, and database transaction atomic rollback.
