@@ -138,17 +138,24 @@ flowchart LR
 
 ### Dual Cryptographic Verification
 1. **APISIX Gateway Layer (`openid-connect` plugin)**:
+   - Client ID: `smartprocure-gateway` (confidential infrastructure client).
    - Validates RS256 signature using public keys fetched from Keycloak JWKS endpoint (`/protocol/openid-connect/certs`).
    - Validates standard claims: issuer (`iss` validated against trusted `claim_validator.issuer.valid_issuers`), expiration (`exp`), not-before (`nbf`).
-   - Validates audience (`claim_validator.audience.required: true`, `match_with_client_id: true` matching `smartprocure-api`).
+   - Validates audience (`claim_validator.audience.required: true`, `match_with_client_id: true` matching `smartprocure-gateway`).
    - Rejects unauthenticated or invalid tokens immediately (`401 Unauthorized`), preventing unauthorized traffic from loading backend application workers.
+   - Header hygiene: `set_access_token_header: false`, `set_refresh_token_header: false`, and `set_userinfo_header: false` to avoid leaking tokens or redundant userinfo into upstream headers.
 2. **NestJS Application Layer (`JwtAuthGuard` & `AuthService`)**:
    - NestJS **does NOT trust** perimeter headers blindly.
    - NestJS extracts the original `Authorization: Bearer <token>` header passed through APISIX.
    - Performs independent cryptographic signature validation against Keycloak JWKS.
    - Enforces `KEYCLOAK_AUDIENCE=smartprocure-api`.
    - Normalizes the `AuthenticatedUser` principal from verified JWT claims.
-3. **Role-Based Authorization Layer (`RolesGuard`)**:
+3. **Layered Audience Model**:
+   - Keycloak access tokens include both audiences: `aud: ["smartprocure-gateway", "smartprocure-api", ...]`.
+   - **Perimeter (APISIX)** verifies `aud` contains `smartprocure-gateway`.
+   - **Application (NestJS)** independently verifies `aud` contains `smartprocure-api`.
+   - Neither layer relies on the other's validation.
+4. **Role-Based Authorization Layer (`RolesGuard`)**:
    - NestJS remains the **sole authoritative decision-maker** for business role access control.
    - APISIX does not perform deep business role checks, avoiding route duplication and keeping gateway configuration minimal.
 
@@ -168,14 +175,16 @@ Keycloak acts as the centralized OpenID Connect Identity Provider. Three distinc
    - **Audience Mappers**: Injects `smartprocure-api` and `smartprocure-gateway`.
 3. `smartprocure-gateway`:
    - **Type**: Confidential infrastructure client for APISIX gateway token introspection and metadata validation.
-   - **Credentials**: Managed via environment variable (`APISIX_OIDC_CLIENT_SECRET`).
+   - **Hardening**: `serviceAccountsEnabled: false`, standard flow disabled, direct access grants disabled, implicit flow disabled, zero user/business domain roles assigned.
+   - **Credentials**: Hardcoded secret in realm import is **DEV/CI ONLY**. Production deployments must inject and rotate credentials via external secret management (Vault/AWS Secrets Manager).
 
 ---
 
 ## 7. Anti-Spoofing & Identity Headers
 
 To prevent spoofing attacks:
-- APISIX `proxy-rewrite` removes any client-supplied identity headers (`X-User-Sub`, `X-User-Name`, `X-User-Email`, `X-User-Roles`) from the incoming request before proxying to NestJS.
+- APISIX `proxy-rewrite` removes any client-supplied identity headers (`X-User-Sub`, `X-User-Name`, `X-User-Email`, `X-User-Roles`, `X-Userinfo`) from the incoming request before proxying to NestJS.
+- APISIX avoids synthetic `X-Userinfo` or `X-Access-Token` injection (`set_userinfo_header: false`, `set_access_token_header: false`).
 - NestJS never constructs security contexts from headers; it only derives identity from the cryptographically verified JWT payload.
 
 ---
@@ -184,12 +193,16 @@ To prevent spoofing attacks:
 
 ### Ownership Strategy
 - **APISIX is the sole external CORS authority** for all traffic entering through the gateway `:9080`.
-- The `cors` plugin is enabled on API routes with explicit allowed origins:
-  - `http://localhost:9080`
-  - `http://localhost:3000`
-  - `http://127.0.0.1:9080`
-  - `http://127.0.0.1:3000`
-- `allow_credential: true` is enabled without wildcard origins (`*`), compliant with browser security standards.
+- The `cors` plugin is enabled on API routes with explicit, hardened parameters (no `*` or `**` wildcards):
+  - **Allowed Origins**:
+    - `http://localhost:9080`
+    - `http://localhost:3000`
+    - `http://127.0.0.1:9080`
+    - `http://127.0.0.1:3000`
+  - **Allowed Methods**: `GET,POST,PUT,PATCH,DELETE,OPTIONS`
+  - **Allowed Headers**: `Authorization,Content-Type,Accept`
+  - **Allow Credentials**: `true`
+- **Protected Route Preflight**: OPTIONS preflight on protected routes (such as `/api/auth/me`) succeeds with HTTP 200 without requiring a Bearer token, as the APISIX CORS plugin intercepts preflight before authentication.
 - Backend NestJS checks `ENABLE_CORS !== 'false'`. In container deployments behind APISIX, `ENABLE_CORS: "false"` is configured to prevent duplicate conflicting headers.
 
 ---
@@ -199,6 +212,7 @@ To prevent spoofing attacks:
 - Managed via APISIX built-in `limit-count` plugin.
 - **Policy**: `local` (in-memory counter on the APISIX instance).
 - **Default Protected API Quota**: `100` requests per `60` seconds per client IP (`remote_addr`).
+- **Test Endpoint Quota**: `5` requests per `10` seconds on `/api/rate-limit-test`.
 - **Rejected Response**: Returns HTTP `429 Too Many Requests`.
 - **Production Consideration**: In multi-instance or Kubernetes cluster deployments, `policy: "redis"` or `policy: "redis-cluster"` should be adopted for a distributed shared counter across all gateway pods.
 
@@ -208,8 +222,10 @@ To prevent spoofing attacks:
 
 ### Prometheus Metrics
 - APISIX Prometheus exporter is enabled in `config.yaml` on internal port `9091` (`/apisix/prometheus/metrics`).
-- Metrics are isolated from the public entry point (`:9080`) to prevent unauthorized reconnaissance.
+- In Docker Compose, the exporter port is bound to host loopback only (`127.0.0.1:9091:9091`), inaccessible from external networks.
+- Metrics are completely isolated from the public entry point (`:9080`).
 - Emits standard APISIX metrics: `apisix_http_status`, `apisix_http_requests_total`, `apisix_node_info`, latency histograms.
+- **Production Guidance**: Do NOT expose port 9091 publicly. Prometheus must scrape this endpoint via the private cluster/container network.
 
 ### Access Logging & Secret Scrubbing
 - Access logs are streamed to standard output (`/dev/stdout`), and error logs to `/dev/stderr`.
@@ -223,9 +239,10 @@ To prevent spoofing attacks:
 | Threat Vector | Mitigation Strategy | Enforcing Component |
 | :--- | :--- | :--- |
 | **Token Forgery / Tampering** | Cryptographic RS256 signature verification against Keycloak JWKS | APISIX Gateway + NestJS API |
-| **Audience Confusion** | Explicit validation that token `aud` claim matches `smartprocure-api` | APISIX (`claim_validator`) + NestJS |
+| **Audience Confusion** | Explicit validation that token `aud` claim matches `smartprocure-gateway` (Perimeter) and `smartprocure-api` (Backend) | APISIX (`claim_validator`) + NestJS |
 | **Header Injection / Spoofing** | Gateway removes incoming `X-User-*` headers; backend only trusts verified JWT | APISIX (`proxy-rewrite`) + NestJS |
 | **Admin API Exploitation** | Admin API is completely disabled in standalone data plane mode (`enable_admin: false`) | APISIX (`config.yaml`) |
 | **DDoS / Request Flooding** | Rate limiting per remote IP (`limit-count` with HTTP 429) | APISIX Gateway |
-| **Cross-Origin Hijacking** | Strict origin allowlist with credentials; preflight validation | APISIX (`cors` plugin) |
-| **Metrics Data Leakage** | Prometheus metrics bound to separate internal port `9091`, unexposed on `:9080` | APISIX (`plugin_attr`) |
+| **Cross-Origin Hijacking** | Strict origin, method, and header allowlists with credentials; preflight validation | APISIX (`cors` plugin) |
+| **Metrics Data Leakage** | Prometheus metrics bound to loopback `127.0.0.1:9091`, unexposed on public ingress | Docker Compose + APISIX |
+| **Direct Backend Ingress** | Ports 3000/4000/5432/8080 are exposed for DEV/CI convenience only; production ingress must expose ONLY gateway 9080/443 | Infrastructure / Firewall |

@@ -55,23 +55,29 @@ This directory contains the declarative infrastructure configuration for **Apach
 ## Defense in Depth Strategy
 
 1. **Gateway Layer (APISIX)**:
+   - Uses dedicated infrastructure client: `smartprocure-gateway`.
    - Validates JWT signature against Keycloak JWKS (`/protocol/openid-connect/certs`).
    - Validates token expiration (`exp`) and issuer (`iss`).
-   - Enforces audience claim matching `smartprocure-api`.
-   - Strips client-supplied spoofing headers (`X-User-*`).
-   - Rate limits traffic using `limit-count` (100 req/60s).
+   - Enforces audience claim matching `smartprocure-gateway` (`claim_validator.audience.required: true`, `match_with_client_id: true`).
+   - Strips client-supplied spoofing headers (`X-User-*`, `X-Userinfo`).
+   - Omits sensitive token duplication (`set_access_token_header: false`, `set_refresh_token_header: false`, `set_userinfo_header: false`).
+   - Acts as external CORS authority with explicit allowlists (no `*` or `**`).
+   - Rate limits traffic using `limit-count` (100 req/60s on `/api/*`, 5 req/10s on `/api/rate-limit-test`).
    - Rejects unauthenticated/invalid requests with `401 Unauthorized`.
 
 2. **Backend Application Layer (NestJS)**:
-   - `JwtAuthGuard` cryptographically re-verifies JWT signature and audience `smartprocure-api`.
+   - `JwtAuthGuard` independently re-verifies JWT cryptographic signature and audience `smartprocure-api`.
    - `RolesGuard` evaluates domain role authorization (`admin`, `buyer`, etc.).
    - Returns `403 Forbidden` if role is insufficient.
 
 ---
 
-## Prometheus Metrics
+## Prometheus Metrics & Network Ingress
 
 APISIX exposes Prometheus metrics on internal port `9091`:
 ```bash
 curl http://localhost:9091/apisix/prometheus/metrics
 ```
+In Docker Compose, this exporter is bound to host loopback only (`127.0.0.1:9091:9091`).
+
+> **Production Security Note**: Host ports 3000, 4000, 5432, and 8080 are published for DEV/CI convenience only. In a production environment, direct access to these ports must be closed by firewall or omitted from host port bindings. Ingress must enter exclusively through the API Gateway (ports 9080/443), and Prometheus metrics must be scraped via private internal networks.
