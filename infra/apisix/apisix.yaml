@@ -1,0 +1,136 @@
+# ==============================================================================
+# SmartProcure-Pay: Apache APISIX Declarative Routes (Issue #4)
+# ==============================================================================
+# Unified API Gateway Routing Strategy:
+#   1. GET /*                -> smartprocure-web:80 (React SPA)
+#   2. GET /api/health       -> smartprocure-api:4000/health (Public Healthcheck)
+#   3. GET /api/rate-limit-test -> smartprocure-api:4000/health (Rate Limit Test Quota)
+#   4. ALL /api/*            -> smartprocure-api:4000/* (Protected Endpoints)
+#
+# Defense in Depth:
+#   APISIX openid-connect verifies Bearer token (signature, exp, issuer, aud)
+#   NestJS JwtAuthGuard independently re-verifies token signature & aud.
+# ==============================================================================
+
+routes:
+  # ----------------------------------------------------------------------------
+  # 1. Rate Limit Validation Route (Higher Priority for Automated Verification)
+  # ----------------------------------------------------------------------------
+  - id: rate-limit-test
+    name: rate-limit-test-endpoint
+    uri: /api/rate-limit-test
+    priority: 20
+    plugins:
+      proxy-rewrite:
+        regex_uri: ["^/api/rate-limit-test", "/health"]
+      cors:
+        allow_origins: "http://localhost:9080,http://localhost:3000,http://127.0.0.1:9080,http://127.0.0.1:3000"
+        allow_methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+        allow_headers: "Authorization,Content-Type,Accept"
+        allow_credential: true
+      limit-count:
+        count: 5
+        time_window: 10
+        rejected_code: 429
+        key: remote_addr
+        policy: local
+      prometheus: {}
+    upstream:
+      type: roundrobin
+      nodes:
+        "smartprocure-api:4000": 1
+
+  # ----------------------------------------------------------------------------
+  # 2. Public API Healthcheck (Bypasses OIDC Authentication)
+  # ----------------------------------------------------------------------------
+  - id: public-api-health
+    name: public-api-healthcheck
+    uri: /api/health
+    priority: 10
+    plugins:
+      proxy-rewrite:
+        regex_uri: ["^/api/(.*)", "/$1"]
+      cors:
+        allow_origins: "http://localhost:9080,http://localhost:3000,http://127.0.0.1:9080,http://127.0.0.1:3000"
+        allow_methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+        allow_headers: "Authorization,Content-Type,Accept"
+        allow_credential: true
+      limit-count:
+        count: 100
+        time_window: 60
+        rejected_code: 429
+        key: remote_addr
+        policy: local
+      prometheus: {}
+    upstream:
+      type: roundrobin
+      nodes:
+        "smartprocure-api:4000": 1
+
+  # ----------------------------------------------------------------------------
+  # 3. Protected Backend API (Enforces Keycloak Bearer Token Verification)
+  # ----------------------------------------------------------------------------
+  - id: protected-api
+    name: protected-backend-api
+    uri: /api/*
+    priority: 5
+    plugins:
+      proxy-rewrite:
+        regex_uri: ["^/api/?(.*)", "/$1"]
+        headers:
+          remove:
+            - "X-User-Sub"
+            - "X-User-Name"
+            - "X-User-Email"
+            - "X-User-Roles"
+            - "X-Userinfo"
+      openid-connect:
+        client_id: "${{APISIX_OIDC_CLIENT_ID:=smartprocure-gateway}}"
+        client_secret: "${{APISIX_OIDC_CLIENT_SECRET:=gateway_dev_secret_123}}"
+        discovery: "http://smartprocure-keycloak:8080/realms/smartprocure/.well-known/openid-configuration"
+        bearer_only: true
+        use_jwks: true
+        ssl_verify: false
+        set_access_token_header: false
+        set_refresh_token_header: false
+        set_userinfo_header: false
+        claim_validator:
+          issuer:
+            valid_issuers:
+              - "http://localhost:8080/realms/smartprocure"
+              - "http://127.0.0.1:8080/realms/smartprocure"
+              - "http://smartprocure-keycloak:8080/realms/smartprocure"
+          audience:
+            required: true
+            match_with_client_id: true
+      cors:
+        allow_origins: "http://localhost:9080,http://localhost:3000,http://127.0.0.1:9080,http://127.0.0.1:3000"
+        allow_methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+        allow_headers: "Authorization,Content-Type,Accept"
+        allow_credential: true
+      limit-count:
+        count: 100
+        time_window: 60
+        rejected_code: 429
+        key: remote_addr
+        policy: local
+      prometheus: {}
+    upstream:
+      type: roundrobin
+      nodes:
+        "smartprocure-api:4000": 1
+
+  # ----------------------------------------------------------------------------
+  # 4. Public Web Client (Serves React Single-Page Application)
+  # ----------------------------------------------------------------------------
+  - id: public-web
+    name: public-web-frontend
+    uri: /*
+    priority: 0
+    upstream:
+      type: roundrobin
+      nodes:
+        "smartprocure-web:80": 1
+
+# Required to signal end of file for APISIX standalone mode
+#END

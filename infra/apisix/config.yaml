@@ -1,0 +1,35 @@
+# ==============================================================================
+# SmartProcure-Pay: Apache APISIX Gateway Configuration (Issue #4)
+# ==============================================================================
+# Deployment role: Standalone data plane (config_provider: yaml)
+# Declarative routes, upstreams, and plugins are defined in conf/apisix.yaml.
+# Reproducible in Git without runtime etcd dependency for local & CI environments.
+# ==============================================================================
+
+apisix:
+  node_listen:
+    - 9080
+  enable_ipv6: false
+  enable_admin: false
+  enable_control: false
+
+deployment:
+  role: data_plane
+  role_data_plane:
+    config_provider: yaml
+
+plugin_attr:
+  prometheus:
+    enable_export_server: true
+    export_addr:
+      ip: 0.0.0.0
+      port: 9091
+    export_uri: /apisix/prometheus/metrics
+
+nginx_config:
+  error_log: "/dev/stderr"
+  error_log_level: "warn"
+  http:
+    access_log: "/dev/stdout"
+    keepalive_timeout: 60s
+    client_header_buffer_size: 4k

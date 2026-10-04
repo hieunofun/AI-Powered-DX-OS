@@ -14,8 +14,8 @@ COPY packages/ ./packages/
 # Install build dependencies
 RUN npm install
 
-# Build-time argument for API Base URL and Keycloak
-ARG VITE_API_BASE_URL=http://localhost:4000
+# Build-time argument for API Base URL and Keycloak (routes via APISIX gateway)
+ARG VITE_API_BASE_URL=/api
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 ARG VITE_KEYCLOAK_URL=http://localhost:8080
 ENV VITE_KEYCLOAK_URL=$VITE_KEYCLOAK_URL
@@ -36,6 +36,6 @@ COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
 EXPOSE 80
 
 HEALTHCHECK --interval=10s --timeout=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:80 || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1/ || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]

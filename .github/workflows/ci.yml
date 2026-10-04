@@ -110,6 +110,32 @@ jobs:
           fi
           echo "Web client verified successfully."
 
+          echo "Waiting for Apache APISIX Gateway (http://localhost:9080)..."
+          APISIX_READY=0
+          for i in {1..20}; do
+            if curl -s -f http://localhost:9080/ > /dev/null; then
+              echo "APISIX Gateway is responding!"
+              APISIX_READY=1
+              break
+            fi
+            echo "Attempt $i/20: APISIX not ready yet. Waiting 2s..."
+            sleep 2
+          done
+
+          if [ $APISIX_READY -ne 1 ]; then
+            echo "Error: Timed out waiting for APISIX Gateway at http://localhost:9080."
+            docker compose ps
+            docker compose logs smartprocure-apisix
+            exit 1
+          fi
+
+          APISIX_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9080/)
+          if [ "$APISIX_STATUS" != "200" ]; then
+            echo "Error: Expected HTTP 200 from APISIX Gateway, got $APISIX_STATUS"
+            exit 1
+          fi
+          echo "APISIX Gateway verified successfully."
+
       - name: Validate PostgreSQL domain schema & constraints
         run: |
           chmod +x database/scripts/validate-schema.sh
@@ -119,6 +145,11 @@ jobs:
         run: |
           chmod +x infra/keycloak/validate-keycloak-auth.sh
           bash infra/keycloak/validate-keycloak-auth.sh
+
+      - name: Validate Apache APISIX Gateway Routing & Security
+        run: |
+          chmod +x infra/apisix/validate-apisix-gateway.sh
+          bash infra/apisix/validate-apisix-gateway.sh
 
       - name: Check container status
         run: docker compose ps
