@@ -264,8 +264,8 @@ if [ "$STATUS_METRICS" != "200" ]; then
   exit 1
 fi
 
-grep -q "apisix_http_status" /tmp/metrics.txt || {
-  echo "ERROR: Expected apisix_http_status metric in Prometheus export"
+grep -qE "apisix_http_requests_total|apisix_http_status" /tmp/metrics.txt || {
+  echo "ERROR: Expected APISIX request metrics in Prometheus export"
   head -n 20 /tmp/metrics.txt
   exit 1
 }
