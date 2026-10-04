@@ -549,15 +549,19 @@ export class GoodsReceiptsRepository {
       }
 
       for (const item of grnItems) {
-        FulfillmentCalculator.validateLineQuantities(
-          {
-            receivedQuantity: item.receivedQuantity,
-            acceptedQuantity: item.acceptedQuantity,
-            rejectedQuantity: item.rejectedQuantity,
-            damageNote: item.damageNote,
-          },
-          true, // isFinalizing = true requires exact accepted + rejected === received
-        );
+        try {
+          FulfillmentCalculator.validateLineQuantities(
+            {
+              receivedQuantity: item.receivedQuantity,
+              acceptedQuantity: item.acceptedQuantity,
+              rejectedQuantity: item.rejectedQuantity,
+              damageNote: item.damageNote,
+            },
+            true, // isFinalizing = true requires exact accepted + rejected === received
+          );
+        } catch (err: any) {
+          throw new ConflictException(err.message);
+        }
       }
 
       // 5. Fetch active over-delivery policy
