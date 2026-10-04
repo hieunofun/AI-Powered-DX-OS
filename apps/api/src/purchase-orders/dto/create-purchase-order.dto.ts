@@ -13,53 +13,122 @@ import {
   ValidationOptions,
   ValidationArguments,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import Decimal from 'decimal.js';
 
-export function IsPositiveDecimalString(validationOptions?: ValidationOptions) {
+export function StrictDecimalString() {
+  return Transform(({ obj, key }) => {
+    const raw = obj?.[key];
+    if (raw === undefined || raw === null) return raw;
+    if (typeof raw !== 'string') {
+      return Symbol.for('INVALID_NON_STRING_DECIMAL');
+    }
+    return raw;
+  });
+}
+
+interface DecimalValidationConstraint {
+  maxIntegerDigits: number; // 14 for NUMERIC(18,4), 3 for NUMERIC(7,4)
+  maxScale: number; // 4
+  min: 'gtZero' | 'gteZero';
+}
+
+function validateDecimalString(value: any, constraint: DecimalValidationConstraint): boolean {
+  if (typeof value !== 'string') {
+    return false;
+  }
+  // Must be strictly unsigned decimal digits without signs, exponent, or whitespace
+  if (!/^\d+(\.\d+)?$/.test(value)) {
+    return false;
+  }
+
+  const [intPart, fracPart] = value.split('.');
+  // Check scale constraint (max 4 decimal places)
+  if (fracPart !== undefined && fracPart.length > constraint.maxScale) {
+    return false;
+  }
+
+  // Check precision constraint (max integer digits excluding leading zeros)
+  const strippedInt = intPart.replace(/^0+/, '') || '0';
+  if (strippedInt !== '0' && strippedInt.length > constraint.maxIntegerDigits) {
+    return false;
+  }
+
+  try {
+    const d = new Decimal(value);
+    if (d.isNaN()) return false;
+    if (constraint.min === 'gtZero') {
+      return d.gt(0);
+    }
+    return d.gte(0);
+  } catch {
+    return false;
+  }
+}
+
+export function IsOrderedQuantityString(validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string) {
     registerDecorator({
-      name: 'isPositiveDecimalString',
+      name: 'isOrderedQuantityString',
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
       validator: {
         validate(value: any) {
-          if (value === undefined || value === null || value === '') return false;
-          try {
-            const d = new Decimal(value);
-            return !d.isNaN() && d.gt(0);
-          } catch {
-            return false;
-          }
+          return validateDecimalString(value, {
+            maxIntegerDigits: 14,
+            maxScale: 4,
+            min: 'gtZero',
+          });
         },
         defaultMessage(args: ValidationArguments) {
-          return `${args.property} must be a valid strictly positive decimal number or string`;
+          return `${args.property} must be a valid strictly positive decimal string with max 4 decimal places fitting NUMERIC(18,4)`;
         },
       },
     });
   };
 }
 
-export function IsNonNegativeDecimalString(validationOptions?: ValidationOptions) {
+export function IsUnitPriceString(validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string) {
     registerDecorator({
-      name: 'isNonNegativeDecimalString',
+      name: 'isUnitPriceString',
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
       validator: {
         validate(value: any) {
-          if (value === undefined || value === null || value === '') return false;
-          try {
-            const d = new Decimal(value);
-            return !d.isNaN() && d.gte(0);
-          } catch {
-            return false;
-          }
+          return validateDecimalString(value, {
+            maxIntegerDigits: 14,
+            maxScale: 4,
+            min: 'gteZero',
+          });
         },
         defaultMessage(args: ValidationArguments) {
-          return `${args.property} must be a valid non-negative decimal number or string`;
+          return `${args.property} must be a valid non-negative decimal string with max 4 decimal places fitting NUMERIC(18,4)`;
+        },
+      },
+    });
+  };
+}
+
+export function IsTaxRateString(validationOptions?: ValidationOptions) {
+  return function (object: object, propertyName: string) {
+    registerDecorator({
+      name: 'isTaxRateString',
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: any) {
+          return validateDecimalString(value, {
+            maxIntegerDigits: 3,
+            maxScale: 4,
+            min: 'gteZero',
+          });
+        },
+        defaultMessage(args: ValidationArguments) {
+          return `${args.property} must be a valid non-negative decimal string with max 4 decimal places fitting NUMERIC(7,4)`;
         },
       },
     });
@@ -78,30 +147,33 @@ export class CreatePurchaseOrderItemDto {
   description: string;
 
   @ApiProperty({
-    description: 'Ordered quantity NUMERIC(18,4) (strictly positive decimal string or number)',
-    example: '10',
-    type: 'string',
+    description: 'Ordered quantity NUMERIC(18,4) strictly positive decimal string with max 4 decimal places',
+    example: '10.0000',
+    type: String,
   })
-  @IsPositiveDecimalString()
-  orderedQuantity: string | number;
+  @StrictDecimalString()
+  @IsOrderedQuantityString()
+  orderedQuantity: string;
 
   @ApiProperty({
-    description: 'Unit price per quantity unit NUMERIC(18,4) (non-negative decimal string or number)',
-    example: '15000000.00',
-    type: 'string',
+    description: 'Unit price per quantity unit NUMERIC(18,4) non-negative decimal string with max 4 decimal places',
+    example: '15000000.0000',
+    type: String,
   })
-  @IsNonNegativeDecimalString()
-  unitPrice: string | number;
+  @StrictDecimalString()
+  @IsUnitPriceString()
+  unitPrice: string;
 
   @ApiPropertyOptional({
-    description: 'Tax rate expressed as decimal fraction NUMERIC(7,4) (0.10 = 10%)',
-    example: '0.10',
-    default: '0',
-    type: 'string',
+    description: 'Tax rate expressed as decimal fraction NUMERIC(7,4) non-negative decimal string with max 4 decimal places (0.10 = 10%)',
+    example: '0.1000',
+    default: '0.0000',
+    type: String,
   })
   @IsOptional()
-  @IsNonNegativeDecimalString()
-  taxRate?: string | number;
+  @StrictDecimalString()
+  @IsTaxRateString()
+  taxRate?: string;
 }
 
 export class CreatePurchaseOrderDto {

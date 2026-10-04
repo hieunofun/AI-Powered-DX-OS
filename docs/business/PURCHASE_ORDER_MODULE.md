@@ -69,6 +69,12 @@ $$\text{PO taxAmount} = \sum \text{line taxAmount}$$
 $$\text{PO totalAmount} = \text{subtotal} + \text{taxAmount}$$
 
 - **Edge Case Protection**: Correctly handles edge cases that native JS fails (e.g. `10.075` rounds to `10.08`, `1.005` rounds to `1.01`).
+- **Scale & Precision Boundaries at API Gateway**:
+  - `orderedQuantity`: Decimal string, $> 0$, max 4 decimal places, fits `NUMERIC(18,4)`.
+  - `unitPrice`: Decimal string, $\ge 0$, max 4 decimal places, fits `NUMERIC(18,4)`.
+  - `taxRate`: Decimal string, $\ge 0$, max 4 decimal places, fits `NUMERIC(7,4)`.
+  - **No Implicit Rounding**: Excess scale (e.g. `"1.00495"`) is strictly rejected at the validation boundary with **HTTP 400 Bad Request** to prevent database quantization discrepancies between creation and pre-issue verification.
+  - **Strict String Type**: Only decimal strings are accepted; native JavaScript numbers are rejected to prevent IEEE-754 precision loss during JSON serialization.
 - **Reconciliation Integrity**: Summing pre-rounded line values ensures that $\sum \text{lineSubtotal}$ exactly matches the sum of stored invoice lines without fractional drift.
 - **Pre-Issue Total Verification**: Before transitioning `DRAFT` ──► `ISSUED`, the service recalculates line items and asserts exact decimal string equality against persisted `subtotal`, `tax_amount`, and `total_amount`. Mismatches are rejected with HTTP 409 Conflict.
 

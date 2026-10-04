@@ -79,9 +79,9 @@ describe('PurchaseOrdersController', () => {
         items: [
           {
             description: 'Item 1',
-            orderedQuantity: 10,
-            unitPrice: 100,
-            taxRate: 0.1,
+            orderedQuantity: '10.0000',
+            unitPrice: '100.0000',
+            taxRate: '0.1000',
           },
         ],
       };

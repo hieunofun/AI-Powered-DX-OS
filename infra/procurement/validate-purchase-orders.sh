@@ -17,6 +17,7 @@
 #   9. PO Cancellation with required reason (POST /cancel -> HTTP 200, status CANCELLED)
 #  10. RBAC enforcement (warehouse token attempts POST -> HTTP 403 Forbidden)
 #  11. Real database transaction atomic rollback proof
+#  12. PostgreSQL Decimal Scale/Precision Boundaries & Quantization Safety
 # ==============================================================================
 
 set -euo pipefail
@@ -409,6 +410,134 @@ if [ "$ORPHAN_AUDIT_COUNT" != "0" ]; then
 fi
 echo "PostgreSQL atomic transaction rollback verified: 0 orphan POs, 0 orphan items, 0 orphan audit records."
 
+# ------------------------------------------------------------------------------
+# 12. Regression Test: PostgreSQL Decimal Scale/Precision Boundaries & Quantization Safety
+# ------------------------------------------------------------------------------
+echo "[12/12] Testing PostgreSQL decimal scale/precision boundaries and DB quantization safety..."
+
+# Record current row counts in PostgreSQL before testing invalid creation
+INITIAL_PO_COUNT=$(run_sql "SELECT count(*) FROM purchase_orders;")
+INITIAL_ITEMS_COUNT=$(run_sql "SELECT count(*) FROM purchase_order_items;")
+INITIAL_AUDIT_COUNT=$(run_sql "SELECT count(*) FROM audit_records;")
+
+# 12a. Attempt create with excess scale unitPrice: "1.00495" (5 decimal places, exceeds NUMERIC(18,4) scale)
+EXCESS_SCALE_PAYLOAD=$(cat <<EOF
+{
+  "supplierId": "$SUPPLIER_ID",
+  "currency": "usd",
+  "orderDate": "2026-10-04",
+  "items": [
+    {
+      "description": "Quantization Test Item - Invalid Scale",
+      "orderedQuantity": "1.0000",
+      "unitPrice": "1.00495",
+      "taxRate": "0.1000"
+    }
+  ]
+}
+EOF
+)
+
+EXCESS_SCALE_RESP=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/purchase-orders" \
+  -H "Authorization: Bearer $BUYER_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "$EXCESS_SCALE_PAYLOAD")
+
+EXCESS_SCALE_CODE=$(echo "$EXCESS_SCALE_RESP" | tail -n 1)
+EXCESS_SCALE_BODY=$(echo "$EXCESS_SCALE_RESP" | sed '$d')
+
+if [ "$EXCESS_SCALE_CODE" != "400" ]; then
+  echo "ERROR: Expected HTTP 400 for excess scale '1.00495', got $EXCESS_SCALE_CODE"
+  echo "$EXCESS_SCALE_BODY"
+  exit 1
+fi
+echo "Excess scale input '1.00495' correctly rejected at API boundary with HTTP 400."
+
+# Verify no purchase_orders, purchase_order_items, or audit_records rows were created
+AFTER_FAIL_PO_COUNT=$(run_sql "SELECT count(*) FROM purchase_orders;")
+AFTER_FAIL_ITEMS_COUNT=$(run_sql "SELECT count(*) FROM purchase_order_items;")
+AFTER_FAIL_AUDIT_COUNT=$(run_sql "SELECT count(*) FROM audit_records;")
+
+if [ "$AFTER_FAIL_PO_COUNT" != "$INITIAL_PO_COUNT" ]; then
+  echo "ERROR: Database leaked purchase_orders row on HTTP 400 rejection!"
+  exit 1
+fi
+if [ "$AFTER_FAIL_ITEMS_COUNT" != "$INITIAL_ITEMS_COUNT" ]; then
+  echo "ERROR: Database leaked purchase_order_items row on HTTP 400 rejection!"
+  exit 1
+fi
+if [ "$AFTER_FAIL_AUDIT_COUNT" != "$INITIAL_AUDIT_COUNT" ]; then
+  echo "ERROR: Database leaked audit_records row on HTTP 400 rejection!"
+  exit 1
+fi
+echo "Verified: No orphan purchase_orders, items, or audit records in PostgreSQL after HTTP 400 rejection."
+
+# 12b. Attempt create with valid 4-decimal unitPrice: "1.0050"
+VALID_SCALE_PAYLOAD=$(cat <<EOF
+{
+  "supplierId": "$SUPPLIER_ID",
+  "currency": "usd",
+  "orderDate": "2026-10-04",
+  "items": [
+    {
+      "description": "Quantization Test Item - Valid Scale",
+      "orderedQuantity": "1.0000",
+      "unitPrice": "1.0050",
+      "taxRate": "0.1000"
+    }
+  ]
+}
+EOF
+)
+
+VALID_SCALE_RESP=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/purchase-orders" \
+  -H "Authorization: Bearer $BUYER_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "$VALID_SCALE_PAYLOAD")
+
+VALID_SCALE_CODE=$(echo "$VALID_SCALE_RESP" | tail -n 1)
+VALID_SCALE_BODY=$(echo "$VALID_SCALE_RESP" | sed '$d')
+
+if [ "$VALID_SCALE_CODE" != "201" ]; then
+  echo "ERROR: Expected HTTP 201 for valid scale '1.0050', got $VALID_SCALE_CODE"
+  echo "$VALID_SCALE_BODY"
+  exit 1
+fi
+
+QUANT_PO_ID=$(echo "$VALID_SCALE_BODY" | jq -r '.id')
+echo "Valid 4-decimal PO created successfully via APISIX (PO ID: $QUANT_PO_ID, unitPrice: 1.0050)."
+
+# 12c. Issue the PO afterward: pre-issue reconciliation MUST succeed
+ISSUE_QUANT_RESP=$(curl -s -w "\n%{http_code}" -X POST "$GATEWAY_URL/api/purchase-orders/$QUANT_PO_ID/issue" \
+  -H "Authorization: Bearer $BUYER_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"expectedVersion": 1}')
+
+ISSUE_QUANT_CODE=$(echo "$ISSUE_QUANT_RESP" | tail -n 1)
+ISSUE_QUANT_BODY=$(echo "$ISSUE_QUANT_RESP" | sed '$d')
+
+if [ "$ISSUE_QUANT_CODE" != "200" ]; then
+  echo "ERROR: Expected HTTP 200 on issue for valid scale PO, got $ISSUE_QUANT_CODE"
+  echo "$ISSUE_QUANT_BODY"
+  exit 1
+fi
+
+QUANT_STATUS=$(echo "$ISSUE_QUANT_BODY" | jq -r '.status')
+if [ "$QUANT_STATUS" != "ISSUED" ]; then
+  echo "ERROR: Expected status ISSUED, got $QUANT_STATUS"
+  exit 1
+fi
+echo "Pre-issue reconciliation succeeded with exact 4-decimal input: PO transitioned to ISSUED."
+
+# 12d. Verify Swagger documentation is disabled by default in production Docker stack
+echo "Verifying Swagger production-default-off policy on Docker container..."
+DOCS_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:4000/docs || echo "000")
+if [ "$DOCS_CODE" != "404" ]; then
+  echo "WARNING: /docs returned HTTP $DOCS_CODE (expected 404 when ENABLE_SWAGGER=false in production)"
+else
+  echo "Verified: Swagger /docs is disabled (HTTP 404) in Docker production environment."
+fi
+
 echo "=========================================================="
-echo "SUCCESS: All 11 Real PostgreSQL & APISIX PO tests passed!"
+echo "SUCCESS: All 12 Real PostgreSQL & APISIX PO tests passed!"
 echo "=========================================================="

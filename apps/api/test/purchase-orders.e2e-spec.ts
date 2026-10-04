@@ -267,9 +267,9 @@ describe('PurchaseOrdersController (e2e)', () => {
           items: [
             {
               description: 'Industrial Sensor Pack',
-              orderedQuantity: 10,
-              unitPrice: 150.5,
-              taxRate: 0.1,
+              orderedQuantity: '10.0000',
+              unitPrice: '150.5000',
+              taxRate: '0.1000',
             },
           ],
         })
@@ -293,9 +293,9 @@ describe('PurchaseOrdersController (e2e)', () => {
           items: [
             {
               description: 'Pallet Fork',
-              orderedQuantity: 2,
-              unitPrice: 500,
-              taxRate: 0.08,
+              orderedQuantity: '2.0000',
+              unitPrice: '500.0000',
+              taxRate: '0.0800',
             },
           ],
         })
@@ -315,9 +315,9 @@ describe('PurchaseOrdersController (e2e)', () => {
           items: [
             {
               description: 'Item A',
-              orderedQuantity: 5,
-              unitPrice: 100,
-              taxRate: 0.1,
+              orderedQuantity: '5.0000',
+              unitPrice: '100.0000',
+              taxRate: '0.1000',
             },
           ],
         })
@@ -354,17 +354,61 @@ describe('PurchaseOrdersController (e2e)', () => {
           items: [
             {
               description: 'Negative Quantity Item',
-              orderedQuantity: -5,
-              unitPrice: 100,
-              taxRate: 0.1,
+              orderedQuantity: '-5.0000',
+              unitPrice: '100.0000',
+              taxRate: '0.1000',
             },
           ],
         })
         .expect(400);
 
       expect(Array.isArray(res.body.message) ? res.body.message.join(' ') : res.body.message).toContain(
-        'orderedQuantity must be a valid strictly positive decimal',
+        'orderedQuantity must be a valid strictly positive decimal string',
       );
+    });
+
+    it('5a. excess scale (1.00495) -> 400 Bad Request', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/purchase-orders')
+        .set('Authorization', 'Bearer buyer-token')
+        .send({
+          supplierId: ACTIVE_SUPPLIER_ID,
+          currency: 'USD',
+          orderDate: '2026-10-04',
+          items: [
+            {
+              description: 'Excess Scale Item',
+              orderedQuantity: '1.0000',
+              unitPrice: '1.00495',
+              taxRate: '0.1000',
+            },
+          ],
+        })
+        .expect(400);
+
+      expect(Array.isArray(res.body.message) ? res.body.message.join(' ') : res.body.message).toContain(
+        'max 4 decimal places',
+      );
+    });
+
+    it('5b. native JavaScript number rejected -> 400 Bad Request', async () => {
+      await request(app.getHttpServer())
+        .post('/purchase-orders')
+        .set('Authorization', 'Bearer buyer-token')
+        .send({
+          supplierId: ACTIVE_SUPPLIER_ID,
+          currency: 'USD',
+          orderDate: '2026-10-04',
+          items: [
+            {
+              description: 'Native Number Item',
+              orderedQuantity: 10,
+              unitPrice: 100.5,
+              taxRate: 0.1,
+            },
+          ],
+        })
+        .expect(400);
     });
   });
 
@@ -382,9 +426,9 @@ describe('PurchaseOrdersController (e2e)', () => {
           items: [
             {
               description: 'Precision Item 1',
-              orderedQuantity: 3,
-              unitPrice: 100.25,
-              taxRate: 0.1,
+              orderedQuantity: '3.0000',
+              unitPrice: '100.2500',
+              taxRate: '0.1000',
             },
           ],
         })
@@ -401,15 +445,15 @@ describe('PurchaseOrdersController (e2e)', () => {
           items: [
             {
               description: 'Precision Item 1',
-              orderedQuantity: 3,
-              unitPrice: 100.25,
-              taxRate: 0.1, // 10%: subtotal 300.75, tax 30.08, total 330.83
+              orderedQuantity: '3.0000',
+              unitPrice: '100.2500',
+              taxRate: '0.1000', // 10%: subtotal 300.75, tax 30.08, total 330.83
             },
             {
               description: 'Precision Item 2',
-              orderedQuantity: 2,
-              unitPrice: 49.5,
-              taxRate: 0.08, // 8%: subtotal 99.00, tax 7.92, total 106.92
+              orderedQuantity: '2.0000',
+              unitPrice: '49.5000',
+              taxRate: '0.0800', // 8%: subtotal 99.00, tax 7.92, total 106.92
             },
           ],
         })
@@ -583,9 +627,9 @@ describe('PurchaseOrdersController (e2e)', () => {
           items: [
             {
               description: 'Item to fail',
-              orderedQuantity: 1,
-              unitPrice: 10,
-              taxRate: 0,
+              orderedQuantity: '1.0000',
+              unitPrice: '10.0000',
+              taxRate: '0.0000',
             },
           ],
         })
