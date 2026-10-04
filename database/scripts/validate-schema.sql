@@ -21,7 +21,8 @@ DECLARE
         'match_results',
         'match_result_items',
         'approval_cases',
-        'audit_records'
+        'audit_records',
+        'goods_receipt_policies'
     ];
     cnt integer;
 BEGIN
@@ -35,7 +36,7 @@ BEGIN
             RAISE EXCEPTION 'Assertion Failed: Table "%" does not exist in schema public', tbl;
         END IF;
     END LOOP;
-    RAISE NOTICE '[OK] All 12 domain tables confirmed present.';
+    RAISE NOTICE '[OK] All 13 domain tables confirmed present.';
 END $$;
 
 -- 2. Key Constraints Existence Validation
@@ -714,5 +715,55 @@ BEGIN
     DELETE FROM purchase_orders WHERE id = v_po_id;
 
     RAISE NOTICE '[OK] PO optimistic locking version column and atomic sequence validated.';
+END $$;
+
+-- 21. Goods Receipt Extensions (Lot Number, GRN Sequence, Policy Table & Constraints)
+DO $$
+DECLARE
+    v_col_count integer;
+    v_seq_val bigint;
+    v_policy_count integer;
+    v_duplicate_active_failed boolean := false;
+BEGIN
+    RAISE NOTICE '=== [Test 21] Verifying GRN extensions: lot_number, sequence & goods_receipt_policies ===';
+
+    -- 21a. Verify lot_number column exists in goods_receipt_items
+    SELECT count(*) INTO v_col_count
+    FROM information_schema.columns
+    WHERE table_name = 'goods_receipt_items' AND column_name = 'lot_number';
+
+    IF v_col_count != 1 THEN
+        RAISE EXCEPTION 'Assertion Failed: Column "lot_number" missing from goods_receipt_items';
+    END IF;
+
+    -- 21b. Verify goods_receipt_number_seq exists and generates positive values
+    SELECT nextval('goods_receipt_number_seq') INTO v_seq_val;
+    IF v_seq_val < 1 THEN
+        RAISE EXCEPTION 'Assertion Failed: Sequence goods_receipt_number_seq returned non-positive value: %', v_seq_val;
+    END IF;
+
+    -- 21c. Verify default goods_receipt_policies row exists with 0.00%
+    SELECT count(*) INTO v_policy_count
+    FROM goods_receipt_policies
+    WHERE policy_code = 'DEFAULT' AND over_delivery_tolerance_percent = 0.00 AND is_active = true;
+
+    IF v_policy_count != 1 THEN
+        RAISE EXCEPTION 'Assertion Failed: Expected 1 active DEFAULT policy with 0.00%% tolerance in goods_receipt_policies, found: %', v_policy_count;
+    END IF;
+
+    -- 21d. Verify partial unique index prevents a second active policy
+    BEGIN
+        INSERT INTO goods_receipt_policies (policy_code, over_delivery_tolerance_percent, is_active)
+        VALUES ('TEST_SECOND_ACTIVE', 5.00, true);
+    EXCEPTION WHEN unique_violation THEN
+        v_duplicate_active_failed := true;
+    END;
+
+    IF NOT v_duplicate_active_failed THEN
+        RAISE EXCEPTION 'Assertion Failed: Inserting second active policy did NOT trigger unique_violation!';
+    END IF;
+
+    RAISE NOTICE '[OK] Goods Receipt extensions (lot_number, sequence, policy table, constraints) validated.';
     RAISE NOTICE '=== ALL SCHEMA INTEGRITY TESTS PASSED SUCCESSFULLY ===';
 END $$;
+
