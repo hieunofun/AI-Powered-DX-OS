@@ -68,6 +68,7 @@ services:
       KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER:-http://localhost:8080/realms/smartprocure}
       KEYCLOAK_JWKS_URI: ${KEYCLOAK_JWKS_URI:-http://smartprocure-keycloak:8080/realms/smartprocure/protocol/openid-connect/certs}
       KEYCLOAK_AUDIENCE: ${KEYCLOAK_AUDIENCE:-smartprocure-api}
+      ENABLE_SWAGGER: ${ENABLE_SWAGGER:-false}
     ports:
       - "${API_PORT:-4000}:4000"
     networks:

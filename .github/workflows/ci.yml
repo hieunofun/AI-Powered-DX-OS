@@ -151,6 +151,11 @@ jobs:
           chmod +x infra/apisix/validate-apisix-gateway.sh
           bash infra/apisix/validate-apisix-gateway.sh
 
+      - name: Validate Purchase Order Module against Real PostgreSQL & Gateway
+        run: |
+          chmod +x infra/procurement/validate-purchase-orders.sh
+          bash infra/procurement/validate-purchase-orders.sh
+
       - name: Check container status
         run: docker compose ps
 
