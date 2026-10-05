@@ -17,7 +17,13 @@ describe('Workflow HTTP contracts (authentication, repository and Flowable mocke
     myTasks:jest.fn(async()=>[]),policy:jest.fn(async()=>policy),updatePolicy:jest.fn(async dto=>({...policy,...dto})),
     prepareAction:jest.fn(async()=>({taskId,idempotent:true})),serialized:jest.fn(async(_id,fn)=>fn()),
     operation:jest.fn(),dispatch:jest.fn(),finish:jest.fn(async()=>({approvalCaseId:caseId,caseStatus:'PENDING'})),failure:jest.fn()};
-  const engine={processes:jest.fn()};
+  const process={id:'process',businessKey:'approval-case:'+caseId,processDefinitionId:'definition'};
+  const engineTask={id:'engine-task',processInstanceId:'process',taskDefinitionKey:'buyerReview',name:'Buyer review',assignee:null};
+  const approval={id:caseId,invoice_id:id,match_result_id:'match',workflow_instance_id:'process',
+    match_snapshot:{requiredRoles:['buyer'],requiresFinanceApproval:false}};
+  const engine={processes:jest.fn(),process:jest.fn(),task:jest.fn(),complete:jest.fn(),historicTask:jest.fn(),
+    verifyDefinition:jest.fn(async()=>({version:1})),tasks:jest.fn(async()=>[engineTask]),
+    identityLinks:jest.fn(async()=>[{type:'candidate',group:'buyer'}])};
   const auth=(role='accountant')=>['Authorization','Bearer '+role] as const;
   beforeAll(async()=>{
     const module=await Test.createTestingModule({imports:[AppModule]})
@@ -62,6 +68,27 @@ describe('Workflow HTTP contracts (authentication, repository and Flowable mocke
     repo.prepareStart.mockRejectedValueOnce(new Error('SELECT password super-secret'));
     const res=await request(app.getHttpServer()).post('/invoices/'+id+'/workflow/start').set(...auth()).expect(503);
     expect(JSON.stringify(res.body)).not.toMatch(/SELECT|password|super-secret/);
+  });
+  it('exception start returns the confirmed persisted case',async()=>{
+    repo.prepareStart.mockResolvedValueOnce({route:'EXCEPTION_REVIEW',operationId:id} as any);
+    repo.operation.mockResolvedValueOnce({op:{operation:'START',status:'PENDING'},approval,actor:{sub:'sub-accountant',roles:['accountant']}});
+    engine.processes.mockResolvedValueOnce([process]);
+    const res=await request(app.getHttpServer()).post('/invoices/'+id+'/workflow/start').set(...auth()).expect(200);
+    expect(res.body).toMatchObject({route:'EXCEPTION_REVIEW',approvalCaseId:caseId,caseStatus:'PENDING'});
+  });
+  it('owned task completion returns the confirmed result through the HTTP contract',async()=>{
+    repo.prepareAction.mockResolvedValueOnce({operationId:id} as any);
+    repo.operation.mockResolvedValueOnce({op:{operation:'COMPLETE',status:'PENDING',payload:{action:'APPROVE'}},approval,
+      task:{flowable_task_id:'engine-task',task_key:'buyerReview',assigned_role:'buyer'},
+      actor:{sub:'sub-buyer',roles:['buyer']}});
+    engine.process.mockResolvedValueOnce(process).mockResolvedValueOnce({...process,endTime:'now',endActivityId:'approved'});
+    engine.task.mockResolvedValueOnce({...engineTask,assignee:'sub-buyer'});
+    engine.historicTask.mockResolvedValueOnce({...engineTask,endTime:'now',variables:[{name:'applicationOperationId',value:id}]});
+    engine.tasks.mockResolvedValueOnce([]);
+    repo.finish.mockResolvedValueOnce({approvalCaseId:caseId,caseStatus:'APPROVED',invoiceStatus:'READY_FOR_PAYMENT'} as any);
+    const res=await request(app.getHttpServer()).post('/approval-tasks/'+taskId+'/complete').set(...auth('buyer')).send({action:'APPROVE'}).expect(200);
+    expect(res.body).toMatchObject({caseStatus:'APPROVED',invoiceStatus:'READY_FOR_PAYMENT'});
+    expect(engine.complete).toHaveBeenLastCalledWith('engine-task','APPROVE',id);
   });
   it('claim passes authenticated subject to repository',async()=>{
     await request(app.getHttpServer()).post('/approval-tasks/'+taskId+'/claim').set(...auth('buyer')).expect(200);

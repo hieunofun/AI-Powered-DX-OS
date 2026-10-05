@@ -985,7 +985,7 @@ BEGIN
   FOREACH name IN ARRAY ARRAY['-1','NaN','Infinity'] LOOP
     failed:=false;
     BEGIN UPDATE workflow_policies SET finance_approval_threshold=name::numeric WHERE is_active;
-    EXCEPTION WHEN check_violation THEN failed:=true; END;
+    EXCEPTION WHEN check_violation OR numeric_value_out_of_range THEN failed:=true; END;
     IF NOT failed THEN RAISE EXCEPTION 'Invalid threshold accepted %',name; END IF;
   END LOOP;
   SELECT id,supplier_id INTO po,supplier FROM purchase_orders LIMIT 1;
