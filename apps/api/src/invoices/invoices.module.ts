@@ -5,13 +5,14 @@ import { StorageModule } from '../storage/storage.module';
 import { InvoicesController, InvoiceIngestionsController } from './invoices.controller';
 import { InvoicesService } from './invoices.service';
 import { InvoicesRepository } from './invoices.repository';
-import { VietnamEinvoiceXmlParser } from './parsers/vietnam-einvoice-xml.parser';
+import { SmartProcureInvoiceV1Parser } from './parsers/smartprocure-invoice-v1.parser';
+import { MatbaoInvoiceV200Parser } from './parsers/matbao-invoice-v200.parser';
 import { InvoiceXmlParserService } from './parsers/invoice-xml-parser.service';
 import { INVOICE_OCR_PROVIDER } from './ocr/invoice-ocr-provider';
 import { PendingOcrProvider } from './ocr/pending-ocr.provider';
 
 @Module({ imports: [DatabaseModule, AuthModule, StorageModule],
   controllers: [InvoicesController, InvoiceIngestionsController],
-  providers: [InvoicesService, InvoicesRepository, VietnamEinvoiceXmlParser, InvoiceXmlParserService,
+  providers: [InvoicesService, InvoicesRepository, SmartProcureInvoiceV1Parser, MatbaoInvoiceV200Parser, InvoiceXmlParserService,
     { provide: INVOICE_OCR_PROVIDER, useClass: PendingOcrProvider }] })
 export class InvoicesModule {}

@@ -1,12 +1,14 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { InvoiceXmlParserService } from './invoice-xml-parser.service';
-import { exactDecimal, VietnamEinvoiceXmlParser } from './vietnam-einvoice-xml.parser';
+import { exactDecimal } from './invoice-xml-validation';
+import { SmartProcureInvoiceV1Parser } from './smartprocure-invoice-v1.parser';
+import { MatbaoInvoiceV200Parser } from './matbao-invoice-v200.parser';
 import { IngestionError } from '../domain/ingestion-error';
 
 const fixture = (name: string) => readFileSync(resolve(__dirname, '../../../../../infra/invoice/fixtures', name));
 describe('Supported XML profile and exact financial validation', () => {
-  const parser = new InvoiceXmlParserService(new VietnamEinvoiceXmlParser());
+  const parser = new InvoiceXmlParserService(new SmartProcureInvoiceV1Parser(), new MatbaoInvoiceV200Parser());
   const valid = fixture('valid-vn-einvoice.xml').toString();
   function expectCode(xml: string | Buffer, code: string) {
     try { parser.parse(Buffer.isBuffer(xml) ? xml : Buffer.from(xml)); throw new Error('Expected rejection'); }

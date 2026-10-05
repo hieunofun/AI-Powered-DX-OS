@@ -4,7 +4,8 @@ import { InvoicesService } from './invoices.service';
 import { InvoicesRepository } from './invoices.repository';
 import { MinioStorageService } from '../storage/minio-storage.service';
 import { InvoiceXmlParserService } from './parsers/invoice-xml-parser.service';
-import { VietnamEinvoiceXmlParser } from './parsers/vietnam-einvoice-xml.parser';
+import { SmartProcureInvoiceV1Parser } from './parsers/smartprocure-invoice-v1.parser';
+import { MatbaoInvoiceV200Parser } from './parsers/matbao-invoice-v200.parser';
 import { PendingOcrProvider } from './ocr/pending-ocr.provider';
 import { IngestionError } from './domain/ingestion-error';
 
@@ -26,7 +27,7 @@ describe('Ingestion lifecycle (repository and storage mocked)', () => {
     };
     storage = { upload: jest.fn(async () => { events.push('UPLOAD'); }) };
     service = new InvoicesService(repository as InvoicesRepository, storage as MinioStorageService,
-      new InvoiceXmlParserService(new VietnamEinvoiceXmlParser()), new PendingOcrProvider());
+      new InvoiceXmlParserService(new SmartProcureInvoiceV1Parser(), new MatbaoInvoiceV200Parser()), new PendingOcrProvider());
   });
   it('moves pending -> stored -> parsed with PO-derived supplier and safe key', async () => {
     const result = await service.ingest('po', { xml: [xml] }, user);

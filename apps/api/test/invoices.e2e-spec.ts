@@ -49,6 +49,22 @@ describe('Invoice multipart API (auth, repository and storage mocked)', () => {
     expect(res.body.status).toBe('PARSED');
     expect(res.body.files.map((file: { fileKind: string }) => file.fileKind).sort()).toEqual(['PDF', 'XML']);
   });
+  it('selects the verified external layout from content despite a project-profile filename', async () => {
+    const providerXml = readFileSync(resolve(__dirname, '../../../infra/invoice/fixtures/valid-vietnam-provider-einvoice.xml'));
+    repo.start.mockResolvedValueOnce({ supplierId: randomUUID(), taxCode: '0000000000001' });
+    const res = await ingest().field('purchaseOrderId', po)
+      .attach('xml', providerXml, { filename: 'SmartProcureInvoice-v1.xml', contentType: 'application/xml' }).expect(201);
+    expect(res.body.status).toBe('PARSED');
+    const parsed = repo.persist.mock.calls[repo.persist.mock.calls.length - 1] as unknown as unknown[];
+    expect(parsed[3]).toMatchObject({ invoiceNumber: '73', sellerTaxCode: '0000000000-001', totalAmount: '217.38' });
+  });
+  it('retains PO seller-tax validation for the external layout', async () => {
+    const providerXml = readFileSync(resolve(__dirname, '../../../infra/invoice/fixtures/valid-vietnam-provider-einvoice.xml'));
+    const res = await ingest().field('purchaseOrderId', po)
+      .attach('xml', providerXml, { filename: 'provider.xml', contentType: 'application/xml' }).expect(422);
+    expect(res.body.errorCode).toBe('SELLER_TAX_CODE_MISMATCH');
+    expect(res.body.ingestionId).toBeDefined();
+  });
   it.each(['warehouse', 'buyer', 'finance_manager'])('forbids %s mutation', role => ingest(role).field('purchaseOrderId', po).attach('xml', xml, 'invoice.xml').expect(403));
   it('requires authentication', () => request(app.getHttpServer()).post('/invoices/ingest').expect(401));
   it('requires PO UUID', () => ingest().field('purchaseOrderId', 'invalid').attach('xml', xml, 'invoice.xml').expect(400));

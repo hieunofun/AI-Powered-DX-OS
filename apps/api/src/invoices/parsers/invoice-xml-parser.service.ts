@@ -4,12 +4,15 @@ import { xmlText } from '../domain/file-validation';
 import { IngestionError } from '../domain/ingestion-error';
 import { CanonicalInvoiceData } from '../interfaces/invoice.interface';
 import { InvoiceXmlParser } from './invoice-xml-parser.interface';
-import { VietnamEinvoiceXmlParser } from './vietnam-einvoice-xml.parser';
+import { SmartProcureInvoiceV1Parser } from './smartprocure-invoice-v1.parser';
+import { MatbaoInvoiceV200Parser } from './matbao-invoice-v200.parser';
 
 @Injectable()
 export class InvoiceXmlParserService {
   private readonly adapters: InvoiceXmlParser[];
-  constructor(profile: VietnamEinvoiceXmlParser) { this.adapters = [profile]; }
+  constructor(projectProfile: SmartProcureInvoiceV1Parser, vietnamProfile: MatbaoInvoiceV200Parser) {
+    this.adapters = [projectProfile, vietnamProfile];
+  }
 
   parse(buffer: Buffer): CanonicalInvoiceData {
     const xml = xmlText(buffer);
