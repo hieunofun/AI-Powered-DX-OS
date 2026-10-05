@@ -103,9 +103,9 @@ sequenceDiagram
   API-->>Actor: HTTP 200 PASSED or REVIEW_REQUIRED
 ```
 
-The invoice lock gives one winner for the same invoice. The parent PO lock serializes different invoices sharing remaining stock and is compatible with the existing GRN receive/cancel PO locks. PostgreSQL READ COMMITTED statements re-read availability **after** this lock; results from an earlier pre-lock snapshot are never used. Supplier/policy share locks stabilize their inputs. Admin policy updates take FOR UPDATE.
+The invoice lock gives one winner for the same invoice. The parent PO lock serializes different invoices sharing remaining stock and is compatible with the existing GRN receive/cancel PO locks. Matching explicitly sets PostgreSQL READ COMMITTED for its transaction, independently of the database/session default. Statements re-read availability **after** the PO lock; results from an earlier pre-lock snapshot are never used. Supplier/policy share locks stabilize their inputs. Admin policy updates take FOR UPDATE.
 
-Matching uses 18 fixed client-issued SQL statements inside a successful transaction, excluding BEGIN/COMMIT, regardless of line count: bulk JSON recordset INSERT/UPDATE removes per-line round trips. Reads use at most three fixed statements. Index and in-memory grouping costs scale with data, but round trips are bounded.
+Matching uses 19 fixed client-issued SQL statements inside a successful transaction, excluding BEGIN/COMMIT, regardless of line count: bulk JSON recordset INSERT/UPDATE removes per-line round trips. Reads use at most three fixed statements. Index and in-memory grouping costs scale with data, but round trips are bounded.
 
 MATCHING_COMPLETED records invoiceId/number, PO ID/number, statuses, snapshot/version, codes, total/matched/exception line counts, duration and actor roles. INVOICE_MATCHED/INVOICE_EXCEPTION captures PARSED → PENDING_MATCH → final state. MATCHING_POLICY_UPDATED records policyCode, previous/new snapshot values, authenticated admin subject and roles. All audits share the transaction; audit failure rolls back everything. No raw XML/PDF, secrets or JWTs enter the response/audit.
 

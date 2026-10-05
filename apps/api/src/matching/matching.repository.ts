@@ -50,6 +50,8 @@ export class MatchingRepository {
   }
   async match(invoiceId: string, actor: AuthenticatedUser) {
     return this.db.transaction(async client => {
+      // Fresh statement snapshots after the PO lock must not depend on a session/database default.
+      await client.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
       const invoice = (await client.query<MatchingInvoice>(`SELECT id,invoice_number AS "invoiceNumber",
         supplier_id AS "supplierId", purchase_order_id AS "purchaseOrderId", seller_tax_code AS "sellerTaxCode",
         currency,status,subtotal::text AS subtotal,tax_amount::text AS "taxAmount",total_amount::text AS "totalAmount"
