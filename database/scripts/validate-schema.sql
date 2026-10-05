@@ -946,3 +946,100 @@ BEGIN
 END $$;
 ROLLBACK;
 
+-- Issue #9 additive workflow schema and executable negative integrity probes.
+BEGIN;
+DO $$
+DECLARE name text; failed boolean; po uuid; supplier uuid; inv uuid; mr uuid; ac uuid; task uuid; decision uuid;
+BEGIN
+  FOREACH name IN ARRAY ARRAY['approval_tasks','approval_decisions','workflow_policies','workflow_operations'] LOOP
+    IF to_regclass('public.'||name) IS NULL THEN RAISE EXCEPTION 'Missing workflow table %',name; END IF;
+  END LOOP;
+  FOREACH name IN ARRAY ARRAY['case_type','assigned_role','current_stage','decision','decision_reason','requested_by_subject',
+    'resolved_by_subject','match_snapshot','workflow_definition_key','workflow_definition_version'] LOOP
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='approval_cases' AND column_name=name) THEN
+      RAISE EXCEPTION 'Missing approval case column %',name;
+    END IF;
+  END LOOP;
+  FOREACH name IN ARRAY ARRAY['uq_approval_case_invoice','chk_approval_status','chk_approval_case_type','chk_approval_case_snapshot',
+    'chk_approval_task_state','chk_approval_task_reason','fk_approval_decision_task_case','fk_workflow_operation_task_case',
+    'chk_workflow_stp_max','chk_workflow_finance_threshold','chk_workflow_operation_task'] LOOP
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname=name) THEN RAISE EXCEPTION 'Missing workflow constraint %',name; END IF;
+  END LOOP;
+  FOREACH name IN ARRAY ARRAY['uq_workflow_policy_active','uq_workflow_unapplied_case','idx_approval_case_status','idx_approval_tasks_role',
+    'idx_approval_tasks_case','idx_approval_decisions_case','idx_workflow_operations_case'] LOOP
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname='public' AND indexname=name) THEN RAISE EXCEPTION 'Missing workflow index %',name; END IF;
+  END LOOP;
+  IF EXISTS(SELECT 1 FROM pg_constraint WHERE contype='f' AND conrelid IN
+    ('approval_tasks'::regclass,'approval_decisions'::regclass,'workflow_operations'::regclass) AND confdeltype<>'r') THEN
+    RAISE EXCEPTION 'Workflow foreign keys must RESTRICT deletion';
+  END IF;
+  IF (SELECT count(*) FROM workflow_policies WHERE is_active)<>1 OR NOT EXISTS(
+    SELECT 1 FROM workflow_policies WHERE policy_code='WORKFLOW_DEFAULT' AND is_active
+      AND finance_approval_threshold=100000000.00 AND auto_ready_for_payment_max_amount IS NULL) THEN
+    RAISE EXCEPTION 'Default workflow policy is incorrect';
+  END IF;
+  failed:=false;
+  BEGIN INSERT INTO workflow_policies(policy_code,finance_approval_threshold) VALUES('SECOND_ACTIVE',1);
+  EXCEPTION WHEN unique_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Multiple active workflow policies allowed'; END IF;
+  FOREACH name IN ARRAY ARRAY['-1','NaN','Infinity'] LOOP
+    failed:=false;
+    BEGIN UPDATE workflow_policies SET finance_approval_threshold=name::numeric WHERE is_active;
+    EXCEPTION WHEN check_violation THEN failed:=true; END;
+    IF NOT failed THEN RAISE EXCEPTION 'Invalid threshold accepted %',name; END IF;
+  END LOOP;
+  SELECT id,supplier_id INTO po,supplier FROM purchase_orders LIMIT 1;
+  INSERT INTO invoices(invoice_number,supplier_id,purchase_order_id,invoice_date,status,subtotal,total_amount)
+    VALUES('WORKFLOW-SCHEMA-'||gen_random_uuid(),supplier,po,CURRENT_DATE,'EXCEPTION',1,1) RETURNING id INTO inv;
+  INSERT INTO match_results(invoice_id,purchase_order_id,status) VALUES(inv,po,'REVIEW_REQUIRED') RETURNING id INTO mr;
+  INSERT INTO approval_cases(invoice_id,match_result_id,status) VALUES(inv,mr,'STARTING') RETURNING id INTO ac;
+  FOREACH name IN ARRAY ARRAY['STARTING','PENDING','FAILED','APPROVED','REJECTED','CANCELLED','CREDIT_NOTE_REQUESTED'] LOOP
+    UPDATE approval_cases SET status=name WHERE id=ac;
+  END LOOP;
+  failed:=false;
+  BEGIN INSERT INTO approval_cases(invoice_id) VALUES(inv);
+  EXCEPTION WHEN unique_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Duplicate approval case accepted'; END IF;
+  failed:=false;
+  BEGIN UPDATE approval_cases SET status='DISCREPANCY_REVIEW' WHERE id=ac;
+  EXCEPTION WHEN check_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Unknown case status accepted'; END IF;
+  failed:=false;
+  BEGIN UPDATE approval_cases SET match_snapshot='{"mutated":true}' WHERE id=ac;
+  EXCEPTION WHEN check_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Immutable snapshot changed'; END IF;
+  INSERT INTO approval_tasks(approval_case_id,flowable_task_id,task_key,task_name,assigned_role)
+    VALUES(ac,'SCHEMA-'||gen_random_uuid(),'buyerReview','Buyer','buyer') RETURNING id INTO task;
+  failed:=false;
+  BEGIN UPDATE approval_tasks SET status='COMPLETED',action='REJECT',completed_at=now() WHERE id=task;
+  EXCEPTION WHEN check_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Reasonless rejection accepted'; END IF;
+  UPDATE approval_tasks SET status='CLAIMED',assignee_subject='schema-actor',claimed_at=now() WHERE id=task;
+  UPDATE approval_tasks SET status='COMPLETED',action='APPROVE_WITH_ADJUSTMENT',action_reason='Schema adjustment rationale',completed_at=now() WHERE id=task;
+  INSERT INTO approval_decisions(approval_case_id,approval_task_id,action,reason,actor_subject,actor_roles,
+    previous_case_status,new_case_status,previous_invoice_status,new_invoice_status)
+    VALUES(ac,task,'APPROVE_WITH_ADJUSTMENT','Schema adjustment rationale','schema-actor',ARRAY['buyer'],'PENDING','APPROVED','EXCEPTION','READY_FOR_PAYMENT')
+    RETURNING id INTO decision;
+  failed:=false;
+  BEGIN UPDATE approval_decisions SET reason='rewritten' WHERE id=decision;
+  EXCEPTION WHEN check_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Decision history was updated'; END IF;
+  failed:=false;
+  BEGIN DELETE FROM approval_decisions WHERE id=decision;
+  EXCEPTION WHEN check_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Decision history was deleted'; END IF;
+  failed:=false;
+  BEGIN DELETE FROM approval_cases WHERE id=ac;
+  EXCEPTION WHEN foreign_key_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Referenced approval case deleted'; END IF;
+  INSERT INTO workflow_operations(approval_case_id,operation,payload,actor_subject,actor_roles)
+    VALUES(ac,'START','{}','schema-actor',ARRAY['accountant']);
+  failed:=false;
+  BEGIN INSERT INTO workflow_operations(approval_case_id,operation,payload,actor_subject,actor_roles)
+    VALUES(ac,'START','{}','schema-actor',ARRAY['accountant']);
+  EXCEPTION WHEN unique_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Concurrent unapplied operations accepted'; END IF;
+  RAISE NOTICE '[OK] Migration 013 workflow policy, status/checks, FK RESTRICT, uniqueness, append-only decisions and snapshots.';
+END $$;
+ROLLBACK;
+
