@@ -42,7 +42,7 @@ code=$(curl -sS --max-time 30 -o "$work/po.json" -w '%{http_code}' "$GATEWAY_URL
 assert_eq "$code" 201 'Create PO via gateway'
 po_id=$(jq -er '.id' "$work/po.json")
 version=$(jq -er '.version' "$work/po.json")
-code=$(curl -sS --max-time 30 -o "$work/issued.json" -w '%{http_code}' -X POST "$GATEWAY_URL/api/purchase-orders/$po_id/issue" -H "Authorization: Bearer $BUYER_TOKEN" -H 'Content-Type: application/json' -d "{\"version\":$version}")
+code=$(curl -sS --max-time 30 -o "$work/issued.json" -w '%{http_code}' -X POST "$GATEWAY_URL/api/purchase-orders/$po_id/issue" -H "Authorization: Bearer $BUYER_TOKEN" -H 'Content-Type: application/json' -d "{\"expectedVersion\":$version}")
 assert_eq "$code" 200 'Issue PO via gateway'
 for source in infra/invoice/fixtures/*.xml; do
   sed "s/0101234567-001/0101234567001-$run_id/g" "$source" > "$work/$(basename "$source")"
