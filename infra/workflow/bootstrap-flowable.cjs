@@ -16,7 +16,8 @@ async function bootstrap(){
   assert.equal(parsed.exclusiveGateway.length,8);
   assert.deepEqual(parsed.endEvent.map(t=>t['@_id']),['approved','rejected','creditNote']);
   let ready=false;
-  for(let attempt=0;attempt<60;attempt++){
+  const deadline=Date.now()+180000;
+  while(Date.now()<deadline){
     try { await engine('/management/engine'); ready=true; break; } catch { await new Promise(r=>setTimeout(r,3000)); }
   }
   assert.ok(ready,'Flowable did not become healthy within bounded wait');

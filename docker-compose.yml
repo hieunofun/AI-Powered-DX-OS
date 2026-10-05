@@ -255,7 +255,7 @@ services:
         condition: service_healthy
     healthcheck:
       # Engine REST health requires authentication; secrets never appear in logs.
-      test: ["CMD-SHELL", "curl -fsS -u \"$$FLOWABLE_REST_APP_ADMIN_USER_ID:$$FLOWABLE_REST_APP_ADMIN_PASSWORD\" http://localhost:8080/flowable-rest/service/management/engine > /dev/null"]
+      test: ["CMD-SHELL", "wget -q -O /dev/null --header=\"Authorization: Basic $$(printf '%s:%s' \"$$FLOWABLE_REST_APP_ADMIN_USER_ID\" \"$$FLOWABLE_REST_APP_ADMIN_PASSWORD\" | base64 | tr -d '\\n')\" http://localhost:8080/flowable-rest/service/management/engine"]
       interval: 5s
       timeout: 5s
       start_period: 40s
