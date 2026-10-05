@@ -90,6 +90,7 @@ CREATE TABLE workflow_operations (
   actor_roles TEXT[] NOT NULL,
   error_code VARCHAR(100),
   retry_safe BOOLEAN NOT NULL DEFAULT false,
+  dispatched_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT chk_workflow_operation_task CHECK((operation='START' AND approval_task_id IS NULL) OR (operation IN ('CLAIM','COMPLETE') AND approval_task_id IS NOT NULL)),
