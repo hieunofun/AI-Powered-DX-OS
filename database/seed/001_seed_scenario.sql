@@ -22,7 +22,10 @@ DECLARE
     v_inv2_id UUID;
     v_policy_id UUID;
 BEGIN
-    -- 1. Default Matching Policy
+    -- 1. Reuse the active policy (migration 012 seeds MATCH_DEFAULT).
+    -- Keep this seed compatible with older schema bootstraps without adding a second active policy.
+    SELECT id INTO v_policy_id FROM matching_policies WHERE is_active = true;
+    IF v_policy_id IS NULL THEN
     INSERT INTO matching_policies (
         policy_code,
         description,
@@ -38,6 +41,7 @@ BEGIN
         0.00,
         true
     ) RETURNING id INTO v_policy_id;
+    END IF;
 
     -- 2. Supplier ABC
     INSERT INTO suppliers (
