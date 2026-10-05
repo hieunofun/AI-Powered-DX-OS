@@ -41,6 +41,14 @@ describe('Invoice multipart API (auth, repository and storage mocked)', () => {
     const res = await ingest().field('purchaseOrderId', po).attach('pdf', Buffer.from('%PDF-1.4\n%%EOF'), { filename: 'invoice.pdf', contentType: 'application/pdf' }).expect(202);
     expect(res.body).toMatchObject({ status: 'OCR_REQUIRED', invoiceId: null });
   });
+  it('accepts one XML and one PDF with the PO field', async () => {
+    const pdf = readFileSync(resolve(__dirname, '../../../infra/invoice/fixtures/sample.pdf'));
+    const res = await ingest().field('purchaseOrderId', po)
+      .attach('xml', xml, { filename: 'invoice.xml', contentType: 'application/xml' })
+      .attach('pdf', pdf, { filename: 'invoice.pdf', contentType: 'application/pdf' }).expect(201);
+    expect(res.body.status).toBe('PARSED');
+    expect(res.body.files.map((file: { fileKind: string }) => file.fileKind).sort()).toEqual(['PDF', 'XML']);
+  });
   it.each(['warehouse', 'buyer', 'finance_manager'])('forbids %s mutation', role => ingest(role).field('purchaseOrderId', po).attach('xml', xml, 'invoice.xml').expect(403));
   it('requires authentication', () => request(app.getHttpServer()).post('/invoices/ingest').expect(401));
   it('requires PO UUID', () => ingest().field('purchaseOrderId', 'invalid').attach('xml', xml, 'invoice.xml').expect(400));

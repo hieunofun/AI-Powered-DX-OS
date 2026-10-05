@@ -23,7 +23,9 @@ export class InvoicesController {
 
   @Post('ingest') @Roles('accountant', 'admin')
   @UseInterceptors(FileFieldsInterceptor([{ name: 'xml', maxCount: 1 }, { name: 'pdf', maxCount: 1 }], {
-    limits: { fileSize: Math.max(fileLimit('XML'), fileLimit('PDF')), files: 2, fields: 1, parts: 3, fieldSize: 100 },
+    // Busboy emits partsLimit when the limit is reached, including the last valid part.
+    // File/field limits still cap the request at two files and one PO field.
+    limits: { fileSize: Math.max(fileLimit('XML'), fileLimit('PDF')), files: 2, fields: 1, parts: 4, fieldSize: 100 },
   }))
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Archive and ingest invoice XML/PDF bound to a purchase order' })
