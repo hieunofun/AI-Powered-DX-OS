@@ -7,7 +7,7 @@
 # 3. smartprocure-web: React + TypeScript + Vite web client
 # 4. smartprocure-minio: Private invoice storage (Issue #7)
 #
-# Roadmap services (Flowable, ImmuDB) are maintained
+# Roadmap service (ImmuDB) is maintained
 # as documented placeholders for subsequent implementation phases.
 # ==============================================================================
 
@@ -23,6 +23,8 @@ volumes:
     name: smartprocure_minio_data
   postgres_data:
     name: smartprocure_postgres_data
+  flowable_postgres_data:
+    name: smartprocure_flowable_postgres_data
 
 services:
   # ----------------------------------------------------------------------------
@@ -81,6 +83,11 @@ services:
       MINIO_USE_SSL: ${MINIO_USE_SSL:-false}
       INVOICE_XML_MAX_BYTES: ${INVOICE_XML_MAX_BYTES:-5242880}
       INVOICE_PDF_MAX_BYTES: ${INVOICE_PDF_MAX_BYTES:-20971520}
+      FLOWABLE_URL: ${FLOWABLE_URL:-http://smartprocure-flowable:8080/flowable-rest/service}
+      FLOWABLE_USERNAME: ${FLOWABLE_USERNAME:-workflow-service}
+      FLOWABLE_PASSWORD: ${FLOWABLE_PASSWORD:-flowable_dev_only_password}
+      FLOWABLE_PROCESS_KEY: ${FLOWABLE_PROCESS_KEY:-invoiceExceptionWorkflow}
+      FLOWABLE_TIMEOUT_MS: ${FLOWABLE_TIMEOUT_MS:-10000}
     ports:
       - "${API_PORT:-4000}:4000"
     networks:
@@ -206,14 +213,53 @@ services:
       start_period: 10s
       retries: 20
 
-  # [Phase 4 / Issue #9] BPMN Workflow Engine: Flowable
-  # flowable:
-  #   image: flowable/flowable-ui:6.8.0
-  #   container_name: smartprocure-flowable
-  #   ports:
-  #     - "8088:8080"
-  #   networks:
-  #     - smartprocure-network
+  # Issue #9: isolated persistent engine database; no host database port.
+  smartprocure-flowable-postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: flowable
+      POSTGRES_USER: flowable
+      POSTGRES_PASSWORD: ${FLOWABLE_DB_PASSWORD:-flowable_db_dev_only_password}
+    volumes:
+      - flowable_postgres_data:/var/lib/postgresql/data
+    networks:
+      - smartprocure-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flowable -d flowable"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  smartprocure-flowable:
+    # Verified official release/image. Digest pins the multi-platform manifest.
+    image: flowable/flowable-rest:8.0.0@sha256:708dfa32f27b93180bb6e7a30684d881d995fe257f5b8413e14b20a55c25672d
+    container_name: smartprocure-flowable
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://smartprocure-flowable-postgres:5432/flowable
+      SPRING_DATASOURCE_USERNAME: flowable
+      SPRING_DATASOURCE_PASSWORD: ${FLOWABLE_DB_PASSWORD:-flowable_db_dev_only_password}
+      FLOWABLE_REST_APP_ADMIN_USER_ID: ${FLOWABLE_USERNAME:-workflow-service}
+      FLOWABLE_REST_APP_ADMIN_PASSWORD: ${FLOWABLE_PASSWORD:-flowable_dev_only_password}
+      FLOWABLE_REST_APP_AUTHENTICATION_MODE: verify-privilege
+      FLOWABLE_HISTORY_LEVEL: full
+      FLOWABLE_REST_APP_CREATE_DEMO_USERS: "false"
+      FLOWABLE_REST_APP_CREATE_DEMO_DEFINITIONS: "false"
+    ports:
+      - "127.0.0.1:${FLOWABLE_PORT:-8088}:8080"
+    networks:
+      - smartprocure-network
+    depends_on:
+      smartprocure-flowable-postgres:
+        condition: service_healthy
+    healthcheck:
+      # Engine REST health requires authentication; secrets never appear in logs.
+      test: ["CMD-SHELL", "curl -fsS -u \"$$FLOWABLE_REST_APP_ADMIN_USER_ID:$$FLOWABLE_REST_APP_ADMIN_PASSWORD\" http://localhost:8080/flowable-rest/service/management/engine > /dev/null"]
+      interval: 5s
+      timeout: 5s
+      start_period: 40s
+      retries: 30
 
   # [Phase 5 / Issue #10] Cryptographic Immutable Ledger: ImmuDB
   # immudb:

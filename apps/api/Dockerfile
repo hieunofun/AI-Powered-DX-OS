@@ -36,6 +36,8 @@ COPY docs/open-source/notices/nodable-val-parsers-MIT.txt ./licenses/nodable-val
 
 # Copy compiled artifacts from builder
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY infra/flowable/processes ./infra/flowable/processes
+COPY infra/workflow ./infra/workflow
 
 EXPOSE 4000
 

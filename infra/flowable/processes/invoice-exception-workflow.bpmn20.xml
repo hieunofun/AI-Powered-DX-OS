@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/bpmn" targetNamespace="https://smartprocure.local/workflow">
+  <process id="invoiceExceptionWorkflow" name="Invoice Approval and Exception Workflow WF-1.0" isExecutable="true">
+    <startEvent id="start"/>
+    <exclusiveGateway id="warehouseNeeded" default="skipwarehouse"/>
+    <userTask id="warehouseReview" name="warehouse domain review" flowable:candidateGroups="warehouse"/>
+    <exclusiveGateway id="warehouseDecision"/>
+    <exclusiveGateway id="buyerNeeded" default="skipbuyer"/>
+    <userTask id="buyerReview" name="buyer domain review" flowable:candidateGroups="buyer"/>
+    <exclusiveGateway id="buyerDecision"/>
+    <exclusiveGateway id="accountantNeeded" default="skipaccountant"/>
+    <userTask id="accountantReview" name="accountant domain review" flowable:candidateGroups="accountant"/>
+    <exclusiveGateway id="accountantDecision"/>
+    <exclusiveGateway id="financeNeeded" default="skipfinance"/>
+    <userTask id="financeReview" name="Finance manager approval" flowable:candidateGroups="finance_manager"/>
+    <exclusiveGateway id="financeDecision"/>
+    <endEvent id="approved" name="Approved"/>
+    <endEvent id="rejected" name="Rejected"/>
+    <endEvent id="creditNote" name="Credit Note Requested"/>
+    <sequenceFlow id="f1" sourceRef="start" targetRef="warehouseNeeded"></sequenceFlow>
+    <sequenceFlow id="f2" sourceRef="warehouseNeeded" targetRef="warehouseReview"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${needsWarehouse}]]></conditionExpression></sequenceFlow>
+    <sequenceFlow id="skipwarehouse" sourceRef="warehouseNeeded" targetRef="buyerNeeded"/>
+    <sequenceFlow id="f3" sourceRef="warehouseReview" targetRef="warehouseDecision"></sequenceFlow>
+    <sequenceFlow id="f4" sourceRef="warehouseDecision" targetRef="rejected"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == "REJECT"}]]></conditionExpression></sequenceFlow>
+    <sequenceFlow id="f5" sourceRef="warehouseDecision" targetRef="creditNote"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == "REQUEST_CREDIT_NOTE"}]]></conditionExpression></sequenceFlow>
+    <sequenceFlow id="f6" sourceRef="warehouseDecision" targetRef="buyerNeeded"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == "APPROVE" || action == "APPROVE_WITH_ADJUSTMENT"}]]></conditionExpression></sequenceFlow>
+    <sequenceFlow id="f7" sourceRef="buyerNeeded" targetRef="buyerReview"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${needsBuyer}]]></conditionExpression></sequenceFlow>
+    <sequenceFlow id="skipbuyer" sourceRef="buyerNeeded" targetRef="accountantNeeded"/>
+    <sequenceFlow id="f8" sourceRef="buyerReview" targetRef="buyerDecision"></sequenceFlow>
+    <sequenceFlow id="f9" sourceRef="buyerDecision" targetRef="rejected"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == "REJECT"}]]></conditionExpression></sequenceFlow>
+    <sequenceFlow id="f10" sourceRef="buyerDecision" targetRef="creditNote"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == "REQUEST_CREDIT_NOTE"}]]></conditionExpression></sequenceFlow>
+    <sequenceFlow id="f11" sourceRef="buyerDecision" targetRef="accountantNeeded"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == "APPROVE" || action == "APPROVE_WITH_ADJUSTMENT"}]]></conditionExpression></sequenceFlow>
+    <sequenceFlow id="f12" sourceRef="accountantNeeded" targetRef="accountantReview"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${needsAccountant}]]></conditionExpression></sequenceFlow>
+    <sequenceFlow id="skipaccountant" sourceRef="accountantNeeded" targetRef="financeNeeded"/>
+    <sequenceFlow id="f13" sourceRef="accountantReview" targetRef="accountantDecision"></sequenceFlow>
+    <sequenceFlow id="f14" sourceRef="accountantDecision" targetRef="rejected"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == "REJECT"}]]></conditionExpression></sequenceFlow>
+    <sequenceFlow id="f15" sourceRef="accountantDecision" targetRef="creditNote"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == "REQUEST_CREDIT_NOTE"}]]></conditionExpression></sequenceFlow>
+    <sequenceFlow id="f16" sourceRef="accountantDecision" targetRef="financeNeeded"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == "APPROVE" || action == "APPROVE_WITH_ADJUSTMENT"}]]></conditionExpression></sequenceFlow>
+    <sequenceFlow id="f17" sourceRef="financeNeeded" targetRef="financeReview"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${requiresFinanceApproval}]]></conditionExpression></sequenceFlow>
+    <sequenceFlow id="skipfinance" sourceRef="financeNeeded" targetRef="approved"/>
+    <sequenceFlow id="f18" sourceRef="financeReview" targetRef="financeDecision"></sequenceFlow>
+    <sequenceFlow id="f19" sourceRef="financeDecision" targetRef="rejected"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == "REJECT"}]]></conditionExpression></sequenceFlow>
+    <sequenceFlow id="f20" sourceRef="financeDecision" targetRef="creditNote"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == "REQUEST_CREDIT_NOTE"}]]></conditionExpression></sequenceFlow>
+    <sequenceFlow id="f21" sourceRef="financeDecision" targetRef="approved"><conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == "APPROVE" || action == "APPROVE_WITH_ADJUSTMENT"}]]></conditionExpression></sequenceFlow>
+  </process>
+</definitions>
+
