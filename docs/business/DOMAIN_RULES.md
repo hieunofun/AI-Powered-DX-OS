@@ -139,7 +139,15 @@ Issue #8 completes `PARSED → PENDING_MATCH → MATCHED/PASSED` or `EXCEPTION/R
 
 ---
 
-## 8. Data Retention & Integrity (Non-Destructive Governance)
+## 8. Invoice workflow (Issue #9, WF-1.0)
+
+Clean `MATCHED/PASSED` invoices use STP to `READY_FOR_PAYMENT` without an approval case by default. Workflow policy cap NULL means all clean invoices; a non-null cap admits totals <= cap and routes higher totals to finance approval. `READY_FOR_PAYMENT` is clearance only, with no payment execution.
+
+`EXCEPTION/REVIEW_REQUIRED` invoices retain `EXCEPTION` throughout review. `DISCREPANCY_REVIEW` is workflow/task state, not an invoice status. Every required role is reviewed in deterministic `warehouse → buyer → accountant` order; a snapshotted total >= finance threshold (`100000000.00` by default) adds `finance_manager`. All comparisons use decimal strings. Flowable orchestrates tasks; PostgreSQL records immutable matching/policy snapshots, decisions, invoice states and audits. Matching is not rerun.
+
+Final approval audits `EXCEPTION → APPROVED → READY_FOR_PAYMENT`. Rejection ends case/invoice at `REJECTED`. A credit-note request ends the case at `CREDIT_NOTE_REQUESTED` and keeps the invoice `EXCEPTION`, without fabricating a credit note. Approve with adjustment records a mandatory rationale without rewriting financial fields. Durable operation intents and explicit reconciliation cover the separate PostgreSQL/Flowable transactions. See [Invoice Workflow Module](INVOICE_WORKFLOW_MODULE.md) for roles, recovery and limitations. Issue #10 sealing is outside this implementation.
+
+## 9. Data Retention & Integrity (Non-Destructive Governance)
 
 1. **No Cascading Deletions on Business Records**:
    - `ON DELETE RESTRICT` is enforced across 100% of foreign keys linking `suppliers`, `purchase_orders`, `purchase_order_items`, `goods_receipts`, `goods_receipt_items`, `invoices`, `invoice_items`, `match_results`, `match_result_items`, `approval_cases`, and `audit_records`.

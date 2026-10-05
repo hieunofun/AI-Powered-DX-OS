@@ -46,7 +46,11 @@ erDiagram
     
     invoices ||--|{ invoice_items : contains
     invoices ||--o| match_results : evaluated_in
-    invoices ||--o{ approval_cases : escalates_to
+    invoices ||--o| approval_cases : escalates_to
+    approval_cases ||--o{ approval_tasks : mirrors
+    approval_cases ||--o{ approval_decisions : records
+    approval_tasks ||--o| approval_decisions : completes
+    approval_cases ||--o{ workflow_operations : coordinates
     
     matching_policies ||--o{ match_results : applies_to
     match_results ||--|{ match_result_items : details
@@ -237,6 +241,16 @@ erDiagram
         uuid match_result_id FK
         varchar status
         varchar workflow_instance_id
+        varchar case_type
+        varchar assigned_role
+        varchar current_stage
+        varchar decision
+        text decision_reason
+        varchar requested_by_subject
+        varchar resolved_by_subject
+        jsonb match_snapshot
+        varchar workflow_definition_key
+        varchar workflow_definition_version
         timestamptz requested_at
         timestamptz resolved_at
         text resolution_note
@@ -292,7 +306,7 @@ erDiagram
 4. **Matching & Exception Resolution**:
    - `invoices (1) ── match_results (0..1)`: Migration 012 enforces one match result per invoice for the Issue #8 MVP; repeated requests conflict. Rematching requires a future explicit design.
    - `match_results (1) ──< match_result_items (N)`: Full item-by-item variance ledger.
-   - `invoices (1) ──< approval_cases (N)`: Escalations for invoices exceeding tolerance thresholds.
+   - `invoices (1) ── approval_cases (0..1)`: Migration 013 allows one exception or clean-finance workflow per invoice. Default clean STP creates no case.
 
 ---
 
@@ -392,3 +406,17 @@ Migration 006 tables remain; old migrations are unchanged. Migration 012 adds:
 | match_result_items | unique (match_result_id,invoice_item_id); tax_rate_variance NUMERIC(7,4), line_total_variance NUMERIC(18,2), discrepancy_codes TEXT[], details JSONB, all NOT NULL with zero/empty defaults |
 
 New composite indexes cover goods_receipts(PO,status), goods_receipt_items(PO item,GRN), match_results(PO,status), match_result_items(PO item,result). Existing invoice_items(invoice_id) index is reused. Migration fails clearly for multiple historical active policies or invoice results rather than repairing history. Each new result records the immutable 3WM-1.0 policy snapshot; legacy empty snapshots are not invented historical evidence. Deterministic confidence fields stay NULL. [Matching module semantics](../business/THREE_WAY_MATCHING_MODULE.md) define variance summaries and transactional status/audit ownership.
+
+## 11. Invoice Workflow Extensions (Issue #9, Migration 013)
+
+| Table | Additions / guarantees |
+| --- | --- |
+| approval_cases | UNIQUE(invoice_id), case_type, assigned_role/current_stage, decision/decision_reason, requested_by_subject/resolved_by_subject, immutable match_snapshot JSONB, workflow_definition_key/version; adds STARTING/FAILED/CREDIT_NOTE_REQUESTED while retaining all migration 007 statuses |
+| approval_tasks | UUID PK, approval_case_id FK RESTRICT, unique flowable_task_id, task_key/name, assigned_role/assignee_subject, OPEN/CLAIMED/COMPLETED/CANCELLED status, action/reason, created/claimed/completed timestamps, role/state/reason checks |
+| approval_decisions | UUID PK, case/task FKs RESTRICT with same-case composite FK, one decision per task, action/reason, actor_subject/roles, previous/new case and invoice states, created_at; ordinary UPDATE/DELETE rejected by trigger |
+| workflow_policies | UUID PK, unique policy_code, nullable NUMERIC(18,2) STP maximum, required NUMERIC(18,2) finance threshold, is_active, timestamps; finite nonnegative checks, partial unique active index; WORKFLOW_DEFAULT NULL / 100000000.00 |
+| workflow_operations | UUID PK, case/task FKs RESTRICT with same-case composite FK, START/CLAIM/COMPLETE intent, PENDING/APPLIED/FAILED status, JSONB payload, original actor/roles, dispatch timestamp, retry_safe/error_code and created/updated timestamps; one unapplied operation per case |
+
+Indexes support status/date case reads, role/status task inboxes and case task/decision/operation history. Duplicate historical approval cases cause a clear migration failure. Match snapshots preserve both matching and workflow policy evidence; a trigger rejects rewrites. No old migration is edited and no DISCREPANCY_REVIEW invoice status is introduced.
+
+Flowable uses its own PostgreSQL database/volume. Application PostgreSQL owns business history; the two stores do not share an ACID transaction. Stable business keys, committed operation intents, row/advisory locks and explicit reconciliation connect engine state to task mirrors. See [Invoice Workflow Module](../business/INVOICE_WORKFLOW_MODULE.md) for state transitions, BPMN, recovery and production boundaries.
