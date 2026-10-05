@@ -38,7 +38,7 @@ This document establishes the official business domain rules governing the Procu
    - **Conservation Constraint**: `accepted_quantity + rejected_quantity <= received_quantity`.
 3. **Partial Fulfillment**:
    - Partial deliveries are fully supported. Received quantity on a single GRN item may be less than the PO item's ordered quantity.
-   - The cumulative accepted quantity across all GRNs for a given PO item forms the upper threshold for payment clearance.
+   - Only accepted quantities in `RECEIVED` GRNs contribute to the matching ceiling. `DRAFT`, `CANCELLED`, gross received and rejected quantities do not contribute.
 
 ---
 
@@ -49,7 +49,7 @@ This document establishes the official business domain rules governing the Procu
    - Multiple Invoices may reference the same PO (accommodating progressive billing and partial shipments).
 2. **Line Item Association**:
    - At raw ingestion / OCR extraction, an invoice item may not yet be deterministically mapped to a PO line item.
-   - Therefore, `po_item_id` in `invoice_items` is **nullable**, allowing progressive resolution via automatic exact matching, semantic embedding matching, or manual accountant reconciliation.
+   - Therefore, `po_item_id` in `invoice_items` is **nullable**. Issue #8 resolves exact existing references, normalized SKU or (only when SKU is absent) normalized description. Semantic/fuzzy matching and manual reconciliation remain future scope.
    - When `po_item_id` IS provided, database triggers (`trg_check_invoice_item_po_consistency` and `trg_check_invoice_parent_po_consistency`) guarantee that the referenced PO line item belongs to the exact same Purchase Order as the parent Invoice.
 3. **Duplicate Prevention**:
    - Invoices are uniquely identified per supplier by exact database constraint:
@@ -86,7 +86,9 @@ $$\text{Available to Invoice} = \sum (\text{Valid Accepted Received Quantity}) -
 | **Invoice 2A** | `INV-2026-002` (Candidate) | Mực in HP 85A | 38 | 98 | 60 | 38 | **VALID (Match PASS)** |
 | **Invoice 2B** | `INV-2026-002` (Over-billed) | Mực in HP 85A | 40 | 98 | 60 | 38 | **BLOCKED (Variance +2)** |
 
-*Note: The calculation logic will be executed by the Matching Engine (Issue #8); the schema must persist all quantities with full decimal fidelity.*
+Issue #8 (`3WM-1.0`) makes the base rule concrete: previous consumption counts only other invoices with `PASSED` match results in `MATCHED`, `APPROVED` or `READY_FOR_PAYMENT`. The current invoice and all invalid/unmatched states are excluded. Legacy `MATCHED` rows without a PASSED result do not qualify automatically.
+
+The effective ceiling is `max(0, min(acceptedReceived - previousValidInvoiced, orderedQuantity * (1 + quantityTolerancePercent / 100) - previousValidInvoiced))`. Tolerance never creates received stock. Split invoice lines aggregate per PO item, then allocate in ascending line order. Valid partial invoices need not equal the full PO quantity. See [the matching module](THREE_WAY_MATCHING_MODULE.md) for exact evidence fields and concurrency guarantees.
 
 ---
 
@@ -109,11 +111,15 @@ To eliminate floating-point rounding errors and ensure compliance with accountin
 Matching rules operate on configurable tolerance thresholds stored in `matching_policies`:
 
 1. **Quantity Tolerance (`quantity_tolerance_percent`)**:
-   - Default: `0.00%` (Zero tolerance for quantity discrepancies; exact match required).
+   - Default: `0.00%` (No over-PO quantity allowance; partial invoices remain valid within physically accepted availability).
 2. **Price Tolerance (`price_tolerance_percent`)**:
    - Default: `1.00%` (Permits minor price rounding variances up to 1%).
 3. **Tax Tolerance (`tax_tolerance_percent`)**:
-   - Default: `0.00%` (Zero tolerance for statutory tax calculation divergence).
+   - Default: `0.00` percentage points. Compare `abs(invoiceTaxRate - poTaxRate) * 100`; 10% versus 8% differs by 2 points.
+4. **Total Tolerance (`total_tolerance_percent`, migration 012)**:
+   - Default: `0.00%`. Compare invoice header amounts with its own structured line sums and conservation, never with the full PO total for partial invoices.
+
+There is at most one active policy. Every result snapshots all four tolerances, policy code and `3WM-1.0` so later admin edits do not alter historical evidence.
 
 ---
 
@@ -121,13 +127,15 @@ Matching rules operate on configurable tolerance thresholds stored in `matching_
 
 The relational schema stores structured discrepancy vectors evaluated during 3-Way Matching:
 
-1. **Supplier Mismatch**: `invoice.supplier_id != po.supplier_id`.
+1. **Supplier Mismatch**: `invoice.supplier_id != po.supplier_id`, plus shared Issue #7 seller tax-code normalization. Missing/mismatched seller tax codes have separate codes; structured seller legal-name comparison is unavailable.
 2. **Currency Mismatch**: `invoice.currency != po.currency`.
-3. **Unit Price Variance**: `(invoice_item.unit_price - po_item.unit_price) / po_item.unit_price * 100 > price_tolerance`.
+3. **Unit Price Variance**: `abs(invoice_item.unit_price - po_item.unit_price) * 100 > po_item.unit_price * price_tolerance`. Zero PO price permits zero invoice price only.
 4. **Quantity Mismatch**: `invoice_item.quantity > available_to_invoice`.
-5. **Tax Mismatch**: Calculated tax diverges beyond tax tolerance.
-6. **Total Mismatch**: Invoice total diverges from `subtotal + tax_amount`.
+5. **Tax Mismatch**: Absolute tax-rate difference in percentage points exceeds policy tolerance.
+6. **Total Mismatch**: Declared invoice subtotal/tax/total diverges from its own structured line sums or header/line conservation beyond total tolerance.
 7. **Duplicate Invoice**: Resubmission of existing `(supplier_id, invoice_number)`.
+
+Issue #8 completes `PARSED → PENDING_MATCH → MATCHED/PASSED` or `EXCEPTION/REVIEW_REQUIRED` atomically, with one result per invoice and one result line per invoice item. Missing GRN, unrecognized/ambiguous items and description discrepancies join the document/financial codes in a unique stable priority list. Business mismatches return HTTP 200. Invoice then PO row locks prevent repeat results and double consumption; technical errors roll back results, mappings, statuses and audits. No approval case or `APPROVED`/`READY_FOR_PAYMENT` transition is implemented here.
 
 ---
 

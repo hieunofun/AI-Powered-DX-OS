@@ -45,7 +45,7 @@ erDiagram
     goods_receipts ||--|{ goods_receipt_items : contains
     
     invoices ||--|{ invoice_items : contains
-    invoices ||--o{ match_results : evaluated_in
+    invoices ||--o| match_results : evaluated_in
     invoices ||--o{ approval_cases : escalates_to
     
     matching_policies ||--o{ match_results : applies_to
@@ -190,12 +190,13 @@ erDiagram
         numeric quantity_tolerance_percent
         numeric price_tolerance_percent
         numeric tax_tolerance_percent
+        numeric total_tolerance_percent
         boolean is_active
     }
     
     match_results {
         uuid id PK
-        uuid invoice_id FK
+        uuid invoice_id FK,UK
         uuid purchase_order_id FK
         uuid matching_policy_id FK
         varchar status
@@ -206,6 +207,11 @@ erDiagram
         numeric price_variance
         numeric tax_variance
         numeric total_variance
+        varchar rule_version
+        text_array discrepancy_codes
+        jsonb policy_snapshot
+        numeric evaluation_duration_ms
+        timestamptz completed_at
     }
     
     match_result_items {
@@ -219,6 +225,10 @@ erDiagram
         numeric semantic_confidence
         varchar status
         varchar reason_code
+        numeric tax_rate_variance
+        numeric line_total_variance
+        text_array discrepancy_codes
+        jsonb details
     }
     
     approval_cases {
@@ -280,7 +290,7 @@ erDiagram
    - `purchase_order_items (1) ──< goods_receipt_items (N)`: Multiple deliveries can receive fractions of the same PO item.
    - `purchase_order_items (1) ──< invoice_items (0..N)`: Invoiced items reference PO items. The reference is **nullable** at raw ingest, resolved during matching.
 4. **Matching & Exception Resolution**:
-   - `invoices (1) ──< match_results (N)`: Allows re-running reconciliation when new GRNs arrive.
+   - `invoices (1) ── match_results (0..1)`: Migration 012 enforces one match result per invoice for the Issue #8 MVP; repeated requests conflict. Rematching requires a future explicit design.
    - `match_results (1) ──< match_result_items (N)`: Full item-by-item variance ledger.
    - `invoices (1) ──< approval_cases (N)`: Escalations for invoices exceeding tolerance thresholds.
 
@@ -339,11 +349,12 @@ The schema directly supports complex partial fulfillment workflows:
 1. **Partial Delivery**:
    - `ordered_quantity` in `purchase_order_items` represents the contract commitment.
    - Each shipment creates a `goods_receipts` entry with `goods_receipt_items.accepted_quantity`.
-   - The total delivered goods equals the sum of `accepted_quantity` across all non-cancelled GRNs.
+   - The physically accepted matching quantity sums `accepted_quantity` only across `RECEIVED` GRNs; DRAFT/CANCELLED and rejected/gross quantities do not contribute.
 2. **Partial Invoicing & Quantity Ceiling**:
    - When a new invoice arrives, the Matching Engine verifies that the invoiced quantity does not exceed the remaining uninvoiced goods:
      $$\text{Available to Invoice} = \sum (\text{GRN.accepted\_quantity}) - \sum (\text{Previous Invoices.quantity})$$
    - If an invoice requests more than the available quantity, the system flags a **Quantity Discrepancy Exception**.
+   - Issue #8 counts only prior `PASSED` result quantities in `MATCHED`/`APPROVED`/`READY_FOR_PAYMENT`, excluding the current invoice. The effective ceiling also caps against `orderedQuantity * (1 + quantityTolerancePercent / 100) - previousValidInvoiced`, with a floor of zero. Split lines aggregate before allocation.
 3. **Goods Receipt Schema Extensions (Issue #6 - Migration 010)**:
    - **Lot / Batch Tracking**: Nullable `lot_number VARCHAR(100)` added to `goods_receipt_items`. Multiple GRN lines can reference the same PO item across distinct lots.
    - **GRN Numbering Sequence**: Concurrency-safe sequence `goods_receipt_number_seq` generates formatted identifiers `GRN-YYYY-XXXXXX`.
@@ -369,3 +380,15 @@ To prevent disjoint document mappings, the database enforces relational consiste
    - **Rule**: When `match_result_id` is specified on an approval case, its referenced match result must belong to the exact same `invoice_id` as the approval case.
 5. **Tolerance Boundary Constraints**:
    - `matching_policies` enforces `CHECK (quantity_tolerance_percent >= 0 AND quantity_tolerance_percent <= 100)` (and identically for `price_tolerance_percent` and `tax_tolerance_percent`).
+
+## 10. Deterministic Matching Extensions (Issue #8, Migration 012)
+
+Migration 006 tables remain; old migrations are unchanged. Migration 012 adds:
+
+| Table | Additions / guarantees |
+|---|---|
+| matching_policies | total_tolerance_percent NUMERIC(5,2) NOT NULL DEFAULT 0, checked 0..100; partial unique active index; MATCH_DEFAULT seeded only when no active policy exists (quantity/price/tax/total = 0/1/0/0) |
+| match_results | unique invoice_id; discrepancy_codes TEXT[] and policy_snapshot JSONB NOT NULL with empty legacy defaults; nullable evaluation_duration_ms NUMERIC(12,3), nonnegative; completed_at TIMESTAMPTZ |
+| match_result_items | unique (match_result_id,invoice_item_id); tax_rate_variance NUMERIC(7,4), line_total_variance NUMERIC(18,2), discrepancy_codes TEXT[], details JSONB, all NOT NULL with zero/empty defaults |
+
+New composite indexes cover goods_receipts(PO,status), goods_receipt_items(PO item,GRN), match_results(PO,status), match_result_items(PO item,result). Existing invoice_items(invoice_id) index is reused. Migration fails clearly for multiple historical active policies or invoice results rather than repairing history. Each new result records the immutable 3WM-1.0 policy snapshot; legacy empty snapshots are not invented historical evidence. Deterministic confidence fields stay NULL. [Matching module semantics](../business/THREE_WAY_MATCHING_MODULE.md) define variance summaries and transactional status/audit ownership.
