@@ -13,7 +13,11 @@ Every license listed below has been verified against the official upstream repos
 | **Keycloak** | [keycloak/keycloak](https://github.com/keycloak/keycloak) | `24.0.5` | Apache-2.0 | Identity & Access Management (SSO, OIDC, RBAC) | Docker Service | Integrated (Pinned known-working version) |
 | **Apache APISIX** | [apache/apisix](https://github.com/apache/apisix) | `3.19.0` | Apache-2.0 | API Gateway (Reverse proxy, rate limiting, routing, JWT validation) | Docker Service | Integrated (Issue #4) |
 | **PostgreSQL** | [postgres/postgres](https://github.com/postgres/postgres) | `16-alpine` | PostgreSQL License | Primary Relational Data Store (Domain models, ledger transactions) | Docker Service | Service Defined |
-| **MinIO** | [minio/minio](https://github.com/minio/minio) | `RELEASE.2024-03-30` | GNU AGPLv3 | S3-Compatible Object Storage (Raw invoices: PDF, XML, images) | Docker Service | Planned |
+| **MinIO** | [minio/minio](https://github.com/minio/minio/releases/tag/RELEASE.2025-10-15T17-29-55Z) | `RELEASE.2025-10-15T17-29-55Z`, commit `9e49d5e7a648f00e26f2246f4dc28e6b07f8c84a` | GNU AGPLv3 | Private raw invoice archival | Unmodified external service, built from official source | Integrated (Issue #7; upstream images unavailable) |
+| **MinIO JavaScript SDK** | [minio/minio-js](https://github.com/minio/minio-js/tree/8.0.7) | `8.0.7` exact | Apache-2.0 | Object upload/stat/read/delete, SHA-256 metadata | Dependency | Integrated (Issue #7) |
+| **fast-xml-parser** | [NaturalIntelligence/fast-xml-parser](https://github.com/NaturalIntelligence/fast-xml-parser/tree/v5.11.2) | `5.11.2` exact | MIT | Secure validation and deterministic XML field extraction | Dependency | Integrated (Issue #7) |
+| **@types/multer** | [DefinitelyTyped/DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/multer) | `2.3.0` exact | MIT | Compile-time multipart upload types | Dev dependency | Integrated (Issue #7) |
+| **Go** | [golang/go](https://github.com/golang/go/tree/go1.24.9) | `1.24.9` | BSD-3-Clause | Build unmodified MinIO source in container | Build tool | Integrated (Issue #7) |
 | **Flowable** | [flowable/flowable-engine](https://github.com/flowable/flowable-engine) | `6.8.x` | Apache-2.0 | BPMN 2.0 Business Process Engine (Discrepancy & approval workflows) | Docker Service | Planned |
 | **ImmuDB** | [codenotary/immudb](https://github.com/codenotary/immudb) | `v1.9.x` | Apache-2.0 | Cryptographic Immutable Ledger (Tamper-evident audit trail sealing) | Docker Service | Planned |
 | **Prometheus** | [prometheus/prometheus](https://github.com/prometheus/prometheus) | `v2.51.x` | Apache-2.0 | System & Business Metrics Monitoring | Docker Service | Planned |
@@ -61,3 +65,34 @@ Every license listed below has been verified against the official upstream repos
    - MinIO and Grafana are used as unmodified external services (deployed via container orchestration).
    - Any distribution or deployment license obligations must be respected in accordance with their respective upstream licenses.
    - For internal guidelines on adding new dependencies, see [License Policy](docs/open-source/LICENSE_POLICY.md).
+
+## Issue #7 newly introduced npm transitive packages
+
+Exact versions and declared licenses below were verified from installed npm package manifests and their packaged license metadata; package-lock.json pins integrity hashes. Direct integrations are listed above. These packages support the SDK/XML parser. MinIO source dependencies remain governed by the pinned upstream go.mod/go.sum and distribution notices.
+
+| Component | Official upstream | Exact version | License | Purpose |
+| --- | --- | --- | --- | --- |
+| @nodable/entities | [upstream](https://github.com/nodable/val-parsers) | 3.1.0 | MIT | SDK/XML transitive dependency |
+| anynum | [upstream](https://github.com/NaturalIntelligence/anynum) | 1.0.1 | MIT | SDK/XML transitive dependency |
+| async | [upstream](https://github.com/caolan/async) | 3.2.6 | MIT | SDK/XML transitive dependency |
+| block-stream2 | [upstream](https://github.com/substack/block-stream2) | 2.1.0 | MIT | SDK/XML transitive dependency |
+| browser-or-node | [upstream](https://github.com/flexdinesh/browser-or-node) | 2.1.1 | MIT | SDK/XML transitive dependency |
+| buffer-crc32 | [upstream](https://github.com/brianloveswords/buffer-crc32) | 1.0.0 | MIT | SDK/XML transitive dependency |
+| decode-uri-component | [upstream](https://github.com/SamVerschueren/decode-uri-component) | 0.2.2 | MIT | SDK/XML transitive dependency |
+| eventemitter3 | [upstream](https://github.com/primus/eventemitter3) | 5.0.4 | MIT | SDK/XML transitive dependency |
+| fast-xml-builder | [upstream](https://github.com/NaturalIntelligence/fast-xml-builder) | 1.3.1 | MIT | SDK/XML transitive dependency |
+| filter-obj | [upstream](https://github.com/sindresorhus/filter-obj) | 1.1.0 | MIT | SDK/XML transitive dependency |
+| is-unsafe | [upstream](https://github.com/NaturalIntelligence/is-unsafe) | 2.0.2 | MIT | SDK/XML transitive dependency |
+| ipaddr.js | [upstream](https://github.com/whitequark/ipaddr.js) | 2.5.0 | MIT | SDK/XML transitive dependency |
+| path-expression-matcher | [upstream](https://github.com/NaturalIntelligence/path-expression-matcher) | 1.6.2 | MIT | SDK/XML transitive dependency |
+| query-string | [upstream](https://github.com/sindresorhus/query-string) | 7.1.3 | MIT | SDK/XML transitive dependency |
+| sax | [upstream](https://github.com/isaacs/sax-js) | 1.6.1 | BlueOak-1.0.0 | SDK/XML transitive dependency |
+| split-on-first | [upstream](https://github.com/sindresorhus/split-on-first) | 1.1.0 | MIT | SDK/XML transitive dependency |
+| stream-chain | [upstream](https://github.com/uhop/stream-chain) | 2.2.5 | BSD-3-Clause | SDK/XML transitive dependency |
+| stream-json | [upstream](https://github.com/uhop/stream-json) | 1.9.1 | BSD-3-Clause | SDK/XML transitive dependency |
+| strict-uri-encode | [upstream](https://github.com/kevva/strict-uri-encode) | 2.0.0 | MIT | SDK/XML transitive dependency |
+| strnum | [upstream](https://github.com/NaturalIntelligence/strnum) | 2.4.2 | MIT | SDK/XML transitive dependency |
+| through2 | [upstream](https://github.com/rvagg/through2) | 4.0.2 | MIT | SDK/XML transitive dependency |
+| xml-naming | [upstream](https://github.com/NaturalIntelligence/xml-naming) | 0.3.0 | MIT | SDK/XML transitive dependency |
+| xml2js | [upstream](https://github.com/Leonidas-from-XIV/node-xml2js) | 0.6.2 | MIT | SDK/XML transitive dependency |
+| xmlbuilder | [upstream](https://github.com/oozcitak/xmlbuilder-js) | 11.0.1 | MIT | SDK/XML transitive dependency |

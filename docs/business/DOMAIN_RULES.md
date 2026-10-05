@@ -55,7 +55,7 @@ This document establishes the official business domain rules governing the Procu
    - Invoices are uniquely identified per supplier by exact database constraint:
      $$\text{UNIQUE}(\text{supplier\_id}, \text{invoice\_number})$$
    - **Current Issue #2 Guarantee**: The PostgreSQL `UNIQUE (supplier_id, invoice_number)` constraint enforces exact binary (case-sensitive and whitespace-sensitive) uniqueness at the database level. For example, submitting `INV-001` twice for the same supplier is blocked, while `inv-001` or `INV 001` would not be considered identical by PostgreSQL's standard binary equality.
-   - **Planned Ingestion Normalization (Issue #7)**: Comprehensive string canonicalization (such as collapsing whitespace or normalizing `INV-001` / `inv-001` / `INV 001`) will be implemented during the ingestion pipeline phase in Issue #7 once the canonicalization policy is finalized.
+   - **Ingestion Normalization (Issue #7)**: NFKC → trim → uppercase → remove whitespace, ASCII hyphens and underscores. `INV-001` / `inv-001` / `INV 001` / `INV_001` become `INV001`, while `/` remains meaningful. A partial unique index protects non-NULL `(supplier_id, invoice_number_normalized)` identities alongside exact uniqueness. Old rows remain unchanged and are compared canonically during ingestion; audited backfill must resolve legacy collisions.
 4. **Invoice Status Lifecycle**:
    - `RECEIVED`: Document ingested (raw PDF, XML, or e-invoice payload).
    - `PARSED`: Line items extracted into structured relational entities.
