@@ -185,6 +185,10 @@ describe('Pure deterministic 3WM-1.0 evaluator', () => {
     expect(result.items[0].discrepancyCodes).toContain('TOTAL_MISMATCH');
   });
   it('rejects empty structured invoices', () => expect(() => evaluateMatching(fixture({ invoiceItems: [] }))).toThrow('structured lines'));
+  it.each(['NaN', 'Infinity', '-1', 1])('rejects unsafe trusted numeric input %j', value => {
+    const input = fixture();
+    expect(() => evaluateMatching({ ...input, receipts: [{ ...input.receipts[0], acceptedQuantity: value as string }] })).toThrow('finite');
+  });
   it('normalizes NFKC, whitespace/case but preserves meaningful punctuation and words', () => {
     expect(normalizeSku(' ａｂ-１２ / x  ')).toBe('AB-12 / X');
     expect(normalizeDescription('  Mực   in\tHP 85A  ')).toBe('MỰC IN HP 85A');

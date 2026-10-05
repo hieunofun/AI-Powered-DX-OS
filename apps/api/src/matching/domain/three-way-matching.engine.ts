@@ -18,6 +18,18 @@ function comparison(actual: string, expected: string, tolerance: string) {
 
 export function evaluateMatching(input: MatchingInput) {
   if (!input.invoiceItems.length) throw new Error('Invoice requires structured lines');
+  // PostgreSQL NUMERIC can represent NaN in legacy/manual rows; never let it bypass comparisons.
+  const numericValues = [input.invoice.subtotal, input.invoice.taxAmount, input.invoice.totalAmount,
+    input.policy.quantityTolerancePercent, input.policy.priceTolerancePercent,
+    input.policy.taxTolerancePercent, input.policy.totalTolerancePercent,
+    ...input.invoiceItems.flatMap(line => [line.quantity, line.unitPrice, line.taxRate, line.lineSubtotal, line.taxAmount, line.lineTotal]),
+    ...input.poItems.flatMap(line => [line.orderedQuantity, line.unitPrice, line.taxRate]),
+    ...input.receipts.map(row => row.acceptedQuantity), ...input.previousInvoices.map(row => row.quantity)];
+  for (const value of numericValues) {
+    if (typeof value !== 'string' || !new D(value).isFinite() || new D(value).lt(0)) {
+      throw new Error('Matching requires finite nonnegative decimal strings');
+    }
+  }
   const { invoice, po, policy } = input;
   const documentCodes: DiscrepancyCode[] = [];
   const sameSupplier = invoice.supplierId === po.supplierId;
@@ -75,9 +87,15 @@ export function evaluateMatching(input: MatchingInput) {
     const codes = [...documentCodes, ...resolution.codes];
     let allocated = new D(0), unitVariance = new D(0), taxRateVariance = new D(0), lineTotalVariance = new D(0);
     let expectedTaxVariance = new D(0);
-    const details: Record<string, unknown> = { resolutionMethod: resolution.method, invoiceLineNumber: line.lineNumber, totalChecks };
+    const details: Record<string, unknown> = { resolutionMethod: resolution.method, invoiceLineNumber: line.lineNumber,
+      invoiceSku: line.sku, invoiceDescription: line.description, invoiceQuantity: line.quantity,
+      documentRules: { invoiceSupplierId: invoice.supplierId, poSupplierId: po.supplierId,
+        sellerTaxCodeNormalized: invoiceTax, supplierTaxCodeNormalized: normalizeTaxCode(input.supplierTaxCode),
+        invoiceCurrency: invoice.currency, poCurrency: po.currency }, totalChecks };
     if (item) {
       const group = groups.get(item.id);
+      details.poSku = item.sku;
+      details.poDescription = item.description;
       // Downward quantization prevents NUMERIC(18,4) persistence rounding a tiny tolerance into stock.
       allocated = D.min(group.remaining, line.quantity).toDecimalPlaces(4, D.ROUND_DOWN);
       group.remaining = group.remaining.minus(allocated);
