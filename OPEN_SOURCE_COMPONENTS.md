@@ -68,6 +68,8 @@ Every license listed below has been verified against the official upstream repos
 
 ## Issue #7 newly introduced npm transitive packages
 
+The `@nodable/entities@3.1.0` npm archive declares MIT but omits its license file. The official [upstream MIT license at commit ac48e7ea591da372be023a481875c747535812b3](https://github.com/nodable/val-parsers/blob/ac48e7ea591da372be023a481875c747535812b3/LICENSE) is preserved in `docs/open-source/notices/nodable-val-parsers-MIT.txt` and copied into the API runtime image. Other introduced npm artifacts retain their packaged license files.
+
 Exact versions and declared licenses below were verified from installed npm package manifests and their packaged license metadata; package-lock.json pins integrity hashes. Direct integrations are listed above. These packages support the SDK/XML parser. MinIO source dependencies remain governed by the pinned upstream go.mod/go.sum and distribution notices.
 
 | Component | Official upstream | Exact version | License | Purpose |

@@ -5,8 +5,9 @@
 # 1. smartprocure-postgres: Relational database store
 # 2. smartprocure-api: NestJS backend API with health endpoint
 # 3. smartprocure-web: React + TypeScript + Vite web client
+# 4. smartprocure-minio: Private invoice storage (Issue #7)
 #
-# Roadmap services (Keycloak, APISIX, MinIO, Flowable, ImmuDB) are maintained
+# Roadmap services (Flowable, ImmuDB) are maintained
 # as documented placeholders for subsequent implementation phases.
 # ==============================================================================
 
