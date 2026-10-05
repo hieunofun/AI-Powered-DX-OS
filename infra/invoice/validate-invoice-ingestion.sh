@@ -148,4 +148,48 @@ assert_eq "$(sql "SELECT count(*) FROM audit_records WHERE event_type='INVOICE_P
 assert_eq "$(sql "SELECT status || '|' || error_code FROM invoice_ingestions WHERE id='$rollback_id';")" 'FAILED|PERSISTENCE_FAILED' 'Rollback trace retained'
 integrity "$rollback_id" "$(hashes "$work/rollback.xml")"
 assert_eq "$(sql 'SELECT count(*) FROM invoices;')" "$((baseline + 3))" 'Only three structured invoices persisted'
+
+echo 'Testing verified external Matbao/MIFI PBan 2.0.0 layout through the real gateway...'
+# A separate test supplier keeps the external profile's 14-character MST bound.
+provider_tax=$(printf '000%010d' "$(( $(date +%s) + RANDOM ))")
+provider_supplier=$(sql "INSERT INTO suppliers(supplier_code,tax_code,name) VALUES ('PROVIDER-TEST-$run_id','$provider_tax','Fictional Provider Test Supplier') RETURNING id;")
+payload=$(jq -nc --arg supplier "$provider_supplier" '{supplierId:$supplier,currency:"VND",orderDate:"2022-02-14",items:[{description:"External XML test goods",orderedQuantity:"100.0000",unitPrice:"100.1234",taxRate:"0.0800"}]}')
+code=$(curl -sS --max-time 30 -o "$work/provider-po.json" -w '%{http_code}' "$GATEWAY_URL/api/purchase-orders" -H "Authorization: Bearer $BUYER_TOKEN" -H 'Content-Type: application/json' -d "$payload")
+assert_eq "$code" 201 'Create external-profile PO'
+po_id=$(jq -er '.id' "$work/provider-po.json")
+version=$(jq -er '.version' "$work/provider-po.json")
+code=$(curl -sS --max-time 30 -o "$work/provider-issued.json" -w '%{http_code}' -X POST "$GATEWAY_URL/api/purchase-orders/$po_id/issue" -H "Authorization: Bearer $BUYER_TOKEN" -H 'Content-Type: application/json' -d "{\"expectedVersion\":$version}")
+assert_eq "$code" 200 'Issue external-profile PO'
+sed "s/0000000000-001/$provider_tax/g" infra/invoice/fixtures/valid-vietnam-provider-einvoice.xml > "$work/provider.xml"
+code=$(ingest "$work/provider.json" -F "xml=@$work/provider.xml;type=application/xml;filename=SmartProcureInvoice-v1.xml")
+assert_eq "$code" 201 'Verified external XML ingestion'
+provider_invoice=$(jq -er '.invoiceId' "$work/provider.json")
+provider_ingestion=$(jq -er '.ingestionId' "$work/provider.json")
+assert_eq "$(sql "SELECT status || '|' || invoice_id FROM invoice_ingestions WHERE id='$provider_ingestion';")" "PARSED|$provider_invoice" 'External ingestion link/state'
+assert_eq "$(sql "SELECT status || '|' || purchase_order_id || '|' || supplier_id || '|' || seller_tax_code || '|' || buyer_tax_code || '|' || invoice_number || '|' || invoice_number_normalized || '|' || invoice_date || '|' || currency || '|' || subtotal || '|' || tax_amount || '|' || total_amount || '|' || source_type FROM invoices WHERE id='$provider_invoice';")" "PARSED|$po_id|$provider_supplier|$provider_tax|0000000001|73|73|2022-02-14|VND|201.26|16.12|217.38|XML_UPLOAD" 'External canonical header and binding'
+assert_eq "$(sql "SELECT count(*) FROM invoice_items WHERE invoice_id='$provider_invoice';")" 2 'External two invoice items'
+assert_eq "$(sql "SELECT string_agg(quantity || '|' || unit_price || '|' || tax_rate || '|' || line_subtotal || '|' || tax_amount || '|' || line_total, ';' ORDER BY line_number) FROM invoice_items WHERE invoice_id='$provider_invoice';")" '1.2500|0.8040|0.1000|1.01|0.10|1.11;2.0000|100.1234|0.0800|200.25|16.02|216.27' 'External exact line strings'
+assert_eq "$(sql "SELECT count(*) FROM invoice_items WHERE invoice_id='$provider_invoice' AND po_item_id IS NOT NULL;")" 0 'External lines remain unresolved'
+assert_eq "$(sql "SELECT processing_status FROM invoice_files WHERE ingestion_id='$provider_ingestion';")" PARSED 'External file state'
+assert_eq "$(sql "SELECT external_file_id=(SELECT object_key FROM invoice_files WHERE ingestion_id='$provider_ingestion') FROM invoices WHERE id='$provider_invoice';")" t 'External primary XML object key'
+assert_eq "$(sql "SELECT count(*) FROM audit_records WHERE entity_type='INVOICE' AND entity_id='$provider_invoice' AND event_type='INVOICE_PARSED' AND actor_subject IS NOT NULL;")" 1 'External parsed audit'
+integrity "$provider_ingestion" "$(hashes "$work/provider.xml")"
+
+echo 'Testing external-profile seller mismatch, discount, precision and XXE regressions...'
+sed "s/$provider_tax/9999999999/g" "$work/provider.xml" > "$work/provider-mismatch.xml"
+sed 's/<STCKhau>0.0000/<STCKhau>1.0000/' "$work/provider.xml" > "$work/provider-discount.xml"
+sed 's/<TgTCThue>201.2600/<TgTCThue>201.2601/' "$work/provider.xml" > "$work/provider-precision.xml"
+sed 's@<HDon>@<!DOCTYPE HDon [<!ENTITY leak SYSTEM "file:///etc/passwd">]><HDon>@' "$work/provider.xml" > "$work/provider-xxe.xml"
+for pair in 'provider-mismatch.xml:SELLER_TAX_CODE_MISMATCH' 'provider-discount.xml:UNSUPPORTED_INVOICE_FEATURE' 'provider-precision.xml:DECIMAL_PRECISION_EXCEEDED' 'provider-xxe.xml:UNSAFE_XML'; do
+  filename=${pair%%:*}; expected=${pair#*:}
+  code=$(ingest "$work/provider-error.json" -F "xml=@$work/$filename;type=application/xml")
+  assert_eq "$code" 422 "$filename response"
+  assert_eq "$(jq -r '.errorCode' "$work/provider-error.json")" "$expected" "$filename code"
+  failed_id=$(jq -er '.ingestionId' "$work/provider-error.json")
+  assert_eq "$(sql "SELECT status || '|' || error_code || '|' || (invoice_id IS NULL)::text FROM invoice_ingestions WHERE id='$failed_id';")" "FAILED|$expected|true" 'External failed ingestion trace'
+  integrity "$failed_id" "$(hashes "$work/$filename")"
+done
+assert_eq "$(sql 'SELECT count(*) FROM invoices;')" "$((baseline + 4))" 'Only four structured invoices, including verified external layout'
+echo 'PASS verified external XML profile: exact PostgreSQL entities, NULL po_item_id, SHA-256 readback and private MinIO.'
+
 echo 'PASS real invoice ingestion: PostgreSQL, MinIO, Keycloak and APISIX; rollback and concurrency verified.'

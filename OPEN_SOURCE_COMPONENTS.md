@@ -68,6 +68,12 @@ Every license listed below has been verified against the official upstream repos
 
 ## Issue #7 newly introduced npm transitive packages
 
+### External XML format reference (no code dependency)
+
+The Matbao-invoice/MIFI PBan 2.0.0 VAT adapter references the provider's public [XML layout example](https://matbao.in/articles/cau-truc-hoa-don-theo-nd-123) and [field tables](https://matbao.in/articles/quyet-dinh-so-1510-qd-tct-bo-sung-quyet-dinh-1450-2020). Only format/documentation facts were referenced; no external code, article prose or verbatim complete sample was copied, and no npm dependency was added. The fixture contains independently authored fictional test data. No OSS license is asserted for the provider documentation; project-authored adapter/test code remains under the repository MIT license. See [fixture provenance](infra/invoice/fixtures/README.md) for the exact source, scope and limitations.
+
+### Package inventory
+
 The `@nodable/entities@3.1.0` npm archive declares MIT but omits its license file. The official [upstream MIT license at commit ac48e7ea591da372be023a481875c747535812b3](https://github.com/nodable/val-parsers/blob/ac48e7ea591da372be023a481875c747535812b3/LICENSE) is preserved in `docs/open-source/notices/nodable-val-parsers-MIT.txt` and copied into the API runtime image. Other introduced npm artifacts retain their packaged license files.
 
 Exact versions and declared licenses below were verified from installed npm package manifests and their packaged license metadata; package-lock.json pins integrity hashes. Direct integrations are listed above. These packages support the SDK/XML parser. MinIO source dependencies remain governed by the pinned upstream go.mod/go.sum and distribution notices.

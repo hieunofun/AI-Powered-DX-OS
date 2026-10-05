@@ -1,6 +1,6 @@
 # Invoice ingestion — Issue #7
 
-The module archives raw XML/PDF in a private MinIO bucket and creates structured invoices only from the supported XML profile. Matching, PO-line resolution and `PENDING_MATCH` belong to Issue #8. No OCR extraction is claimed.
+The module archives raw XML/PDF in a private MinIO bucket and creates structured invoices from two supported XML adapters: the internal SmartProcureInvoice v1 profile and a verified Matbao-invoice/MIFI PBan 2.0.0 VAT subset. Matching, PO-line resolution and `PENDING_MATCH` belong to Issue #8. No OCR extraction is claimed.
 
 ## API and authorization
 
@@ -39,7 +39,7 @@ Migration 011 adds nullable identity/tax columns without rewriting legacy data. 
 
 ## Supported XML profile: SmartProcureInvoice v1
 
-This is a **project interchange profile**, not certification of TCT Decree 123/Circular 78, nor universal Vietnamese provider compatibility. `valid-vn-einvoice.xml` uses Vietnamese field names but is a synthetic project fixture. Only the following exact case-sensitive tags are supported, with `SmartProcureInvoice version="1"` as the single root. No implicit aliases are accepted.
+This remains an **internal/project interchange profile**, not certification of TCT Decree 123/Circular 78, nor universal Vietnamese provider compatibility. `valid-vn-einvoice.xml` uses Vietnamese field names but is a synthetic project fixture. `SmartProcureInvoiceV1Parser` accepts the following exact case-sensitive tags with `SmartProcureInvoice version="1"` as the single root. No implicit aliases are accepted.
 
 | XML path below root | Canonical field | Rule |
 | --- | --- | --- |
@@ -60,11 +60,36 @@ This is a **project interchange profile**, not certification of TCT Decree 123/C
 | `TongTien/TgTThue` | taxAmount | Sum of line taxes |
 | `TongTien/TgTTTBSo` | totalAmount | Subtotal + tax |
 
-Invoices require 1–1000 lines. `InvoiceXmlParser` exposes `profile`, `supports`, `parse`; register additional adapters in `InvoiceXmlParserService` only with verified provider samples, mappings and tests. No provider guessing is performed.
+Invoices require 1–1000 lines. `InvoiceXmlParser` exposes `profile`, `supports`, `parse`. `InvoiceXmlParserService` selects SmartProcureInvoiceV1Parser or MatbaoInvoiceV200Parser from the parsed root/version structure, never filename, request provider name or a nested signature object. Register further adapters only with verified samples, mappings and tests.
 
-Every financial XML value is parsed as a string. Unsigned plain decimal notation only; scientific notation, localized commas, excess lexical scale (including extra trailing zeros), overflow and negative values are rejected before SQL. An isolated decimal.js context at precision 60 avoids changes from other modules' global settings. Quantity/prices have four decimals, rates four decimals, money two decimals. VAT percentage allows at most two decimals and a range 0–100; division by 100 is exact. No financial `Number`, `parseFloat`, native rounding or approximate assertions are used.
+For the internal profile, every financial XML value is parsed as a string. Unsigned plain decimal notation only; scientific notation, localized commas, excess lexical scale (including extra trailing zeros), overflow and negative values are rejected before SQL. An isolated decimal.js context at precision 60 avoids changes from other modules' global settings. Quantity/prices have four decimals, rates four decimals, money two decimals. VAT percentage allows at most two decimals and a range 0–100; division by 100 is exact. No financial `Number`, `parseFloat`, native rounding or approximate assertions are used.
 
 Profile calculation: line subtotal = half-up round(quantity × unitPrice, 2); tax = half-up round(line subtotal × fractional rate, 2); line total = their sum. Invoice totals sum the rounded lines. Declared values must equal the calculations exactly; values are never silently corrected. The fixture includes `1.2500 × 0.8040 = 1.005`, rounded exactly to `1.01`. Unknown fields/attributes, mixed content, discounts, allowances, surcharges and special rounding concepts fail `UNSUPPORTED_INVOICE_FEATURE`; repeated/missing scalar fields fail format validation.
+
+## Verified external XML profile: Matbao-invoice/MIFI PBan 2.0.0
+
+This additional adapter is based on the provider's public [ordinary-invoice XML example](https://matbao.in/articles/cau-truc-hoa-don-theo-nd-123), published 2022-03-17. Buyer MST, VAT-group fields and signature containers were cross-checked against the provider's [published Decision 1510 field tables](https://matbao.in/articles/quyet-dinh-so-1510-qd-tct-bo-sung-quyet-dinh-1450-2020). These references establish a concrete external tag layout; they do not establish certification, current legal compliance or compatibility with every provider/version. Detailed source/fixture provenance is in [fixtures/README.md](../../infra/invoice/fixtures/README.md).
+
+`valid-vietnam-provider-einvoice.xml` is a sanitized, independently authored fixture preserving the verified layout. All business data, tax placeholders, number, goods, amounts and QR text are fictional. No provider code, article prose, complete sample, certificate or actual invoice data was copied. Only public format/documentation was referenced; the provider has not granted an OSS license, and none is assigned to its documentation. New adapter code and test data belong to this MIT-licensed project; no dependency is added.
+
+Selection requires the direct unnamespaced `HDon/DLHDon/TTChung/PBan` to equal `2.0.0`. A single business payload is required. The supported subset is ordinary VAT (`KHMSHDon=1`), VND, B2B with both tax codes, and goods/service lines (`TChat=1`), with 1–1000 lines. Invoice number is the original positive 1–8 digit `SHDon` string, including leading zeros; the existing supplier+number identity policy applies. Series/year are not added to duplicate identity, so numbering reuse across series requires a future domain/schema decision.
+
+| Verified path below `HDon/DLHDon` | Canonical output / validation |
+| --- | --- |
+| `NDHDon/NBan/MST`, `NDHDon/NMua/MST` | sellerTaxCode / buyerTaxCode, required ≤14 characters; existing seller/PO binding applies |
+| `TTChung/SHDon`, `NLap`, `DVTTe` | invoiceNumber, valid YYYY-MM-DD invoiceDate, currency VND |
+| `NDHDon/DSHHDVu/HHDVu/MHHDVu`, `THHDVu` | Optional sku ≤50, required description ≤500 |
+| `.../SLuong`, `DGia`, `TSuat` | Positive quantity / nonnegative unitPrice at 18,4; numeric percentage converted to rate 7,4 |
+| `.../ThTien` | Declared lineSubtotal reconciled with rounded quantity × price |
+| No line-tax/line-total tag in this layout | Derive taxAmount using half-up subtotal × rate; lineTotal is subtotal + tax |
+| `NDHDon/TToan/THTTLTSuat/LTSuat/TSuat`, `ThTien`, `TThue` | Exactly one group per rate; compare declared subtotal/tax to sums of computed line amounts |
+| `NDHDon/TToan/TgTCThue`, `TgTThue`, `TgTTTBSo` | Exact subtotal, taxAmount, totalAmount; reconcile against all lines/groups |
+
+The provider example prints monetary values with four-place zero padding. This adapter accepts up to six lexical money decimal places **only when removing trailing zeros leaves an exactly representable NUMERIC(18,2) value**. `201.2600` becomes `201.26` without changing its value; `201.2601` fails precision validation. No monetary value is rounded to fit PostgreSQL. Quantity/prices still require ≤4 places, VAT percentages ≤2, and overflow is rejected. Shared `invoice-xml-validation.ts` retains the isolated Decimal context and financial rules; the internal adapter continues to reject excess lexical scale, including trailing zeros. Every previous precision regression remains in place.
+
+Recognized metadata is validated as scalar text and retained only in the raw archive: header title/series/payment/provider-tax metadata, seller name/address/contact, buyer name/address, line unit, total text, DLQRCode and MCCQT. Line STT, when present, must be sequential. DLHDon Id is metadata, not a trust decision. TLCKhau, STCKhau and TTCKTMai are accepted only as exact zero, as in the public example. Nonzero discounts, adjustments/replacements (TTHDLQuan), foreign currency/exchange, exempt/special VAT, fees, allowances, custom TTKhac and alternate rounding are rejected; unknown financial fields are never discarded.
+
+Optional DSCKS/NBan, NMua or CQT Signature subtrees are archived only and never used to select business data. Parsing **does not verify digital signatures, certificate chains, tax-authority approval or authenticity**. Those are separate capabilities. All XML still passes the same UTF-8, DTD/ENTITY/XXE, malformed/reference and safe-error checks before either adapter runs.
 
 ## XML and upload security
 
@@ -134,6 +159,6 @@ Audit events: INVOICE_INGESTION_STARTED, INVOICE_FILE_STORED, INVOICE_PARSED, IN
 
 Unit tests cover canonicalization, field mappings, XXE, unsupported features, precision, VAT, totals, signatures, checksum/key generation and transitions. HTTP E2E tests explicitly mock auth, repository and storage; these do not prove real storage/database acceptance.
 
-Run `bash infra/invoice/validate-invoice-ingestion.sh` only against a disposable development/CI stack. It authenticates demo users through Keycloak, sends multipart via APISIX, validates real SQL and MinIO downloads, asserts private bucket access, PDF fallback, XML+PDF, failures, duplicate normalization, concurrent 201/409 outcomes, file limits/RBAC and rollback after header+first line. A temporary test-only invoice-item trigger induces rollback and is removed by the EXIT trap. Existing schema/Keycloak/APISIX/PO/GRN validation remains in CI before invoice acceptance.
+Run `bash infra/invoice/validate-invoice-ingestion.sh` only against a disposable development/CI stack. It authenticates demo users through Keycloak, sends multipart via APISIX, validates real SQL and MinIO downloads, asserts private bucket access, PDF fallback, XML+PDF, failures, duplicate normalization, concurrent 201/409 outcomes, file limits/RBAC and rollback after header+first line. It additionally uploads the sanitized verified external layout with a separate PO/supplier, verifies exact header/two lines/tax codes/normalized number/PARSED states/NULL po_item_id/audit and four-way SHA-256 readback, and rejects external-profile seller mismatch, discounts, precision and XXE. The acceptance criterion for standard electronic invoice XML is therefore backed by the verified external layout, not only the internal profile. A temporary test-only invoice-item trigger induces rollback and is removed by the EXIT trap. Existing schema/Keycloak/APISIX/PO/GRN validation remains in CI before invoice acceptance.
 
 Issue #8 receives structured PARSED invoices and unresolved lines. No GRN matching, payment clearance, workflow, ledger sealing, provider certification, tax-authority integration or trained OCR is included here.
