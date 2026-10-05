@@ -2,3 +2,5 @@
 *.sh text eol=lf
 # Preserve PDF fixture byte offsets and hashes across checkouts.
 *.pdf -text
+# Keep byte-sensitive XML fixture mutations and archival hashes identical across platforms.
+infra/invoice/fixtures/*.xml text eol=lf

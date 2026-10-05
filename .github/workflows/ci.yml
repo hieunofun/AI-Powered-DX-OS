@@ -40,6 +40,9 @@ jobs:
       - name: Run e2e tests
         run: npm run test:e2e --workspace=apps/api
 
+      - name: Measure pure matching domain coverage
+        run: npm run test --workspace=apps/api -- --runInBand matching/domain --coverage --coverageProvider=v8 --collectCoverageFrom='matching/domain/*.ts' --coverageDirectory=coverage/matching
+
       - name: Validate Docker Compose configuration
         run: docker compose config
 
@@ -163,6 +166,9 @@ jobs:
 
       - name: Validate Invoice Ingestion against Real PostgreSQL, MinIO & Gateway
         run: bash infra/invoice/validate-invoice-ingestion.sh
+
+      - name: Validate 3-Way Matching against Real PostgreSQL & Gateway
+        run: bash infra/matching/validate-three-way-matching.sh
 
       - name: Check container status
         run: docker compose ps

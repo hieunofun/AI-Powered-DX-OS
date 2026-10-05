@@ -865,4 +865,84 @@ BEGIN
     RAISE NOTICE '[OK] Migration 011 columns, constraints, restrictive FKs and normalized uniqueness validated.';
 END $$;
 ROLLBACK;
+-- 23. Deterministic matching extensions (012); negative probes leave no rows.
+BEGIN;
+DO $$
+DECLARE
+    name text; failed boolean; po uuid; supplier uuid; inv uuid; item uuid; result uuid;
+BEGIN
+    IF (SELECT count(*) FROM matching_policies WHERE is_active) != 1 THEN
+        RAISE EXCEPTION 'Exactly one active matching policy required';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM matching_policies WHERE policy_code='MATCH_DEFAULT'
+        AND is_active AND description='Default deterministic 3-way matching policy'
+        AND quantity_tolerance_percent=0 AND price_tolerance_percent=1
+        AND tax_tolerance_percent=0 AND total_tolerance_percent=0) THEN
+        RAISE EXCEPTION 'Fresh schema default policy missing or incorrect';
+    END IF;
+    FOR name IN SELECT unnest(ARRAY['chk_total_tolerance','uq_match_result_invoice','uq_match_result_invoice_item',
+        'chk_match_evaluation_duration']) LOOP
+        IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname=name) THEN RAISE EXCEPTION 'Missing matching constraint %',name; END IF;
+    END LOOP;
+    FOR name IN SELECT unnest(ARRAY['uq_matching_policies_active','idx_goods_receipts_po_status',
+        'idx_grn_items_po_receipt','idx_match_results_po_status','idx_match_items_po_result','idx_invoice_items_invoice_id']) LOOP
+        IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname='public' AND indexname=name) THEN
+            RAISE EXCEPTION 'Missing matching index %',name;
+        END IF;
+    END LOOP;
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE indexname='uq_matching_policies_active'
+        AND indexdef LIKE 'CREATE UNIQUE INDEX%WHERE (is_active = true)') THEN
+        RAISE EXCEPTION 'Single-active index must be partial and unique';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='matching_policies'
+        AND column_name='total_tolerance_percent' AND numeric_precision=5 AND numeric_scale=2 AND is_nullable='NO')
+      OR NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='match_results'
+        AND column_name='evaluation_duration_ms' AND numeric_precision=12 AND numeric_scale=3)
+      OR NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='match_results'
+        AND column_name='completed_at' AND data_type='timestamp with time zone')
+      OR NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='match_result_items'
+        AND column_name='tax_rate_variance' AND numeric_precision=7 AND numeric_scale=4 AND is_nullable='NO')
+      OR NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='match_result_items'
+        AND column_name='line_total_variance' AND numeric_precision=18 AND numeric_scale=2 AND is_nullable='NO')
+      OR (SELECT count(*) FROM information_schema.columns WHERE table_name IN ('match_results','match_result_items')
+        AND column_name='discrepancy_codes' AND udt_name='_text' AND is_nullable='NO' AND column_default IS NOT NULL) != 2
+      OR NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='match_results'
+        AND column_name='policy_snapshot' AND data_type='jsonb' AND is_nullable='NO' AND column_default IS NOT NULL)
+      OR NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='match_result_items'
+        AND column_name='details' AND data_type='jsonb' AND is_nullable='NO' AND column_default IS NOT NULL) THEN
+        RAISE EXCEPTION 'Matching column types, precision, defaults or nullability incorrect';
+    END IF;
+    failed := false;
+    BEGIN INSERT INTO matching_policies(policy_code,is_active) VALUES('SCHEMA-SECOND-ACTIVE',true);
+    EXCEPTION WHEN unique_violation THEN failed := true; END;
+    IF NOT failed THEN RAISE EXCEPTION 'Second active policy accepted'; END IF;
+    FOREACH name IN ARRAY ARRAY['-0.01','100.01'] LOOP
+        failed := false;
+        BEGIN INSERT INTO matching_policies(policy_code,is_active,total_tolerance_percent)
+            VALUES('SCHEMA-BAD-TOTAL',false,name::numeric);
+        EXCEPTION WHEN check_violation THEN failed := true; END;
+        IF NOT failed THEN RAISE EXCEPTION 'Invalid total tolerance accepted'; END IF;
+    END LOOP;
+    SELECT id,supplier_id INTO po,supplier FROM purchase_orders LIMIT 1;
+    INSERT INTO invoices(invoice_number,supplier_id,purchase_order_id,invoice_date,status,subtotal,total_amount)
+        VALUES('MATCH-SCHEMA-'||gen_random_uuid(),supplier,po,CURRENT_DATE,'PARSED',1,1) RETURNING id INTO inv;
+    INSERT INTO invoice_items(invoice_id,line_number,description,quantity,unit_price,line_subtotal,line_total)
+        VALUES(inv,1,'Schema matching probe',1,1,1,1) RETURNING id INTO item;
+    INSERT INTO match_results(invoice_id,purchase_order_id,status) VALUES(inv,po,'REVIEW_REQUIRED') RETURNING id INTO result;
+    failed := false;
+    BEGIN INSERT INTO match_results(invoice_id,purchase_order_id,status) VALUES(inv,po,'REVIEW_REQUIRED');
+    EXCEPTION WHEN unique_violation THEN failed := true; END;
+    IF NOT failed THEN RAISE EXCEPTION 'Duplicate invoice match accepted'; END IF;
+    INSERT INTO match_result_items(match_result_id,invoice_item_id,status) VALUES(result,item,'EXCEPTION');
+    failed := false;
+    BEGIN INSERT INTO match_result_items(match_result_id,invoice_item_id,status) VALUES(result,item,'EXCEPTION');
+    EXCEPTION WHEN unique_violation THEN failed := true; END;
+    IF NOT failed THEN RAISE EXCEPTION 'Duplicate result line accepted'; END IF;
+    failed := false;
+    BEGIN UPDATE match_results SET evaluation_duration_ms=-1 WHERE id=result;
+    EXCEPTION WHEN check_violation THEN failed := true; END;
+    IF NOT failed THEN RAISE EXCEPTION 'Negative evaluation duration accepted'; END IF;
+    RAISE NOTICE '[OK] Migration 012 policy, types, constraints, uniqueness and indexes validated.';
+END $$;
+ROLLBACK;
 
