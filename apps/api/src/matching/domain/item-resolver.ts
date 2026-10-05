@@ -10,7 +10,7 @@ export class ItemResolver {
     for (const item of items) {
       if (item.purchaseOrderId !== poId) throw new Error('Invalid PO item ownership');
       this.ids.set(item.id, item);
-      if (item.sku !== null) this.add(this.skus, normalizeSku(item.sku), item);
+      if (item.sku !== null && normalizeSku(item.sku) !== '') this.add(this.skus, normalizeSku(item.sku), item);
       this.add(this.descriptions, normalizeDescription(item.description), item);
     }
   }
@@ -23,9 +23,10 @@ export class ItemResolver {
     if (line.poItemId !== null) {
       const item = this.ids.get(line.poItemId);
       if (!item) throw new Error('Invalid existing invoice PO item ownership');
-      return { item, codes: [], method: 'EXISTING_REFERENCE' };
+      return { item, codes: normalizeDescription(line.description) === normalizeDescription(item.description)
+        ? [] : ['ITEM_DESCRIPTION_MISMATCH'], method: 'EXISTING_REFERENCE' };
     }
-    const hasSku = line.sku !== null && normalizeSku(line.sku) !== '';
+    const hasSku = line.sku !== null;
     const matches = hasSku ? this.skus.get(normalizeSku(line.sku)) : this.descriptions.get(normalizeDescription(line.description));
     if (!matches?.length) return { item: null, codes: ['UNRECOGNIZED_ITEM'], method: hasSku ? 'SKU' : 'DESCRIPTION' };
     if (matches.length > 1) return { item: null, codes: ['AMBIGUOUS_ITEM'], method: hasSku ? 'SKU' : 'DESCRIPTION' };
