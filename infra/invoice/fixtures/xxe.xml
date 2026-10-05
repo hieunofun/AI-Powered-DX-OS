@@ -1,0 +1,3 @@
+<?xml version="1.0"?>
+<!DOCTYPE SmartProcureInvoice [<!ENTITY xxe SYSTEM "file:///etc/passwd">]>
+<SmartProcureInvoice version="1"><NguoiBan><MST>&xxe;</MST></NguoiBan></SmartProcureInvoice>

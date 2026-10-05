@@ -1,0 +1,4 @@
+# Shell acceptance scripts must run identically in Linux CI and Windows/WSL.
+*.sh text eol=lf
+# Preserve PDF fixture byte offsets and hashes across checkouts.
+*.pdf -text

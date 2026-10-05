@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Sanitized, independently authored test data; format reference in README.md. -->
+<HDon>
+  <DLHDon Id="SigningData">
+    <TTChung>
+      <PBan>2.0.0</PBan><THDon>HÓA ĐƠN GIÁ TRỊ GIA TĂNG - TEST ONLY</THDon>
+      <KHMSHDon>1</KHMSHDon><KHHDon>C22TSP</KHHDon><SHDon>73</SHDon>
+      <NLap>2022-02-14</NLap><DVTTe>VND</DVTTe><HTTToan>Chuyển khoản</HTTToan><MSTTCGP>0000000002</MSTTCGP>
+    </TTChung>
+    <NDHDon>
+      <NBan><Ten>TEST SELLER - NOT A REAL COMPANY</Ten><MST>0000000000-001</MST><DChi>TEST ADDRESS ONLY</DChi></NBan>
+      <NMua><Ten>TEST BUYER - NOT A REAL COMPANY</Ten><MST>0000000001</MST><DChi>TEST ADDRESS ONLY</DChi></NMua>
+      <DSHHDVu>
+        <HHDVu>
+          <TChat>1</TChat><STT>1</STT><MHHDVu>TEST-INK</MHHDVu><THHDVu>Mực in thử nghiệm</THHDVu><DVTinh>Hộp</DVTinh>
+          <SLuong>1.2500</SLuong><DGia>0.8040</DGia><TLCKhau>0.00000</TLCKhau><STCKhau>0.0000</STCKhau>
+          <ThTien>1.0100</ThTien><TSuat>10%</TSuat>
+        </HHDVu>
+        <HHDVu>
+          <TChat>1</TChat><STT>2</STT><THHDVu>Giấy in thử nghiệm</THHDVu><DVTinh>Ram</DVTinh>
+          <SLuong>2.0000</SLuong><DGia>100.1234</DGia><TLCKhau>0.00000</TLCKhau><STCKhau>0.0000</STCKhau>
+          <ThTien>200.2500</ThTien><TSuat>8%</TSuat>
+        </HHDVu>
+      </DSHHDVu>
+      <TToan>
+        <THTTLTSuat>
+          <LTSuat><TSuat>10%</TSuat><ThTien>1.0100</ThTien><TThue>0.1000</TThue></LTSuat>
+          <LTSuat><TSuat>8%</TSuat><ThTien>200.2500</ThTien><TThue>16.0200</TThue></LTSuat>
+        </THTTLTSuat>
+        <TgTCThue>201.2600</TgTCThue><TgTThue>16.1200</TgTThue><TTCKTMai>0.00000</TTCKTMai>
+        <TgTTTBSo>217.3800</TgTTTBSo><TgTTTBChu>TEST TOTAL TEXT ONLY</TgTTTBChu>
+      </TToan>
+    </NDHDon>
+  </DLHDon>
+  <DLQRCode>TEST-ONLY-QR</DLQRCode><MCCQT />
+</HDon>

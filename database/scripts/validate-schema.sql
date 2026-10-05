@@ -22,7 +22,9 @@ DECLARE
         'match_result_items',
         'approval_cases',
         'audit_records',
-        'goods_receipt_policies'
+        'goods_receipt_policies',
+        'invoice_ingestions',
+        'invoice_files'
     ];
     cnt integer;
 BEGIN
@@ -36,7 +38,7 @@ BEGIN
             RAISE EXCEPTION 'Assertion Failed: Table "%" does not exist in schema public', tbl;
         END IF;
     END LOOP;
-    RAISE NOTICE '[OK] All 13 domain tables confirmed present.';
+    RAISE NOTICE '[OK] All 15 domain tables confirmed present.';
 END $$;
 
 -- 2. Key Constraints Existence Validation
@@ -766,4 +768,101 @@ BEGIN
     RAISE NOTICE '[OK] Goods Receipt extensions (lot_number, sequence, policy table, constraints) validated.';
     RAISE NOTICE '=== ALL SCHEMA INTEGRITY TESTS PASSED SUCCESSFULLY ===';
 END $$;
+
+
+-- 22. Invoice ingestion additions (migration 011).
+-- Included by validate-schema.sql; test rows are rolled back.
+BEGIN;
+DO $$
+DECLARE
+    v_name text;
+    v_po uuid;
+    v_supplier uuid;
+    v_ingestion uuid := gen_random_uuid();
+    v_invoice uuid;
+    v_other uuid := gen_random_uuid();
+    v_file uuid := gen_random_uuid();
+    v_failed boolean;
+BEGIN
+    FOR v_name IN SELECT unnest(ARRAY['seller_tax_code','buyer_tax_code','invoice_number_normalized']) LOOP
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public'
+            AND table_name='invoices' AND column_name=v_name AND is_nullable='YES') THEN
+            RAISE EXCEPTION 'Missing nullable invoice metadata column %', v_name;
+        END IF;
+    END LOOP;
+    IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname='public' AND indexname='uq_invoice_supplier_normalized'
+        AND indexdef LIKE 'CREATE UNIQUE INDEX% (supplier_id, invoice_number_normalized)%WHERE (invoice_number_normalized IS NOT NULL)') THEN
+        RAISE EXCEPTION 'Missing normalized partial unique index';
+    END IF;
+    FOR v_name IN SELECT unnest(ARRAY['idx_invoice_ingestions_po','idx_invoice_ingestions_supplier',
+        'idx_invoice_ingestions_status_created','idx_invoice_files_ingestion']) LOOP
+        IF NOT EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname='public' AND indexname=v_name) THEN
+            RAISE EXCEPTION 'Missing invoice ingestion index %', v_name;
+        END IF;
+    END LOOP;
+    IF (SELECT count(*) FROM pg_constraint WHERE contype='f' AND confdeltype='r'
+        AND conrelid IN ('invoice_ingestions'::regclass,'invoice_files'::regclass)) != 4 THEN
+        RAISE EXCEPTION 'Ingestion/file foreign keys must all use ON DELETE RESTRICT';
+    END IF;
+    FOR v_name IN SELECT unnest(ARRAY['chk_invoice_ingestion_status','chk_invoice_ingestion_parsed',
+        'chk_invoice_file_kind','chk_invoice_file_status','chk_invoice_file_size','chk_invoice_file_sha256',
+        'chk_invoice_number_normalized','uq_invoice_file_kind','uq_supplier_invoice']) LOOP
+        IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname=v_name) THEN
+            RAISE EXCEPTION 'Missing invoice constraint %', v_name;
+        END IF;
+    END LOOP;
+    SELECT id, supplier_id INTO v_po, v_supplier FROM purchase_orders LIMIT 1;
+    INSERT INTO invoice_ingestions(id,purchase_order_id,supplier_id) VALUES(v_ingestion,v_po,v_supplier);
+    INSERT INTO invoice_files(id,ingestion_id,file_kind,object_key,original_filename,media_type,size_bytes,sha256)
+        VALUES(v_file,v_ingestion,'XML','schema-test/'||v_file,'invoice.xml','application/xml',1,repeat('a',64));
+    v_failed := false;
+    BEGIN UPDATE invoice_ingestions SET status='PENDING_MATCH' WHERE id=v_ingestion;
+    EXCEPTION WHEN check_violation THEN v_failed := true; END;
+    IF NOT v_failed THEN RAISE EXCEPTION 'Unsupported ingestion status accepted'; END IF;
+    v_failed := false;
+    BEGIN UPDATE invoice_ingestions SET status='PARSED' WHERE id=v_ingestion;
+    EXCEPTION WHEN check_violation THEN v_failed := true; END;
+    IF NOT v_failed THEN RAISE EXCEPTION 'Parsed ingestion without invoice accepted'; END IF;
+    v_failed := false;
+    BEGIN UPDATE invoice_files SET file_kind='PNG' WHERE id=v_file;
+    EXCEPTION WHEN check_violation THEN v_failed := true; END;
+    IF NOT v_failed THEN RAISE EXCEPTION 'Unsupported invoice file kind accepted'; END IF;
+    v_failed := false;
+    BEGIN UPDATE invoice_files SET processing_status='MATCHED' WHERE id=v_file;
+    EXCEPTION WHEN check_violation THEN v_failed := true; END;
+    IF NOT v_failed THEN RAISE EXCEPTION 'Unsupported invoice file status accepted'; END IF;
+    v_failed := false;
+    BEGIN UPDATE invoice_files SET size_bytes=0 WHERE id=v_file;
+    EXCEPTION WHEN check_violation THEN v_failed := true; END;
+    IF NOT v_failed THEN RAISE EXCEPTION 'Zero file size accepted'; END IF;
+    v_failed := false;
+    BEGIN UPDATE invoice_files SET sha256=repeat('g',64) WHERE id=v_file;
+    EXCEPTION WHEN check_violation THEN v_failed := true; END;
+    IF NOT v_failed THEN RAISE EXCEPTION 'Invalid SHA-256 accepted'; END IF;
+    v_failed := false;
+    BEGIN DELETE FROM invoice_ingestions WHERE id=v_ingestion;
+    EXCEPTION WHEN foreign_key_violation THEN v_failed := true; END;
+    IF NOT v_failed THEN RAISE EXCEPTION 'File parent deletion was not restricted'; END IF;
+
+    INSERT INTO invoices(invoice_number,invoice_number_normalized,supplier_id,purchase_order_id,
+        invoice_date,subtotal,total_amount) VALUES('SCHEMA-A-'||v_other,'SCHEMA'||v_other,v_supplier,v_po,CURRENT_DATE,1,1) RETURNING id INTO v_invoice;
+    v_failed := false;
+    BEGIN
+        INSERT INTO invoices(invoice_number,invoice_number_normalized,supplier_id,purchase_order_id,
+            invoice_date,subtotal,total_amount) VALUES('SCHEMA-B-'||v_other,'SCHEMA'||v_other,v_supplier,v_po,CURRENT_DATE,1,1);
+    EXCEPTION WHEN unique_violation THEN v_failed := true; END;
+    IF NOT v_failed THEN RAISE EXCEPTION 'Duplicate normalized identity accepted'; END IF;
+    v_failed := false;
+    BEGIN UPDATE invoices SET invoice_number_normalized='' WHERE id=v_invoice;
+    EXCEPTION WHEN check_violation THEN v_failed := true; END;
+    IF NOT v_failed THEN RAISE EXCEPTION 'Empty normalized identity accepted'; END IF;
+    UPDATE invoice_ingestions SET status='PARSED',invoice_id=v_invoice WHERE id=v_ingestion;
+    v_failed := false;
+    BEGIN
+        INSERT INTO invoice_ingestions(purchase_order_id,supplier_id,invoice_id,status) VALUES(v_po,v_supplier,v_invoice,'PARSED');
+    EXCEPTION WHEN unique_violation THEN v_failed := true; END;
+    IF NOT v_failed THEN RAISE EXCEPTION 'Invoice linked to multiple ingestions'; END IF;
+    RAISE NOTICE '[OK] Migration 011 columns, constraints, restrictive FKs and normalized uniqueness validated.';
+END $$;
+ROLLBACK;
 

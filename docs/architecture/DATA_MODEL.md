@@ -29,6 +29,10 @@ As part of the **DX-OS Open-Core** architecture, the PostgreSQL database functio
 erDiagram
     suppliers ||--o{ purchase_orders : issues
     suppliers ||--o{ invoices : submits
+    suppliers ||--o{ invoice_ingestions : uploads
+    purchase_orders ||--o{ invoice_ingestions : binds
+    invoice_ingestions ||--o| invoices : produces
+    invoice_ingestions ||--|{ invoice_files : archives
     
     purchase_orders ||--|{ purchase_order_items : contains
     purchase_orders ||--o{ goods_receipts : fulfills
@@ -122,6 +126,9 @@ erDiagram
     invoices {
         uuid id PK
         varchar invoice_number
+        varchar invoice_number_normalized
+        varchar seller_tax_code
+        varchar buyer_tax_code
         uuid supplier_id FK
         uuid purchase_order_id FK
         date invoice_date
@@ -134,6 +141,34 @@ erDiagram
         varchar source_type
     }
     
+    invoice_ingestions {
+        uuid id PK
+        uuid purchase_order_id FK
+        uuid supplier_id FK
+        uuid invoice_id FK,UK
+        varchar status
+        varchar error_code
+        text error_message
+        varchar created_by_subject
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    invoice_files {
+        uuid id PK
+        uuid ingestion_id FK
+        varchar file_kind
+        varchar object_key UK
+        varchar original_filename
+        varchar media_type
+        bigint size_bytes
+        char sha256
+        varchar processing_status
+        varchar parse_error_code
+        text parse_error_message
+        timestamptz created_at
+    }
+
     invoice_items {
         uuid id PK
         uuid invoice_id FK
@@ -222,6 +257,8 @@ erDiagram
 | **`goods_receipt_items`** | Line-level item inspection logging accepted and rejected goods. | UUID (`gen_random_uuid()`) | `UNIQUE(goods_receipt_id, line_number)`, `received_quantity > 0`, `accepted + rejected <= received` |
 | **`invoices`** | Supplier invoices ingested via digital e-invoice or OCR extraction. | UUID (`gen_random_uuid()`) | `UNIQUE(supplier_id, invoice_number)`, `FK -> purchase_orders (RESTRICT)`, `CHECK(status)` |
 | **`invoice_items`** | Line items on the invoice with progressive resolution to PO items. | UUID (`gen_random_uuid()`) | `UNIQUE(invoice_id, line_number)`, `quantity > 0`, `unit_price >= 0`, `po_item_id NULLABLE` |
+| **`invoice_ingestions`** | PO/supplier-bound upload lifecycle, including unsuccessful parse and pending OCR. | UUID (`gen_random_uuid()`) | Restrictive PO/supplier/invoice FKs; nullable unique `invoice_id`; PARSED iff linked invoice; checked status |
+| **`invoice_files`** | Raw object metadata and SHA-256; bytes live only in private MinIO. | UUID (`gen_random_uuid()`) | Restrictive ingestion FK; unique object key and `(ingestion_id,file_kind)`; XML/PDF only; positive size; 64-character hex checksum; checked processing status |
 | **`matching_policies`** | Configurable reconciliation tolerance parameters. | UUID (`gen_random_uuid()`) | `UNIQUE(policy_code)`, Tolerance percentages bounded between 0% and 100% |
 | **`match_results`** | Header-level evaluation outcomes of 3-Way Matching runs. | UUID (`gen_random_uuid()`) | `FK -> invoices (RESTRICT)`, `FK -> purchase_orders (RESTRICT)`, `CHECK(status)` |
 | **`match_result_items`** | Item-level reconciliation results with variance calculations. | UUID (`gen_random_uuid()`) | `FK -> match_results (RESTRICT)`, `FK -> invoice_items (RESTRICT)`, `confidence BETWEEN 0 AND 100` |
@@ -291,7 +328,7 @@ $$\text{CONSTRAINT uq\_supplier\_invoice UNIQUE (supplier\_id, invoice\_number)}
 - Uniqueness is scoped to the **supplier**, acknowledging that different suppliers may independently issue the same invoice number (e.g., `INV-001`).
 - The same supplier cannot issue two invoices with identical numbers.
 - **Current Issue #2 Guarantee**: The PostgreSQL `UNIQUE (supplier_id, invoice_number)` constraint enforces exact binary (case-sensitive and whitespace-sensitive) uniqueness at the database level. Submitting `INV-001` twice for the same supplier is blocked, while case or whitespace variations (e.g. `inv-001` or `INV 001`) are distinct in standard SQL binary equality.
-- **Planned Normalization (Issue #7)**: Comprehensive string canonicalization (such as collapsing whitespace or normalizing `INV-001` / `inv-001` / `INV 001`) will be implemented during the ingestion pipeline phase in Issue #7 once the canonicalization policy is finalized.
+- **Ingestion Normalization (Issue #7, migration 011)**: NFKC → trim → uppercase → remove whitespace, ASCII hyphens and underscores; preserve slash and other punctuation. A partial unique index `uq_invoice_supplier_normalized` covers `(supplier_id, invoice_number_normalized) WHERE invoice_number_normalized IS NOT NULL`. Original numbers and exact uniqueness remain. Existing rows keep NULL normalized values; ingestion also compares legacy canonical identities without rewriting them. Legacy backfill needs collision review.
 
 ---
 

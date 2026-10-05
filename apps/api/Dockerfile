@@ -30,6 +30,10 @@ COPY apps/api/package.json ./apps/api/
 COPY packages/ ./packages/
 RUN npm install --omit=dev
 
+# @nodable/entities 3.1.0 omits its license file from the npm archive.
+# Preserve the verified official upstream MIT notice with the runtime artifact.
+COPY docs/open-source/notices/nodable-val-parsers-MIT.txt ./licenses/nodable-val-parsers-MIT.txt
+
 # Copy compiled artifacts from builder
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 

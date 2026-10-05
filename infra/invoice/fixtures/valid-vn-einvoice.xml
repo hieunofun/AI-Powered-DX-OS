@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SmartProcureInvoice version="1">
+  <NguoiBan><MST>0101234567-001</MST></NguoiBan>
+  <NguoiMua><MST>0312345678</MST></NguoiMua>
+  <ThongTinChung><SHDon>INV-001</SHDon><NLap>2026-10-05</NLap><DVTTe>vnd</DVTTe></ThongTinChung>
+  <DanhSachHangHoa>
+    <HangHoa><MHHDVu>INK-85A</MHHDVu><THHDVu>Mực in HP 85A</THHDVu><SLuong>1.2500</SLuong><DGia>0.8040</DGia><TSuat>10%</TSuat><ThTien>1.01</ThTien><TienThue>0.10</TienThue><TongTien>1.11</TongTien></HangHoa>
+    <HangHoa><THHDVu>Giấy in</THHDVu><SLuong>2.0000</SLuong><DGia>100.1234</DGia><TSuat>8</TSuat><ThTien>200.25</ThTien><TienThue>16.02</TienThue><TongTien>216.27</TongTien></HangHoa>
+  </DanhSachHangHoa>
+  <TongTien><TgTCThue>201.26</TgTCThue><TgTThue>16.12</TgTThue><TgTTTBSo>217.38</TgTTTBSo></TongTien>
+</SmartProcureInvoice>
