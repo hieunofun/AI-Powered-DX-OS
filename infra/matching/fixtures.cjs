@@ -25,7 +25,7 @@ module.exports = function fixtures(db, supplierId, taxCode, runId) {
     items.sort((a, b) => a.lineNumber - b.lineNumber);
     for (const receipt of receipts) {
       const grn = (await db.query(`INSERT INTO goods_receipts(grn_number,purchase_order_id,status,cancelled_at,cancelled_reason)
-        VALUES($1,$2,$3,CASE WHEN $3='CANCELLED' THEN now() END,CASE WHEN $3='CANCELLED' THEN 'Synthetic cancelled receipt' END)
+        VALUES($1,$2,$3::text,CASE WHEN $3::text='CANCELLED' THEN now() END,CASE WHEN $3::text='CANCELLED' THEN 'Synthetic cancelled receipt' END)
         RETURNING id`, ['MATCH-GRN-' + randomUUID(), id, receipt.status])).rows[0].id;
       const gross = D.max(1, new D(receipt.accepted).plus(receipt.rejected)).toFixed(4);
       await db.query(`INSERT INTO goods_receipt_items(goods_receipt_id,purchase_order_item_id,line_number,
