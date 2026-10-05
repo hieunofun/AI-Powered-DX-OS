@@ -19,6 +19,21 @@ cleanup() {
 }
 trap cleanup EXIT
 assert_eq() { [[ "$1" == "$2" ]] || { echo "FAIL $3: expected $2, got $1"; exit 1; }; }
+# Prior PO/GRN tests and invoice checks share APISIX's 100 requests / 60s quota.
+# Retry only an explicit gateway 429, never a transport error or another status;
+# rejected requests have not reached a business handler. Keep the gateway policy.
+gateway() {
+  local code attempt
+  for ((attempt=0; attempt<31; attempt++)); do
+    code=$(curl -sS --max-time 60 "$@") || return "$?"
+    if [[ "$code" != 429 ]]; then printf '%s' "$code"; return 0; fi
+    if ((attempt < 30)); then
+      echo 'Gateway quota reached; bounded 429 retry in 2s.' >&2
+      sleep 2
+    fi
+  done
+  printf '%s' "$code"
+}
 token() {
   curl --fail --silent --show-error --max-time 20 -X POST "$KEYCLOAK_URL/realms/${KEYCLOAK_REALM:-smartprocure}/protocol/openid-connect/token" \
     --data-urlencode "client_id=${CI_CLIENT_ID:-smartprocure-ci}" --data-urlencode 'grant_type=password' \
@@ -38,18 +53,18 @@ ADMIN_TOKEN=$(token admin.demo)
 run_id="$(date +%s)-$RANDOM"
 supplier_id=$(sql "INSERT INTO suppliers(supplier_code,tax_code,name) VALUES ('INV-TEST-$run_id','0101234567001-$run_id','Invoice Integration Supplier') RETURNING id;")
 payload=$(jq -nc --arg supplier "$supplier_id" '{supplierId:$supplier,currency:"VND",orderDate:"2026-10-05",items:[{description:"Invoice test goods",orderedQuantity:"100.0000",unitPrice:"100.1234",taxRate:"0.0800"}]}')
-code=$(curl -sS --max-time 30 -o "$work/po.json" -w '%{http_code}' "$GATEWAY_URL/api/purchase-orders" -H "Authorization: Bearer $BUYER_TOKEN" -H 'Content-Type: application/json' -d "$payload")
+code=$(gateway -o "$work/po.json" -w '%{http_code}' "$GATEWAY_URL/api/purchase-orders" -H "Authorization: Bearer $BUYER_TOKEN" -H 'Content-Type: application/json' -d "$payload")
 assert_eq "$code" 201 'Create PO via gateway'
 po_id=$(jq -er '.id' "$work/po.json")
 version=$(jq -er '.version' "$work/po.json")
-code=$(curl -sS --max-time 30 -o "$work/issued.json" -w '%{http_code}' -X POST "$GATEWAY_URL/api/purchase-orders/$po_id/issue" -H "Authorization: Bearer $BUYER_TOKEN" -H 'Content-Type: application/json' -d "{\"expectedVersion\":$version}")
+code=$(gateway -o "$work/issued.json" -w '%{http_code}' -X POST "$GATEWAY_URL/api/purchase-orders/$po_id/issue" -H "Authorization: Bearer $BUYER_TOKEN" -H 'Content-Type: application/json' -d "{\"expectedVersion\":$version}")
 assert_eq "$code" 200 'Issue PO via gateway'
 for source in infra/invoice/fixtures/*.xml; do
   sed "s/0101234567-001/0101234567001-$run_id/g" "$source" > "$work/$(basename "$source")"
 done
 ingest() {
   local output="$1"; shift
-  curl -sS --max-time 60 -o "$output" -w '%{http_code}' "$GATEWAY_URL/api/invoices/ingest" \
+  gateway -o "$output" -w '%{http_code}' "$GATEWAY_URL/api/invoices/ingest" \
     -H "Authorization: Bearer $ACCOUNTANT_TOKEN" -F "purchaseOrderId=$po_id" "$@"
 }
 integrity() {
@@ -122,12 +137,12 @@ head -c 5242881 /dev/zero > "$work/oversized.xml"
 assert_eq "$(ingest "$work/large-xml.json" -F "xml=@$work/oversized.xml;type=application/xml")" 413 'Oversized XML'
 head -c 20971521 /dev/zero > "$work/oversized.pdf"
 assert_eq "$(ingest "$work/large-pdf.json" -F "pdf=@$work/oversized.pdf;type=application/pdf")" 413 'Oversized PDF'
-code=$(curl -sS --max-time 30 -o "$work/warehouse.json" -w '%{http_code}' "$GATEWAY_URL/api/invoices/ingest" -H "Authorization: Bearer $WAREHOUSE_TOKEN" -F "purchaseOrderId=$po_id" -F "xml=@$work/valid-vn-einvoice.xml;type=application/xml")
+code=$(gateway -o "$work/warehouse.json" -w '%{http_code}' "$GATEWAY_URL/api/invoices/ingest" -H "Authorization: Bearer $WAREHOUSE_TOKEN" -F "purchaseOrderId=$po_id" -F "xml=@$work/valid-vn-einvoice.xml;type=application/xml")
 assert_eq "$code" 403 'Warehouse upload denied'
-code=$(curl -sS --max-time 30 -o "$work/admin.json" -w '%{http_code}' "$GATEWAY_URL/api/invoices/ingest" -H "Authorization: Bearer $ADMIN_TOKEN" -F "purchaseOrderId=$po_id" -F 'pdf=@infra/invoice/fixtures/sample.pdf;type=application/pdf')
+code=$(gateway -o "$work/admin.json" -w '%{http_code}' "$GATEWAY_URL/api/invoices/ingest" -H "Authorization: Bearer $ADMIN_TOKEN" -F "purchaseOrderId=$po_id" -F 'pdf=@infra/invoice/fixtures/sample.pdf;type=application/pdf')
 assert_eq "$code" 202 'Admin upload allowed'
 for path in "invoices?page=1&limit=20&supplierId=$supplier_id" "invoices/$invoice_id" "invoices/$invoice_id/files" "invoice-ingestions/$ingestion_id"; do
-  code=$(curl -sS --max-time 30 -o "$work/read.json" -w '%{http_code}' "$GATEWAY_URL/api/$path" -H "Authorization: Bearer $ACCOUNTANT_TOKEN")
+  code=$(gateway -o "$work/read.json" -w '%{http_code}' "$GATEWAY_URL/api/$path" -H "Authorization: Bearer $ACCOUNTANT_TOKEN")
   assert_eq "$code" 200 "Authenticated read $path"
 done
 
@@ -154,11 +169,11 @@ echo 'Testing verified external Matbao/MIFI PBan 2.0.0 layout through the real g
 provider_tax=$(printf '000%010d' "$(( $(date +%s) + RANDOM ))")
 provider_supplier=$(sql "INSERT INTO suppliers(supplier_code,tax_code,name) VALUES ('PROVIDER-TEST-$run_id','$provider_tax','Fictional Provider Test Supplier') RETURNING id;")
 payload=$(jq -nc --arg supplier "$provider_supplier" '{supplierId:$supplier,currency:"VND",orderDate:"2022-02-14",items:[{description:"External XML test goods",orderedQuantity:"100.0000",unitPrice:"100.1234",taxRate:"0.0800"}]}')
-code=$(curl -sS --max-time 30 -o "$work/provider-po.json" -w '%{http_code}' "$GATEWAY_URL/api/purchase-orders" -H "Authorization: Bearer $BUYER_TOKEN" -H 'Content-Type: application/json' -d "$payload")
+code=$(gateway -o "$work/provider-po.json" -w '%{http_code}' "$GATEWAY_URL/api/purchase-orders" -H "Authorization: Bearer $BUYER_TOKEN" -H 'Content-Type: application/json' -d "$payload")
 assert_eq "$code" 201 'Create external-profile PO'
 po_id=$(jq -er '.id' "$work/provider-po.json")
 version=$(jq -er '.version' "$work/provider-po.json")
-code=$(curl -sS --max-time 30 -o "$work/provider-issued.json" -w '%{http_code}' -X POST "$GATEWAY_URL/api/purchase-orders/$po_id/issue" -H "Authorization: Bearer $BUYER_TOKEN" -H 'Content-Type: application/json' -d "{\"expectedVersion\":$version}")
+code=$(gateway -o "$work/provider-issued.json" -w '%{http_code}' -X POST "$GATEWAY_URL/api/purchase-orders/$po_id/issue" -H "Authorization: Bearer $BUYER_TOKEN" -H 'Content-Type: application/json' -d "{\"expectedVersion\":$version}")
 assert_eq "$code" 200 'Issue external-profile PO'
 sed "s/0000000000-001/$provider_tax/g" infra/invoice/fixtures/valid-vietnam-provider-einvoice.xml > "$work/provider.xml"
 code=$(ingest "$work/provider.json" -F "xml=@$work/provider.xml;type=application/xml;filename=SmartProcureInvoice-v1.xml")
