@@ -99,12 +99,14 @@ export class WorkflowRepository {
       await c.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
       const owner=(await c.query(`SELECT c.id,c.invoice_id FROM approval_tasks t JOIN approval_cases c ON c.id=t.approval_case_id WHERE t.id=$1`,[taskId])).rows[0];
       if(!owner) throw new WorkflowError('APPROVAL_TASK_NOT_FOUND','Approval task not found.',404);
-      await c.query('SELECT id FROM invoices WHERE id=$1 FOR UPDATE',[owner.invoice_id]);
+      const invoice=(await c.query('SELECT id,status FROM invoices WHERE id=$1 FOR UPDATE',[owner.invoice_id])).rows[0];
       const approval=(await c.query('SELECT * FROM approval_cases WHERE id=$1 FOR UPDATE',[owner.id])).rows[0];
       const task=(await c.query('SELECT * FROM approval_tasks WHERE id=$1 FOR UPDATE',[taskId])).rows[0];
       const admin=actor.roles.includes('admin');
       if(!admin && !actor.roles.includes(task.assigned_role)) throw new WorkflowError('TASK_ROLE_FORBIDDEN','Your authenticated roles cannot act on this task.',403);
       if(task.status==='COMPLETED') throw new WorkflowError('TASK_ALREADY_COMPLETED','Task already completed.',409);
+      if(invoice.status!==(approval.case_type==='CLEAN_FINANCE'?'MATCHED':'EXCEPTION'))
+        throw new WorkflowError('INVALID_INVOICE_STATE','Invoice changed while workflow review was active.',409);
       if(task.status==='CANCELLED' || approval.status!=='PENDING') throw new WorkflowError('INVALID_TASK_STATE','Task is not active.',409);
       const pending=(await c.query("SELECT operation FROM workflow_operations WHERE approval_case_id=$1 AND status IN ('PENDING','FAILED')",[owner.id])).rows[0];
       if(pending) throw new WorkflowError(operation==='COMPLETE' && pending.operation==='COMPLETE'?'TASK_ALREADY_COMPLETED':
@@ -170,6 +172,8 @@ export class WorkflowRepository {
       const approval=(await c.query('SELECT * FROM approval_cases WHERE id=$1 FOR UPDATE',[original.approval_case_id])).rows[0];
       const op=(await c.query('SELECT * FROM workflow_operations WHERE id=$1 FOR UPDATE',[id])).rows[0];
       if(op.status==='APPLIED') return {approvalCaseId:approval.id,invoiceId:invoice.id,invoiceStatus:invoice.status};
+      if(invoice.status!==(approval.case_type==='CLEAN_FINANCE'?'MATCHED':'EXCEPTION'))
+        throw new WorkflowError('INVALID_INVOICE_STATE','Invoice changed before workflow synchronization.',409);
       const actor={sub:op.actor_subject,roles:op.actor_roles,username:''};
       if(op.operation==='START') {
         await c.query(`UPDATE approval_cases SET workflow_instance_id=$2,status='PENDING',workflow_definition_version=$3 WHERE id=$1`,

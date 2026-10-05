@@ -10,7 +10,7 @@ async function main(){
   const args=process.argv.slice(2),apply=args.includes('--apply');
   const at=args.indexOf('--operation'),id=at>=0?args[at+1]:null;
   if(apply && (!id||!/^[0-9a-f-]{36}$/i.test(id))) throw new Error('--apply requires --operation <UUID>');
-  if(args.some((value,i)=>!['--apply','--operation'].includes(value)&&i!==at+1)) throw new Error('Unknown option');
+  if(args.some((value,i)=>!['--apply','--operation'].includes(value)&&!(at>=0&&i===at+1))) throw new Error('Unknown option');
   const app=await NestFactory.createApplicationContext(AppModule,{logger:false});
   try {
     const repository=app.get(WorkflowRepository),engine=app.get(FlowableClient);

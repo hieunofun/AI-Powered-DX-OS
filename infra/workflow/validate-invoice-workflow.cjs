@@ -217,6 +217,17 @@ async function main(){
   assert.ok((await db.query("SELECT id FROM audit_records WHERE event_type='WORKFLOW_POLICY_UPDATED' AND metadata ? 'previous' AND metadata ? 'new'")).rowCount);
   console.log('PASS immutable policy snapshots, clean finance cap boundary, admin override audit and policy previous/new audit');
 
+  const changed=await fixture(['PRICE_MISMATCH']);
+  const changedCase=await start(changed.invoiceId);
+  const changedTask=await active(changedCase.approvalCaseId,'buyer');
+  await db.query("UPDATE invoices SET status='REJECTED' WHERE id=$1",[changed.invoiceId]);
+  const conflict=await request('POST','/approval-tasks/'+changedTask.id+'/claim','buyer',undefined,409);
+  assert.equal(conflict.errorCode,'INVALID_INVOICE_STATE');
+  assert.equal((await db.query('SELECT status FROM approval_tasks WHERE id=$1',[changedTask.id])).rows[0].status,'OPEN');
+  await db.query("UPDATE invoices SET status='EXCEPTION' WHERE id=$1",[changed.invoiceId]);
+  await claim(changedTask.id,'buyer'); await complete(changedTask.id,'buyer');
+  console.log('PASS externally changed invoice state prevents task action before engine dispatch');
+
   // A real stopped engine, not a mocked HTTP response.
   const outage=await fixture(['PRICE_MISMATCH']);
   docker(['stop','-t','5','smartprocure-flowable']);

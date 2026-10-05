@@ -62,6 +62,7 @@ export class WorkflowService {
     if(!task || task.processInstanceId!==process.id || !role || !allowed.includes(role) ||
       (mirror && (task.id!==mirror.flowable_task_id || task.taskDefinitionKey!==mirror.task_key || role!==mirror.assigned_role))) this.mismatch();
     const links=await this.engine.identityLinks(task.id);
+    if(!Array.isArray(links)) this.mismatch();
     const candidates=links.filter((link:any)=>link.type==='candidate');
     if(candidates.length!==1 || candidates[0].group!==role || candidates[0].user) this.mismatch();
   }
