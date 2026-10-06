@@ -107,6 +107,8 @@ A failed START becomes FAILED, with no false active case or fake tasks; the invo
 
 For a dispatched operation with no conclusive engine evidence, the CLI refuses replay. The operator must inspect engine history/logs and ensure prior requests/workers have stopped; restore lost engine history or resolve the external inconsistency before retry. There is deliberately no force-replay or automatic production mutation. If both databases lose their evidence, this MVP cannot reconstruct business history. Back up both stores consistently and monitor unapplied operations. Remote engine edits, purged history and indefinite network ambiguity require operator intervention.
 
+All reads and short PostgreSQL transactions during a serialized operation reuse its advisory-lock session. Each active case therefore needs one pool connection, avoiding starvation from waiting for a second connection while other cases hold theirs. Request-local connection context is released after the operation; unlock failures destroy the session. Regression tests exercise a pool with one available slot, transaction rollback and failed unlock cleanup.
+
 ## Task actions and authorization
 
 | Endpoint | Roles / rules |

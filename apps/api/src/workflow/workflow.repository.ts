@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { PoolClient } from 'pg';
 import { DatabaseService } from '../database/database.service';
 import { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
@@ -19,7 +20,25 @@ const TASK = `id,approval_case_id AS "approvalCaseId",flowable_task_id AS "flowa
 
 @Injectable()
 export class WorkflowRepository {
+  private readonly connection = new AsyncLocalStorage<PoolClient>();
   constructor(private readonly db: DatabaseService) {}
+  private query(sql: string, params?: any[]) {
+    const client=this.connection.getStore();
+    return client?client.query(sql,params):this.db.query(sql,params);
+  }
+  private async transaction<T>(work: (client: PoolClient)=>Promise<T>): Promise<T> {
+    const client=this.connection.getStore();
+    if(!client) return this.db.transaction(work);
+    await client.query('BEGIN');
+    try {
+      const result=await work(client);
+      await client.query('COMMIT');
+      return result;
+    } catch(error) {
+      await client.query('ROLLBACK');
+      throw error;
+    }
+  }
   async audit(client: PoolClient, type: string, id: string, event: string, actor: AuthenticatedUser, metadata: any) {
     await client.query(`INSERT INTO audit_records(entity_type,entity_id,event_type,actor_subject,metadata)
       VALUES($1,$2,$3,$4,$5::jsonb)`,[type,id,event,actor.sub,JSON.stringify({...metadata,roles:actor.roles})]);
@@ -29,9 +48,9 @@ export class WorkflowRepository {
     if(rows.length!==1) throw new WorkflowError('WORKFLOW_POLICY_UNAVAILABLE','Exactly one active workflow policy is required.');
     return rows[0];
   }
-  policy() { return this.db.transaction(c=>this.activePolicy(c)); }
+  policy() { return this.transaction(c=>this.activePolicy(c)); }
   updatePolicy(dto: Partial<WorkflowPolicy>, actor: AuthenticatedUser) {
-    return this.db.transaction(async c=>{
+    return this.transaction(async c=>{
       const previous=await this.activePolicy(c,true);
       const current=(await c.query(`UPDATE workflow_policies SET auto_ready_for_payment_max_amount=$2,finance_approval_threshold=$3
         WHERE id=$1 RETURNING `+POLICY,[previous.id,dto.autoReadyForPaymentMaxAmount===undefined?previous.autoReadyForPaymentMaxAmount:dto.autoReadyForPaymentMaxAmount,
@@ -45,7 +64,7 @@ export class WorkflowRepository {
       VALUES($1,$2,$3,$4::jsonb,$5,$6) RETURNING id`,[caseId,taskId,operation,JSON.stringify(payload),actor.sub,actor.roles])).rows[0].id as string;
   }
   prepareStart(invoiceId: string, actor: AuthenticatedUser) {
-    return this.db.transaction(async c=>{
+    return this.transaction(async c=>{
       await c.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
       const invoice=(await c.query('SELECT id,status,total_amount::text AS total FROM invoices WHERE id=$1 FOR UPDATE',[invoiceId])).rows[0];
       if(!invoice) throw new WorkflowError('INVOICE_NOT_FOUND','Invoice not found.',404);
@@ -75,11 +94,11 @@ export class WorkflowRepository {
       return {route:route.route,approvalCaseId:caseId,operationId};
     });
   }
-  async cases() { return (await this.db.query('SELECT '+CASE+' FROM approval_cases c JOIN invoices i ON i.id=c.invoice_id ORDER BY c.requested_at DESC LIMIT 200')).rows; }
+  async cases() { return (await this.query('SELECT '+CASE+' FROM approval_cases c JOIN invoices i ON i.id=c.invoice_id ORDER BY c.requested_at DESC LIMIT 200')).rows; }
   async detail(id: string) {
-    const value=(await this.db.query('SELECT '+CASE+' FROM approval_cases c JOIN invoices i ON i.id=c.invoice_id WHERE c.id=$1',[id])).rows[0];
+    const value=(await this.query('SELECT '+CASE+' FROM approval_cases c JOIN invoices i ON i.id=c.invoice_id WHERE c.id=$1',[id])).rows[0];
     if(!value) throw new WorkflowError('APPROVAL_CASE_NOT_FOUND','Approval case not found.',404);
-    value.decisions=(await this.db.query(`SELECT id,approval_task_id AS "approvalTaskId",action,reason,actor_subject AS "actorSubject",
+    value.decisions=(await this.query(`SELECT id,approval_task_id AS "approvalTaskId",action,reason,actor_subject AS "actorSubject",
       actor_roles AS "actorRoles",previous_case_status AS "previousCaseStatus",new_case_status AS "newCaseStatus",
       previous_invoice_status AS "previousInvoiceStatus",new_invoice_status AS "newInvoiceStatus",created_at AS "createdAt"
       FROM approval_decisions WHERE approval_case_id=$1 ORDER BY created_at,id`,[id])).rows;
@@ -87,15 +106,15 @@ export class WorkflowRepository {
   }
   async tasks(id: string) {
     await this.detail(id);
-    return (await this.db.query('SELECT '+TASK+' FROM approval_tasks WHERE approval_case_id=$1 ORDER BY created_at,id',[id])).rows;
+    return (await this.query('SELECT '+TASK+' FROM approval_tasks WHERE approval_case_id=$1 ORDER BY created_at,id',[id])).rows;
   }
   async myTasks(actor: AuthenticatedUser) {
-    return (await this.db.query('SELECT '+TASK+` FROM approval_tasks WHERE status IN ('OPEN','CLAIMED')
+    return (await this.query('SELECT '+TASK+` FROM approval_tasks WHERE status IN ('OPEN','CLAIMED')
       AND ($1 OR assigned_role=ANY($2::text[])) AND (assignee_subject IS NULL OR assignee_subject=$3 OR $1) ORDER BY created_at LIMIT 200`,
     [actor.roles.includes('admin'),actor.roles,actor.sub])).rows;
   }
   prepareAction(taskId: string, operation: 'CLAIM'|'COMPLETE', payload: any, actor: AuthenticatedUser) {
-    return this.db.transaction(async c=>{
+    return this.transaction(async c=>{
       await c.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
       const owner=(await c.query(`SELECT c.id,c.invoice_id FROM approval_tasks t JOIN approval_cases c ON c.id=t.approval_case_id WHERE t.id=$1`,[taskId])).rows[0];
       if(!owner) throw new WorkflowError('APPROVAL_TASK_NOT_FOUND','Approval task not found.',404);
@@ -124,33 +143,37 @@ export class WorkflowRepository {
     });
   }
   async operation(id: string) {
-    const op=(await this.db.query('SELECT * FROM workflow_operations WHERE id=$1',[id])).rows[0];
+    const op=(await this.query('SELECT * FROM workflow_operations WHERE id=$1',[id])).rows[0];
     if(!op) throw new WorkflowError('WORKFLOW_OPERATION_NOT_FOUND','Workflow operation not found.',404);
-    const approval=(await this.db.query('SELECT * FROM approval_cases WHERE id=$1',[op.approval_case_id])).rows[0];
-    const task=op.approval_task_id?(await this.db.query('SELECT * FROM approval_tasks WHERE id=$1',[op.approval_task_id])).rows[0]:null;
+    const approval=(await this.query('SELECT * FROM approval_cases WHERE id=$1',[op.approval_case_id])).rows[0];
+    const task=op.approval_task_id?(await this.query('SELECT * FROM approval_tasks WHERE id=$1',[op.approval_task_id])).rows[0]:null;
     return {op,approval,task,actor:{sub:op.actor_subject,roles:op.actor_roles,username:op.actor_subject} as AuthenticatedUser};
   }
   async serialized<T>(id: string, work: ()=>Promise<T>): Promise<T> {
-    const {op}=await this.operation(id);
     const c=await this.db.getClient();
-    let locked=false;
+    let locked=false, key: string;
     try {
-      locked=(await c.query('SELECT pg_try_advisory_lock(hashtextextended($1,0)) AS locked',['workflow:'+op.approval_case_id])).rows[0].locked;
-      if(!locked) throw new WorkflowError('WORKFLOW_OPERATION_IN_PROGRESS','Another operator is reconciling this case.',409);
-      return await work();
+      return await this.connection.run(c,async()=>{
+        const {op}=await this.operation(id);
+        key='workflow:'+op.approval_case_id;
+        locked=(await c.query('SELECT pg_try_advisory_lock(hashtextextended($1,0)) AS locked',[key])).rows[0].locked;
+        if(!locked) throw new WorkflowError('WORKFLOW_OPERATION_IN_PROGRESS','Another operator is reconciling this case.',409);
+        // Reuse this session for all reads and short DB transactions; holding an advisory lock
+        // must not require borrowing a second pool connection while other cases hold theirs.
+        return await work();
+      });
     } finally {
-      // If unlock fails, destroy the session so the pool cannot retain its advisory lock.
       let destroy=false;
-      try { if(locked) await c.query('SELECT pg_advisory_unlock(hashtextextended($1,0))',['workflow:'+op.approval_case_id]); }
+      try { if(locked) await c.query('SELECT pg_advisory_unlock(hashtextextended($1,0))',[key]); }
       catch { destroy=true; }
       c.release(destroy);
     }
   }
   async dispatch(id: string) {
-    await this.db.query("UPDATE workflow_operations SET dispatched_at=clock_timestamp(),retry_safe=false,updated_at=now() WHERE id=$1 AND status<>'APPLIED'",[id]);
+    await this.query("UPDATE workflow_operations SET dispatched_at=clock_timestamp(),retry_safe=false,updated_at=now() WHERE id=$1 AND status<>'APPLIED'",[id]);
   }
   async failure(id: string, code: string, retrySafe: boolean) {
-    return this.db.transaction(async c=>{
+    return this.transaction(async c=>{
       const op=(await c.query("UPDATE workflow_operations SET status='FAILED',error_code=$2,retry_safe=$3,updated_at=now() WHERE id=$1 AND status<>'APPLIED' RETURNING *",[id,code,retrySafe])).rows[0];
       if(!op) return;
       if(op.operation==='START') {
@@ -161,11 +184,11 @@ export class WorkflowRepository {
     });
   }
   async pending() {
-    return (await this.db.query(`SELECT id,approval_case_id AS "approvalCaseId",operation,status,error_code AS "errorCode",
+    return (await this.query(`SELECT id,approval_case_id AS "approvalCaseId",operation,status,error_code AS "errorCode",
       dispatched_at AS "dispatchedAt",retry_safe AS "retrySafe" FROM workflow_operations WHERE status<>'APPLIED' ORDER BY created_at`)).rows;
   }
   async finish(id: string, process: any, engineTasks: any[]) {
-    return this.db.transaction(async c=>{
+    return this.transaction(async c=>{
       const original=(await c.query('SELECT * FROM workflow_operations WHERE id=$1',[id])).rows[0];
       const base=(await c.query('SELECT invoice_id FROM approval_cases WHERE id=$1',[original.approval_case_id])).rows[0];
       const invoice=(await c.query('SELECT id,status FROM invoices WHERE id=$1 FOR UPDATE',[base.invoice_id])).rows[0];
