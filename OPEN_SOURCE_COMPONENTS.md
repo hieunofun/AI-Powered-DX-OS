@@ -18,7 +18,7 @@ Every license listed below has been verified against the official upstream repos
 | **fast-xml-parser** | [NaturalIntelligence/fast-xml-parser](https://github.com/NaturalIntelligence/fast-xml-parser/tree/v5.11.2) | `5.11.2` exact | MIT | Secure validation and deterministic XML field extraction | Dependency | Integrated (Issue #7) |
 | **@types/multer** | [DefinitelyTyped/DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/multer) | `2.3.0` exact | MIT | Compile-time multipart upload types | Dev dependency | Integrated (Issue #7) |
 | **Go** | [golang/go](https://github.com/golang/go/tree/go1.24.9) | `1.24.9` | BSD-3-Clause | Build unmodified MinIO source in container | Build tool | Integrated (Issue #7) |
-| **Flowable** | [flowable/flowable-engine](https://github.com/flowable/flowable-engine) | `6.8.x` | Apache-2.0 | BPMN 2.0 Business Process Engine (Discrepancy & approval workflows) | Docker Service | Planned |
+| **Flowable** | [flowable/flowable-engine](https://github.com/flowable/flowable-engine) | `8.0.0` | Apache-2.0 | Invoice approval/exception BPMN orchestration | Official REST Docker service; native Node fetch client | Integrated (Issue #9) |
 | **ImmuDB** | [codenotary/immudb](https://github.com/codenotary/immudb) | `v1.9.x` | Apache-2.0 | Cryptographic Immutable Ledger (Tamper-evident audit trail sealing) | Docker Service | Planned |
 | **Prometheus** | [prometheus/prometheus](https://github.com/prometheus/prometheus) | `v2.51.x` | Apache-2.0 | System & Business Metrics Monitoring | Docker Service | Planned |
 | **Grafana** | [grafana/grafana](https://github.com/grafana/grafana) | `10.4.x` | GNU AGPLv3 | Operational & Observability Dashboards | Docker Service | Planned |
@@ -44,6 +44,14 @@ Every license listed below has been verified against the official upstream repos
 | **decimal.js** | [MikeMcl/decimal.js](https://github.com/MikeMcl/decimal.js) | `^10.6.0` | MIT | Arbitrary-precision decimal arithmetic for financial calculations | Dependency | Integrated (Issue #5) |
 
 ---
+
+## Flowable Issue #9 provenance
+
+- Exact engine release: [Flowable OSS 8.0.0](https://github.com/flowable/flowable-engine/releases/tag/flowable-8.0.0), published 2026-02-27 and the latest stable upstream release verified on 2026-10-05. The source uses Spring Boot 4/Spring 7; SmartProcure integrates over REST and does not embed those Java dependencies.
+- License: [Apache-2.0 at the exact release tag](https://github.com/flowable/flowable-engine/blob/flowable-8.0.0/LICENSE).
+- Image: `flowable/flowable-rest:8.0.0` from the upstream Flowable Docker Hub namespace. The [official REST installation instructions](https://github.com/flowable/flowable-engine/blob/flowable-8.0.0/docs/public-api/README.md) identify this image. [Tag metadata](https://hub.docker.com/v2/repositories/flowable/flowable-rest/tags/8.0.0) was verified against manifest digest `sha256:708dfa32f27b93180bb6e7a30684d881d995fe257f5b8413e14b20a55c25672d` and its linux/amd64 and linux/arm64 images. Compose pins the exact tag and manifest digest.
+- REST compatibility: the tagged [TaskResource](https://github.com/flowable/flowable-engine/blob/flowable-8.0.0/modules/flowable-rest/src/main/java/org/flowable/rest/service/api/runtime/task/TaskResource.java) and [HistoricTaskInstanceCollectionResource](https://github.com/flowable/flowable-engine/blob/flowable-8.0.0/modules/flowable-rest/src/main/java/org/flowable/rest/service/api/history/HistoricTaskInstanceCollectionResource.java) define the claim/complete, local completion variables and historic task queries used for recovery. The real CI suite exercises deployment, start, task identity, claim, completion and history with this exact image.
+- Integration is the standalone REST engine with a dedicated PostgreSQL store. The prior planned 6.8.x entry is replaced. No Flowable UI or new client library is introduced; native Node fetch and existing dependencies are sufficient. Upstream/image notices remain in the unmodified image. Component and base-image licenses retain their own terms.
 
 ## License Compliance & Version Notes
 

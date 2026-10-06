@@ -6,9 +6,10 @@ import { PurchaseOrdersModule } from './purchase-orders/purchase-orders.module';
 import { GoodsReceiptsModule } from './goods-receipts/goods-receipts.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { MatchingModule } from './matching/matching.module';
+import { WorkflowModule } from './workflow/workflow.module';
 
 @Module({
-  imports: [DatabaseModule, HealthModule, AuthModule, PurchaseOrdersModule, GoodsReceiptsModule, InvoicesModule, MatchingModule],
+  imports: [DatabaseModule, HealthModule, AuthModule, PurchaseOrdersModule, GoodsReceiptsModule, InvoicesModule, MatchingModule, WorkflowModule],
   controllers: [],
   providers: [],
 })

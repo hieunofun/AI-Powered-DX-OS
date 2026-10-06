@@ -44,7 +44,7 @@ jobs:
         run: npm run test --workspace=apps/api -- --runInBand matching/domain --coverage --coverageProvider=v8 --collectCoverageFrom='matching/domain/*.ts' --coverageDirectory=coverage/matching
 
       - name: Validate Docker Compose configuration
-        run: docker compose config
+        run: docker compose config --quiet
 
       - name: Build Docker containers
         run: docker compose build
@@ -169,6 +169,9 @@ jobs:
 
       - name: Validate 3-Way Matching against Real PostgreSQL & Gateway
         run: bash infra/matching/validate-three-way-matching.sh
+
+      - name: Validate Invoice Workflow against Real PostgreSQL, Flowable & Gateway
+        run: bash infra/workflow/validate-invoice-workflow.sh
 
       - name: Check container status
         run: docker compose ps
