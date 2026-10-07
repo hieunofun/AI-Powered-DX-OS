@@ -12,7 +12,7 @@ const {hashJson}=require('../../apps/api/dist/audit/domain/canonical-json');
 const db=new Pool({host:'localhost',port:Number(process.env.POSTGRES_PORT||5432),database:process.env.POSTGRES_DB||'smartprocure_db',
   user:process.env.POSTGRES_USER||'smartprocure_user',password:process.env.POSTGRES_PASSWORD||'postgres_password',connectionTimeoutMillis:5000});
 const ledger=new Pool({host:'localhost',port:Number(process.env.IMMUDB_HOST_PGSQL_PORT||5433),database:process.env.IMMUDB_DATABASE||'defaultdb',
-  user:process.env.IMMUDB_USERNAME||'immudb',password:process.env.IMMUDB_PASSWORD||'immudb_dev_only_password',connectionTimeoutMillis:5000,query_timeout:10000});
+  user:process.env.IMMUDB_USERNAME||'immudb',password:process.env.IMMUDB_PASSWORD||'immudb_dev_only_password',connectionTimeoutMillis:5000,query_timeout:10000,maxUses:1});
 ledger.on('error',()=>{});
 const tokens={},gateway=process.env.GATEWAY_URL||'http://localhost:9080';
 const work=mkdtempSync(join(tmpdir(),'smartprocure-audit-'));
@@ -63,7 +63,7 @@ async function fixture(mismatch=false){
 }
 async function sealed(invoiceId,state){
   const verification=await request('GET',base(invoiceId)+'/verify','accountant');
-  assert.equal(verification.verificationStatus,'VERIFIED');assert.equal(verification.immudbCryptographicProofValid,true);
+  assert.equal(verification.verificationStatus,'VERIFIED',JSON.stringify(verification));assert.equal(verification.immudbCryptographicProofValid,true);
   const detail=await request('GET',base(invoiceId),'accountant');
   assert.equal(detail.pkg.final_business_state,state);assert.equal(detail.seal.status,'SEALED');
   assert.ok(detail.seal.immudb_tx_id);assert.ok(detail.seal.receipt.rowProof);assert.ok(detail.seal.receipt.transactionHeader);
@@ -74,7 +74,8 @@ async function sealed(invoiceId,state){
   const rebuilt=buildPackage(e,detail.pkg.package_json.builtAt,detail.pkg.package_json.capturedAt,detail.pkg.package_json.captureMode);
   assert.equal(rebuilt.packageSha256,detail.pkg.package_sha256);assert.equal(rebuilt.manifest.merkleRoot,detail.pkg.merkle_root);
   assert.equal(buildPackage(e,detail.pkg.package_json.builtAt,detail.pkg.package_json.capturedAt,detail.pkg.package_json.captureMode).manifest.merkleRoot,rebuilt.manifest.merkleRoot);
-  assert.equal((await ledger.query('SELECT seal_key FROM smartprocure_audit_seals WHERE seal_key=$1',[detail.seal.seal_key])).rows.length,1);
+  const rows=(await ledger.query('SELECT seal_key,merkle_root FROM smartprocure_audit_seals WHERE seal_key=$1',[detail.seal.seal_key])).rows;
+  assert.equal(rows.length,1);assert.equal(rows[0].seal_key,detail.seal.seal_key);assert.equal(rows[0].merkle_root,detail.pkg.merkle_root);
   return {verification,detail};
 }
 async function terminal(action,concurrent=false){

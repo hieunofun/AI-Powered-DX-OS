@@ -14,7 +14,10 @@ export function immudbOptions() {
   return {host:process.env.IMMUDB_HOST||'smartprocure-immudb',port:Number(process.env.IMMUDB_PGSQL_PORT||5432),
     database:process.env.IMMUDB_DATABASE||'defaultdb',user:process.env.IMMUDB_USERNAME||'immudb',password:process.env.IMMUDB_PASSWORD,
     ssl:process.env.IMMUDB_SSL==='true'?{rejectUnauthorized:true}:false,
-    connectionTimeoutMillis:timeout,query_timeout:timeout,idleTimeoutMillis:10000,max:5};
+    // v1.11.0 caches parsed SQL per wire session; WHERE substitution mutates
+    // that cached AST. Retire each checked-out session so a later seal key
+    // cannot inherit the first query's bound parameter. Queries stay static.
+    connectionTimeoutMillis:timeout,query_timeout:timeout,idleTimeoutMillis:10000,max:5,maxUses:1};
 }
 @Injectable()
 export class ImmudbClient implements OnModuleDestroy {
