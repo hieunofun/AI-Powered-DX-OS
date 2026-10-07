@@ -7,8 +7,7 @@
 # 3. smartprocure-web: React + TypeScript + Vite web client
 # 4. smartprocure-minio: Private invoice storage (Issue #7)
 #
-# Roadmap service (ImmuDB) is maintained
-# as documented placeholders for subsequent implementation phases.
+# ImmuDB and its internal cryptographic verifier are integrated in Issue #10.
 # ==============================================================================
 
 version: '3.8'
@@ -25,6 +24,10 @@ volumes:
     name: smartprocure_postgres_data
   flowable_postgres_data:
     name: smartprocure_flowable_postgres_data
+  immudb_data:
+    name: smartprocure_immudb_data
+  immudb_verifier_state:
+    name: smartprocure_immudb_verifier_state
 
 services:
   # ----------------------------------------------------------------------------
@@ -88,6 +91,15 @@ services:
       FLOWABLE_PASSWORD: ${FLOWABLE_PASSWORD:-flowable_dev_only_password}
       FLOWABLE_PROCESS_KEY: ${FLOWABLE_PROCESS_KEY:-invoiceExceptionWorkflow}
       FLOWABLE_TIMEOUT_MS: ${FLOWABLE_TIMEOUT_MS:-10000}
+      IMMUDB_HOST: smartprocure-immudb
+      IMMUDB_PGSQL_PORT: 5432
+      IMMUDB_DATABASE: ${IMMUDB_DATABASE:-defaultdb}
+      IMMUDB_USERNAME: ${IMMUDB_USERNAME:-immudb}
+      IMMUDB_PASSWORD: ${IMMUDB_PASSWORD:-immudb_dev_only_password}
+      IMMUDB_SSL: ${IMMUDB_SSL:-false}
+      IMMUDB_TIMEOUT_MS: ${IMMUDB_TIMEOUT_MS:-10000}
+      IMMUDB_VERIFIER_URL: http://smartprocure-audit-verifier:8081
+      IMMUDB_VERIFIER_TOKEN: ${IMMUDB_VERIFIER_TOKEN:-audit_verifier_dev_only_token}
     ports:
       - "${API_PORT:-4000}:4000"
     networks:
@@ -261,12 +273,52 @@ services:
       start_period: 40s
       retries: 30
 
-  # [Phase 5 / Issue #10] Cryptographic Immutable Ledger: ImmuDB
-  # immudb:
-  #   image: codenotary/immudb:v1.9.2
-  #   container_name: smartprocure-immudb
-  #   ports:
-  #     - "3322:3322"
-  #     - "9497:9497"
-  #   networks:
-  #     - smartprocure-network
+  # Issue #10: source-available BUSL-1.1; see the exact release license notice.
+  smartprocure-immudb:
+    image: codenotary/immudb:1.11.0@sha256:460cb34bb0a690ee743336a174c59f2f24edf79dd00c26d936717495db32d1cf
+    platform: linux/amd64
+    container_name: smartprocure-immudb
+    restart: unless-stopped
+    environment:
+      IMMUDB_DIR: /var/lib/immudb
+      IMMUDB_AUTH: "true"
+      IMMUDB_DEVMODE: "false"
+      IMMUDB_ADMIN_PASSWORD: ${IMMUDB_PASSWORD:-immudb_dev_only_password}
+      IMMUDB_PGSQL_SERVER: "true"
+      IMMUDB_PGSQL_SERVER_PORT: 5432
+    ports:
+      - "127.0.0.1:${IMMUDB_HOST_PGSQL_PORT:-5433}:5432"
+    volumes:
+      - immudb_data:/var/lib/immudb
+    networks:
+      - smartprocure-network
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/immuadmin", "status"]
+      interval: 5s
+      timeout: 3s
+      start_period: 10s
+      retries: 30
+
+  # Official Go client performs proof checks that the SQL wrappers do not.
+  # Native gRPC 3322 and verifier HTTP 8081 stay on the private Docker network.
+  smartprocure-audit-verifier:
+    build:
+      context: .
+      dockerfile: infra/audit/verifier/Dockerfile
+    container_name: smartprocure-audit-verifier
+    restart: unless-stopped
+    environment:
+      IMMUDB_HOST: smartprocure-immudb
+      IMMUDB_GRPC_PORT: 3322
+      IMMUDB_DATABASE: ${IMMUDB_DATABASE:-defaultdb}
+      IMMUDB_USERNAME: ${IMMUDB_USERNAME:-immudb}
+      IMMUDB_PASSWORD: ${IMMUDB_PASSWORD:-immudb_dev_only_password}
+      IMMUDB_STATE_DIR: /state
+      IMMUDB_VERIFIER_TOKEN: ${IMMUDB_VERIFIER_TOKEN:-audit_verifier_dev_only_token}
+    volumes:
+      - immudb_verifier_state:/state
+    networks:
+      - smartprocure-network
+    depends_on:
+      smartprocure-immudb:
+        condition: service_healthy
