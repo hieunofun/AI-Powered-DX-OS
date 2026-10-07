@@ -19,7 +19,10 @@ export function canonicalJson(value: unknown): string {
         for (let i=0;i<v.length;i++) if (!(i in v)) throw new Error('Sparse canonical array');
         return '['+v.map(encode).join(',')+']';
       }
-      if (Object.getPrototypeOf(v)!==Object.prototype && Object.getPrototypeOf(v)!==null) throw new Error('Canonical objects must be plain');
+      const prototype=Object.getPrototypeOf(v);
+      // Accept plain JSON objects from another VM realm (e.g. structuredClone),
+      // while rejecting Date/class instances and custom prototype chains.
+      if (prototype!==null && (Object.getPrototypeOf(prototype)!==null || prototype.constructor?.name!=='Object')) throw new Error('Canonical objects must be plain');
       if (Object.getOwnPropertySymbols(v).length) throw new Error('Symbol keys are unsupported');
       return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+encode((v as any)[k])).join(',')+'}';
     } finally { active.delete(v); }

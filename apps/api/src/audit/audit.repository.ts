@@ -27,6 +27,7 @@ export class AuditRepository {
   }
   async audit(c:PoolClient,invoiceId:string,event:string,actor:string,metadata:any) {
     // This hash covers exactly metadata in SP-CJSON-1; it is not the package root.
+    metadata={...metadata,roles:[]}; // system/operator seal events do not invent JWT role evidence
     await c.query(`INSERT INTO audit_records(entity_type,entity_id,event_type,actor_subject,metadata,payload_hash)
       VALUES('INVOICE',$1,$2,$3,$4::jsonb,$5)`,[invoiceId,event,actor,JSON.stringify(metadata),hashJson(metadata)]);
   }
