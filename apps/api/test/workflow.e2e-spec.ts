@@ -14,6 +14,7 @@ describe('Workflow HTTP contracts (authentication, repository and Flowable mocke
   const policy={id:randomUUID(),policyCode:'WORKFLOW_DEFAULT',autoReadyForPaymentMaxAmount:null,financeApprovalThreshold:'100000000.00'};
   const repo={prepareStart:jest.fn(async()=>({route:'STP',invoiceId:id,invoiceStatus:'READY_FOR_PAYMENT'})),
     cases:jest.fn(async()=>[]),detail:jest.fn(async()=>({id:caseId,status:'PENDING'})),tasks:jest.fn(async()=>[]),
+    invoiceCase:jest.fn(async()=>({id:caseId,invoiceId:id,status:'PENDING'})),
     myTasks:jest.fn(async()=>[]),policy:jest.fn(async()=>policy),updatePolicy:jest.fn(async dto=>({...policy,...dto})),
     prepareAction:jest.fn(async()=>({taskId,idempotent:true})),serialized:jest.fn(async(_id,fn)=>fn()),
     operation:jest.fn(),dispatch:jest.fn(),finish:jest.fn(async()=>({approvalCaseId:caseId,caseStatus:'PENDING'})),failure:jest.fn()};
@@ -46,11 +47,24 @@ describe('Workflow HTTP contracts (authentication, repository and Flowable mocke
   it.each([{requiredRole:'buyer'},{invoiceTotal:'0'},{discrepancyCodes:[]},{matchStatus:'PASSED'},{financeThreshold:'0'},[]])(
     'rejects untrusted business data %j',body=>request(app.getHttpServer()).post('/invoices/'+id+'/workflow/start').set(...auth()).send(body).expect(400));
   it.each(roles)('%s reads cases, tasks and policy',async role=>{
-    for(const path of ['/approval-cases','/approval-cases/'+caseId,'/approval-cases/'+caseId+'/tasks','/my-approval-tasks','/workflow/policy'])
+    for(const path of ['/approval-cases','/approval-cases/'+caseId,'/approval-cases/'+caseId+'/tasks','/my-approval-tasks','/workflow/policy','/invoices/'+id+'/workflow'])
       await request(app.getHttpServer()).get(path).set(...auth(role)).expect(200);
   });
   it('anonymous read is 401',()=>request(app.getHttpServer()).get('/approval-cases').expect(401));
   it('UUID validation',()=>request(app.getHttpServer()).get('/approval-cases/not-uuid').set(...auth()).expect(400));
+  it('invoice lookup distinguishes absent approval cases from service failure',async()=>{
+    repo.invoiceCase.mockRejectedValueOnce(new WorkflowError('APPROVAL_CASE_NOT_FOUND','No approval case exists.',404));
+    const res=await request(app.getHttpServer()).get('/invoices/'+id+'/workflow').set(...auth()).expect(404);
+    expect(res.body.errorCode).toBe('APPROVAL_CASE_NOT_FOUND');
+    repo.invoiceCase.mockRejectedValueOnce(new Error('SELECT private-data'));
+    const unavailable=await request(app.getHttpServer()).get('/invoices/'+id+'/workflow').set(...auth()).expect(503);
+    expect(unavailable.body.errorCode).toBe('WORKFLOW_UNAVAILABLE');
+    expect(JSON.stringify(unavailable.body)).not.toContain('private-data');
+  });
+  it('invoice lookup rejects anonymous and invalid identifiers',async()=>{
+    await request(app.getHttpServer()).get('/invoices/'+id+'/workflow').expect(401);
+    await request(app.getHttpServer()).get('/invoices/not-uuid/workflow').set(...auth()).expect(400);
+  });
   it.each([['INVOICE_NOT_FOUND',404],['INVALID_INVOICE_STATE',409],['WORKFLOW_ALREADY_EXISTS',409]])(
     '%s is safe %s',async(code,status)=>{
       repo.prepareStart.mockRejectedValueOnce(new WorkflowError(String(code),'Safe response.',Number(status)));

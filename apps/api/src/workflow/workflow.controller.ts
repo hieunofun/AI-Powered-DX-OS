@@ -19,6 +19,8 @@ export class WorkflowController {
   constructor(private readonly service: WorkflowService) {}
   @Post('invoices/:invoiceId/workflow/start') @HttpCode(200) @Roles('accountant','admin')
   start(@Param('invoiceId',ParseUUIDPipe) id: string,@Body() body: unknown,@CurrentUser() actor: AuthenticatedUser) { empty(body); return this.service.start(id,actor); }
+  @Get('invoices/:invoiceId/workflow') @Roles(...READ)
+  invoiceCase(@Param('invoiceId',ParseUUIDPipe) id: string) { return this.service.invoiceCase(id); }
   @Get('approval-cases') @Roles(...READ)
   cases() { return this.service.cases(); }
   @Get('approval-cases/:id') @Roles(...READ)
