@@ -1,14 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { WorkflowRepository } from './workflow.repository';
 import { FlowableClient, EngineError, EngineTask } from './flowable/flowable.client';
 import { WorkflowError } from './workflow-error';
 import { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
 import { TASK_ROLES } from './domain/workflow-rules';
 import { CompleteTaskDto, UpdateWorkflowPolicyDto } from './workflow.dto';
+import { AuditSealService } from '../audit/audit-seal.service';
 
 @Injectable()
 export class WorkflowService {
-  constructor(private readonly repository: WorkflowRepository, private readonly engine: FlowableClient) {}
+  constructor(private readonly repository: WorkflowRepository, private readonly engine: FlowableClient,
+    @Optional() private readonly audit?:AuditSealService) {}
+  private async afterCommit(result:any) {
+    const {auditScheduled,...businessResult}=result;
+    if(auditScheduled && this.audit) await this.audit.automatic(result.invoiceId);
+    return businessResult;
+  }
   private async safe<T>(work: ()=>Promise<T>): Promise<T> {
     try { return await work(); }
     catch(error) {
@@ -21,21 +28,21 @@ export class WorkflowService {
   start(id: string, actor: AuthenticatedUser) {
     return this.safe(async()=>{
       const started=await this.repository.prepareStart(id,actor);
-      if(started.route==='STP') return started;
-      return {...started,...await this.execute(started.operationId)};
+      if(started.route==='STP') return this.afterCommit(started);
+      return this.afterCommit({...started,...await this.execute(started.operationId)});
     });
   }
   claim(id: string, actor: AuthenticatedUser) {
     return this.safe(async()=>{
       const intent=await this.repository.prepareAction(id,'CLAIM',{},actor);
       if(intent.idempotent) return intent;
-      return this.execute(intent.operationId);
+      return this.afterCommit(await this.execute(intent.operationId));
     });
   }
   complete(id: string, dto: CompleteTaskDto, actor: AuthenticatedUser) {
     return this.safe(async()=>{
       const intent=await this.repository.prepareAction(id,'COMPLETE',{action:dto.action,reason:dto.reason?.trim()||null},actor);
-      return this.execute(intent.operationId);
+      return this.afterCommit(await this.execute(intent.operationId));
     });
   }
   cases() { return this.safe(()=>this.repository.cases()); }
@@ -67,7 +74,7 @@ export class WorkflowService {
     if(candidates.length!==1 || candidates[0].group!==role || candidates[0].user) this.mismatch();
   }
   // Used by the explicit operator CLI as well as normal authenticated API operations.
-  reconcileOperation(id: string) { return this.safe(()=>this.execute(id)); }
+  reconcileOperation(id: string) { return this.safe(async()=>this.afterCommit(await this.execute(id))); }
   private async execute(id: string): Promise<any> {
     return this.repository.serialized(id,async()=>{
       const {op,approval,task,actor}=await this.repository.operation(id);
