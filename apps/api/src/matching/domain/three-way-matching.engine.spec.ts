@@ -6,7 +6,7 @@ import { orderedCodes, DISCREPANCY_CODES } from './discrepancy-codes';
 import { snapshotPolicy } from './matching-policy';
 import { PreviousQuantity } from '../interfaces/matching.interface';
 
-describe('Pure deterministic 3WM-1.0 evaluator', () => {
+describe('Pure deterministic 3WM-1.1 evaluator', () => {
   const received = (quantity: string) => [{ purchaseOrderItemId: 'po-item-1', status: 'RECEIVED', acceptedQuantity: quantity }];
   const previous = (quantity: string, extra: Partial<PreviousQuantity> = {}) => ({
     purchaseOrderItemId: 'po-item-1', invoiceId: 'previous', invoiceStatus: 'MATCHED', resultStatus: 'PASSED', quantity, ...extra,
@@ -15,8 +15,8 @@ describe('Pure deterministic 3WM-1.0 evaluator', () => {
     const result = evaluateMatching(fixture());
     expect(result).toMatchObject({ status: 'PASSED', invoiceStatus: 'MATCHED', overallConfidence: null, discrepancyCodes: [],
       quantityVariance: '0.0000', priceVariance: '0.0000', taxVariance: '0.00', totalVariance: '0.00',
-      ruleVersion: '3WM-1.0', policySnapshot: { policyCode: 'MATCH_DEFAULT', quantityTolerancePercent: '0.00',
-        priceTolerancePercent: '1.00', taxTolerancePercent: '0.00', totalTolerancePercent: '0.00', ruleVersion: '3WM-1.0' } });
+      ruleVersion: '3WM-1.1', policySnapshot: { policyCode: 'MATCH_DEFAULT', quantityTolerancePercent: '0.00',
+        priceTolerancePercent: '1.00', taxTolerancePercent: '0.00', totalTolerancePercent: '0.00', ruleVersion: '3WM-1.1' } });
     expect(result.items[0]).toMatchObject({ status: 'MATCHED', purchaseOrderItemId: 'po-item-1',
       matchedReceivedQuantity: '100.0000', semanticConfidence: null, reasonCode: null });
   });
@@ -51,15 +51,27 @@ describe('Pure deterministic 3WM-1.0 evaluator', () => {
     expect(evaluateMatching(fixture({ previousInvoices: [previous('80', { invoiceStatus })],
       invoiceItems: [line({ quantity: '20' })] })).status).toBe('PASSED');
   });
-  it.each(['PARSED', 'PENDING_MATCH', 'EXCEPTION', 'REJECTED', 'CANCELLED', 'RECEIVED'])('excludes previous %s', invoiceStatus => {
+  it.each(['PARSED', 'PENDING_MATCH', 'REJECTED', 'CANCELLED', 'RECEIVED'])('excludes previous %s', invoiceStatus => {
     expect(evaluateMatching(fixture({ previousInvoices: [previous('100', { invoiceStatus })] })).status).toBe('PASSED');
   });
-  it('excludes current invoice and non-PASSED results; aggregates valid consumption', () => {
+  it('excludes current invoice and released claims; aggregates active consumption', () => {
     const result = evaluateMatching(fixture({ previousInvoices: [previous('100', { invoiceId: 'invoice-1' }),
-      previous('100', { resultStatus: 'REVIEW_REQUIRED' }), previous('30'), previous('50', { invoiceId: 'previous-2' })],
+      previous('100', { resultStatus: 'REVIEW_REQUIRED', invoiceStatus: 'REJECTED' }), previous('30'), previous('50', { invoiceId: 'previous-2' })],
       invoiceItems: [line({ quantity: '20' })] }));
     expect(result.status).toBe('PASSED');
     expect(result.items[0].details.previousValidInvoicedQuantity).toBe('80');
+  });
+  it.each(['APPROVED', 'READY_FOR_PAYMENT'])('approved exception reserves received quantity despite original REVIEW_REQUIRED/%s', invoiceStatus => {
+    const result = evaluateMatching(fixture({ previousInvoices: [previous('100', { resultStatus: 'REVIEW_REQUIRED', invoiceStatus })] }));
+    expect(result.status).toBe('REVIEW_REQUIRED');
+    expect(result.items[0].discrepancyCodes).toContain('QUANTITY_MISMATCH');
+    expect(result.items[0].details).toMatchObject({ previousValidInvoicedQuantity: '100', availableToInvoice: '0' });
+  });
+  it('pending exception claims reserve only the effective allocation supplied by the repository', () => {
+    const result = evaluateMatching(fixture({ previousInvoices: [previous('40', { resultStatus: 'REVIEW_REQUIRED', invoiceStatus: 'EXCEPTION' })],
+      invoiceItems: [line({ quantity: '61' })] }));
+    expect(result.status).toBe('REVIEW_REQUIRED');
+    expect(result.items[0].details).toMatchObject({ previousValidInvoicedQuantity: '40', availableToInvoice: '60' });
   });
   it('clamps negative remaining availability to zero', () => {
     const result = evaluateMatching(fixture({ previousInvoices: [previous('120')] }));

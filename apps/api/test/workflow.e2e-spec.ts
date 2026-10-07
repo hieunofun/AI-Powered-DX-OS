@@ -17,7 +17,8 @@ describe('Workflow HTTP contracts (authentication, repository and Flowable mocke
     invoiceCase:jest.fn(async()=>({id:caseId,invoiceId:id,status:'PENDING'})),
     myTasks:jest.fn(async()=>[]),policy:jest.fn(async()=>policy),updatePolicy:jest.fn(async dto=>({...policy,...dto})),
     prepareAction:jest.fn(async()=>({taskId,idempotent:true})),serialized:jest.fn(async(_id,fn)=>fn()),
-    operation:jest.fn(),dispatch:jest.fn(),finish:jest.fn(async()=>({approvalCaseId:caseId,caseStatus:'PENDING'})),failure:jest.fn()};
+    operation:jest.fn(),dispatch:jest.fn(),finish:jest.fn(async()=>({approvalCaseId:caseId,caseStatus:'PENDING'})),failure:jest.fn(),
+    ensureQuantityReservation:jest.fn(async()=>undefined)};
   const process={id:'process',businessKey:'approval-case:'+caseId,processDefinitionId:'definition'};
   const engineTask={id:'engine-task',processInstanceId:'process',taskDefinitionKey:'buyerReview',name:'Buyer review',assignee:null};
   const approval={id:caseId,invoice_id:id,match_result_id:'match',workflow_instance_id:'process',
@@ -103,6 +104,13 @@ describe('Workflow HTTP contracts (authentication, repository and Flowable mocke
     const res=await request(app.getHttpServer()).post('/approval-tasks/'+taskId+'/complete').set(...auth('buyer')).send({action:'APPROVE'}).expect(200);
     expect(res.body).toMatchObject({caseStatus:'APPROVED',invoiceStatus:'READY_FOR_PAYMENT'});
     expect(engine.complete).toHaveBeenLastCalledWith('engine-task','APPROVE',id);
+  });
+  it('quantity conflicts surface as HTTP 409 before an approval intent or remote call',async()=>{
+    repo.prepareAction.mockRejectedValueOnce(new WorkflowError('INSUFFICIENT_RECEIVED_QUANTITY','Received quantity is reserved.',409));
+    const before=engine.complete.mock.calls.length;
+    const res=await request(app.getHttpServer()).post('/approval-tasks/'+taskId+'/complete').set(...auth('buyer')).send({action:'APPROVE'}).expect(409);
+    expect(res.body.errorCode).toBe('INSUFFICIENT_RECEIVED_QUANTITY');
+    expect(engine.complete.mock.calls.length).toBe(before);
   });
   it('claim passes authenticated subject to repository',async()=>{
     await request(app.getHttpServer()).post('/approval-tasks/'+taskId+'/claim').set(...auth('buyer')).expect(200);

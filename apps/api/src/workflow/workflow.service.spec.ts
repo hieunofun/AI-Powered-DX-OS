@@ -12,7 +12,7 @@ describe('Durable workflow reconciliation (repository/engine mocked)',()=>{
     op={id:'operation',operation:'START',status:'PENDING',payload:{},dispatched_at:null,retry_safe:false};
     repository={serialized:jest.fn(async(_,fn)=>fn()),operation:jest.fn(async()=>({op,approval:{...approval},task,actor})),
       dispatch:jest.fn(),failure:jest.fn(),finish:jest.fn(async()=>({caseStatus:'PENDING'})),detail:jest.fn(),
-      prepareStart:jest.fn(),prepareAction:jest.fn()};
+      prepareStart:jest.fn(),prepareAction:jest.fn(),ensureQuantityReservation:jest.fn()};
     engine={processes:jest.fn(async()=>[process]),process:jest.fn(async()=>process),verifyDefinition:jest.fn(async()=>({version:1})),
       tasks:jest.fn(async()=>[{...active,assignee:null}]),identityLinks:jest.fn(async()=>[{type:'candidate',group:'buyer',user:null}]),
       task:jest.fn(async()=>active),historicTask:jest.fn(),start:jest.fn(async()=>process),definition:jest.fn(async()=>({id:'definition'})),
@@ -22,6 +22,15 @@ describe('Durable workflow reconciliation (repository/engine mocked)',()=>{
   it('STP never calls Flowable or creates an operation',async()=>{
     repository.prepareStart.mockResolvedValue({route:'STP',invoiceStatus:'READY_FOR_PAYMENT'});
     expect((await service.start('invoice',actor)).route).toBe('STP'); expect(engine.processes).not.toHaveBeenCalled();
+  });
+  it('blocks approval recovery before touching Flowable when current quantity evidence fails',async()=>{
+    op.operation='COMPLETE'; op.payload={action:'APPROVE'}; op.dispatched_at=new Date();
+    const {WorkflowError}=await import('./workflow-error');
+    repository.ensureQuantityReservation.mockRejectedValue(new WorkflowError('INSUFFICIENT_RECEIVED_QUANTITY','Reservation needs operator review.',409));
+    await expect(service.reconcileOperation('operation')).rejects.toThrow('Reservation needs operator review.');
+    expect(engine.process).not.toHaveBeenCalled(); expect(engine.complete).not.toHaveBeenCalled();
+    expect(repository.finish).not.toHaveBeenCalled();
+    expect(repository.failure).toHaveBeenCalledWith('operation','INSUFFICIENT_RECEIVED_QUANTITY',false);
   });
   it('attempts automatic audit only after the terminal transaction returns, without exposing its marker',async()=>{
     let committed=false;

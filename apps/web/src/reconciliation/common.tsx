@@ -39,12 +39,12 @@ export function MatchEvidence({ match }: { match: MatchResult }) {
     <div className="metadata"><div><small>Chính sách tại thời điểm đối soát</small><strong>{policy.policyCode}</strong><span>{match.ruleVersion} · <DateText value={match.completedAt} /></span></div>
       <div><small>Dung sai số lượng / đơn giá</small><strong>{decimal(policy.quantityTolerancePercent)}% / {decimal(policy.priceTolerancePercent)}%</strong></div>
       <div><small>Dung sai thuế / tổng tiền</small><strong>{decimal(policy.taxTolerancePercent)} điểm % / {decimal(policy.totalTolerancePercent)}%</strong></div></div>
-    <p className="evidence-copy">Bằng chứng được lưu tại lần đối soát này. Số nhận hàng chỉ tính hàng đã chấp nhận; trừ số đã đối soát hợp lệ cho hóa đơn trước.</p>
+    <p className="evidence-copy">Bằng chứng được lưu tại lần đối soát này. Lượng nhận hàng đã chấp nhận được trừ phần đã phân bổ hoặc giữ chỗ cho hóa đơn trước.</p>
     <div className="table-scroll" tabIndex={0} aria-label="So sánh PO GRN hóa đơn"><table className="comparison-table"><thead><tr><th>Mặt hàng</th><th>Đơn đặt hàng (PO)</th><th>Nhận hàng (GRN)</th><th>Hóa đơn</th><th>Kết quả</th></tr></thead>
       <tbody>{match.items.map(line => <tr key={line.id}><td><strong>Dòng {line.lineNumber}</strong><small>{line.details.invoiceSku || 'Không có SKU'}</small></td>
         <td>{line.details.poDescription || 'Chưa xác định mặt hàng'}<small>Đặt: {decimal(line.details.orderedQuantity)}</small>
           <small>Đơn giá: {decimal(line.details.price?.poUnitPrice)}</small><small>Thuế: {line.details.tax ? percentage(line.details.tax.poTaxRate) : '—'}</small></td>
-        <td>Chấp nhận: {decimal(line.details.cumulativeAcceptedReceived)}<small>Đã đối soát trước: {decimal(line.details.previousValidInvoicedQuantity)}</small>
+        <td>Chấp nhận: {decimal(line.details.cumulativeAcceptedReceived)}<small>Đã phân bổ/giữ chỗ trước: {decimal(line.details.previousValidInvoicedQuantity)}</small>
           <small>Còn để đối soát: {decimal(line.details.availableToInvoice)}</small></td>
         <td>{line.details.invoiceDescription}<small>SL: {decimal(line.details.invoiceQuantity)}</small><small>Đơn giá: {decimal(line.details.price?.invoiceUnitPrice)}</small>
           <small>Thuế: {line.details.tax ? percentage(line.details.tax.invoiceTaxRate) : '—'}</small></td>

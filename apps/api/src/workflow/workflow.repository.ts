@@ -6,6 +6,7 @@ import { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interfa
 import { WorkflowError } from './workflow-error';
 import { workflowRoute, policySnapshot, WorkflowPolicy, PROCESS_KEY, TASK_ROLES, outcome } from './domain/workflow-rules';
 import { scheduleAuditFinalization } from '../audit/evidence-reader';
+import { assertInvoiceQuantityAvailable, QuantityClaimError } from '../matching/quantity-claims';
 
 const POLICY = `id,policy_code AS "policyCode",auto_ready_for_payment_max_amount::text AS "autoReadyForPaymentMaxAmount",
   finance_approval_threshold::text AS "financeApprovalThreshold"`;
@@ -23,6 +24,16 @@ const TASK = `id,approval_case_id AS "approvalCaseId",flowable_task_id AS "flowa
 export class WorkflowRepository {
   private readonly connection = new AsyncLocalStorage<PoolClient>();
   constructor(private readonly db: DatabaseService) {}
+  private async quantityGuard(client: PoolClient, invoiceId: string, poId: string) {
+    const po=(await client.query('SELECT id,status FROM purchase_orders WHERE id=$1 FOR UPDATE',[poId])).rows[0];
+    if(!po || !['ISSUED','PARTIALLY_RECEIVED','FULLY_RECEIVED'].includes(po.status))
+      throw new WorkflowError('INVALID_PURCHASE_ORDER_STATE','The purchase order must remain active before approval.',409);
+    try { await assertInvoiceQuantityAvailable(client,invoiceId,poId); }
+    catch(error) {
+      if(error instanceof QuantityClaimError) throw new WorkflowError(error.code,error.message,409);
+      throw error;
+    }
+  }
   private query(sql: string, params?: any[]) {
     const client=this.connection.getStore();
     return client?client.query(sql,params):this.db.query(sql,params);
@@ -67,7 +78,7 @@ export class WorkflowRepository {
   prepareStart(invoiceId: string, actor: AuthenticatedUser) {
     return this.transaction(async c=>{
       await c.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
-      const invoice=(await c.query('SELECT id,status,total_amount::text AS total FROM invoices WHERE id=$1 FOR UPDATE',[invoiceId])).rows[0];
+      const invoice=(await c.query('SELECT id,status,purchase_order_id,total_amount::text AS total FROM invoices WHERE id=$1 FOR UPDATE',[invoiceId])).rows[0];
       if(!invoice) throw new WorkflowError('INVOICE_NOT_FOUND','Invoice not found.',404);
       if((await c.query('SELECT id FROM approval_cases WHERE invoice_id=$1',[invoiceId])).rowCount ||
         (await c.query("SELECT id FROM audit_records WHERE entity_id=$1 AND event_type='INVOICE_READY_FOR_PAYMENT'",[invoiceId])).rowCount)
@@ -81,6 +92,7 @@ export class WorkflowRepository {
         policySnapshot:match.policy_snapshot,ruleVersion:match.rule_version,invoiceTotal:invoice.total,
         requiredRoles:route.requiredRoles,requiresFinanceApproval:route.requiresFinanceApproval,workflowPolicySnapshot:policySnapshot(policy)};
       if(route.route==='STP') {
+        await this.quantityGuard(c,invoiceId,invoice.purchase_order_id);
         await c.query("UPDATE invoices SET status='READY_FOR_PAYMENT' WHERE id=$1",[invoiceId]);
         await this.audit(c,'INVOICE',invoiceId,'INVOICE_READY_FOR_PAYMENT',actor,{invoiceId,matchResultId:match.id,route:'STP',
           previousStatus:'MATCHED',newStatus:'READY_FOR_PAYMENT',policySnapshot:snapshot.workflowPolicySnapshot});
@@ -125,7 +137,7 @@ export class WorkflowRepository {
       await c.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
       const owner=(await c.query(`SELECT c.id,c.invoice_id FROM approval_tasks t JOIN approval_cases c ON c.id=t.approval_case_id WHERE t.id=$1`,[taskId])).rows[0];
       if(!owner) throw new WorkflowError('APPROVAL_TASK_NOT_FOUND','Approval task not found.',404);
-      const invoice=(await c.query('SELECT id,status FROM invoices WHERE id=$1 FOR UPDATE',[owner.invoice_id])).rows[0];
+      const invoice=(await c.query('SELECT id,status,purchase_order_id FROM invoices WHERE id=$1 FOR UPDATE',[owner.invoice_id])).rows[0];
       const approval=(await c.query('SELECT * FROM approval_cases WHERE id=$1 FOR UPDATE',[owner.id])).rows[0];
       const task=(await c.query('SELECT * FROM approval_tasks WHERE id=$1 FOR UPDATE',[taskId])).rows[0];
       const admin=actor.roles.includes('admin');
@@ -145,6 +157,8 @@ export class WorkflowRepository {
       } else if(!admin && (task.status!=='CLAIMED' || task.assignee_subject!==actor.sub)) {
         throw new WorkflowError('TASK_NOT_OWNED','Claim the task before completing it; only its claimant can complete.',403);
       }
+      if(operation==='COMPLETE' && ['APPROVE','APPROVE_WITH_ADJUSTMENT'].includes(payload.action))
+        await this.quantityGuard(c,invoice.id,invoice.purchase_order_id);
       const operationId=await this.intent(c,owner.id,taskId,operation,{...payload,override:operation==='COMPLETE'&&admin&&task.assignee_subject!==actor.sub},actor);
       return {operationId,approvalCaseId:owner.id,taskId};
     });
@@ -155,6 +169,14 @@ export class WorkflowRepository {
     const approval=(await this.query('SELECT * FROM approval_cases WHERE id=$1',[op.approval_case_id])).rows[0];
     const task=op.approval_task_id?(await this.query('SELECT * FROM approval_tasks WHERE id=$1',[op.approval_task_id])).rows[0]:null;
     return {op,approval,task,actor:{sub:op.actor_subject,roles:op.actor_roles,username:op.actor_subject} as AuthenticatedUser};
+  }
+  ensureQuantityReservation(invoiceId: string) {
+    return this.transaction(async c=>{
+      await c.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
+      const invoice=(await c.query('SELECT id,purchase_order_id FROM invoices WHERE id=$1 FOR UPDATE',[invoiceId])).rows[0];
+      if(!invoice) throw new WorkflowError('INVOICE_NOT_FOUND','Invoice not found.',404);
+      await this.quantityGuard(c,invoice.id,invoice.purchase_order_id);
+    });
   }
   async serialized<T>(id: string, work: ()=>Promise<T>): Promise<T> {
     const c=await this.db.getClient();
@@ -196,9 +218,11 @@ export class WorkflowRepository {
   }
   async finish(id: string, process: any, engineTasks: any[]) {
     return this.transaction(async c=>{
+      await c.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
       const original=(await c.query('SELECT * FROM workflow_operations WHERE id=$1',[id])).rows[0];
       const base=(await c.query('SELECT invoice_id FROM approval_cases WHERE id=$1',[original.approval_case_id])).rows[0];
-      const invoice=(await c.query('SELECT id,status FROM invoices WHERE id=$1 FOR UPDATE',[base.invoice_id])).rows[0];
+      const invoice=(await c.query('SELECT id,status,purchase_order_id FROM invoices WHERE id=$1 FOR UPDATE',[base.invoice_id])).rows[0];
+      await c.query('SELECT id FROM purchase_orders WHERE id=$1 FOR UPDATE',[invoice.purchase_order_id]);
       const approval=(await c.query('SELECT * FROM approval_cases WHERE id=$1 FOR UPDATE',[original.approval_case_id])).rows[0];
       const op=(await c.query('SELECT * FROM workflow_operations WHERE id=$1 FOR UPDATE',[id])).rows[0];
       if(op.status==='APPLIED') return {approvalCaseId:approval.id,invoiceId:invoice.id,invoiceStatus:invoice.status};

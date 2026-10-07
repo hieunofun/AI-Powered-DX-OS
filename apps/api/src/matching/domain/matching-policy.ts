@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js';
 import { MatchingPolicy } from '../interfaces/matching.interface';
-export const RULE_VERSION = '3WM-1.0';
+export const RULE_VERSION = '3WM-1.1';
 export function snapshotPolicy(policy: MatchingPolicy) {
   return {
     policyCode: policy.policyCode,

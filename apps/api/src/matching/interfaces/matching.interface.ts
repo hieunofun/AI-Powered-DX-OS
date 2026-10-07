@@ -57,6 +57,8 @@ export interface PreviousQuantity {
   readonly invoiceId: string;
   readonly invoiceStatus: string;
   readonly resultStatus: string;
+  // Effective reserved/cleared quantity supplied by the repository, not invariably
+  // the original invoice quantity. Credit-note/rejected cases are excluded there.
   readonly quantity: string;
 }
 export interface MatchingInput {
