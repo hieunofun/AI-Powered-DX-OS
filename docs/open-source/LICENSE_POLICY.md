@@ -39,3 +39,9 @@ When reusing snippets, algorithms, or forking code from public repositories:
   - Third-party components licensed under AGPL-3.0 (such as MinIO or Grafana) are utilized strictly as unmodified external services deployed via container orchestration.
   - Distribution and deployment license obligations must be respected according to their respective upstream licenses.
 - **Review Prior to Merge**: Pull Requests that introduce new external dependencies or services must undergo license compliance review before being merged into `develop`.
+
+## 5. Issue #10 source-available exception
+
+The explicit Issue #10 implementation instruction authorizes ImmuDB 1.11.0 and its official Go proof client under the exact tagged BUSL-1.1 license. This is a scoped exception to the OSI-only rule in section 1, not a change to the license classification of BUSL or a general authorization to add source-available dependencies. Project-authored application code remains MIT; the linked verifier dependency retains BUSL terms.
+
+The [component inventory](../../OPEN_SOURCE_COMPONENTS.md#immudb-and-pdf-issue-10-provenance) records the Additional Use Grant, production limitations, future Apache-2.0 Change License and upstream notice. Deployment/distribution must comply with those terms. The implementation PR is left unmerged for review as instructed.

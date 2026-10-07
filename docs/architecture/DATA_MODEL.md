@@ -420,3 +420,28 @@ New composite indexes cover goods_receipts(PO,status), goods_receipt_items(PO it
 Indexes support status/date case reads, role/status task inboxes and case task/decision/operation history. Duplicate historical approval cases cause a clear migration failure. Match snapshots preserve both matching and workflow policy evidence; a trigger rejects rewrites. No old migration is edited and no DISCREPANCY_REVIEW invoice status is introduced.
 
 Flowable uses its own PostgreSQL database/volume. Application PostgreSQL owns business history; the two stores do not share an ACID transaction. Stable business keys, committed operation intents, row/advisory locks and explicit reconciliation connect engine state to task mirrors. See [Invoice Workflow Module](../business/INVOICE_WORKFLOW_MODULE.md) for state transitions, BPMN, recovery and production boundaries.
+
+## 12. Immutable audit extensions (Issue #10, Migration 014)
+
+Migrations 001–013 remain unchanged. `014_create_immutable_audit.sql` adds four tables; all business foreign keys use `ON DELETE RESTRICT`.
+
+| Table | Evidence and guarantees |
+| --- | --- |
+| audit_finalizations | invoice UUID primary key, match/case references, final business state, finalized_at, frozen source_snapshot JSONB, actor_subject, FINALIZATION/BACKFILL capture mode, PENDING/BUILT/FAILED state and safe error metadata. Created inside the terminal business transaction. Snapshot/identity updates are rejected. |
+| audit_packages | UUID primary key; one package per invoice; match/case references; package/canonicalization versions; package_json, lowercase 64-hex package SHA-256 and Merkle root; positive leaf_count; final state, built_at and created_at. All ordinary updates/deletes rejected. |
+| audit_seals | UUID primary key; unique invoice/package/stable seal_key; package SHA/root; actual ImmuDB transaction ID/hash, verified state ID/hash, JSON receipt; PENDING/SEALED/FAILED state, seal/verification timestamps, last verification result/error. SEALED requires genuine non-null receipt fields. Composite FK guarantees the package and invoice agree. |
+| audit_seal_operations | UUID primary key; package FK; SEAL/VERIFY operation; PENDING/APPLIED/FAILED state; actor_subject, safe error_code, retry_safe, dispatch/creation/update timestamps. A partial unique index permits at most one unapplied SEAL per package. |
+
+Final states are READY_FOR_PAYMENT, REJECTED and CREDIT_NOTE_REQUESTED; verification outcomes are VERIFIED, TAMPERED, LEDGER_MISMATCH, UNAVAILABLE and initial NOT_VERIFIED. Hash/ID/status checks, document-link consistency triggers and indexes are verified by `validate-schema.sql`.
+
+```mermaid
+erDiagram
+  invoices ||--o| audit_finalizations : finalizes
+  invoices ||--o| audit_packages : captures
+  match_results ||--o| audit_packages : proves
+  approval_cases o|--o| audit_packages : reviews
+  audit_packages ||--o| audit_seals : anchors
+  audit_packages ||--o{ audit_seal_operations : dispatches
+```
+
+ImmuDB has a separate SQL table `smartprocure_audit_seals`, keyed by `smartprocure:audit:invoice:<UUID>:v1`. It stores invoice/package identity, package version/SHA/root, final state and seal timestamp. Application code only inserts and retrieves; it never updates an existing logical seal. A separate PostgreSQL-wire pool and native official Go proof verifier access that service. PostgreSQL and ImmuDB do not share ACID. See [Immutable Audit Module](../business/IMMUTABLE_AUDIT_MODULE.md) for proof validation and recovery.
