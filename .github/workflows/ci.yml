@@ -179,6 +179,9 @@ jobs:
       - name: Validate Immutable Audit against Real PostgreSQL, ImmuDB & Gateway
         run: bash infra/audit/validate-immutable-audit.sh
 
+      - name: Validate quantity reservations across matching and Flowable approvals
+        run: node infra/workflow/validate-quantity-reservations.cjs
+
       - name: Install Chromium for real business UI acceptance
         run: npx playwright install --with-deps chromium
 

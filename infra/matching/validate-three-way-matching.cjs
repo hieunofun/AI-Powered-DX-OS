@@ -62,8 +62,8 @@ async function assertResult(invoiceId, result, expectedStatus, codes = []) {
   assert.equal(result.overallConfidence, null);
   assert.deepEqual(result.discrepancyCodes, codes);
   assert.ok(result.completedAt);
-  assert.equal(result.ruleVersion, '3WM-1.0');
-  assert.equal(result.policySnapshot.ruleVersion, '3WM-1.0');
+  assert.equal(result.ruleVersion, '3WM-1.1');
+  assert.equal(result.policySnapshot.ruleVersion, '3WM-1.1');
   const stored = (await pool.query(`SELECT i.status,mr.status AS result_status,mr.policy_snapshot,
     mr.overall_confidence,mr.completed_at,mr.evaluation_duration_ms::text,
     (SELECT count(*)::int FROM invoice_items WHERE invoice_id=i.id) AS invoice_lines,
