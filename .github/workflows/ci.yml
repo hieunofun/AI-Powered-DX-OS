@@ -170,8 +170,14 @@ jobs:
       - name: Validate 3-Way Matching against Real PostgreSQL & Gateway
         run: bash infra/matching/validate-three-way-matching.sh
 
+      - name: Bootstrap pinned ImmuDB ledger and native proof verifier
+        run: bash infra/audit/validate-immutable-audit.sh --bootstrap-only
+
       - name: Validate Invoice Workflow against Real PostgreSQL, Flowable & Gateway
         run: bash infra/workflow/validate-invoice-workflow.sh
+
+      - name: Validate Immutable Audit against Real PostgreSQL, ImmuDB & Gateway
+        run: bash infra/audit/validate-immutable-audit.sh
 
       - name: Check container status
         run: docker compose ps
