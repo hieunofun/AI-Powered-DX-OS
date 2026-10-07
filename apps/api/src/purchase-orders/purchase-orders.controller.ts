@@ -24,6 +24,7 @@ import { UpdatePurchaseOrderDto } from './dto/update-purchase-order.dto';
 import { IssuePurchaseOrderDto } from './dto/issue-purchase-order.dto';
 import { CancelPurchaseOrderDto } from './dto/cancel-purchase-order.dto';
 import { QueryPurchaseOrderDto } from './dto/query-purchase-order.dto';
+import { QuerySupplierDto } from './dto/query-supplier.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -65,6 +66,20 @@ export class PurchaseOrdersController {
   @ApiResponse({ status: 401, description: 'Missing or invalid authentication token' })
   async findAll(@Query() query: QueryPurchaseOrderDto) {
     return this.poService.findAll(query);
+  }
+
+  @Get('suppliers')
+  @Roles('buyer', 'admin', 'warehouse', 'accountant', 'finance_manager')
+  @ApiOperation({ summary: 'Read-only paginated supplier lookup for procurement forms' })
+  findSuppliers(@Query() query: QuerySupplierDto) {
+    return this.poService.findSuppliers(query);
+  }
+
+  @Get(':id/fulfillment')
+  @Roles('buyer', 'admin', 'warehouse', 'accountant', 'finance_manager')
+  @ApiOperation({ summary: 'Cumulative accepted and rejected quantities from finalized, non-cancelled receipts' })
+  findFulfillment(@Param('id', ParseUUIDPipe) id: string) {
+    return this.poService.findFulfillment(id);
   }
 
   /**

@@ -40,10 +40,10 @@ export class UpdatePurchaseOrderDto {
   @IsOptional()
   orderDate?: string;
 
-  @ApiPropertyOptional({ description: 'Updated expected delivery date in YYYY-MM-DD format', example: '2026-10-20' })
+  @ApiPropertyOptional({ description: 'Updated expected delivery date in YYYY-MM-DD format; null clears it', example: '2026-10-20', nullable: true })
   @IsDateString()
   @IsOptional()
-  expectedDeliveryDate?: string;
+  expectedDeliveryDate?: string | null;
 
   @ApiPropertyOptional({
     description: 'Updated line items (replaces all existing line items)',

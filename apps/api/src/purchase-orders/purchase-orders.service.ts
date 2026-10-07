@@ -13,6 +13,7 @@ import { UpdatePurchaseOrderDto } from './dto/update-purchase-order.dto';
 import { IssuePurchaseOrderDto } from './dto/issue-purchase-order.dto';
 import { CancelPurchaseOrderDto } from './dto/cancel-purchase-order.dto';
 import { QueryPurchaseOrderDto } from './dto/query-purchase-order.dto';
+import { QuerySupplierDto } from './dto/query-supplier.dto';
 import {
   PurchaseOrderEntity,
   PaginatedResult,
@@ -22,6 +23,15 @@ import { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interfa
 @Injectable()
 export class PurchaseOrdersService {
   constructor(private readonly repository: PurchaseOrdersRepository) {}
+
+  findSuppliers(query: QuerySupplierDto) {
+    return this.repository.findSuppliers(query);
+  }
+
+  async findFulfillment(id: string) {
+    await this.findById(id);
+    return this.repository.findFulfillment(id);
+  }
 
   /**
    * Creates a new Purchase Order in DRAFT status.
