@@ -8,7 +8,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint src --ext .ts,.tsx"
+    "lint": "eslint src --ext .ts,.tsx",
+    "test": "playwright test --project=unit",
+    "test:browser": "playwright test --project=browser"
   },
   "dependencies": {
     "keycloak-js": "^24.0.5",
@@ -16,9 +18,11 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "caniuse-lite": "1.0.30001815",
     "typescript": "^5.4.5",
     "vite": "^5.3.1"
   }

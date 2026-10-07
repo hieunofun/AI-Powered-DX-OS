@@ -15,7 +15,7 @@
     "build": "npm run build:api && npm run build:web",
     "test:web": "npm run test --workspace=apps/web --if-present",
     "test:api": "npm run test --workspace=apps/api",
-    "test": "npm run test:api",
+    "test": "npm run test:api && npm run test:web",
     "lint:web": "npm run lint --workspace=apps/web",
     "lint:api": "npm run lint --workspace=apps/api",
     "lint": "npm run lint:api && npm run lint:web"

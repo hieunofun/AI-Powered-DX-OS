@@ -4,6 +4,8 @@ node_modules/
 .pnp.js
 
 # Testing and Coverage
+test-results/
+playwright-report/
 coverage/
 *.lcov
 .nyc_output
