@@ -182,6 +182,12 @@ jobs:
       - name: Install Chromium for real procurement UI acceptance
         run: npx playwright install --with-deps chromium
 
+      - name: Isolate browser acceptance from the previous gateway quota window
+        # Protected APIs share a 100 requests / 60 seconds quota per source IP.
+        # Previous integration validators use the same runner IP. Let their window
+        # expire so browser lifecycle assertions exercise an independent workload.
+        run: sleep 60
+
       - name: Validate procurement UI with real Keycloak, APISIX and PostgreSQL
         run: |
           node infra/web/bootstrap-web-fixtures.cjs

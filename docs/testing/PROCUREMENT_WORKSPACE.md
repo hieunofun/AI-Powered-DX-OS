@@ -20,6 +20,8 @@ npm run test:browser --workspace=apps/web
 
 Wait for the Compose services to become healthy before running browser tests. Fixture bootstrap runs on the host using the standard PostgreSQL environment variables; if `.env` overrides database credentials, export the same values into the host process. Fixtures add two clearly identified synthetic `WEB-E2E-*` suppliers and keep existing rows. They are development/CI data with intentionally synthetic tax identifiers, not supplier/tax verification evidence. Tests create their own PO/GRN records through the real API and preserve audit history. Run against a development database.
 
+APISIX protected routes use a shared 100-requests/60-seconds quota per source IP. If other integration validators just ran, let that window expire before browser acceptance. CI waits one existing window after the earlier validators; it does not alter the gateway policy. This avoids attributing a prior suite's HTTP 429 to a failed browser persistence assertion.
+
 `WEB_BASE_URL` defaults to `http://localhost:9080`; `GATEWAY_BASE_URL` defaults to the same origin. `TEST_KEYCLOAK_URL` defaults to `http://localhost:8080`. `TEST_DEMO_PASSWORD` defaults to the checked-in development realm's demo password. For an already installed Chrome, set `PLAYWRIGHT_CHANNEL=chrome`. CI installs Chromium instead. No API token or SSO storage state is saved to disk. Traces are disabled; browser screenshots/results are Git-ignored and not uploaded automatically.
 
 ## Coverage and limits
