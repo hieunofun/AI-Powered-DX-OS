@@ -80,8 +80,15 @@ export class AuditSealService {
       const packageBuildMs=performance.now()-buildStart;
       const currentHashStart=performance.now();
       if(current) {
-        currentRoot=merkleRoot(businessLeaves(current).map(l=>l.sha256));
-        sourceSnapshotMatchesPackage=currentRoot===pkg.merkle_root;
+        try {
+          currentRoot=merkleRoot(businessLeaves(current).map(l=>l.sha256));
+          sourceSnapshotMatchesPackage=currentRoot===pkg.merkle_root;
+        } catch {
+          // Unencodable current evidence (e.g. corrupt JSON metadata containing
+          // financial floats) is a failed source check, not a transport outage.
+          // Continue independently verifying the original ledger evidence.
+          currentRoot=null;sourceSnapshotMatchesPackage=false;
+        }
       }
       hashMs+=performance.now()-currentHashStart;
       let immudbEntryMatches=false,immudbCryptographicProofValid=false,available=true,receipt:any=null;

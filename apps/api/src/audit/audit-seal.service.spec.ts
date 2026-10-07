@@ -39,6 +39,13 @@ describe('Audit orchestration (repository and ledger mocked; real proof tested i
     expect(result.verificationStatus).toBe('TAMPERED');expect(result.currentRoot).not.toBe(result.sealedRoot);
     expect(result.immudbCryptographicProofValid).toBe(true);expect(ledger.insert).not.toHaveBeenCalled();
   });
+  it('classifies unencodable current metadata as tampering and still checks the ledger',async()=>{
+    repo.current.mockResolvedValueOnce({...evidence,po:{...evidence.po,metadata:{financialValue:0.1}}});
+    const {result}=await service.verify(invoiceId,'actor');
+    expect(result.verificationStatus).toBe('TAMPERED');expect(result.currentRoot).toBeNull();
+    expect(result.sourceSnapshotMatchesPackage).toBe(false);expect(result.immudbCryptographicProofValid).toBe(true);
+    expect(ledger.proof).toHaveBeenCalled();expect(ledger.insert).not.toHaveBeenCalled();
+  });
   it('detects corrupted original package and independently checks the ledger',async()=>{
     loaded.pkg.package_json=structuredClone(loaded.pkg.package_json);loaded.pkg.package_json.evidence.po.total_amount='2.00';
     const {result}=await service.verify(invoiceId,'actor');

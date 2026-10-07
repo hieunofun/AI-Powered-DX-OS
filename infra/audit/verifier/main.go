@@ -22,6 +22,8 @@ import (
 	"github.com/codenotary/immudb/embedded/store"
 	"github.com/codenotary/immudb/pkg/api/schema"
 	"github.com/codenotary/immudb/pkg/client"
+	clientstate "github.com/codenotary/immudb/pkg/client/state"
+	"google.golang.org/grpc"
 )
 
 const table = "smartprocure_audit_seals"
@@ -29,6 +31,39 @@ const columns = "seal_key,invoice_id,audit_package_id,package_version,package_sh
 
 var validKey = regexp.MustCompile(`^smartprocure:audit:invoice:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:v1$`)
 var proofMu sync.Mutex // one persistent trust-state writer in this verifier instance
+
+// Capture the exact RPC response consumed and verified by the official SDK.
+// Fetching a second unverified proof afterward would not establish that the
+// saved receipt contains the same proof that VerifyRow actually validated.
+type proofCapture struct {
+	schema.ImmuServiceClient
+	row *schema.VerifiableSQLEntry
+}
+
+func (p *proofCapture) VerifiableSQLGet(ctx context.Context, request *schema.VerifiableSQLGetRequest, opts ...grpc.CallOption) (*schema.VerifiableSQLEntry, error) {
+	result, err := p.ImmuServiceClient.VerifiableSQLGet(ctx, request, opts...)
+	if err == nil {
+		p.row = result
+	}
+	return result, err
+}
+
+func receiptState(ctx context.Context, service clientstate.StateService, database string) (*schema.ImmutableState, error) {
+	// The official SDK's file cache requires its own lock for GetState, even
+	// after VerifyRow/VerifiedTxByID have already completed and released theirs.
+	if err := service.CacheLock(); err != nil {
+		return nil, err
+	}
+	value, err := service.GetState(ctx, database)
+	unlockErr := service.CacheUnlock()
+	if err != nil {
+		return nil, err
+	}
+	if unlockErr != nil {
+		return nil, unlockErr
+	}
+	return value, nil
+}
 func env(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
@@ -111,26 +146,18 @@ func verify(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	pk := []*schema.SQLValue{{Value: &schema.SQLValue_S{S: input.SealKey}}}
-	request := &schema.VerifiableSQLGetRequest{SqlGetRequest: &schema.SQLGetRequest{Table: table, PkValues: pk}}
-	before, err := c.GetServiceClient().VerifiableSQLGet(ctx, request)
-	if err != nil {
-		safeError(w, err)
-		return
-	}
+	captured := &proofCapture{ImmuServiceClient: c.GetServiceClient()}
+	c.WithServiceClient(captured)
 	if err = c.VerifyRow(ctx, result.Rows[0], table, pk); err != nil {
 		safeError(w, err)
 		return
 	}
-	after, err := c.GetServiceClient().VerifiableSQLGet(ctx, request)
-	if err != nil {
-		safeError(w, err)
-		return
-	}
-	if before.SqlEntry == nil || after.SqlEntry == nil || before.SqlEntry.Tx != after.SqlEntry.Tx {
+	rowProof := captured.row
+	if rowProof == nil || rowProof.SqlEntry == nil {
 		reply(w, 409, map[string]string{"errorCode": "LEDGER_PROOF_INVALID"})
 		return
 	}
-	tx, err := c.VerifiedTxByID(ctx, after.SqlEntry.Tx)
+	tx, err := c.VerifiedTxByID(ctx, rowProof.SqlEntry.Tx)
 	if err != nil {
 		safeError(w, err)
 		return
@@ -152,7 +179,7 @@ func verify(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	state, err := c.StateService.GetState(ctx, database)
+	state, err := receiptState(ctx, c.StateService, database)
 	if err != nil {
 		safeError(w, err)
 		return
@@ -164,9 +191,9 @@ func verify(w http.ResponseWriter, r *http.Request) {
 		entry[parts[len(parts)-1]] = result.Rows[0].Values[i].GetS()
 	}
 	reply(w, 200, map[string]any{"verified": true, "method": "immudb-go-v1.11.0 VerifyRow + VerifiedTxByID",
-		"entry": entry, "txId": strconv.FormatUint(after.SqlEntry.Tx, 10), "txHash": hex.EncodeToString(txHash[:]),
+		"entry": entry, "txId": strconv.FormatUint(rowProof.SqlEntry.Tx, 10), "txHash": hex.EncodeToString(txHash[:]),
 		"stateTxId": strconv.FormatUint(state.TxId, 10), "stateHash": hex.EncodeToString(state.TxHash),
-		"rowProof": after, "transactionHeader": tx.Header})
+		"rowProof": rowProof, "transactionHeader": tx.Header})
 }
 func main() {
 	if len(os.Args) > 1 && os.Args[1] == "health" {

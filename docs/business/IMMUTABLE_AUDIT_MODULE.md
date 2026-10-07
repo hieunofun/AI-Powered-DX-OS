@@ -75,7 +75,7 @@ The exact tagged database CurrentState implementation omits Db, so the SQL state
 
 An internal verifier therefore links the official Go client **v1.11.0** and uses native gRPC **VerifyRow** (row values/inclusion/dual proof) and **VerifiedTxByID** (transaction consistency proof). Persistent client state and server identity survive restarts. The recorded state transaction/hash is also reverified independently. SDK proof code is used without a custom cryptographic implementation. Native gRPC port 3322 is necessary and remains internal; no npm SDK is added.
 
-The real receipt includes key/root/identity, row transaction ID and actual transaction-header ALH, verified database state ID/hash, real row proof and transaction header, method/outcome and sealed time. Receipt fields originate from the verified ledger, not fabricated local values.
+The real receipt includes key/root/identity, row transaction ID and actual transaction-header ALH, verified database state ID/hash, real row proof and transaction header, method/outcome and sealed time. A transport wrapper captures the exact response consumed and verified by the official SDK, rather than fetching a different unverified proof afterward. Receipt fields originate from the verified ledger, not fabricated local values.
 
 ## Persistence, idempotency and recovery
 
@@ -129,7 +129,7 @@ PDFKit 0.20.2 (MIT) renders human-readable PDF with Noto Sans (OFL-1.1), require
 
 Unit tests independently derive algorithm steps for canonical JSON, exact numeric strings, Unicode, timestamps, null/boolean, leaves/domain separation, single/odd/multiple trees, package construction/eligibility, report hashing and the verification decision matrix. Service orchestration and HTTP E2E use explicitly mocked repository/ledger/auth boundaries. Those mocks do not establish cryptographic acceptance; real CI does.
 
-Verification returns separately measured packageBuildMs (current relational snapshot queries), hashMs (package/current hashing) and ledgerVerifyMs (ledger reads and native proof request). Real acceptance prints one-line fixture timings. Docker startup/authentication setup is excluded. No sub-second/high-throughput SLA is claimed for audit verification.
+Verification returns separately measured packageBuildMs (current relational snapshot queries), hashMs (package/current hashing) and ledgerVerifyMs (ledger reads and native proof request). Real acceptance prints one-line fixture timings. Docker startup and Keycloak/gateway authentication setup are excluded. hashMs measures local hashing; ledgerVerifyMs includes live connection/session/protocol work and is not a pure crypto microbenchmark. No sub-second/high-throughput SLA is claimed for audit verification.
 
 ## Operational limitations
 
