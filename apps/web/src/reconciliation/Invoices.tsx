@@ -38,7 +38,9 @@ export function InvoiceUpload({ api, poId }: { api: ProcurementApi; poId?: strin
   const [error, setError] = useState<unknown>(); const [errors, setErrors] = useState<FieldError[]>([]);
   const [ingestionId, setIngestionId] = useState('');
   const binding = useResource(useCallback((signal: AbortSignal) => selected ? api.order(selected, signal) : Promise.resolve(null), [api, selected]));
-  useDraftGuard({ selected, xml: xml && [xml.name, xml.size, xml.lastModified], pdf: pdf && [pdf.name, pdf.size, pdf.lastModified] }, busy);
+  // An identified failed ingestion has already archived these files; its recovery
+  // link should open directly. Selecting corrected files restores the draft guard.
+  useDraftGuard({ selected, xml: xml && [xml.name, xml.size, xml.lastModified], pdf: pdf && [pdf.name, pdf.size, pdf.lastModified] }, busy || !!ingestionId);
   if (!hasAnyRole(['accountant', 'admin'])) return <p className="notice">Việc nhập hóa đơn thuộc kế toán hoặc quản trị viên. <a href="#/invoices">Xem hóa đơn</a></p>;
   async function submit(event: FormEvent) {
     event.preventDefault(); if (busy) return;
@@ -67,13 +69,13 @@ export function InvoiceUpload({ api, poId }: { api: ProcurementApi; poId?: strin
       <Field id="invoice-po-search" label="Tra cứu số PO"><input id="invoice-po-search" value={search} maxLength={100} disabled={busy} onChange={e => setSearch(e.target.value)} /></Field>
       <button disabled={busy || lookupBusy}>{lookupBusy ? 'Đang tra cứu…' : 'Tra cứu PO'}</button></form>
       <form onSubmit={e => void submit(e)} noValidate><fieldset disabled={busy} className="upload-fields"><div className="form-grid two-columns">
-        <Field id="invoice-po" label="PO tiếp nhận hóa đơn" error={errors.find(e => e.id === 'invoice-po')?.message}><select id="invoice-po" value={selected} onChange={e => setSelected(e.target.value)} {...inputAccessibility('invoice-po', errors)}>
+        <Field id="invoice-po" label="PO tiếp nhận hóa đơn" error={errors.find(e => e.id === 'invoice-po')?.message}><select id="invoice-po" value={selected} onChange={e => { setSelected(e.target.value); setIngestionId(''); }} {...inputAccessibility('invoice-po', errors)}>
           <option value="">Chọn PO đã phát hành</option>{selected && !options.some(po => po.id === selected) && <option value={selected}>{binding.data?.poNumber || selected}</option>}
           {options.map(po => <option key={po.id} value={po.id}>{po.poNumber} · {po.supplierName}</option>)}</select></Field>
         <div>{binding.loading && selected && <p role="status">Đang kiểm tra PO…</p>}{!!binding.error && <ErrorNotice error={binding.error} retry={binding.reload} />}
           {binding.data && <p className="notice">{binding.data.supplierName} · MST {binding.data.supplierTaxCode}<br /><Status value={binding.data.status} /></p>}</div>
-        <Field id="invoice-xml" label="Hóa đơn XML" error={errors.find(e => e.id === 'invoice-xml')?.message}><input id="invoice-xml" type="file" accept=".xml,application/xml,text/xml" onChange={e => setXml(e.target.files?.[0])} {...inputAccessibility('invoice-xml', errors)} /></Field>
-        <Field id="invoice-pdf" label="Bản thể hiện PDF" error={errors.find(e => e.id === 'invoice-pdf')?.message}><input id="invoice-pdf" type="file" accept=".pdf,application/pdf" onChange={e => setPdf(e.target.files?.[0])} {...inputAccessibility('invoice-pdf', errors)} /></Field>
+        <Field id="invoice-xml" label="Hóa đơn XML" error={errors.find(e => e.id === 'invoice-xml')?.message}><input id="invoice-xml" type="file" accept=".xml,application/xml,text/xml" onChange={e => { setXml(e.target.files?.[0]); setIngestionId(''); }} {...inputAccessibility('invoice-xml', errors)} /></Field>
+        <Field id="invoice-pdf" label="Bản thể hiện PDF" error={errors.find(e => e.id === 'invoice-pdf')?.message}><input id="invoice-pdf" type="file" accept=".pdf,application/pdf" onChange={e => { setPdf(e.target.files?.[0]); setIngestionId(''); }} {...inputAccessibility('invoice-pdf', errors)} /></Field>
       </div><p className="evidence-copy">Hỗ trợ profile SmartProcureInvoice v1 và tập con Matbao/MIFI PBan 2.0.0. PDF gửi riêng được lưu ở trạng thái chờ OCR; chưa tạo dữ liệu hóa đơn. Xác minh chữ ký số chưa được cung cấp.</p>
         <div className="save-bar"><span>Tệp và dữ liệu hóa đơn được kiểm tra trên máy chủ.</span><button className="primary" disabled={busy || binding.loading || !binding.data}>{busy ? 'Đang tiếp nhận…' : 'Tiếp nhận hóa đơn'}</button></div>
       </fieldset></form></section></>;

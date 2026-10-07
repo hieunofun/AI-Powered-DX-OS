@@ -44,22 +44,23 @@ export function ApprovalDetail({ api, id }: { api: ProcurementApi; id: string })
   if (!resource.data) return null;
   const { approval, tasks, match } = resource.data;
   const admin = hasAnyRole(['admin']); const policy = approval.matchSnapshot.workflowPolicySnapshot;
-  return <><a className="back-link" href="#/tasks">← Nhiệm vụ của tôi</a><header className="page-heading"><div><p className="eyebrow">PHÊ DUYỆT</p><h1>Hồ sơ xử lý sai lệch</h1><p><Status value={approval.status} /> · {approval.caseType === 'CLEAN_FINANCE' ? 'Hóa đơn khớp, cần duyệt tài chính' : 'Sai lệch cần bộ phận kiểm tra'}</p></div><button onClick={resource.reload} disabled={!!busy}>Làm mới</button></header>
+  return <><a className="back-link" href="#/tasks">← Nhiệm vụ của tôi</a><header className="page-heading"><div><p className="eyebrow">PHÊ DUYỆT</p><h1>Hồ sơ xử lý sai lệch</h1><p>Hồ sơ: <Status value={approval.status} /> · Hóa đơn: <Status value={approval.invoiceStatus} /></p><p>{approval.caseType === 'CLEAN_FINANCE' ? 'Hóa đơn khớp, cần duyệt tài chính' : 'Sai lệch cần bộ phận kiểm tra'}</p></div><button onClick={resource.reload} disabled={!!busy}>Làm mới</button></header>
     <div className="actions evidence-copy">{hasAnyRole(['accountant', 'finance_manager', 'buyer', 'admin']) && <a className="button" href={`#/invoices/${approval.invoiceId}`}>Xem hóa đơn</a>}
       <a className="button" href={`#/orders/${match.purchaseOrderId}`}>Xem PO</a>{hasAnyRole(['accountant', 'finance_manager', 'admin']) && <a className="button" href={`#/audit/${approval.invoiceId}`}>Kiểm chứng hồ sơ</a>}</div>
     {!!error && <ErrorNotice error={error} retry={() => { setError(undefined); resource.reload(); }} />}
     {approval.invoiceStatus === 'READY_FOR_PAYMENT' && <p className="notice notice-success">Đã đủ điều kiện chuyển sang bước thanh toán; chưa có xác nhận chuyển tiền.</p>}
     {approval.status === 'CREDIT_NOTE_REQUESTED' && <p className="notice">Đã ghi nhận yêu cầu điều chỉnh hóa đơn. Hệ thống chưa tự gửi yêu cầu cho nhà cung cấp.</p>}
     {['FAILED', 'STARTING'].includes(approval.status) && <p className="notice notice-error">Luồng xử lý chưa được xác nhận hoàn tất. Quản trị viên cần kiểm tra và đối chiếu trạng thái trước khi tiếp tục.</p>}
-    <section className="panel metadata"><div><small>Bước hiện tại</small><strong>{approval.assignedRole ? roles[approval.assignedRole] || approval.assignedRole : 'Đã kết thúc'}</strong><span>{approval.currentStage}</span></div>
+    <section className="panel metadata"><div><small>Bước hiện tại</small><strong>{approval.assignedRole ? roles[approval.assignedRole] || approval.assignedRole : ['APPROVED', 'REJECTED', 'CREDIT_NOTE_REQUESTED'].includes(approval.status) ? 'Đã kết thúc' : 'Chưa xác định'}</strong><span>{approval.currentStage}</span></div>
       {policy ? <><div><small>Ngưỡng cần duyệt tài chính</small><strong>{decimal(policy.financeApprovalThreshold)}</strong><span>{approval.matchSnapshot.requiresFinanceApproval === true ? 'Cần duyệt tài chính' : approval.matchSnapshot.requiresFinanceApproval === false ? 'Không cần bước tài chính' : 'Chưa có bằng chứng về bước tài chính'}</span></div>
         <div><small>Giới hạn tự động STP tại lúc bắt đầu</small><strong>{policy.autoReadyForPaymentMaxAmount === null ? 'Không giới hạn hóa đơn khớp' : decimal(policy.autoReadyForPaymentMaxAmount)}</strong></div></>
         : <p className="notice">Hồ sơ chưa có bản chụp chính sách workflow. Cần kiểm tra hồ sơ trước khi quyết định.</p>}</section>
     <section className="panel"><div className="section-heading"><h2>Nhiệm vụ trong hồ sơ</h2><span>{tasks.length} bước đã tạo</span></div>
       <div className="task-cards">{tasks.map(task => { const active = approval.status === 'PENDING' && ['OPEN', 'CLAIMED'].includes(task.status);
-        const allowed = admin || hasAnyRole([task.assignedRole]); const owned = task.status === 'CLAIMED' && task.assigneeSubject === user?.sub;
+        const allowed = admin || hasAnyRole([task.assignedRole]); const receivedByMe = task.assigneeSubject === user?.sub;
+        const owned = task.status === 'CLAIMED' && receivedByMe;
         return <article key={task.id}><div><h3>{task.taskName}</h3><p>{roles[task.assignedRole] || task.assignedRole} · <Status value={task.status} /></p>
-          <small>{owned ? 'Bạn đã nhận nhiệm vụ này' : task.assigneeSubject ? 'Nhiệm vụ đã được người khác nhận' : 'Chưa có người nhận'}</small>
+          <small>{task.status === 'COMPLETED' ? 'Nhiệm vụ đã hoàn thành' : receivedByMe ? 'Bạn đã nhận nhiệm vụ này' : task.assigneeSubject ? 'Nhiệm vụ đã được người khác nhận' : 'Chưa có người nhận'}</small>
           {task.action && <p>{actions[task.action] || task.action}: {task.actionReason || 'Không có lý do ghi nhận'}</p>}</div><div className="actions">
           {active && allowed && task.status === 'OPEN' && <button disabled={!!busy} onClick={async () => { if (busy) return; setBusy(task.id); setError(undefined); try { await api.claimTask(task.id); resource.reload(); } catch (failure) { setError(failure); } finally { setBusy(''); } }}>{busy === task.id ? 'Đang nhận…' : 'Nhận nhiệm vụ'}</button>}
           {active && allowed && (owned || admin) && <button className="primary" disabled={!!busy} onClick={() => setSelected(task)}>{admin && !owned ? 'Xử lý bằng quyền quản trị' : 'Ra quyết định'}</button>}

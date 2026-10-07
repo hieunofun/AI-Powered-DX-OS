@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Development workflow
 
 ### Fixed
+- Open persisted failed-ingestion recovery links without discarding-file prompts; selecting corrected files restores the draft guard.
+- Distinguish approval-case and invoice states, and avoid reporting completed tasks as claimed by another user.
 - Reuse Keycloak initialization during React StrictMode effect remounts.
 - Pin missing Babel/Browserslist compatibility data so Vite development can run after a clean install; license review recorded in the component inventory.
 - Allow explicitly clearing an optional PO expected delivery date with `null`.
