@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Issue #34: real acceptance for approved exceptions, competing quantity reservations, release on rejection/credit note, unresolved mapping and Flowable/local persistence recovery.
 - Issue #24: XML/PDF intake, persisted ingestion status, line-by-line reconciliation evidence, role-specific approval tasks and audit verification/export workspaces.
 - Direct invoice-to-approval-case lookup and audit verification status headers for exports, including warning reports returned with HTTP 503.
 - Real reconciliation browser scenarios for clean STP, price/receipt exceptions, OCR-required and failed intake, authorization and controlled audit tampering of synthetic fixtures.
@@ -19,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Development workflow
 
 ### Fixed
+- Matching 3WM-1.1 counts cleared exceptions and pending physical allocations without changing original matching evidence. Approval intents reserve full mapped quantities under the PO lock; recovery rechecks capacity before remote actions. Received GRN cancellation cannot invalidate active claims.
 - Open persisted failed-ingestion recovery links without discarding-file prompts; selecting corrected files restores the draft guard.
 - Distinguish approval-case and invoice states, and avoid reporting completed tasks as claimed by another user.
 - Reuse Keycloak initialization during React StrictMode effect remounts.
