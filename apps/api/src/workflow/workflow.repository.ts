@@ -5,6 +5,7 @@ import { DatabaseService } from '../database/database.service';
 import { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
 import { WorkflowError } from './workflow-error';
 import { workflowRoute, policySnapshot, WorkflowPolicy, PROCESS_KEY, TASK_ROLES, outcome } from './domain/workflow-rules';
+import { scheduleAuditFinalization } from '../audit/evidence-reader';
 
 const POLICY = `id,policy_code AS "policyCode",auto_ready_for_payment_max_amount::text AS "autoReadyForPaymentMaxAmount",
   finance_approval_threshold::text AS "financeApprovalThreshold"`;
@@ -83,7 +84,8 @@ export class WorkflowRepository {
         await c.query("UPDATE invoices SET status='READY_FOR_PAYMENT' WHERE id=$1",[invoiceId]);
         await this.audit(c,'INVOICE',invoiceId,'INVOICE_READY_FOR_PAYMENT',actor,{invoiceId,matchResultId:match.id,route:'STP',
           previousStatus:'MATCHED',newStatus:'READY_FOR_PAYMENT',policySnapshot:snapshot.workflowPolicySnapshot});
-        return {route:'STP',invoiceId,invoiceStatus:'READY_FOR_PAYMENT'};
+        await scheduleAuditFinalization(c,invoiceId,actor.sub);
+        return {route:'STP',invoiceId,invoiceStatus:'READY_FOR_PAYMENT',auditScheduled:true};
       }
       const caseId=(await c.query(`INSERT INTO approval_cases(invoice_id,match_result_id,status,case_type,current_stage,
         requested_by_subject,match_snapshot,workflow_definition_key,workflow_definition_version)
@@ -247,7 +249,8 @@ export class WorkflowRepository {
         VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,[approval.id,op.approval_task_id,op.payload.action,op.payload.reason??null,
         actor.sub,actor.roles,approval.status,caseStatus,invoice.status,invoiceStatus]);
       await c.query("UPDATE workflow_operations SET status='APPLIED',error_code=NULL,retry_safe=false,updated_at=now() WHERE id=$1",[id]);
-      return {approvalCaseId:approval.id,invoiceId:invoice.id,invoiceStatus,caseStatus,taskId:op.approval_task_id,operationId:id};
+      if(process.endTime) await scheduleAuditFinalization(c,invoice.id,actor.sub);
+      return {approvalCaseId:approval.id,invoiceId:invoice.id,invoiceStatus,caseStatus,taskId:op.approval_task_id,operationId:id,auditScheduled:Boolean(process.endTime)};
     });
   }
 }

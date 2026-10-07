@@ -23,6 +23,21 @@ describe('Durable workflow reconciliation (repository/engine mocked)',()=>{
     repository.prepareStart.mockResolvedValue({route:'STP',invoiceStatus:'READY_FOR_PAYMENT'});
     expect((await service.start('invoice',actor)).route).toBe('STP'); expect(engine.processes).not.toHaveBeenCalled();
   });
+  it('attempts automatic audit only after the terminal transaction returns, without exposing its marker',async()=>{
+    let committed=false;
+    repository.prepareStart.mockImplementation(async()=>{committed=true;return {route:'STP',invoiceId:'invoice',invoiceStatus:'READY_FOR_PAYMENT',auditScheduled:true};});
+    const audit={automatic:jest.fn(async()=>{expect(committed).toBe(true);})};
+    service=new WorkflowService(repository,engine,audit as any);
+    await expect(service.start('invoice',actor)).resolves.toEqual({route:'STP',invoiceId:'invoice',invoiceStatus:'READY_FOR_PAYMENT'});
+    expect(audit.automatic).toHaveBeenCalledWith('invoice');expect(engine.processes).not.toHaveBeenCalled();
+  });
+  it('active exception setup removes the internal marker and does not seal',async()=>{
+    repository.prepareStart.mockResolvedValue({route:'DISCREPANCY_REVIEW',operationId:'operation'});
+    repository.finish.mockResolvedValue({invoiceId:'invoice',caseStatus:'PENDING',auditScheduled:false});
+    const audit={automatic:jest.fn()};service=new WorkflowService(repository,engine,audit as any);
+    const result=await service.start('invoice',actor);
+    expect(result).not.toHaveProperty('auditScheduled');expect(audit.automatic).not.toHaveBeenCalled();
+  });
   it('adopts existing process after lost DB sync without a second start',async()=>{
     op.dispatched_at=new Date(); op.status='FAILED';
     await service.reconcileOperation('operation');

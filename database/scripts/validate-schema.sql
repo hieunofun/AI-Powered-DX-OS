@@ -5,6 +5,22 @@
 
 \set ON_ERROR_STOP on
 
+-- Issue #10 additive schema catalog checks; old validation remains unchanged.
+DO $$ DECLARE name text; BEGIN
+  FOREACH name IN ARRAY ARRAY['audit_finalizations','audit_packages','audit_seals','audit_seal_operations'] LOOP
+    IF to_regclass('public.'||name) IS NULL THEN RAISE EXCEPTION 'Missing audit table %',name; END IF;
+  END LOOP;
+  IF EXISTS(SELECT 1 FROM pg_constraint WHERE contype='f' AND conrelid IN
+    ('audit_finalizations'::regclass,'audit_packages'::regclass,'audit_seals'::regclass,'audit_seal_operations'::regclass)
+    AND confdeltype<>'r') THEN RAISE EXCEPTION 'Audit foreign keys must RESTRICT deletion'; END IF;
+  FOREACH name IN ARRAY ARRAY['uq_audit_unapplied_seal','idx_audit_seals_status','idx_audit_operations_package','idx_audit_finalizations_pending'] LOOP
+    IF NOT EXISTS(SELECT 1 FROM pg_indexes WHERE schemaname='public' AND indexname=name) THEN RAISE EXCEPTION 'Missing audit index %',name; END IF;
+  END LOOP;
+  FOREACH name IN ARRAY ARRAY['trg_preserve_audit_package','trg_preserve_audit_finalization','trg_audit_package_links','trg_audit_finalization_links'] LOOP
+    IF NOT EXISTS(SELECT 1 FROM pg_trigger WHERE tgname=name AND NOT tgisinternal) THEN RAISE EXCEPTION 'Missing audit guard %',name; END IF;
+  END LOOP;
+END $$;
+
 -- 1. Table Existence Validation
 DO $$
 DECLARE
@@ -1040,6 +1056,65 @@ BEGIN
   EXCEPTION WHEN unique_violation THEN failed:=true; END;
   IF NOT failed THEN RAISE EXCEPTION 'Concurrent unapplied operations accepted'; END IF;
   RAISE NOTICE '[OK] Migration 013 workflow policy, status/checks, FK RESTRICT, uniqueness, append-only decisions and snapshots.';
+END $$;
+ROLLBACK;
+
+-- Issue #10 executable integrity probes are disposable and rolled back.
+BEGIN;
+DO $$
+DECLARE po uuid; supplier uuid; inv uuid; mr uuid; pkg uuid; seal uuid; failed boolean; bad text;
+BEGIN
+  SELECT id,supplier_id INTO po,supplier FROM purchase_orders ORDER BY created_at,id LIMIT 1;
+  INSERT INTO invoices(invoice_number,supplier_id,purchase_order_id,invoice_date,status,subtotal,total_amount)
+    VALUES('AUDIT-SCHEMA-'||gen_random_uuid(),supplier,po,CURRENT_DATE,'READY_FOR_PAYMENT',1,1) RETURNING id INTO inv;
+  INSERT INTO match_results(invoice_id,purchase_order_id,status,completed_at) VALUES(inv,po,'PASSED',now()) RETURNING id INTO mr;
+  FOREACH bad IN ARRAY ARRAY['short',repeat('A',64),repeat('g',64)] LOOP
+    failed:=false;
+    BEGIN
+      INSERT INTO audit_packages(invoice_id,match_result_id,package_version,canonicalization_version,package_json,package_sha256,
+        merkle_root,leaf_count,final_business_state,built_at) VALUES(inv,mr,'SMARTPROCURE-AUDIT-1','SP-CJSON-1','{}',bad,repeat('b',64),1,'READY_FOR_PAYMENT',now());
+    EXCEPTION WHEN check_violation THEN failed:=true; END;
+    IF NOT failed THEN RAISE EXCEPTION 'Invalid audit hash accepted'; END IF;
+  END LOOP;
+  INSERT INTO audit_packages(invoice_id,match_result_id,package_version,canonicalization_version,package_json,package_sha256,
+    merkle_root,leaf_count,final_business_state,built_at) VALUES(inv,mr,'SMARTPROCURE-AUDIT-1','SP-CJSON-1','{}',repeat('a',64),repeat('b',64),1,'READY_FOR_PAYMENT',now()) RETURNING id INTO pkg;
+  failed:=false;
+  BEGIN INSERT INTO audit_packages(invoice_id,match_result_id,package_version,canonicalization_version,package_json,package_sha256,
+    merkle_root,leaf_count,final_business_state,built_at) VALUES(inv,mr,'SMARTPROCURE-AUDIT-1','SP-CJSON-1','{}',repeat('a',64),repeat('b',64),1,'READY_FOR_PAYMENT',now());
+  EXCEPTION WHEN unique_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Duplicate invoice audit package accepted'; END IF;
+  failed:=false;
+  BEGIN UPDATE audit_packages SET package_json='{"changed":true}' WHERE id=pkg;
+  EXCEPTION WHEN check_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Historical package mutation accepted'; END IF;
+  INSERT INTO audit_seals(audit_package_id,invoice_id,seal_key,package_sha256,merkle_root)
+    VALUES(pkg,inv,'smartprocure:audit:invoice:'||inv||':v1',repeat('a',64),repeat('b',64)) RETURNING id INTO seal;
+  failed:=false;
+  BEGIN UPDATE audit_seals SET status='SEALED' WHERE id=seal;
+  EXCEPTION WHEN check_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Fake sealed receipt accepted'; END IF;
+  failed:=false;
+  BEGIN UPDATE audit_seals SET last_verification_status='GREEN' WHERE id=seal;
+  EXCEPTION WHEN check_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Invalid verification status accepted'; END IF;
+  failed:=false;
+  BEGIN UPDATE audit_seals SET status='UNKNOWN' WHERE id=seal;
+  EXCEPTION WHEN check_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Invalid seal status accepted'; END IF;
+  INSERT INTO audit_seal_operations(audit_package_id,operation,actor_subject) VALUES(pkg,'SEAL','schema');
+  failed:=false;
+  BEGIN INSERT INTO audit_seal_operations(audit_package_id,operation,actor_subject) VALUES(pkg,'SEAL','schema');
+  EXCEPTION WHEN unique_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Duplicate unapplied seal operation accepted'; END IF;
+  failed:=false;
+  BEGIN INSERT INTO audit_seal_operations(audit_package_id,operation,status,actor_subject) VALUES(pkg,'VERIFY','UNKNOWN','schema');
+  EXCEPTION WHEN check_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Invalid operation state accepted'; END IF;
+  failed:=false;
+  BEGIN DELETE FROM invoices WHERE id=inv;
+  EXCEPTION WHEN foreign_key_violation THEN failed:=true; END;
+  IF NOT failed THEN RAISE EXCEPTION 'Sealed invoice deletion accepted'; END IF;
+  RAISE NOTICE '[OK] Migration 014 audit tables, RESTRICT links, hash/status checks, uniqueness, immutable package guard and indexes.';
 END $$;
 ROLLBACK;
 

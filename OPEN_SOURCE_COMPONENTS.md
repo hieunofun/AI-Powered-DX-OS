@@ -1,8 +1,8 @@
 # Open Source Components Inventory
 
-This document tracks all external open-source software (OSS) components evaluated and planned for integration into **SmartProcure-Pay**. 
+This document tracks external software evaluated and integrated into **SmartProcure-Pay**, including open-source and explicitly identified source-available components.
 
-Every license listed below has been verified against the official upstream repository in compliance with open-source governance guidelines.
+Issue #10 corrects the stale ImmuDB license entry: the selected release is BUSL-1.1 source-available software, not currently Apache-2.0 or OSI-approved open source. Version-specific provenance and limitations follow the registry.
 
 ---
 
@@ -19,7 +19,12 @@ Every license listed below has been verified against the official upstream repos
 | **@types/multer** | [DefinitelyTyped/DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/multer) | `2.3.0` exact | MIT | Compile-time multipart upload types | Dev dependency | Integrated (Issue #7) |
 | **Go** | [golang/go](https://github.com/golang/go/tree/go1.24.9) | `1.24.9` | BSD-3-Clause | Build unmodified MinIO source in container | Build tool | Integrated (Issue #7) |
 | **Flowable** | [flowable/flowable-engine](https://github.com/flowable/flowable-engine) | `8.0.0` | Apache-2.0 | Invoice approval/exception BPMN orchestration | Official REST Docker service; native Node fetch client | Integrated (Issue #9) |
-| **ImmuDB** | [codenotary/immudb](https://github.com/codenotary/immudb) | `v1.9.x` | Apache-2.0 | Cryptographic Immutable Ledger (Tamper-evident audit trail sealing) | Docker Service | Planned |
+| **ImmuDB** | [codenotary/immudb v1.11.0](https://github.com/codenotary/immudb/tree/v1.11.0) | `1.11.0` exact | BUSL-1.1; future Change License Apache-2.0 | Independent tamper-evident audit ledger | Pinned official Docker service; PostgreSQL wire SQL | Integrated (Issue #10) |
+| **ImmuDB Go client** | [tagged client source](https://github.com/codenotary/immudb/tree/v1.11.0/pkg/client) | `v1.11.0` exact | BUSL-1.1, same tagged LICENSE | Actual inclusion/dual proof validation | Internal isolated native gRPC verifier | Integrated (Issue #10) |
+| **Go (audit verifier)** | [golang/go](https://github.com/golang/go/tree/go1.27.1) | `1.27.1` | BSD-3-Clause | Build and test isolated verifier | Build tool | Integrated (Issue #10) |
+| **PDFKit** | [foliojs/pdfkit v0.20.2](https://github.com/foliojs/pdfkit/tree/v0.20.2) | `0.20.2` exact | MIT | Human-readable audit PDF with paired JSON attachment | API dependency | Integrated (Issue #10) |
+| **@types/pdfkit** | [DefinitelyTyped types](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/pdfkit) | `0.17.6` exact | MIT | PDFKit compile-time types | Dev dependency | Integrated (Issue #10) |
+| **Noto Sans** | [google/fonts pinned source](https://github.com/google/fonts/tree/8b0a1d0f5983c89bc2b93f1b5fb55f9e252744b5/ofl/notosans) | commit `8b0a1d0f5983c89bc2b93f1b5fb55f9e252744b5` | SIL OFL-1.1 | Vietnamese/Unicode PDF rendering | Bundled font and OFL notice | Integrated (Issue #10) |
 | **Prometheus** | [prometheus/prometheus](https://github.com/prometheus/prometheus) | `v2.51.x` | Apache-2.0 | System & Business Metrics Monitoring | Docker Service | Planned |
 | **Grafana** | [grafana/grafana](https://github.com/grafana/grafana) | `10.4.x` | GNU AGPLv3 | Operational & Observability Dashboards | Docker Service | Planned |
 | **React** | [facebook/react](https://github.com/facebook/react) | `^18.3.1` | MIT | Web UI Frontend Application Framework | Dependency | Integrated |
@@ -44,6 +49,17 @@ Every license listed below has been verified against the official upstream repos
 | **decimal.js** | [MikeMcl/decimal.js](https://github.com/MikeMcl/decimal.js) | `^10.6.0` | MIT | Arbitrary-precision decimal arithmetic for financial calculations | Dependency | Integrated (Issue #5) |
 
 ---
+
+## ImmuDB and PDF Issue #10 provenance
+
+- Release: [v1.11.0](https://github.com/codenotary/immudb/releases/tag/v1.11.0), published 2026-04-28; exact [tagged LICENSE](https://github.com/codenotary/immudb/blob/v1.11.0/LICENSE) is Business Source License 1.1. The complete notice is retained in [immudb-v1.11.0-BUSL-1.1.txt](docs/open-source/notices/immudb-v1.11.0-BUSL-1.1.txt) and the verifier image.
+- License correction: the previous planned `v1.9.x / Apache-2.0` row did not describe this release. BUSL is source-available and restricts production uses outside its Additional Use Grant; it must not be presented as MIT/Apache permissive open source. The user's Issue #10 instruction explicitly selects this component; [the policy exception](docs/open-source/LICENSE_POLICY.md#5-issue-10-source-available-exception) records that scope.
+- Additional Use Grant: production use is allowed provided it does not offer the work to third parties on a hosted or embedded basis to compete with Codenotary's paid versions, as defined in the LICENSE. A competitive offering is paid (including paid support) and significantly overlaps those capabilities. Unpaid products and internal organizational use, including affiliates under common control, are excluded from that definition. Embedded includes packaging that requires downloading/accessing the work. Uses outside the grant require an appropriate commercial license or refraining from that use. Deployment/distribution decisions must follow the full terms.
+- Future license: Change Date is four years from publication; the terms also apply the Change License on the fourth anniversary of the first public distribution of the specific version, if earlier. Apache-2.0 is that future Change License, not the current release license. No earlier version's conversion is attributed to 1.11.0.
+- Official image: [Docker Hub tag metadata](https://hub.docker.com/v2/repositories/codenotary/immudb/tags/1.11.0) identifies `codenotary/immudb:1.11.0@sha256:460cb34bb0a690ee743336a174c59f2f24edf79dd00c26d936717495db32d1cf`, linux/amd64. Compose pins both tag and digest. Authentication is enabled, SQL is internal port 5432 and native gRPC internal port 3322; only development SQL port 5433 is published on loopback.
+- Exact wire semantics: [tagged SQL wrappers](https://github.com/codenotary/immudb/blob/v1.11.0/pkg/pgsql/server/immudb_functions.go) implement `immudb_state()`, `immudb_verify_row(table, primaryKey)` and `immudb_verify_tx(txId)`. The verification wrappers fetch verifiable data and return string `true`; they do not perform client cryptographic verification. SmartProcure therefore uses the existing Node `pg` dependency for SQL and an isolated official Go client for [VerifyRow](https://github.com/codenotary/immudb/blob/v1.11.0/pkg/client/sql.go) and [VerifiedTxByID](https://github.com/codenotary/immudb/blob/v1.11.0/pkg/client/client.go), with persistent trust state. No ImmuDB npm SDK is added. `go.mod/go.sum` pin the client and its dependencies; each dependency retains its own license terms.
+- Exact state limitation: tagged `pkg/database/database.go` CurrentState omits the Db field, so the wire `immudb_state()` db column is empty. Bootstrap validates this actual behavior and real transaction/hash fields rather than fabricating a database-name receipt; native verification uses the configured authenticated database.
+- PDF: [PDFKit v0.20.2 LICENSE](https://github.com/foliojs/pdfkit/blob/v0.20.2/LICENSE) is MIT. Exact npm versions and integrity hashes are locked. The upstream library handles PDF serialization; Poppler `pdftotext` is used only as a CI parser, not an API dependency. Bundled Noto Sans comes from the pinned upstream commit above, with OFL notice; font SHA-256 is `bfb7bb691513f12e734dc346c03a03f784912432d7e3fa8e56efcf906fe86b3d`.
 
 ## Flowable Issue #9 provenance
 

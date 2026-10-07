@@ -38,6 +38,7 @@ COPY docs/open-source/notices/nodable-val-parsers-MIT.txt ./licenses/nodable-val
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY infra/flowable/processes ./infra/flowable/processes
 COPY infra/workflow ./infra/workflow
+COPY infra/audit ./infra/audit
 
 EXPOSE 4000
 
