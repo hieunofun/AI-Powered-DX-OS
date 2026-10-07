@@ -8,6 +8,15 @@ Issue #10 corrects the stale ImmuDB license entry: the selected release is BUSL-
 
 ## Component Registry
 
+### Procurement workspace build and test tooling (Issue #23)
+
+| Component | Official upstream | Exact version | License | Purpose |
+| --- | --- | --- | --- | --- |
+| @playwright/test, playwright, playwright-core | [Microsoft Playwright](https://github.com/microsoft/playwright) | 1.63.0 | Apache-2.0 | Development/CI browser acceptance tests with real SSO, gateway and database |
+| caniuse-lite | [Browserslist/caniuse-lite](https://github.com/browserslist/caniuse-lite) | 1.0.30001815 | CC-BY-4.0 | Build-time browser compatibility dataset consumed by the existing Babel/Browserslist toolchain; fixes an absent lockfile dependency in Vite development |
+
+The Can I Use compatibility dataset is maintained upstream by Alexis Deveria and contributors; the compact package is maintained by Ben Briggs and Browserslist contributors. Data is retained unchanged. See the [upstream dataset license](https://github.com/browserslist/caniuse-lite/blob/main/LICENSE) and the packaged `node_modules/caniuse-lite/LICENSE`. CC-BY-4.0 is a data/content license, **not an OSI software license**. This proposed build-data exception requires the existing pre-merge license review; it does not waive Issue #22's runtime ledger eligibility decision. No dataset or browser binary is copied into the Nginx application image. Chromium installed by Playwright retains its upstream third-party notices and stays in the development/CI environment.
+
 | Component | Repository | Version | License | Role | Integration Type | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Keycloak** | [keycloak/keycloak](https://github.com/keycloak/keycloak) | `24.0.5` | Apache-2.0 | Identity & Access Management (SSO, OIDC, RBAC) | Docker Service | Integrated (Pinned known-working version) |

@@ -6,6 +6,8 @@ This document delineates the boundary between third-party open-source building b
 
 ## 1. Reused Open Source Components
 
+Issue #23 adds original React PO/GRN workspaces, typed authenticated requests, four-place fixed-scale quantity helpers, bounded supplier/fulfillment reads and real browser acceptance scenarios. Playwright is development tooling; `caniuse-lite` is unchanged build-time compatibility data with attribution recorded in [the component inventory](OPEN_SOURCE_COMPONENTS.md).
+
 SmartProcure-Pay leverages proven, industry-grade open-source platforms to establish a robust infrastructure layer (based on the DX-OS Open-Core architecture):
 
 - **Keycloak** (Apache-2.0): Leveraged for centralized authentication, OAuth2/OIDC token exchange, and Role-Based Access Control (RBAC).

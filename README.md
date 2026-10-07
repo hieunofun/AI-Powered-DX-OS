@@ -7,6 +7,8 @@
 
 ## 1. Overview
 
+**Issue #23 operational UI:** PO/GRN workspaces run at the APISIX origin `http://localhost:9080`. See [workspace acceptance and limitations](docs/testing/PROCUREMENT_WORKSPACE.md) for real browser tests and setup. Invoice reconciliation/task screens remain Issue #24.
+
 **SmartProcure Pay** is an open-source, intelligent Procure-to-Pay (P2P) platform designed to automate and safeguard the reconciliation of Purchase Orders (PO), Goods Receipt Notes (GRN), and electronic invoices (e-Invoices). 
 
 SmartProcure Pay is engineered as an illustrative enterprise application operating atop the **DX-OS Open-Core** foundation. It replaces error-prone, fragmented, and manual verification routines with deterministic automated reconciliation, structured exception routing, and tamper-evident cryptographic audit trails.

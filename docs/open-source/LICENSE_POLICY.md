@@ -45,3 +45,9 @@ When reusing snippets, algorithms, or forking code from public repositories:
 The explicit Issue #10 implementation instruction authorizes ImmuDB 1.11.0 and its official Go proof client under the exact tagged BUSL-1.1 license. This is a scoped exception to the OSI-only rule in section 1, not a change to the license classification of BUSL or a general authorization to add source-available dependencies. Project-authored application code remains MIT; the linked verifier dependency retains BUSL terms.
 
 The [component inventory](../../OPEN_SOURCE_COMPONENTS.md#immudb-and-pdf-issue-10-provenance) records the Additional Use Grant, production limitations, future Apache-2.0 Change License and upstream notice. Deployment/distribution must comply with those terms. The implementation PR is left unmerged for review as instructed.
+
+## 6. Issue #23 build-time compatibility data review
+
+Issue #23 explicitly pins `caniuse-lite`, browser compatibility data required by the existing Babel/Browserslist development toolchain but absent from the previous lockfile. Its verified license is CC-BY-4.0, a data/content license rather than an OSI software license. The proposed exception is limited to this unchanged build-time dataset, with attribution and packaged license retained as recorded in the component inventory. It introduces no source-available runtime service.
+
+This proposal remains subject to section 4's maintainer license review before merge. It is not evidence of acceptance by the contest organizers and does not authorize other non-OSI software dependencies.
