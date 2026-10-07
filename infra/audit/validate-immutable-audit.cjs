@@ -77,21 +77,28 @@ async function sealed(invoiceId,state){
   assert.equal((await ledger.query('SELECT seal_key FROM smartprocure_audit_seals WHERE seal_key=$1',[detail.seal.seal_key])).rows.length,1);
   return {verification,detail};
 }
-async function terminal(action){
+async function terminal(action,concurrent=false){
   const input=await fixture(true);const started=await request('POST','/invoices/'+input.invoiceId+'/workflow/start','accountant');
   await request('POST',base(input.invoiceId)+'/seal','admin',undefined,409);
   const tasks=await request('GET','/approval-cases/'+started.approvalCaseId+'/tasks','buyer');
   assert.equal(tasks.length,1);assert.equal(tasks[0].assignedRole,'buyer');
   await request('POST','/approval-tasks/'+tasks[0].id+'/claim','buyer');
   const reason='Audit acceptance '+action;
-  await request('POST','/approval-tasks/'+tasks[0].id+'/complete','buyer',{action,reason});
+  if(concurrent){
+    const attempts=await Promise.all([api('POST','/approval-tasks/'+tasks[0].id+'/complete','buyer',{action,reason}),
+      api('POST','/approval-tasks/'+tasks[0].id+'/complete','buyer',{action,reason})]);
+    assert.deepEqual(attempts.map(r=>r.status).sort(),[200,409]);
+  }else await request('POST','/approval-tasks/'+tasks[0].id+'/complete','buyer',{action,reason});
   const state=action==='REJECT'?'REJECTED':action==='REQUEST_CREDIT_NOTE'?'CREDIT_NOTE_REQUESTED':'READY_FOR_PAYMENT';
   const result=await sealed(input.invoiceId,state),e=result.detail.pkg.package_json.evidence;
   assert.equal(e.tasks.length,1);assert.equal(e.decisions.length,1);assert.equal(e.decisions[0].action,action);assert.equal(e.decisions[0].reason,reason);
   assert.equal(e.approvalCase.id,started.approvalCaseId);
+  assert.equal((await db.query('SELECT count(*) FROM approval_decisions WHERE approval_case_id=$1',[started.approvalCaseId])).rows[0].count,'1');
+  assert.equal((await db.query('SELECT count(*) FROM audit_packages WHERE invoice_id=$1',[input.invoiceId])).rows[0].count,'1');
+  assert.equal((await db.query('SELECT count(*) FROM audit_seals WHERE invoice_id=$1',[input.invoiceId])).rows[0].count,'1');
   if(action==='REQUEST_CREDIT_NOTE') assert.equal(e.invoice.status,'EXCEPTION');
   if(action==='APPROVE_WITH_ADJUSTMENT') assert.equal(e.invoice.total_amount,'120.00');
-  console.log('PASS automatic terminal seal '+action+' with real Flowable decision history');return input;
+  console.log('PASS automatic terminal seal '+action+' with real Flowable decision history'+(concurrent?' and concurrent finalization: one decision/package/seal':''));return input;
 }
 async function pdfText(invoiceId,want){
   const response=await api('GET',base(invoiceId)+'/report.pdf');assert.equal(response.status,200);assert.match(response.headers.get('content-type'),/application\/pdf/);
@@ -101,6 +108,11 @@ async function pdfText(invoiceId,want){
   for(const field of ['SmartProcure-Pay Audit Verification Report','Invoice','PO','Supplier','Final State','Package Version','Package SHA-256','Merkle Root','ImmuDB Transaction ID','Verified At','Leaf count',want]) assert.ok(text.includes(field),'PDF missing '+field);
   assert.ok(text.includes('Công ty Audit Việt Nam'),'Unicode supplier rendering');
   if(want!=='VERIFIED') assert.ok(text.includes('WARNING'));
+  const attachment=join(work,want+'-paired.json');
+  execFileSync('pdfdetach',['-save','1','-o',attachment,path],{stdio:'pipe'});
+  const {reportPayloadSha256,...paired}=JSON.parse(readFileSync(attachment,'utf8'));
+  assert.equal(hashJson(paired),reportPayloadSha256);assert.equal(paired.verificationStatus,want);
+  assert.ok(text.replace(/\s/g,'').includes(reportPayloadSha256),'Printed PDF hash must match its exact extracted JSON attachment');
 }
 async function restorePoItem(id,original){
   const c=await db.connect();try{await c.query('BEGIN');await c.query("SET LOCAL session_replication_role='replica'");
@@ -115,6 +127,15 @@ async function main(){
   const {verification,detail}=await sealed(stp.invoiceId,'READY_FOR_PAYMENT');
   assert.equal(detail.pkg.package_json.evidence.approvalCase,null);assert.equal(detail.pkg.package_json.evidence.decisions.length,0);
   console.log('PASS clean STP automatically creates one complete deterministic package, ledger seal and native cryptographic proof');
+  // These exact-version SQL wrappers prove real function dispatch and identity;
+  // the separate native proof above remains the cryptographic authority.
+  assert.match(detail.seal.seal_key,/^smartprocure:audit:invoice:[0-9a-f-]{36}:v1$/);
+  assert.match(detail.seal.immudb_tx_id,/^[1-9]\d*$/);
+  const wireRow=(await ledger.query("SELECT immudb_verify_row('smartprocure_audit_seals', '"+detail.seal.seal_key+"')")).rows[0];
+  const wireTx=(await ledger.query('SELECT immudb_verify_tx('+detail.seal.immudb_tx_id+')')).rows[0];
+  assert.equal(wireRow.verified,'true');assert.equal(String(wireRow.tx_id),detail.seal.immudb_tx_id);
+  assert.equal(wireTx.verified,'true');assert.equal(String(wireTx.tx_id),detail.seal.immudb_tx_id);
+  console.log('PASS exact v1.11.0 immudb_verify_row/immudb_verify_tx signatures against the real sealed row/transaction');
   const file=detail.pkg.package_json.evidence.files[0];
   const minio=new MinioClient({endPoint:'localhost',port:Number(process.env.MINIO_PORT||9000),useSSL:false,
     accessKey:process.env.MINIO_ACCESS_KEY||'minio_dev_only',secretKey:process.env.MINIO_SECRET_KEY||'minio_dev_password_only'});
@@ -133,7 +154,7 @@ async function main(){
   const {reportPayloadSha256,...payload}=jsonResponse.body;assert.equal(hashJson(payload),reportPayloadSha256);
   assert.equal(payload.verificationStatus,'VERIFIED');assert.equal(payload.packageSha256,detail.pkg.package_sha256);assert.equal(payload.immudb.txId,detail.seal.immudb_tx_id);
   await pdfText(stp.invoiceId,'VERIFIED');console.log('PASS JSON payload hash and PDFKit PDF parsed with Poppler (including Unicode and required fields)');
-  await terminal('APPROVE');await terminal('APPROVE_WITH_ADJUSTMENT');await terminal('REJECT');await terminal('REQUEST_CREDIT_NOTE');
+  await terminal('APPROVE',true);await terminal('APPROVE_WITH_ADJUSTMENT');await terminal('REJECT');await terminal('REQUEST_CREDIT_NOTE');
   const original=(await db.query('SELECT unit_price,updated_at::text FROM purchase_order_items WHERE id=$1',[stp.poItem])).rows[0];
   try{
     await db.query('UPDATE purchase_order_items SET unit_price=777 WHERE id=$1',[stp.poItem]);
