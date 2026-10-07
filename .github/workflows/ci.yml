@@ -179,7 +179,7 @@ jobs:
       - name: Validate Immutable Audit against Real PostgreSQL, ImmuDB & Gateway
         run: bash infra/audit/validate-immutable-audit.sh
 
-      - name: Install Chromium for real procurement UI acceptance
+      - name: Install Chromium for real business UI acceptance
         run: npx playwright install --with-deps chromium
 
       - name: Isolate browser acceptance from the previous gateway quota window
@@ -188,7 +188,7 @@ jobs:
         # expire so browser lifecycle assertions exercise an independent workload.
         run: sleep 60
 
-      - name: Validate procurement UI with real Keycloak, APISIX and PostgreSQL
+      - name: Validate business UI with real SSO, gateway, storage, workflow and ledger
         run: |
           node infra/web/bootstrap-web-fixtures.cjs
           npm run test:browser --workspace=apps/web

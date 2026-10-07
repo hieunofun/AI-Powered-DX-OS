@@ -24,6 +24,8 @@ All reused components are consumed as unmodified external services via Docker or
 
 ## 2. Built by SmartProcure-Pay Team
 
+Issue #24 adds original invoice intake/reconciliation, approval task and audit workspaces connected to the implemented APIs. Evidence is displayed from persisted matching/workflow snapshots; exports use the verification status of their own response. The team also adds invoice-case lookup, export status headers and real browser scenarios with identifiable synthetic fixtures. No new third-party component or upstream modification is introduced. Runtime scope and reproduction are recorded in [the invoice workspace guide](docs/testing/INVOICE_WORKSPACE.md); the broader documentation update remains PR #31.
+
 > [!IMPORTANT]
 > **Status: Planned team contributions (Phase 0)**.
 > In accordance with Phase 0 project boundaries, the items listed below represent the planned original contributions to be implemented in upcoming milestones. None of the business logic modules below are claimed as completed in the initial bootstrap phase.

@@ -3,7 +3,8 @@ import type { ApprovalCase, ApprovalTask, AuditDetail, IngestResult, Ingestion, 
 
 export class ApiError extends Error {
   constructor(public status: number, public details: string[], public code?: string, public ingestionId?: string) {
-    super(status === 401 ? 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Hãy đăng nhập lại.'
+    super(code?.startsWith('WORKFLOW_') && (status >= 500 || code === 'WORKFLOW_RECONCILIATION_REQUIRED') ? 'Chưa xác nhận được trạng thái luồng xử lý. Tải lại hồ sơ và nhờ quản trị viên kiểm tra thao tác đang chờ trước khi gửi lại quyết định.'
+      : status === 401 ? 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Hãy đăng nhập lại.'
       : status === 403 ? 'Tài khoản không có quyền thực hiện thao tác này.'
       : status === 409 ? 'Hồ sơ đã thay đổi hoặc thao tác không còn hợp lệ. Tải lại hồ sơ để kiểm tra trước khi tiếp tục.'
       : status === 429 ? 'Có quá nhiều yêu cầu. Chờ một lúc rồi thử lại.'

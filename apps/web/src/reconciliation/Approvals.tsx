@@ -52,8 +52,9 @@ export function ApprovalDetail({ api, id }: { api: ProcurementApi; id: string })
     {approval.status === 'CREDIT_NOTE_REQUESTED' && <p className="notice">Đã ghi nhận yêu cầu điều chỉnh hóa đơn. Hệ thống chưa tự gửi yêu cầu cho nhà cung cấp.</p>}
     {['FAILED', 'STARTING'].includes(approval.status) && <p className="notice notice-error">Luồng xử lý chưa được xác nhận hoàn tất. Quản trị viên cần kiểm tra và đối chiếu trạng thái trước khi tiếp tục.</p>}
     <section className="panel metadata"><div><small>Bước hiện tại</small><strong>{approval.assignedRole ? roles[approval.assignedRole] || approval.assignedRole : 'Đã kết thúc'}</strong><span>{approval.currentStage}</span></div>
-      <div><small>Ngưỡng cần duyệt tài chính</small><strong>{decimal(policy.financeApprovalThreshold)}</strong><span>{approval.matchSnapshot.requiresFinanceApproval ? 'Cần duyệt tài chính' : 'Không cần bước tài chính'}</span></div>
-      <div><small>Giới hạn tự động STP tại lúc bắt đầu</small><strong>{policy.autoReadyForPaymentMaxAmount === null ? 'Không giới hạn hóa đơn khớp' : decimal(policy.autoReadyForPaymentMaxAmount)}</strong></div></section>
+      {policy ? <><div><small>Ngưỡng cần duyệt tài chính</small><strong>{decimal(policy.financeApprovalThreshold)}</strong><span>{approval.matchSnapshot.requiresFinanceApproval === true ? 'Cần duyệt tài chính' : approval.matchSnapshot.requiresFinanceApproval === false ? 'Không cần bước tài chính' : 'Chưa có bằng chứng về bước tài chính'}</span></div>
+        <div><small>Giới hạn tự động STP tại lúc bắt đầu</small><strong>{policy.autoReadyForPaymentMaxAmount === null ? 'Không giới hạn hóa đơn khớp' : decimal(policy.autoReadyForPaymentMaxAmount)}</strong></div></>
+        : <p className="notice">Hồ sơ chưa có bản chụp chính sách workflow. Cần kiểm tra hồ sơ trước khi quyết định.</p>}</section>
     <section className="panel"><div className="section-heading"><h2>Nhiệm vụ trong hồ sơ</h2><span>{tasks.length} bước đã tạo</span></div>
       <div className="task-cards">{tasks.map(task => { const active = approval.status === 'PENDING' && ['OPEN', 'CLAIMED'].includes(task.status);
         const allowed = admin || hasAnyRole([task.assignedRole]); const owned = task.status === 'CLAIMED' && task.assigneeSubject === user?.sub;

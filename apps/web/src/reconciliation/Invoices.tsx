@@ -43,7 +43,7 @@ export function InvoiceUpload({ api, poId }: { api: ProcurementApi; poId?: strin
   async function submit(event: FormEvent) {
     event.preventDefault(); if (busy) return;
     const validation: FieldError[] = [];
-    if (!binding.data || !['ISSUED', 'PARTIALLY_RECEIVED', 'FULLY_RECEIVED'].includes(binding.data.status)) validation.push({ id: 'invoice-po', message: 'Chọn PO đã phát hành hoặc đã nhận hàng.' });
+    if (!binding.data || binding.data.id !== selected || !['ISSUED', 'PARTIALLY_RECEIVED', 'FULLY_RECEIVED'].includes(binding.data.status)) validation.push({ id: 'invoice-po', message: 'Chọn PO đã phát hành hoặc đã nhận hàng.' });
     if (!xml && !pdf) validation.push({ id: 'invoice-xml', message: 'Chọn ít nhất một tệp XML hoặc PDF.' });
     for (const [id, file, extension] of [['invoice-xml', xml, 'xml'], ['invoice-pdf', pdf, 'pdf']] as const) {
       if (file && (!file.size || !file.name.toLowerCase().endsWith(`.${extension}`))) validation.push({ id, message: `Chọn tệp ${extension.toUpperCase()} có nội dung và đúng phần mở rộng.` });
