@@ -62,6 +62,8 @@ export function OrderDetail({ api, id }: { api: ProcurementApi; id: string }) {
     <header className="page-heading"><div><p className="eyebrow">HỒ SƠ MUA SẮM</p><h1>{po.poNumber}</h1><p>{po.supplierName || 'Nhà cung cấp'} · <Status value={po.status} /></p></div>
       <div className="actions">
         <button onClick={result.reload}>Làm mới</button>
+        {hasAnyRole(['buyer', 'accountant', 'finance_manager', 'admin']) && <a className="button" href={`#/invoices?po=${id}`}>Hóa đơn của PO</a>}
+        {hasAnyRole(['accountant', 'admin']) && ['ISSUED', 'PARTIALLY_RECEIVED', 'FULLY_RECEIVED'].includes(po.status) && <a className="button" href={`#/invoices/new?po=${id}`}>+ Nhập hóa đơn</a>}
         {canBuy && po.status === 'DRAFT' && <><a className="button" href={`#/orders/${id}/edit`}>Sửa bản nháp</a><button className="primary" onClick={() => setAction('issue')}>Phát hành PO</button></>}
         {canReceive && <a className="button primary" href={`#/receipts/new?po=${id}`}>+ Lập phiếu nhận hàng</a>}
         {canBuy && ['DRAFT', 'ISSUED'].includes(po.status) && <button className="danger-outline" onClick={() => setAction('cancel')}>Hủy PO</button>}
