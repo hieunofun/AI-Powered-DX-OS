@@ -5,6 +5,12 @@ import { ApiError } from './api';
 export const statusNames: Record<string, string> = {
   DRAFT: 'Bản nháp', ISSUED: 'Đã phát hành', PARTIALLY_RECEIVED: 'Nhận một phần',
   FULLY_RECEIVED: 'Đã nhận đủ', CLOSED: 'Đã đóng', CANCELLED: 'Đã hủy', RECEIVED: 'Đã xác nhận',
+  PARSED: 'Đã bóc tách', PENDING_MATCH: 'Đang đối soát', MATCHED: 'Đã khớp', EXCEPTION: 'Cần xử lý sai lệch',
+  APPROVED: 'Đã phê duyệt', READY_FOR_PAYMENT: 'Sẵn sàng thanh toán', REJECTED: 'Đã từ chối',
+  PASSED: 'Đạt chính sách', REVIEW_REQUIRED: 'Cần kiểm tra', MISMATCHED: 'Có sai lệch',
+  PENDING_UPLOAD: 'Chờ lưu tệp', STORED: 'Đã lưu tệp', OCR_REQUIRED: 'Chờ OCR', FAILED: 'Thất bại',
+  STARTING: 'Đang khởi tạo', PENDING: 'Chờ xử lý', OPEN: 'Chưa nhận', CLAIMED: 'Đã nhận nhiệm vụ',
+  COMPLETED: 'Đã hoàn thành', CREDIT_NOTE_REQUESTED: 'Đã yêu cầu điều chỉnh', SEALED: 'Đã niêm phong',
 };
 export function Status({ value }: { value: string }) {
   return <span className={`status status-${value.toLowerCase()}`}>{statusNames[value] || value}</span>;

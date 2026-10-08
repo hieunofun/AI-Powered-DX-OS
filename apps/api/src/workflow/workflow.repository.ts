@@ -97,6 +97,11 @@ export class WorkflowRepository {
     });
   }
   async cases() { return (await this.query('SELECT '+CASE+' FROM approval_cases c JOIN invoices i ON i.id=c.invoice_id ORDER BY c.requested_at DESC LIMIT 200')).rows; }
+  async invoiceCase(invoiceId: string) {
+    const row=(await this.query('SELECT c.id FROM approval_cases c WHERE c.invoice_id=$1',[invoiceId])).rows[0];
+    if(!row) throw new WorkflowError('APPROVAL_CASE_NOT_FOUND','No approval case exists for this invoice.',404);
+    return this.detail(row.id);
+  }
   async detail(id: string) {
     const value=(await this.query('SELECT '+CASE+' FROM approval_cases c JOIN invoices i ON i.id=c.invoice_id WHERE c.id=$1',[id])).rows[0];
     if(!value) throw new WorkflowError('APPROVAL_CASE_NOT_FOUND','Approval case not found.',404);

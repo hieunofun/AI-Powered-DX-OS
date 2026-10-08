@@ -46,6 +46,7 @@ export class WorkflowService {
     });
   }
   cases() { return this.safe(()=>this.repository.cases()); }
+  invoiceCase(id: string) { return this.safe(()=>this.repository.invoiceCase(id)); }
   detail(id: string) { return this.safe(()=>this.repository.detail(id)); }
   tasks(id: string) { return this.safe(()=>this.repository.tasks(id)); }
   myTasks(actor: AuthenticatedUser) { return this.safe(()=>this.repository.myTasks(actor)); }

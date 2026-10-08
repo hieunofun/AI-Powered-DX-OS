@@ -47,16 +47,19 @@ describe('Audit HTTP contracts (auth and audit orchestration mocked)',()=>{
     audit.verify.mockResolvedValueOnce({result:{invoiceId:id,verificationStatus:'UNAVAILABLE',immudbCryptographicProofValid:false}});
     const response=await request(app.getHttpServer()).get(base+'/verify').auth('accountant',{type:'bearer'}).expect(503);
     expect(response.body.verificationStatus).toBe('UNAVAILABLE');
+    expect(response.headers['x-audit-verification-status']).toBe('UNAVAILABLE');
   });
   it('exports JSON as an attachment',async()=>{
     const response=await request(app.getHttpServer()).get(base+'/report.json').auth('finance_manager',{type:'bearer'}).expect(200).expect('Content-Type',/json/);
     expect(response.body.reportPayloadSha256).toBe(report.reportPayloadSha256);expect(response.headers['content-disposition']).toContain('attachment');
+    expect(response.headers['x-audit-verification-status']).toBe(report.verificationStatus);
   });
   it('exports an actual PDFKit PDF',async()=>{
     const response=await request(app.getHttpServer()).get(base+'/report.pdf').auth('accountant',{type:'bearer'}).buffer(true)
       .parse((res,callback)=>{const chunks:Buffer[]=[];res.on('data',c=>chunks.push(c));res.on('end',()=>callback(null,Buffer.concat(chunks)));})
       .expect(200).expect('Content-Type',/application\/pdf/);
     expect(response.body.subarray(0,5).toString()).toBe('%PDF-');
+    expect(response.headers['x-audit-verification-status']).toBe(report.verificationStatus);
   });
   it.each(['accountant','finance_manager','buyer','warehouse'])('%s cannot request a manual seal',role=>
     request(app.getHttpServer()).post(base+'/seal').auth(role,{type:'bearer'}).expect(403));

@@ -6,6 +6,8 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
+- Issue #24: Vietnamese XML/PDF intake status, saved three-way comparison, role-based task decisions and native audit verification/JSON/PDF export workspaces. Add direct invoice-case lookup and explicit export-status headers; CI runs 11 real browser scenarios.
+
 - Issue #23: Vietnamese PO/GRN lists, detail views and guarded draft/lifecycle actions; bounded supplier lookup and finalized receipt quantities. Real browser acceptance and exact-decimal tests run in CI.
 
 - 2026-10-03: Executable React/NestJS monorepo, health endpoint, Docker foundation and CI - [Issue #1](https://github.com/hieunofun/SmartProcure-Pay/issues/1), [PR #11](https://github.com/hieunofun/SmartProcure-Pay/pull/11).

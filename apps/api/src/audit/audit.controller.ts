@@ -17,15 +17,18 @@ export class AuditController {
   @Get(':invoiceId') detail(@Param('invoiceId',new ParseUUIDPipe()) id:string) {return this.audit.detail(id);}
   @Get(':invoiceId/verify') async verify(@Param('invoiceId',new ParseUUIDPipe()) id:string,@CurrentUser() actor:AuthenticatedUser,@Res() res:Response) {
     const {result}=await this.audit.verify(id,actor.sub);
+    res.setHeader('X-Audit-Verification-Status',result.verificationStatus);
     res.setHeader('Cache-Control','no-store');return res.status(result.verificationStatus==='UNAVAILABLE'?503:200).json(result);
   }
   @Get(':invoiceId/report.json') async json(@Param('invoiceId',new ParseUUIDPipe()) id:string,@CurrentUser() actor:AuthenticatedUser,@Res() res:Response) {
     const report=await this.reports.json(id,actor.sub);
+    res.setHeader('X-Audit-Verification-Status',report.verificationStatus);
     res.setHeader('Cache-Control','no-store');res.setHeader('Content-Disposition','attachment; filename="audit-'+id+'.json"');
     return res.status(report.verificationStatus==='UNAVAILABLE'?503:200).json(report);
   }
   @Get(':invoiceId/report.pdf') async pdf(@Param('invoiceId',new ParseUUIDPipe()) id:string,@CurrentUser() actor:AuthenticatedUser,@Res() res:Response) {
     const {report,bytes}=await this.reports.pdf(id,actor.sub);
+    res.setHeader('X-Audit-Verification-Status',report.verificationStatus);
     res.setHeader('Cache-Control','no-store');res.setHeader('Content-Type','application/pdf');
     res.setHeader('Content-Disposition','attachment; filename="audit-'+id+'.pdf"');
     return res.status(report.verificationStatus==='UNAVAILABLE'?503:200).send(bytes);

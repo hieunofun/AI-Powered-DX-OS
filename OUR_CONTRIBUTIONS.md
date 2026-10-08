@@ -19,6 +19,8 @@ Prometheus and Grafana are planned deployments. APISIX exports metrics, but a fu
 
 Issue #23 adds original React PO/GRN workspaces, typed authenticated requests, four-place fixed-scale quantity helpers, bounded supplier/fulfillment reads and real browser acceptance scenarios. Playwright is development tooling; `caniuse-lite` is unchanged build-time compatibility data with attribution recorded in [the component inventory](OPEN_SOURCE_COMPONENTS.md).
 
+Issue #24 adds original invoice intake/evidence screens, role-based approval workspaces and audit verification/report UX, plus bounded invoice-case lookup and explicit report verification-status headers. No AI, OCR, legal signature or bank execution is attributed to this change.
+
 ## Implemented project-authored work
 
 | Original contribution | Implementation evidence |
