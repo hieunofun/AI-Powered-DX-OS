@@ -1,28 +1,42 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). No version has been tagged or released yet; the existing package version does not establish a published release. Dates below are implementation PR merge dates in Asia/Saigon.
 
 ## [Unreleased]
 
 ### Added
-- Issue #34: real acceptance for approved exceptions, competing quantity reservations, release on rejection/credit note, unresolved mapping and Flowable/local persistence recovery.
-- Issue #24: XML/PDF intake, persisted ingestion status, line-by-line reconciliation evidence, role-specific approval tasks and audit verification/export workspaces.
-- Direct invoice-to-approval-case lookup and audit verification status headers for exports, including warning reports returned with HTTP 503.
-- Real reconciliation browser scenarios for clean STP, price/receipt exceptions, OCR-required and failed intake, authorization and controlled audit tampering of synthetic fixtures.
-- Issue #23: Vietnamese purchase-order and goods-receipt workspaces using authenticated APIs, with paginated search, role-aware draft forms, confirmations and receipt fulfillment details.
-- Read-only bounded supplier lookup and cumulative finalized receipt quantities for procurement UI.
-- Real browser acceptance tests through Keycloak, APISIX and PostgreSQL; fixed-scale decimal tests and CI execution.
-- Initial project structure
-- Open-source governance documentation
-- Development workflow
 
-### Fixed
-- Matching 3WM-1.1 counts cleared exceptions and pending physical allocations without changing original matching evidence. Approval intents reserve full mapped quantities under the PO lock; recovery rechecks capacity before remote actions. Received GRN cancellation cannot invalidate active claims.
-- Open persisted failed-ingestion recovery links without discarding-file prompts; selecting corrected files restores the draft guard.
-- Distinguish approval-case and invoice states, and avoid reporting completed tasks as claimed by another user.
-- Reuse Keycloak initialization during React StrictMode effect remounts.
-- Pin missing Babel/Browserslist compatibility data so Vite development can run after a clean install; license review recorded in the component inventory.
-- Allow explicitly clearing an optional PO expected delivery date with `null`.
+- Issue #24: Vietnamese XML/PDF intake status, saved three-way comparison, role-based task decisions and native audit verification/JSON/PDF export workspaces. Add direct invoice-case lookup and explicit export-status headers; CI runs 11 real browser scenarios.
+
+- Issue #23: Vietnamese PO/GRN lists, detail views and guarded draft/lifecycle actions; bounded supplier lookup and finalized receipt quantities. Real browser acceptance and exact-decimal tests run in CI.
+
+- 2026-10-03: Executable React/NestJS monorepo, health endpoint, Docker foundation and CI - [Issue #1](https://github.com/hieunofun/SmartProcure-Pay/issues/1), [PR #11](https://github.com/hieunofun/SmartProcure-Pay/pull/11).
+- 2026-10-04: PostgreSQL domain model, constraints, indexes and reference seed - [Issue #2](https://github.com/hieunofun/SmartProcure-Pay/issues/2), [PR #12](https://github.com/hieunofun/SmartProcure-Pay/pull/12).
+- 2026-10-04: Keycloak OIDC/PKCE and backend JWT/RBAC - [Issue #3](https://github.com/hieunofun/SmartProcure-Pay/issues/3), [PR #13](https://github.com/hieunofun/SmartProcure-Pay/pull/13).
+- 2026-10-04: Apache APISIX routing, authentication, CORS and rate-limit validation - [Issue #4](https://github.com/hieunofun/SmartProcure-Pay/issues/4), [PR #14](https://github.com/hieunofun/SmartProcure-Pay/pull/14).
+- 2026-10-04: Purchase order API/lifecycle, exact financial arithmetic and optimistic locking - [Issue #5](https://github.com/hieunofun/SmartProcure-Pay/issues/5), [PR #15](https://github.com/hieunofun/SmartProcure-Pay/pull/15).
+- 2026-10-04: Goods receipt API/lifecycle, cumulative accepted quantities and policy audit - [Issue #6](https://github.com/hieunofun/SmartProcure-Pay/issues/6), [PR #16](https://github.com/hieunofun/SmartProcure-Pay/pull/16).
+- 2026-10-05: XML invoice adapters, private MinIO storage, file hashes and ingestion recovery; PDF-only input remains pending OCR - [Issue #7](https://github.com/hieunofun/SmartProcure-Pay/issues/7), [PR #17](https://github.com/hieunofun/SmartProcure-Pay/pull/17).
+- 2026-10-05: Deterministic three-way matching, discrepancy evidence, historical policies and concurrency validation - [Issue #8](https://github.com/hieunofun/SmartProcure-Pay/issues/8), [PR #18](https://github.com/hieunofun/SmartProcure-Pay/pull/18).
+- 2026-10-06: Flowable invoice approval/exception workflow, role tasks, STP and durable recovery - [Issue #9](https://github.com/hieunofun/SmartProcure-Pay/issues/9), [PR #19](https://github.com/hieunofun/SmartProcure-Pay/pull/19).
+- 2026-10-07: Canonical/Merkle audit evidence, native ImmuDB proofs, recovery and JSON/PDF reports - [Issue #10](https://github.com/hieunofun/SmartProcure-Pay/issues/10), [PR #20](https://github.com/hieunofun/SmartProcure-Pay/pull/20).
+- 2026-10-07: DX-OS component responsibilities, confirmed team accounts and reviewable next-delivery specifications - [Issue #21](https://github.com/hieunofun/SmartProcure-Pay/issues/21).
+
+### Changed
+
+- Issue #34: reserve effective invoice quantities independently of the original matching outcome. Recheck current PO/receipt capacity before durable approving intents and recovery, retain claims through ambiguous outcomes, release rejected/credit-note claims and block GRN cancellation that removes their stock. New matching uses 3WM-1.1; historical snapshots and seals remain unchanged. CI adds seven real quantity scenarios.
+
+- Procurement workspaces replace the diagnostic-only start page; platform checks remain separate. Reuse Keycloak initialization under StrictMode, preserve bookmark routes and permit clearing the optional PO delivery date.
+
+- Replace obsolete Phase 0 status/attribution with the implemented backend baseline and explicit remaining UI/OCR/AI/trust/payment scope.
+- Document the gateway runtime URL, workflow/ledger bootstrap, reference seed and local-versus-live-stack test boundaries.
+
+### Licensing
+
+- Review the unchanged `caniuse-lite` CC-BY-4.0 browser dataset as a scoped build-data exception, retaining attribution and notices; Playwright is pinned Apache-2.0 development tooling. This does not resolve runtime ledger Issue #22.
+
+- Record the integrated ImmuDB server/client 1.11.0 as BUSL-1.1 source-available; Apache-2.0 is its future Change License. Preserve the scoped existing policy exception and track competition eligibility in [Issue #22](https://github.com/hieunofun/SmartProcure-Pay/issues/22).
+
+### Release gates
+
+- Operational UI and reproducible demo scenarios, a licensing decision, real-stack acceptance and genuine peer review remain prerequisites for a tagged MVP demo release.
