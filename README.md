@@ -6,7 +6,7 @@ SmartProcure replaces manual PO / GRN / invoice comparison with deterministic ma
 
 ## Current implementation
 
-The implementation baseline was verified on **7 October 2026** at `develop@42dd7a3`. The first ten backend/foundation issues have merged. The business UI, semantic AI and OCR are follow-up work; a closed initial backlog does not mean the whole proposed product is complete.
+The implementation baseline was verified on **7 October 2026** at `develop@42dd7a3`. The first ten backend/foundation issues have merged. The PO/GRN business workspaces are implemented in Issue #23; invoice/task/audit workspaces, semantic AI and OCR remain follow-up work; a closed initial backlog does not mean the whole proposed product is complete.
 
 Clone **develop** for the current implementation. `main` still contains the initial repository snapshot and has no tagged demo release.
 
@@ -23,9 +23,11 @@ Clone **develop** for the current implementation. `main` still contains the init
 | Workflow | Flowable BPMN, straight-through processing, role tasks and durable recovery | [#9](https://github.com/hieunofun/SmartProcure-Pay/issues/9) / [PR #19](https://github.com/hieunofun/SmartProcure-Pay/pull/19) |
 | Audit | Canonical packages, Merkle hashes, native ledger proof validation, JSON/PDF export | [#10](https://github.com/hieunofun/SmartProcure-Pay/issues/10) / [PR #20](https://github.com/hieunofun/SmartProcure-Pay/pull/20) |
 
+**Procurement workspace:** PO/GRN lists, details and guarded draft/issue/receive/cancel actions use the authenticated APIs at `http://localhost:9080`. See [acceptance and limitations](docs/testing/PROCUREMENT_WORKSPACE.md).
+
 ### Remaining product scope
 
-- **Business UI:** the current web app demonstrates login, RBAC and API diagnostics; PO/GRN/invoice/task/audit workspaces are not implemented yet.
+- **Business UI:** PO/GRN workspaces and separate platform diagnostics are implemented. Invoice reconciliation, role tasks and audit screens remain [Issue #24](https://github.com/hieunofun/AI-Powered-DX-OS/issues/24).
 - **OCR:** PDF bytes are archived, but PDF-only ingestion returns `OCR_REQUIRED / NOT_CONFIGURED`. No text extraction or image-upload support is claimed.
 - **Semantic AI:** item matching uses existing references, normalized SKU or normalized description equality. Different product names are not resolved with embeddings; confidence fields remain NULL.
 - **Invoice trust:** supported XML parsing does not verify signatures, certificate trust or tax-authority authenticity. Seller tax ID is compared with the PO supplier; there is no external tax-risk lookup.
@@ -62,7 +64,7 @@ The domain backend is one modular NestJS application, not a fleet of separately 
 | Layer | Current components | Responsibility |
 | --- | --- | --- |
 | Core services | Keycloak, APISIX, PostgreSQL, MinIO, Flowable, ImmuDB/native verifier | Identity, traffic policy, persistence, process execution and audit proof |
-| H-P-D-I workspace | React web, role guards, domain APIs | Current login/role demonstration; operational workspaces follow in the next backlog |
+| H-P-D-I workspace | React web, role guards, domain APIs | Role-aware PO/GRN workspaces and separate platform diagnostics |
 | Procurement application | PO, GRN, invoice, matching, workflow and audit modules | Procure-to-Pay business rules above the generic foundations |
 
 ## Technology and licensing
@@ -153,6 +155,8 @@ npm run test:e2e --workspace=apps/api -- --runInBand
 At baseline `42dd7a3`, local build/lint passed with **445 unit tests in 27 suites** and **204 HTTP E2E tests in 8 suites**. HTTP tests use mocks for external orchestration/persistence dependencies; they are not proof of a full live stack.
 
 [Baseline CI run 37591846165](https://github.com/hieunofun/SmartProcure-Pay/actions/runs/37591846165) passed Docker, schema, Keycloak, APISIX, PO, GRN, MinIO/ingestion, matching, Flowable and real ledger proof/recovery validation. Matching coverage is measured for the pure matching domain, not for the entire repository. [.github/workflows/ci.yml](.github/workflows/ci.yml) contains the reproducible acceptance sequence; its fault/tamper probes require a disposable test stack.
+
+Issue #23 adds 6 backend DTO unit cases (451 backend tests total), 4 exact-decimal web tests and 5 real browser scenarios. The browser scenarios exercise Keycloak, APISIX and PostgreSQL; only failed-read error presentation is injected. [Original UI CI](https://github.com/hieunofun/AI-Powered-DX-OS/actions/runs/37654219498) passed at `7c33c7d`; the PR checks validate the updated integration.
 
 ## Documentation and delivery
 

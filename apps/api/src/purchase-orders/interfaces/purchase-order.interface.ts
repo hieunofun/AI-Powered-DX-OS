@@ -20,6 +20,8 @@ export interface PurchaseOrderEntity {
   id: string;
   poNumber: string;
   supplierId: string;
+  supplierName?: string;
+  supplierTaxCode?: string;
   currency: string;
   status: PurchaseOrderStatus;
   orderDate: string; // YYYY-MM-DD
@@ -40,4 +42,19 @@ export interface PaginatedResult<T> {
   page: number;
   limit: number;
   total: number;
+}
+
+export interface SupplierLookup {
+  id: string;
+  supplierCode: string;
+  taxCode: string;
+  name: string;
+  status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED';
+}
+
+export interface PurchaseOrderFulfillment {
+  purchaseOrderItemId: string;
+  orderedQuantity: string;
+  acceptedQuantity: string;
+  rejectedQuantity: string;
 }

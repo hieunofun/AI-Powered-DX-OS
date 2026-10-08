@@ -1,383 +1,75 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import './App.css';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useAuth } from './auth/AuthContext';
-import { ProtectedRoute } from './auth/ProtectedRoute';
+import { createApi } from './procurement/api';
+import { OrderDetail, OrderEditor, OrderList } from './procurement/Orders';
+import { ReceiptDetail, ReceiptEditor, ReceiptList } from './procurement/Receipts';
+import './App.css';
 
-interface ApiHealthState {
-  status: 'checking' | 'connected' | 'disconnected';
-  message?: string;
+const Diagnostics = lazy(() => import('./Diagnostics'));
+const roleNames: Record<string, string> = { buyer: 'Mua hàng', warehouse: 'Kho', accountant: 'Kế toán', finance_manager: 'Tài chính', admin: 'Quản trị viên' };
+
+function Icon({ kind }: { kind: 'order' | 'receipt' | 'settings' }) {
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    {kind === 'order' ? <path d="M8 4H5v17h14V4h-3M9 2h6v4H9zM8 11h8M8 15h5" />
+      : kind === 'receipt' ? <path d="M3 7l9-5 9 5-9 5-9-5zm0 0v10l9 5 9-5V7M12 12v10M7 5l10 5" />
+        : <><circle cx="12" cy="12" r="3" /><path d="M9 3h6l1 3 3 1 2 5-2 5-3 1-1 3H9l-1-3-3-1-2-5 2-5 3-1 1-3z" /></>}
+  </svg>;
 }
 
-interface ApiResponseState {
-  endpoint: string;
-  statusCode?: number;
-  data?: unknown;
-  error?: string;
-}
-
-export const App: React.FC = () => {
-  const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
-  const apiBaseUrl = rawApiBaseUrl.replace(/\/$/, '');
-  const { isAuthenticated, isLoading, user, roles, login, logout, getToken } = useAuth();
-
-  const [apiHealth, setApiHealth] = useState<ApiHealthState>({ status: 'checking' });
-  const [activeTab, setActiveTab] = useState<'overview' | 'protected' | 'admin'>('overview');
-  const [apiResponse, setApiResponse] = useState<ApiResponseState | null>(null);
-  const [callingApi, setCallingApi] = useState<boolean>(false);
-
+export default function App() {
+  const { isAuthenticated, isLoading, user, roles, hasAnyRole, login, logout, getToken } = useAuth();
+  const [route, setRoute] = useState(() => window.location.hash.slice(1) || '/orders');
+  const [authError, setAuthError] = useState('');
   useEffect(() => {
-    let isMounted = true;
-    fetch(`${apiBaseUrl}/health`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        if (isMounted) {
-          setApiHealth({
-            status: data.status === 'ok' ? 'connected' : 'disconnected',
-            message: `Service: ${data.service || 'unknown'}`,
-          });
-        }
-      })
-      .catch((err) => {
-        if (isMounted) {
-          setApiHealth({
-            status: 'disconnected',
-            message: err.message || 'Connection failed',
-          });
-        }
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [apiBaseUrl]);
-
-  const callEndpoint = useCallback(
-    async (endpoint: string, includeAuth: boolean = true) => {
-      setCallingApi(true);
-      setApiResponse(null);
-      try {
-        const headers: Record<string, string> = {
-          'Content-Type': 'application/json',
-        };
-
-        if (includeAuth) {
-          const token = await getToken();
-          if (token) {
-            headers.Authorization = `Bearer ${token}`;
-          }
-        }
-
-        const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-        const targetUrl = `${apiBaseUrl}${normalizedEndpoint}`;
-        const res = await fetch(targetUrl, { headers });
-        let data: unknown;
-        try {
-          data = await res.json();
-        } catch {
-          data = await res.text();
-        }
-
-        setApiResponse({
-          endpoint: targetUrl,
-          statusCode: res.status,
-          data,
-        });
-      } catch (err) {
-        setApiResponse({
-          endpoint,
-          error: err instanceof Error ? err.message : String(err),
-        });
-      } finally {
-        setCallingApi(false);
-      }
-    },
-    [apiBaseUrl, getToken],
-  );
-
-  return (
-    <div className="container">
-      <header className="header">
-        <h1>SmartProcure Pay</h1>
-        <p className="subtitle">
-          Open-Source Smart Procure-to-Pay &amp; 3-Way e-Invoice Reconciliation Platform
-        </p>
-
-        <div className="status-bar">
-          <div className="badge badge-green">
-            <span className="badge-dot"></span>
-            Frontend: Running
-          </div>
-          <div className={`badge ${apiHealth.status === 'connected' ? 'badge-green' : 'badge-amber'}`}>
-            <span className="badge-dot"></span>
-            Backend API ({apiBaseUrl}): {apiHealth.status.toUpperCase()}
-          </div>
-          <div className={`badge ${isAuthenticated ? 'badge-green' : 'badge-amber'}`}>
-            <span className="badge-dot"></span>
-            Keycloak Auth: {isLoading ? 'INITIALIZING' : isAuthenticated ? 'AUTHENTICATED' : 'UNAUTHENTICATED'}
-          </div>
-        </div>
-      </header>
-
-      {/* Identity & Session Card */}
-      <section className="card">
-        <h2>
-          <span>Identity Provider &amp; SSO State</span>
-          <span className={`tag ${isAuthenticated ? 'tag-active' : ''}`}>
-            {isAuthenticated ? 'Active Session' : 'No Session'}
-          </span>
-        </h2>
-
-        {isLoading ? (
-          <p>Verifying Keycloak SSO session...</p>
-        ) : !isAuthenticated ? (
-          <div>
-            <p>
-              You are currently not authenticated. Log in via Keycloak OpenID Connect to obtain a JWT access token with role claims.
-            </p>
-            <div className="alert-box alert-info">
-              <strong>Demo Test Accounts (DEV ONLY - password: <code>DemoPassword123!</code>):</strong>
-              <ul style={{ marginTop: '0.5rem', paddingLeft: '1.25rem' }}>
-                <li><code>admin.demo</code> (Role: <code>admin</code>)</li>
-                <li><code>buyer.demo</code> (Role: <code>buyer</code>)</li>
-                <li><code>warehouse.demo</code> (Role: <code>warehouse</code>)</li>
-                <li><code>accountant.demo</code> (Role: <code>accountant</code>)</li>
-                <li><code>finance.demo</code> (Role: <code>finance_manager</code>)</li>
-              </ul>
-            </div>
-            <div className="btn-group">
-              <button className="btn btn-primary" onClick={() => login()}>
-                Log In via Keycloak
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div>
-            <div className="alert-box alert-success">
-              <p><strong>Logged in as:</strong> {user?.username} ({user?.name || user?.username})</p>
-              <p><strong>Email:</strong> {user?.email || 'N/A'}</p>
-              <p><strong>Identity (sub):</strong> {user?.sub}</p>
-              <p><strong>Realm Roles:</strong> {roles.length > 0 ? roles.join(', ') : 'None'}</p>
-            </div>
-            <div className="btn-group">
-              <button className="btn btn-danger" onClick={() => logout()}>
-                Log Out
-              </button>
-            </div>
-          </div>
-        )}
-      </section>
-
-      {/* RBAC Technical Validation Endpoints */}
-      <section className="card">
-        <h2>
-          <span>Backend RBAC Technical Validation</span>
-          <span className="tag">Gateway &amp; Auth Endpoints</span>
-        </h2>
-        <p>
-          Execute live calls against NestJS API authentication and role authorization guards routed via Apache APISIX Gateway.
-        </p>
-
-        <div className="btn-group">
-          <button
-            className="btn btn-secondary"
-            disabled={callingApi}
-            onClick={() => callEndpoint('/auth/me', true)}
-          >
-            GET /api/auth/me (Authenticated User)
-          </button>
-          <button
-            className="btn btn-secondary"
-            disabled={callingApi}
-            onClick={() => callEndpoint('/auth/buyer-test', true)}
-          >
-            GET /api/auth/buyer-test (buyer | admin)
-          </button>
-          <button
-            className="btn btn-secondary"
-            disabled={callingApi}
-            onClick={() => callEndpoint('/auth/admin-test', true)}
-          >
-            GET /api/auth/admin-test (admin only)
-          </button>
-          <button
-            className="btn btn-secondary"
-            disabled={callingApi}
-            onClick={() => callEndpoint('/auth/me', false)}
-          >
-            GET /api/auth/me (No Token &rarr; 401)
-          </button>
-        </div>
-
-        {callingApi && <p style={{ color: 'var(--accent-blue)' }}>Executing request...</p>}
-
-        {apiResponse && (
-          <div style={{ marginTop: '1rem' }}>
-            <div
-              className={`alert-box ${
-                apiResponse.statusCode === 200
-                  ? 'alert-success'
-                  : apiResponse.statusCode === 403
-                  ? 'alert-error'
-                  : 'alert-info'
-              }`}
-            >
-              <strong>Endpoint:</strong> {apiResponse.endpoint} |{' '}
-              <strong>Status:</strong> {apiResponse.statusCode ? `HTTP ${apiResponse.statusCode}` : 'Error'}
-              {apiResponse.statusCode === 200 && ' (Authorized - Success)'}
-              {apiResponse.statusCode === 401 && ' (401 Unauthorized - Missing or Invalid Token)'}
-              {apiResponse.statusCode === 403 && ' (403 Forbidden - Insufficient Role)'}
-            </div>
-            <pre className="code-block">
-              {JSON.stringify(apiResponse.data || apiResponse.error, null, 2)}
-            </pre>
-          </div>
-        )}
-      </section>
-
-      {/* Route Protection Demo Tabs */}
-      <section className="card">
-        <h2>
-          <span>Frontend Route Protection</span>
-          <span className="tag">Guards Demo</span>
-        </h2>
-
-        <div className="tab-nav">
-          <button
-            className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
-            onClick={() => setActiveTab('overview')}
-          >
-            Public Overview
-          </button>
-          <button
-            className={`tab-btn ${activeTab === 'protected' ? 'active' : ''}`}
-            onClick={() => setActiveTab('protected')}
-          >
-            Protected User Area
-          </button>
-          <button
-            className={`tab-btn ${activeTab === 'admin' ? 'active' : ''}`}
-            onClick={() => setActiveTab('admin')}
-          >
-            Admin Only Area
-          </button>
-        </div>
-
-        {activeTab === 'overview' && (
-          <div>
-            <p>
-              This is a public view accessible by any visitor without requiring Keycloak authentication.
-            </p>
-          </div>
-        )}
-
-        {activeTab === 'protected' && (
-          <ProtectedRoute>
-            <div className="alert-box alert-success">
-              <h3>Protected User Area</h3>
-              <p>
-                Successfully authorized. This area is visible to any authenticated user regardless of specific realm roles.
-              </p>
-              <p>Current user: <strong>{user?.username}</strong></p>
-            </div>
-          </ProtectedRoute>
-        )}
-
-        {activeTab === 'admin' && (
-          <ProtectedRoute requiredRoles={['admin']}>
-            <div className="alert-box alert-success">
-              <h3>Admin Only Area</h3>
-              <p>
-                Successfully authorized. This area is strictly restricted to accounts possessing the <code>admin</code> realm role.
-              </p>
-              <p>Admin user: <strong>{user?.username}</strong></p>
-            </div>
-          </ProtectedRoute>
-        )}
-      </section>
-
-      {/* Architecture & Roadmap */}
-      <main className="grid">
-        <section className="card">
-          <h2>
-            DX-OS Open-Core
-            <span className="tag">Phase 0/1/2 Foundation</span>
-          </h2>
-          <p>
-            Standardized open-core infrastructure layer providing identity, API gateway, relational storage, object store, and immutable ledger capabilities.
-          </p>
-          <ul className="service-list">
-            <li className="service-item">
-              <span>PostgreSQL (Relational Store)</span>
-              <span className="tag tag-active">Foundation Active</span>
-            </li>
-            <li className="service-item">
-              <span>Keycloak (SSO / RBAC)</span>
-              <span className="tag tag-active">Integrated (Issue #3)</span>
-            </li>
-            <li className="service-item">
-              <span>Apache APISIX (API Gateway)</span>
-              <span className="tag tag-active">Integrated (Issue #4)</span>
-            </li>
-            <li className="service-item">
-              <span>MinIO (Object Storage)</span>
-              <span className="tag">Planned (Phase 3)</span>
-            </li>
-            <li className="service-item">
-              <span>Flowable (BPMN Engine)</span>
-              <span className="tag">Planned (Phase 4)</span>
-            </li>
-            <li className="service-item">
-              <span>ImmuDB (Immutable Ledger)</span>
-              <span className="tag">Planned (Phase 5)</span>
-            </li>
-          </ul>
-        </section>
-
-        <section className="card">
-          <h2>
-            Procure-to-Pay Application
-            <span className="tag">Roadmap</span>
-          </h2>
-          <p>
-            Domain business capabilities for the Procure-to-Pay lifecycle.
-          </p>
-          <ul className="service-list">
-            <li className="service-item">
-              <span>Purchase Order Lifecycle</span>
-              <span className="tag">Planned (Issue #5)</span>
-            </li>
-            <li className="service-item">
-              <span>Goods Receipt (GRN) Intake</span>
-              <span className="tag">Planned (Issue #6)</span>
-            </li>
-            <li className="service-item">
-              <span>e-Invoice Ingestion Pipeline</span>
-              <span className="tag">Planned (Issue #7)</span>
-            </li>
-            <li className="service-item">
-              <span>Deterministic 3-Way Matching Engine</span>
-              <span className="tag">Planned (Issue #8)</span>
-            </li>
-            <li className="service-item">
-              <span>Exception &amp; Approval Workflow</span>
-              <span className="tag">Planned (Issue #9)</span>
-            </li>
-            <li className="service-item">
-              <span>Cryptographic Audit Sealing</span>
-              <span className="tag">Planned (Issue #10)</span>
-            </li>
-          </ul>
-        </section>
-      </main>
-
-      <footer className="footer">
-        SmartProcure-Pay &bull; OLP 2026 Open Source Software Competition &bull; Licensed under MIT
-      </footer>
+    const update = () => setRoute(window.location.hash.slice(1) || '/orders');
+    window.addEventListener('hashchange', update);
+    return () => window.removeEventListener('hashchange', update);
+  }, []);
+  // Keycloak cleans its callback with replaceState, which does not emit hashchange.
+  useEffect(() => {
+    if (!isLoading) setRoute(window.location.hash.slice(1) || '/orders');
+  }, [isLoading]);
+  const api = useMemo(() => createApi(getToken), [getToken]);
+  const url = new URL(route.startsWith('/') ? route : '/orders', window.location.origin);
+  const parts = url.pathname.split('/').filter(Boolean);
+  const section = parts[0];
+  const canRead = hasAnyRole(['buyer', 'warehouse', 'accountant', 'finance_manager', 'admin']);
+  const authAction = async (action: () => Promise<void>) => {
+    try { setAuthError(''); await action(); } catch { setAuthError('Không kết nối được dịch vụ đăng nhập. Hãy thử lại.'); }
+  };
+  if (isLoading) return <main className="auth-page"><p role="status">Đang kiểm tra phiên đăng nhập…</p></main>;
+  if (!isAuthenticated) return <main className="auth-page"><div className="auth-card">
+    <div className="brand-mark" aria-hidden="true">S</div><p className="eyebrow">SMARTPROCURE PAY</p>
+    <h1>Hồ sơ mua sắm,<br />trong một nơi.</h1><p>Tạo đơn đặt hàng, kiểm nhận từng lần giao và theo dõi hồ sơ theo đúng vai trò của bạn.</p>
+    <button className="primary" onClick={() => void authAction(login)}>Đăng nhập để làm việc →</button>
+    {authError && <p className="notice notice-error" role="alert">{authError}</p>}
+    <div className="auth-steps"><span>01 · Đặt hàng</span><span>02 · Kiểm nhận</span><span>03 · Đối soát</span></div>
+  </div><p className="auth-caption">SmartProcure-Pay · OLP PMNM 2026</p></main>;
+  let content;
+  if (!canRead) content = <p className="notice">Tài khoản chưa được cấp quyền truy cập hồ sơ mua sắm. Liên hệ quản trị viên để được phân vai trò.</p>;
+  else if (section === 'orders' && parts[1] === 'new') content = <OrderEditor api={api} />;
+  else if (section === 'orders' && parts[1] && parts[2] === 'edit') content = <OrderEditor api={api} id={parts[1]} />;
+  else if (section === 'orders' && parts[1]) content = <OrderDetail api={api} id={parts[1]} />;
+  else if (section === 'orders') content = <OrderList api={api} />;
+  else if (section === 'receipts' && parts[1] === 'new') content = <ReceiptEditor api={api} poId={url.searchParams.get('po') || undefined} />;
+  else if (section === 'receipts' && parts[1] && parts[2] === 'edit') content = <ReceiptEditor api={api} id={parts[1]} />;
+  else if (section === 'receipts' && parts[1]) content = <ReceiptDetail api={api} id={parts[1]} />;
+  else if (section === 'receipts') content = <ReceiptList api={api} poId={url.searchParams.get('po') || undefined} />;
+  else if (section === 'diagnostics' && roles.includes('admin')) content = <Suspense fallback={<p role="status">Đang tải…</p>}><div className="diagnostics"><Diagnostics /></div></Suspense>;
+  else content = <p className="notice">Không tìm thấy màn hình hoặc bạn chưa có quyền truy cập. <a href="#/orders">Về đơn đặt hàng</a></p>;
+  return <div className="app-shell">
+    <a className="skip-link" href="#workspace" onClick={e => { e.preventDefault(); document.getElementById('workspace')?.focus(); }}>Đến nội dung chính</a>
+    <aside className="sidebar"><a className="brand" href="#/orders"><span className="brand-mark">S</span><span>SmartProcure<small>PAY WORKSPACE</small></span></a>
+      <p className="nav-label">KHÔNG GIAN LÀM VIỆC</p><nav aria-label="Điều hướng chính">
+        <a className={section === 'orders' ? 'active' : ''} aria-current={section === 'orders' ? 'page' : undefined} href="#/orders"><Icon kind="order" />Đơn đặt hàng</a>
+        <a className={section === 'receipts' ? 'active' : ''} aria-current={section === 'receipts' ? 'page' : undefined} href="#/receipts"><Icon kind="receipt" />Phiếu nhận hàng</a>
+        {roles.includes('admin') && <a className={section === 'diagnostics' ? 'active' : ''} aria-current={section === 'diagnostics' ? 'page' : undefined} href="#/diagnostics"><Icon kind="settings" />Chẩn đoán hệ thống</a>}
+      </nav><div className="sidebar-bottom"><strong>Smart Procure-to-Pay</strong><span>OLP PMNM 2026</span></div>
+    </aside>
+    <div className="workspace"><header className="topbar"><div>Không gian mua sắm</div><div className="account"><span className="avatar" aria-hidden="true">{(user?.name || user?.username || 'U').slice(0, 1).toUpperCase()}</span>
+      <div><strong>{user?.name || user?.username}</strong><small>{roles.map(role => roleNames[role] || role).join(' · ')}</small></div><button onClick={() => void authAction(logout)}>Đăng xuất</button></div></header>
+      {authError && <p className="notice notice-error" role="alert">{authError}</p>}
+      <main id="workspace" className="workspace-main" tabIndex={-1} key={route}>{content}</main>
     </div>
-  );
-};
-
-export default App;
+  </div>;
+}

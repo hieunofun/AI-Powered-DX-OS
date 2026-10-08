@@ -45,3 +45,9 @@ When reusing snippets, algorithms, or forking code from public repositories:
 The explicit Issue #10 implementation instruction authorizes ImmuDB 1.11.0 and its official Go proof client under the exact tagged BUSL-1.1 license. This is a scoped exception to the OSI-only rule in section 1, not a change to the license classification of BUSL or a general authorization to add source-available dependencies. Project-authored application code remains MIT; the linked verifier dependency retains BUSL terms.
 
 The [component inventory](../../OPEN_SOURCE_COMPONENTS.md#immudb-and-pdf-issue-10-provenance) records the Additional Use Grant, production limitations, future Apache-2.0 Change License and upstream notice. Deployment/distribution must comply with those terms. The existing integration was merged through PR #20. Competition eligibility remains unresolved in [Issue #22](https://github.com/hieunofun/SmartProcure-Pay/issues/22); this internal exception does not establish organizer acceptance or authorize a different dependency. Normal dependency license review remains required.
+
+## 6. Issue #23 build-time compatibility data review
+
+The maintainer review for PR #32 verifies the pinned `caniuse-lite@1.0.30001815` package, its CC-BY-4.0 license and upstream attribution. The scoped exception covers the unchanged browser compatibility dataset consumed by the existing Babel/Browserslist build toolchain. CC-BY-4.0 is a data/content license, not an OSI software license. Preserve its packaged license and attribution; the production Nginx image copies compiled web files only. Playwright/Chromium tooling remains in development and CI.
+
+This maintainer decision does not establish contest-organizer acceptance, resolve Issue #22 or authorize other non-OSI software dependencies. The explicitly authorized Codex review is automated; no independent human review is claimed.

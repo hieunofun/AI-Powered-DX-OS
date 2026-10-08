@@ -6,6 +6,8 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
+- Issue #23: Vietnamese PO/GRN lists, detail views and guarded draft/lifecycle actions; bounded supplier lookup and finalized receipt quantities. Real browser acceptance and exact-decimal tests run in CI.
+
 - 2026-10-03: Executable React/NestJS monorepo, health endpoint, Docker foundation and CI - [Issue #1](https://github.com/hieunofun/SmartProcure-Pay/issues/1), [PR #11](https://github.com/hieunofun/SmartProcure-Pay/pull/11).
 - 2026-10-04: PostgreSQL domain model, constraints, indexes and reference seed - [Issue #2](https://github.com/hieunofun/SmartProcure-Pay/issues/2), [PR #12](https://github.com/hieunofun/SmartProcure-Pay/pull/12).
 - 2026-10-04: Keycloak OIDC/PKCE and backend JWT/RBAC - [Issue #3](https://github.com/hieunofun/SmartProcure-Pay/issues/3), [PR #13](https://github.com/hieunofun/SmartProcure-Pay/pull/13).
@@ -20,10 +22,14 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Changed
 
+- Procurement workspaces replace the diagnostic-only start page; platform checks remain separate. Reuse Keycloak initialization under StrictMode, preserve bookmark routes and permit clearing the optional PO delivery date.
+
 - Replace obsolete Phase 0 status/attribution with the implemented backend baseline and explicit remaining UI/OCR/AI/trust/payment scope.
 - Document the gateway runtime URL, workflow/ledger bootstrap, reference seed and local-versus-live-stack test boundaries.
 
 ### Licensing
+
+- Review the unchanged `caniuse-lite` CC-BY-4.0 browser dataset as a scoped build-data exception, retaining attribution and notices; Playwright is pinned Apache-2.0 development tooling. This does not resolve runtime ledger Issue #22.
 
 - Record the integrated ImmuDB server/client 1.11.0 as BUSL-1.1 source-available; Apache-2.0 is its future Change License. Preserve the scoped existing policy exception and track competition eligibility in [Issue #22](https://github.com/hieunofun/SmartProcure-Pay/issues/22).
 

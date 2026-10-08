@@ -356,6 +356,7 @@ export class GoodsReceiptsRepository {
   async findById(id: string, client?: PoolClient): Promise<GoodsReceiptEntity | null> {
     const grnQuery = `
       SELECT id, grn_number AS "grnNumber", purchase_order_id AS "purchaseOrderId",
+             (SELECT po_number FROM purchase_orders WHERE id = purchase_order_id) AS "poNumber",
              to_char(received_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "receivedAt",
              status, reference_note AS "referenceNote",
              cancelled_at AS "cancelledAt", cancelled_reason AS "cancelledReason",
@@ -971,6 +972,7 @@ export class GoodsReceiptsRepository {
 
     const dataQuery = `
       SELECT gr.id, gr.grn_number AS "grnNumber", gr.purchase_order_id AS "purchaseOrderId",
+             (SELECT po_number FROM purchase_orders WHERE id = gr.purchase_order_id) AS "poNumber",
              to_char(gr.received_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "receivedAt",
              gr.status, gr.reference_note AS "referenceNote",
              gr.cancelled_at AS "cancelledAt", gr.cancelled_reason AS "cancelledReason",

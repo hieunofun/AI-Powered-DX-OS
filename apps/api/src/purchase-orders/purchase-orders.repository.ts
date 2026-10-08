@@ -5,8 +5,11 @@ import {
   PurchaseOrderEntity,
   PurchaseOrderItemEntity,
   PaginatedResult,
+  SupplierLookup,
+  PurchaseOrderFulfillment,
 } from './interfaces/purchase-order.interface';
 import { QueryPurchaseOrderDto } from './dto/query-purchase-order.dto';
+import { QuerySupplierDto } from './dto/query-supplier.dto';
 
 @Injectable()
 export class PurchaseOrdersRepository {
@@ -44,6 +47,37 @@ export class PurchaseOrdersRepository {
     return res.rows[0] || null;
   }
 
+  async findSuppliers(query: QuerySupplierDto): Promise<PaginatedResult<SupplierLookup>> {
+    const { page = 1, limit = 20, search = '', id } = query;
+    // Escape LIKE metacharacters: searching for '%' must not enumerate unrelated suppliers.
+    const pattern = `%${search.replace(/[\\%_]/g, '\\$&')}%`;
+    const where = `WHERE ($1::uuid IS NULL OR id = $1)
+      AND (name ILIKE $2 OR supplier_code ILIKE $2 OR tax_code ILIKE $2)`;
+    const count = await this.db.query<{ total: number }>(
+      `SELECT count(*)::int AS total FROM suppliers ${where}`, [id ?? null, pattern],
+    );
+    const result = await this.db.query<SupplierLookup>(
+      `SELECT id, supplier_code AS "supplierCode", tax_code AS "taxCode", name, status
+       FROM suppliers ${where} ORDER BY name, id LIMIT $3 OFFSET $4`,
+      [id ?? null, pattern, limit, (page - 1) * limit],
+    );
+    return { data: result.rows, page, limit, total: count.rows[0]?.total ?? 0 };
+  }
+
+  async findFulfillment(id: string): Promise<PurchaseOrderFulfillment[]> {
+    const result = await this.db.query<PurchaseOrderFulfillment>(
+      `SELECT poi.id AS "purchaseOrderItemId", poi.ordered_quantity::text AS "orderedQuantity",
+         COALESCE(sum(gi.accepted_quantity) FILTER (WHERE gr.status = 'RECEIVED'), 0)::text AS "acceptedQuantity",
+         COALESCE(sum(gi.rejected_quantity) FILTER (WHERE gr.status = 'RECEIVED'), 0)::text AS "rejectedQuantity"
+       FROM purchase_order_items poi
+       LEFT JOIN goods_receipt_items gi ON gi.purchase_order_item_id = poi.id
+       LEFT JOIN goods_receipts gr ON gr.id = gi.goods_receipt_id
+       WHERE poi.purchase_order_id = $1
+       GROUP BY poi.id ORDER BY poi.line_number`, [id],
+    );
+    return result.rows;
+  }
+
   /**
    * Finds a Purchase Order by ID, including its line items.
    * Returns exact decimal values as strings to prevent floating-point inaccuracy.
@@ -51,6 +85,8 @@ export class PurchaseOrdersRepository {
   async findById(id: string, client?: PoolClient): Promise<PurchaseOrderEntity | null> {
     const poQuery = `
       SELECT id, po_number AS "poNumber", supplier_id AS "supplierId", currency, status,
+             (SELECT name FROM suppliers WHERE id = supplier_id) AS "supplierName",
+             (SELECT tax_code FROM suppliers WHERE id = supplier_id) AS "supplierTaxCode",
              to_char(order_date, 'YYYY-MM-DD') AS "orderDate",
              to_char(expected_delivery_date, 'YYYY-MM-DD') AS "expectedDeliveryDate",
              subtotal::text AS subtotal,
@@ -124,6 +160,8 @@ export class PurchaseOrdersRepository {
 
     const selectQuery = `
       SELECT id, po_number AS "poNumber", supplier_id AS "supplierId", currency, status,
+             (SELECT name FROM suppliers WHERE id = supplier_id) AS "supplierName",
+             (SELECT tax_code FROM suppliers WHERE id = supplier_id) AS "supplierTaxCode",
              to_char(order_date, 'YYYY-MM-DD') AS "orderDate",
              to_char(expected_delivery_date, 'YYYY-MM-DD') AS "expectedDeliveryDate",
              subtotal::text AS subtotal,

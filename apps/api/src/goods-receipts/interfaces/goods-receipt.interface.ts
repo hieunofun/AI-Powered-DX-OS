@@ -18,6 +18,7 @@ export interface GoodsReceiptEntity {
   id: string;
   grnNumber: string;
   purchaseOrderId: string;
+  poNumber?: string;
   receivedAt: string;
   status: GrnStatus;
   referenceNote?: string | null;

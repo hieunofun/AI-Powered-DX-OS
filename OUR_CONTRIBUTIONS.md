@@ -17,6 +17,8 @@ Implementation baseline: `develop@42dd7a3`, 7 October 2026. This inventory disti
 
 Prometheus and Grafana are planned deployments. APISIX exports metrics, but a fully deployed observability stack is not claimed. BUSL is not currently Apache-2.0 or an OSI-approved license; the ledger's competition eligibility remains [Issue #22](https://github.com/hieunofun/SmartProcure-Pay/issues/22).
 
+Issue #23 adds original React PO/GRN workspaces, typed authenticated requests, four-place fixed-scale quantity helpers, bounded supplier/fulfillment reads and real browser acceptance scenarios. Playwright is development tooling; `caniuse-lite` is unchanged build-time compatibility data with attribution recorded in [the component inventory](OPEN_SOURCE_COMPONENTS.md).
+
 ## Implemented project-authored work
 
 | Original contribution | Implementation evidence |

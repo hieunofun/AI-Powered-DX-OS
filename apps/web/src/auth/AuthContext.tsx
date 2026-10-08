@@ -21,6 +21,8 @@ export interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// React StrictMode remounts effects in development. Keycloak.init may only run once.
+let initialization: Promise<boolean> | undefined;
 
 const INTERNAL_ROLES = new Set([
   'default-roles-smartprocure',
@@ -57,13 +59,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let isMounted = true;
 
-    keycloak
-      .init({
+    initialization ??= keycloak.init({
         onLoad: 'check-sso',
         pkceMethod: 'S256',
+        // Keep OIDC callbacks out of the workspace's hash routes.
+        responseMode: 'query',
         checkLoginIframe: false,
-      })
-      .then((authenticated) => {
+      });
+    initialization.then((authenticated) => {
         if (!isMounted) return;
         setIsAuthenticated(authenticated);
         if (authenticated) {
@@ -93,6 +96,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => {
       isMounted = false;
+      keycloak.onTokenExpired = undefined;
+      keycloak.onAuthLogout = undefined;
     };
   }, [extractUserInfo]);
 
@@ -115,6 +120,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return keycloak.token;
     } catch {
       setIsAuthenticated(false);
+      setUser(null);
+      setRoles([]);
       return undefined;
     }
   }, []);
