@@ -1,329 +1,168 @@
 # SmartProcure Pay
 
-> **Open-Source Smart Procure-to-Pay & 3-Way e-Invoice Reconciliation Platform**  
-> *An open-core enterprise solution demonstrating digital transformation running on the DX-OS platform for the OLP Open Source Software Competition 2026.*
+Procure-to-Pay and three-way invoice reconciliation for the OLP PMNM 2026 DX-OS Open-Core topic.
 
----
+SmartProcure replaces manual PO / GRN / invoice comparison with deterministic matching, role-based exception handling and verifiable audit evidence. The application code is MIT-licensed. The integrated ImmuDB 1.11.0 server/client uses **BUSL-1.1 source-available licensing**, with a scoped repository exception; competition eligibility remains an open delivery gate. See [component provenance](OPEN_SOURCE_COMPONENTS.md) and [license policy](docs/open-source/LICENSE_POLICY.md).
 
-## 1. Overview
+## Current implementation
 
-**SmartProcure Pay** is an open-source, intelligent Procure-to-Pay (P2P) platform designed to automate and safeguard the reconciliation of Purchase Orders (PO), Goods Receipt Notes (GRN), and electronic invoices (e-Invoices). 
+The implementation baseline was verified on **7 October 2026** at `develop@42dd7a3`. The first ten backend/foundation issues have merged. The business UI, semantic AI and OCR are follow-up work; a closed initial backlog does not mean the whole proposed product is complete.
 
-SmartProcure Pay is engineered as an illustrative enterprise application operating atop the **DX-OS Open-Core** foundation. It replaces error-prone, fragmented, and manual verification routines with deterministic automated reconciliation, structured exception routing, and tamper-evident cryptographic audit trails.
+Clone **develop** for the current implementation. `main` still contains the initial repository snapshot and has no tagged demo release.
 
-### End-to-End Business Flow
+| Capability | Implemented behavior | Evidence |
+| --- | --- | --- |
+| Application foundation | React/Vite web, modular NestJS API, npm workspaces, Docker, CI | [#1](https://github.com/hieunofun/SmartProcure-Pay/issues/1) / [PR #11](https://github.com/hieunofun/SmartProcure-Pay/pull/11) |
+| Structured data | PostgreSQL migrations 001-014, constraints, indexes and reference seed | [#2](https://github.com/hieunofun/SmartProcure-Pay/issues/2) / [PR #12](https://github.com/hieunofun/SmartProcure-Pay/pull/12) |
+| Identity and access | Keycloak OIDC/PKCE, independently verified JWTs and role guards | [#3](https://github.com/hieunofun/SmartProcure-Pay/issues/3) / [PR #13](https://github.com/hieunofun/SmartProcure-Pay/pull/13) |
+| API gateway | APISIX routing, authentication checks, CORS and rate limits | [#4](https://github.com/hieunofun/SmartProcure-Pay/issues/4) / [PR #14](https://github.com/hieunofun/SmartProcure-Pay/pull/14) |
+| Procurement | PO creation, draft editing, issuance, cancellation and optimistic locking | [#5](https://github.com/hieunofun/SmartProcure-Pay/issues/5) / [PR #15](https://github.com/hieunofun/SmartProcure-Pay/pull/15) |
+| Receiving | GRN lifecycle, accepted/rejected quantities and cumulative fulfillment | [#6](https://github.com/hieunofun/SmartProcure-Pay/issues/6) / [PR #16](https://github.com/hieunofun/SmartProcure-Pay/pull/16) |
+| Invoice ingestion | Supported XML adapters, private MinIO archival, checksums and duplicate checks | [#7](https://github.com/hieunofun/SmartProcure-Pay/issues/7) / [PR #17](https://github.com/hieunofun/SmartProcure-Pay/pull/17) |
+| Three-way matching | Deterministic item resolution; quantity, price, tax, currency and total rules | [#8](https://github.com/hieunofun/SmartProcure-Pay/issues/8) / [PR #18](https://github.com/hieunofun/SmartProcure-Pay/pull/18) |
+| Workflow | Flowable BPMN, straight-through processing, role tasks and durable recovery | [#9](https://github.com/hieunofun/SmartProcure-Pay/issues/9) / [PR #19](https://github.com/hieunofun/SmartProcure-Pay/pull/19) |
+| Audit | Canonical packages, Merkle hashes, native ledger proof validation, JSON/PDF export | [#10](https://github.com/hieunofun/SmartProcure-Pay/issues/10) / [PR #20](https://github.com/hieunofun/SmartProcure-Pay/pull/20) |
 
-```text
-Purchase Order (PO)
-       │
-       ▼
-Goods Receipt (GRN)
-       │
-       ▼
-Invoice Ingestion (XML / PDF)
-       │
-       ▼
-3-Way Matching Engine ──► [Discrepancy / Exception?] ──► Approval Workflow
-       │                                                         │
-       ├───────────────── [Passed / Resolved] ───────────────────┘
-       ▼
-Ready for Payment
-       │
-       ▼
-Immutable Audit Sealing (ImmuDB)
-```
+### Remaining product scope
 
----
+- **Business UI:** the current web app demonstrates login, RBAC and API diagnostics; PO/GRN/invoice/task/audit workspaces are not implemented yet.
+- **OCR:** PDF bytes are archived, but PDF-only ingestion returns `OCR_REQUIRED / NOT_CONFIGURED`. No text extraction or image-upload support is claimed.
+- **Semantic AI:** item matching uses existing references, normalized SKU or normalized description equality. Different product names are not resolved with embeddings; confidence fields remain NULL.
+- **Invoice trust:** supported XML parsing does not verify signatures, certificate trust or tax-authority authenticity. Seller tax ID is compared with the PO supplier; there is no external tax-risk lookup.
+- **Finance:** `READY_FOR_PAYMENT` means workflow clearance. Bank transfers, payment orders, automatic vendor messages and CFO PKI signatures are not implemented.
+- **Operations:** multi-tenancy, lakehouse/BI, a full monitoring deployment and a validated ten-year retention/recovery policy are future work.
 
-## 2. Business Problem
-
-Modern supply chain and financial operations face systemic bottlenecks and vulnerabilities in the invoice verification and payment settlement phase:
-
-- **Manual Reconciliation Overhead**: Accounts payable departments spend thousands of hours cross-referencing paper or unstructured electronic invoices against procurement purchase orders and warehouse intake logs.
-- **Invoice Fraud and Duplicate Billing**: Without automated multi-way validation, companies risk paying duplicate invoices, unauthorized rate increases, or phantom deliveries.
-- **Siloed Stakeholder Workflows**: Purchasing agents (Buyers), warehouse receivers, accountants, and finance directors operate across disconnected systems without a shared source of operational truth.
-- **Compliance & Audit Fragility**: Regulatory tax scrutiny (e.g., electronic invoice compliance) demands unalterable records. Traditional databases are susceptible to retroactive modifications or administrative tampering.
-
----
-
-## 3. Proposed Solution
-
-SmartProcure Pay delivers an enterprise-grade, open-source platform that unifies procurement, inventory receiving, and invoice settlement:
-
-1. **Straight-Through Processing (STP) 3-Way Matching**: Deterministic, automated reconciliation validating Vendor Identity, Product Codes, Quantities, Unit Prices, Tax Rates, and Grand Totals across PO, GRN, and Invoice lines.
-2. **Multi-Format e-Invoice Ingestion**: Support for standard electronic invoice formats (structured XML schemas according to tax standards) and document fallback (PDF/image uploads).
-3. **Structured BPMN Exception Routing**: Automated isolation of discrepancies (quantity variances, price deviations, missing GRNs) into role-governed review workflows.
-4. **Cryptographic Proof of Settlement**: Generation of deterministic cryptographic hash packages anchored to an immutable ledger for tamper-evident auditability.
-
----
-
-## 4. DX-OS Architecture
-
-SmartProcure Pay is built upon the **DX-OS Open-Core** architectural blueprint, separating core foundational infrastructure from domain business logic:
+## Business flow and boundaries
 
 ```mermaid
-graph TD
-    Client[Web UI / Client Apps] --> Gateway[API Gateway: Apache APISIX]
-    Gateway --> Auth[Identity & Access: Keycloak]
-    Gateway --> Services[SmartProcure-Pay Application Services]
-
-    subgraph "SmartProcure-Pay Domain Services"
-        Services --> PO[Procurement Service]
-        Services --> GRN[Warehouse Intake Service]
-        Services --> Ingestion[Invoice Ingestion Pipeline]
-        Services --> Engine[3-Way Matching Engine]
-        Services --> AuditSvc[Audit Package Builder]
-    end
-
-    subgraph "DX-OS Core Platform & Persistence"
-        Services --> Relational[(PostgreSQL 16)]
-        Ingestion --> ObjectStore[(MinIO S3 Object Store)]
-        Services --> WorkflowEngine[Flowable BPMN 2.0 Engine]
-        AuditSvc --> Ledger[(ImmuDB Cryptographic Ledger)]
-    end
+flowchart LR
+  PO[Issued PO] --> GRN[Accepted goods receipts]
+  GRN --> INV[Supported XML invoice]
+  INV --> MATCH[Deterministic 3-way matching]
+  MATCH -->|passed| STP[Workflow policy]
+  MATCH -->|discrepancies| TASK[Role-based review tasks]
+  STP --> READY[Ready for payment]
+  STP -->|finance review required| TASK
+  TASK --> READY
+  TASK --> REJECT[Rejected or credit-note requested]
+  READY --> AUDIT[Audit package and ledger proof]
+  REJECT --> AUDIT
 ```
 
----
+Accepted GRN quantities, prior trusted invoices and historical matching policy determine available quantity and discrepancies. Matching does not itself authorize payment. Clean invoices use STP by default; the clean-invoice cap and exception finance threshold are separate workflow policies. The default STP cap is NULL, so the exception finance threshold alone does not require CFO review of every large clean invoice.
 
-## 5. H-P-D-I Mapping
+Audit seals finalized evidence and detects later changes; hashing is not encryption or a legal digital signature. Ledger proofs require continuity of the verifier's persisted trust state. See the [workflow specification](docs/business/INVOICE_WORKFLOW_MODULE.md) and [audit specification](docs/business/IMMUTABLE_AUDIT_MODULE.md).
 
-The system design aligns with the **Human - Process - Data - Intelligence (H-P-D-I)** framework *(all capabilities listed below represent planned roadmap features to be delivered across upcoming milestones)*:
+## DX-OS architecture
 
-| Dimension | Component & Responsibilities in SmartProcure-Pay *(Planned)* |
-| :--- | :--- |
-| **H (Human)** | - **Buyer**: Generates Purchase Orders and manages vendor communications.<br>- **Warehouse Staff**: Performs inventory intake and logs partial/damaged deliveries.<br>- **Accountant**: Ingests e-invoices, reviews reconciliation results, and schedules payments.<br>- **Finance Manager / CFO**: Authorizes high-value expenditures and resolves financial exceptions.<br>- **Admin**: Manages system configurations, tenant settings, and security governance.<br>- **Role-based digital workspace**: Dedicated, role-tailored operational dashboards and task queues. |
-| **P (Process)** | - **Purchase Order workflow**: Authorizations, issuance, amendments, and fulfillment tracking.<br>- **Goods Receipt workflow**: Intake inspection, quantity verification, and inventory intake logging.<br>- **Deterministic 3-Way Matching**: Strict rule-based cross-validation across PO ↔ GRN ↔ Invoice lines.<br>- **Tolerance policies**: Configurable variance thresholds (e.g., fractional rounding, minor tax deviations).<br>- **Exception handling**: Automated isolation and escalation paths for mismatched invoices.<br>- **Approval workflow**: Multi-tier sign-off escalation based on department and monetary thresholds.<br>- **Payment blocking rules**: Automated quarantine preventing disbursement on disputed or unverified claims. |
-| **D (Data)** | - **PO / GRN / Invoice structured data**: Relational domain models, line items, and lifecycle states.<br>- **Supplier data**: Vendor profiles, tax codes, bank details, and compliance metadata.<br>- **Match results**: Granular reconciliation records, discrepancy codes, and line-level flags.<br>- **Approval records**: Decision histories, electronic signatures, and approval timelines.<br>- **Audit trail**: Tamper-evident transaction logs, SHA-256 hashes, and ImmuDB receipts.<br>- **Analytics and reconciliation metrics**: STP rates, cycle times, variance statistics, and cash flow projections. |
-| **I (Intelligence)** | - **OCR-assisted invoice extraction**: Automated text and tabular data extraction from scanned PDF/image invoices.<br>- **Semantic product matching using embeddings / AI**: Cross-referencing non-standard item descriptions between PO and Invoice.<br>- **AI confidence scoring**: Reliability ratings for fuzzy line-item pairing suggestions.<br>- **Intelligent anomaly/risk detection**: Flagging potential duplicate billing, pricing outliers, and fraud risks.<br>- **AI-assisted explanation of invoice mismatches**: Contextual root-cause explanations for complex reconciliation discrepancies.<br>- **Human-in-the-loop recommendations**: AI-driven resolution suggestions requiring human authorization. |
+The mandatory headless foundations are integrated: **Identity/SSO, API Gateway, structured/object data and Workflow**. They expose services to the application layer; operators may use upstream administration consoles, while business user interfaces belong in the application.
 
----
+The domain backend is one modular NestJS application, not a fleet of separately deployed procurement microservices. [DX-OS architecture and H-P-D-I mapping](docs/architecture/DX_OS_OVERVIEW.md) describe each component and its reuse boundary.
 
-## 6. Planned Features: Status Breakdown
+| Layer | Current components | Responsibility |
+| --- | --- | --- |
+| Core services | Keycloak, APISIX, PostgreSQL, MinIO, Flowable, ImmuDB/native verifier | Identity, traffic policy, persistence, process execution and audit proof |
+| H-P-D-I workspace | React web, role guards, domain APIs | Current login/role demonstration; operational workspaces follow in the next backlog |
+| Procurement application | PO, GRN, invoice, matching, workflow and audit modules | Procure-to-Pay business rules above the generic foundations |
 
-To ensure project transparency, system capabilities are explicitly categorized into currently implemented baseline foundation versus planned future milestones:
+## Technology and licensing
 
-### Implemented (Issue #1 Foundation)
-- [x] Monorepo foundation with npm workspaces (`apps/web`, `apps/api`, `packages/*`).
-- [x] React + TypeScript + Vite frontend bootstrap application (`apps/web`).
-- [x] NestJS + TypeScript backend API bootstrap service (`apps/api`).
-- [x] Health endpoint (`GET /health`) with automated unit & Supertest e2e tests.
-- [x] PostgreSQL infrastructure service defined in `docker-compose.yml` with health check.
-- [x] Docker foundation: Multi-stage Dockerfiles for web & api, plus container orchestration config.
-- [x] Open-source licensing compliance and verified dependency inventory.
-- [x] Strict Git branching model (`main`, `develop`, `feature/*`, `fix/*`, `docs/*`).
-- [x] Ten foundational project backlog issues created and tracked on GitHub.
+| Component | Integrated version | License / status |
+| --- | --- | --- |
+| Keycloak | 24.0.5 | Apache-2.0 |
+| Apache APISIX | 3.19.0 | Apache-2.0 |
+| PostgreSQL | 16-alpine | PostgreSQL License |
+| MinIO | RELEASE.2025-10-15T17-29-55Z | AGPL-3.0; built from pinned unmodified upstream source |
+| Flowable REST | 8.0.0, pinned image digest | Apache-2.0 |
+| ImmuDB server and Go client | 1.11.0, pinned image/client | BUSL-1.1; future Change License Apache-2.0 |
+| React / Vite / NestJS | Locked by package-lock.json | MIT |
+| TypeScript | Locked by package-lock.json | Apache-2.0 |
+| Prometheus / Grafana | Planned deployment | APISIX exports metrics; no complete monitoring stack is claimed |
 
-### Planned (Subsequent Implementation Phases)
-- [ ] **Domain Schema**: Relational database migration scripts for PO, GRN, Invoice, and Matching entities (*Planned - Issue #2*).
-- [ ] **Identity & RBAC**: Keycloak OIDC integration with role definitions (*Planned - Issue #3*).
-- [ ] **API Gateway**: Apache APISIX reverse proxy, rate limiting, and CORS (*Planned - Issue #4*).
-- [ ] **Purchase Order Service**: Full lifecycle PO management and validation (*Planned - Issue #5*).
-- [ ] **Goods Receipt Service**: Receiving intake and partial shipment tracking (*Planned - Issue #6*).
-- [ ] **Invoice Ingestion Pipeline**: XML parsing, PDF upload, and MinIO storage (*Planned - Issue #7*).
-- [ ] **3-Way Matching Engine**: Deterministic multi-attribute reconciliation engine (*Planned - Issue #8*).
-- [ ] **Exception Workflow**: Flowable BPMN discrepancy review and approvals (*Planned - Issue #9*).
-- [ ] **Immutable Audit Sealing**: Cryptographic package hashing and ImmuDB integration (*Planned - Issue #10*).
-- [ ] **Intelligence & AI**: Semantic matching embeddings, anomaly detection, AI mismatch explanation (*Planned*).
-- [ ] **Business Dashboard**: Unified web analytics UI for procurement and finance (*Planned - Phase 6*).
+[OPEN_SOURCE_COMPONENTS.md](OPEN_SOURCE_COMPONENTS.md) is the version/license inventory. [OUR_CONTRIBUTIONS.md](OUR_CONTRIBUTIONS.md) separates original application work from reused software. Internal authorization of the BUSL component is not organizer acceptance.
 
----
-
-## 7. Technology Stack
-
-All external open-source platforms and planned framework components are listed with verified licenses:
-
-| Layer | Technology | Version | License | Role | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Gateway** | [Apache APISIX](https://apisix.apache.org/) | `3.9.x` | Apache-2.0 | API Gateway & Traffic Policy Controller | Planned |
-| **Auth** | [Keycloak](https://www.keycloak.org/) | `24.0.x` | Apache-2.0 | Identity Provider, SSO, and RBAC | Planned |
-| **Database** | [PostgreSQL](https://www.postgresql.org/) | `16-alpine` | PostgreSQL License | Primary Relational Transactional Database | Service Defined |
-| **Object Store** | [MinIO](https://min.io/) | `RELEASE.2024-03-30` | GNU AGPLv3 | S3-Compatible Storage for Invoices | Planned |
-| **BPMN Engine** | [Flowable](https://www.flowable.com/open-source/) | `6.8.x` | Apache-2.0 | Business Process & Exception Workflow Engine | Planned |
-| **Ledger** | [ImmuDB](https://immudb.io/) | `v1.9.x` | Apache-2.0 | Cryptographically Verifiable Immutable Ledger | Planned |
-| **Monitoring** | [Prometheus](https://prometheus.io/) | `v2.51.x` | Apache-2.0 | Telemetry & Performance Metrics | Planned |
-| **Dashboard** | [Grafana](https://grafana.com/) | `10.4.x` | GNU AGPLv3 | Observability & Metrics Visualization | Planned |
-| **Frontend UI** | [React](https://react.dev/) | `^18.3.1` | MIT | Web User Interface | Integrated |
-| **Frontend Tooling** | [Vite](https://vitejs.dev/) | `^5.3.1` | MIT | Frontend Build Tooling & Dev Server | Integrated |
-| **Backend API** | [NestJS](https://nestjs.com/) | `^10.3.9` | MIT | Backend Application Framework | Integrated |
-
-For complete licensing details and integration classifications, refer to [OPEN_SOURCE_COMPONENTS.md](OPEN_SOURCE_COMPONENTS.md).
-
----
-
-## 8. Project Structure
-
-```text
-SmartProcure-Pay/
-├── apps/                         # User-facing applications
-│   ├── web/                      # Web frontend client
-│   └── api/                      # Backend application API service
-├── services/                     # Domain-specific backend microservices
-├── packages/                     # Reusable monorepo shared packages
-│   ├── contracts/                # API contracts, DTOs & OpenAPI definitions
-│   ├── shared-types/             # TypeScript domain types & interfaces
-│   └── shared-utils/             # Cryptographic helpers, formatters, loggers
-├── infra/                        # Infrastructure-as-code & service configs
-│   ├── keycloak/                 # Realm configurations & theme definitions
-│   ├── apisix/                   # Gateway routes, plugins & upstream config
-│   ├── postgres/                 # Database initialization scripts
-│   ├── minio/                    # Bucket policies & life-cycle rules
-│   ├── flowable/                 # BPMN 2.0 XML process definitions
-│   ├── immudb/                   # Ledger configuration & key management
-│   └── monitoring/               # Prometheus targets & Grafana dashboards
-├── database/                     # Database evolution scripts
-│   ├── migrations/               # DDL schema migration files
-│   └── seed/                     # Seed datasets for development & testing
-├── docs/                         # Technical and business documentation
-│   ├── architecture/             # DX-OS design, C4 models & diagrams
-│   ├── business/                 # Business logic, P2P specifications
-│   ├── api/                      # OpenAPI specifications & endpoints
-│   ├── workflow/                 # BPMN exception handling diagrams
-│   ├── security/                 # Security threat models & RBAC matrix
-│   ├── open-source/              # License compliance & governance policies
-│   ├── project/                  # Initial issue backlog specifications
-│   └── demo/                     # Demonstration scripts and scenarios
-├── README.md                     # Main project documentation
-├── LICENSE                       # MIT License
-├── CHANGELOG.md                  # Semantic change log
-├── CONTRIBUTING.md               # Contribution workflow and guidelines
-├── OPEN_SOURCE_COMPONENTS.md     # Third-party OSS inventory and licenses
-├── OUR_CONTRIBUTIONS.md          # Architectural attribution & team contributions
-├── .gitignore                    # Git untracked file patterns
-├── .env.example                  # Environment variable configuration template
-└── docker-compose.yml            # Phase 0 container orchestration skeleton
-```
-
----
-
-## 9. Development Workflow
-
-We enforce an issue-driven, peer-reviewed development methodology:
-
-1. **Branch Conventions**:
-   - `main`: Production / release / demo stable branch.
-   - `develop`: Primary integration branch.
-   - `feature/<issue-number>-<short-name>`: New feature implementations.
-   - `fix/<issue-number>-<short-name>`: Bug fixes.
-   - `docs/<issue-number>-<short-name>`: Documentation additions.
-2. **Commit Standard**: Conventional Commits format (`feat(procurement): implement PO creation`).
-3. **Pull Requests**: Pull Requests must target `develop` and link issues via `Closes #<issue>`.
-
-Detailed guidelines are documented in [CONTRIBUTING.md](CONTRIBUTING.md).
-
----
-
-## 10. Quick Start (Phase 0 Baseline)
+## Run from source
 
 ### Prerequisites
-- [Git](https://git-scm.com/) (>= 2.40)
-- [Node.js](https://nodejs.org/) (>= 20.x LTS)
-- [npm](https://www.npmjs.com/) (>= 10.x)
-- [Docker](https://www.docker.com/) & Docker Compose (optional for containerized runtime)
 
----
+Git, Docker Engine/Desktop with Compose v2, and available local ports. Install Node.js >=20 and npm >=10 for host builds and tests. The root `.env` is consumed by Docker Compose; host API code reads process environment variables directly.
 
-### Option A: Local Development (Host Environment)
-
-1. **Clone the repository and switch to develop**:
-   ```bash
-   git clone https://github.com/hieunofun/SmartProcure-Pay.git
-   cd SmartProcure-Pay
-   git checkout develop
-   ```
-
-2. **Configure environment variables**:
-   ```bash
-   cp .env.example .env
-   ```
-
-3. **Install monorepo dependencies**:
-   ```bash
-   npm install
-   ```
-
-4. **Build and test all workspaces**:
-   ```bash
-   npm run build
-   npm run test
-   ```
-
-5. **Start development servers**:
-   - Backend API (Port 4000):
-     ```bash
-     npm run dev:api
-     ```
-     Verify health endpoint: `curl http://localhost:4000/health`
-   - Frontend Web Client (Port 3000):
-     ```bash
-     npm run dev:web
-     ```
-     Access UI in browser at: `http://localhost:3000`
-
----
-
-### Option B: Docker Container Orchestration
-
-> [!NOTE]
-> **Container Validation Matrix**:
-> - **Local Workstation**: Docker CLI is unavailable on the local host OS (status: **Not Verified / Host Blocked**).
-> - **Continuous Integration (CI)**: Full containerized stack validation (`docker compose config`, `build`, `up -d`, retry healthcheck polling, `GET /health` verification, and shutdown) is automated via [GitHub Actions CI](.github/workflows/ci.yml).
-
-1. **Build and start services**:
-   ```bash
-   docker compose up --build -d
-   ```
-
-2. **Verify container status**:
-   ```bash
-   docker compose ps
-   ```
-
-3. **Check endpoints**:
-   - Web Client: `http://localhost:3000`
-   - API Health: `http://localhost:4000/health`
-   - PostgreSQL: `localhost:5432`
-
-4. **Stop containers**:
-   ```bash
-   docker compose down
-   ```
-
----
-
-## 11. Open Source & Licensing
-
-- **Original Code**: Code developed by the SmartProcure-Pay team is licensed under the [MIT License](LICENSE).
-- **Third-Party Open Source**: Upstream components (Keycloak, APISIX, PostgreSQL, MinIO, Flowable, ImmuDB, Prometheus, Grafana) are utilized under their respective open-source licenses.
-- **Compliance Policy**: Full open-source governance and compliance rules are defined in [LICENSE_POLICY.md](docs/open-source/LICENSE_POLICY.md).
-
----
-
-## 12. Roadmap
-
-```text
-┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│   Phase 0    │ ──► │   Phase 1    │ ──► │   Phase 2    │ ──► │   Phase 3    │
-│  Bootstrap   │     │ Domain Schema│     │ Gateway/Auth │     │ P2P Services │
-└──────────────┘     └──────────────┘     └──────────────┘     └──────────────┘
-                                                                       │
-┌──────────────┐     ┌──────────────┐     ┌──────────────┐             │
-│   Phase 6    │ ◄── │   Phase 5    │ ◄── │   Phase 4    │ ◄───────────┘
-│ UI & OLP Demo│     │ ImmuDB Audit │     │ 3-Way Engine │
-└──────────────┘     └──────────────┘     └──────────────┘
+```bash
+git clone --branch develop https://github.com/hieunofun/SmartProcure-Pay.git
+cd SmartProcure-Pay
+cp .env.example .env
 ```
 
-- **Phase 0 (Current)**: Monorepo layout, Git branching workflow, Open-source documentation, Initial 10 backlog issues.
-- **Phase 1**: Database domain schema design and migrations (Issue #2).
-- **Phase 2**: Identity and API Gateway integration (Keycloak & Apache APISIX) (Issues #3, #4).
-- **Phase 3**: Procurement, Warehouse, and Invoice ingestion pipelines (Issues #5, #6, #7).
-- **Phase 4**: Deterministic 3-Way Matching Engine & Flowable BPMN approval workflow (Issues #8, #9).
-- **Phase 5**: ImmuDB tamper-evident audit package sealing & verification endpoint (Issue #10).
-- **Phase 6**: Web analytics dashboard, end-to-end integration testing, and OLP competition submission.
+PowerShell: use `Copy-Item .env.example .env` for the copy command. The example credentials are public local-demo values and must be replaced for any deployment.
 
----
+### Docker runtime
 
-## 13. Team & Contributors
+```bash
+docker compose config --quiet
+docker compose up --build -d --wait --wait-timeout 240
+docker compose exec -T smartprocure-api node infra/workflow/bootstrap-flowable.cjs
+docker compose exec -T smartprocure-api node infra/audit/bootstrap-immudb.cjs
+docker compose ps
+```
 
-- **Project Lead & Architecture**: SmartProcure-Pay Development Team
-- **Competition**: Vietnam National Olympiad in Informatics (OLP) - Open Source Software Category 2026
-- **Repository**: [https://github.com/hieunofun/SmartProcure-Pay](https://github.com/hieunofun/SmartProcure-Pay)
+The Flowable bootstrap checks and deploys the BPMN resource idempotently. The ledger bootstrap creates/checks the exact schema and proof service; it does not manufacture business seals. First builds include Go-based MinIO/verifier images and may take several minutes.
+
+| Entry point | Default URL / purpose |
+| --- | --- |
+| **Application through APISIX** | **http://localhost:9080** |
+| Public API health through gateway | http://localhost:9080/api/health |
+| Keycloak realm | http://localhost:8080/realms/smartprocure |
+| Direct API health | http://localhost:4000/health |
+| Swagger, when ENABLE_SWAGGER=true | http://localhost:4000/docs |
+| MinIO operator console | http://localhost:9001 |
+
+Port 3000 in the Docker stack serves static web files directly. With the default relative `/api` URL, use port 9080 for working API routing. Host Vite development on port 3000 has its own `/api` proxy to APISIX.
+
+The imported realm provides `admin.demo`, `buyer.demo`, `warehouse.demo`, `accountant.demo` and `finance.demo` with the local-demo password `DemoPassword123!`. Browser login uses Authorization Code + PKCE; the `smartprocure-ci` password-grant client is for DEV/CI validation only.
+
+### Reference data
+
+Migrations are applied when the primary PostgreSQL volume is first initialized. Existing volumes do not automatically receive new SQL migrations. Apply pending migrations deliberately; do not delete volumes to upgrade data.
+
+The reference seed is a database illustration: PO 100 units, accepted GRNs 98, a previous invoice for 60 and a candidate for the remaining 38. It is not a complete ingestion/matching/workflow demo, and its historical invoice states must not be presented as completed live API processing.
+
+Bash:
+
+```bash
+docker compose exec -T smartprocure-postgres sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < database/seed/001_seed_scenario.sql
+```
+
+PowerShell:
+
+```powershell
+Get-Content -Raw database/seed/001_seed_scenario.sql | docker compose exec -T smartprocure-postgres sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
+```
+
+Stop the local services with `docker compose down`. Persistent volumes are retained.
+
+## Validation
+
+```bash
+npm ci
+npm run build
+npm run lint
+npm test
+npm run test:e2e --workspace=apps/api -- --runInBand
+```
+
+At baseline `42dd7a3`, local build/lint passed with **445 unit tests in 27 suites** and **204 HTTP E2E tests in 8 suites**. HTTP tests use mocks for external orchestration/persistence dependencies; they are not proof of a full live stack.
+
+[Baseline CI run 37591846165](https://github.com/hieunofun/SmartProcure-Pay/actions/runs/37591846165) passed Docker, schema, Keycloak, APISIX, PO, GRN, MinIO/ingestion, matching, Flowable and real ledger proof/recovery validation. Matching coverage is measured for the pure matching domain, not for the entire repository. [.github/workflows/ci.yml](.github/workflows/ci.yml) contains the reproducible acceptance sequence; its fault/tamper probes require a disposable test stack.
+
+## Documentation and delivery
+
+- [DX-OS architecture](docs/architecture/DX_OS_OVERVIEW.md)
+- [Next delivery backlog and team allocation](docs/project/MVP_ROADMAP.md)
+- [Historical initial issue specifications](docs/project/INITIAL_ISSUES.md)
+- [PO](docs/business/PURCHASE_ORDER_MODULE.md), [GRN](docs/business/GOODS_RECEIPT_MODULE.md), [ingestion](docs/business/INVOICE_INGESTION_MODULE.md), [matching](docs/business/THREE_WAY_MATCHING_MODULE.md), [workflow](docs/business/INVOICE_WORKFLOW_MODULE.md), [audit](docs/business/IMMUTABLE_AUDIT_MODULE.md)
+- [Identity/RBAC](docs/security/IDENTITY_AND_RBAC.md) and [gateway](docs/architecture/API_GATEWAY.md)
+- [Changelog](CHANGELOG.md) and [contribution process](CONTRIBUTING.md)
+
+Confirmed team accounts: [huybitvvt](https://github.com/huybitvvt) and [hieunofun](https://github.com/hieunofun). The third member is pending. Working allocation: huybitvvt owns documentation/frontend/release preparation; hieunofun owns backend/AI/ledger work. Unassigned OCR/data/demo tasks remain available for the third member.
+
+Use the `issue -> branch -> tests -> PR -> peer review` lifecycle. Current work targets `develop`; reviewed demo releases belong on `main` with a real version tag. No released version is claimed by the current Unreleased changelog.
