@@ -1,5 +1,7 @@
 # Initial Project Backlog Issues (Phase 0 Baseline)
 
+> Historical planning archive. Issues #1-#10 were implemented through PRs #11-#20. Original unchecked lists and proposed states below are not the current completion tracker or authoritative API contract. Use the [current README](../../README.md), module specifications and [next MVP backlog](MVP_ROADMAP.md).
+
 This document contains the foundational backlog of the initial 10 issues designed for **SmartProcure-Pay**. Each issue includes a comprehensive specification: Description, Scope, Acceptance Criteria, Out of Scope, and Dependencies.
 
 ---
