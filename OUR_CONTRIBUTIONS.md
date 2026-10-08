@@ -1,51 +1,53 @@
-# Architectural Attribution & Contributions
+# Attribution and original contributions
 
-This document delineates the boundary between third-party open-source building blocks and the original software contributions developed by the **SmartProcure-Pay** team.
+Implementation baseline: `develop@42dd7a3`, 7 October 2026. This inventory distinguishes integrated third-party software from project-authored modules. It does not assign copyright or contributions to an unidentified team member. Exact upstream versions, licenses and notices are in [OPEN_SOURCE_COMPONENTS.md](OPEN_SOURCE_COMPONENTS.md).
 
----
+## Integrated third-party components
 
-## 1. Reused Open Source Components
+| Component | Upstream license | Reused capability and integration |
+| --- | --- | --- |
+| Keycloak | Apache-2.0 | External OIDC identity provider; project-authored realm configuration and JWT/RBAC integration |
+| Apache APISIX | Apache-2.0 | External gateway; project-authored routing/authentication/rate-limit configuration |
+| PostgreSQL | PostgreSQL License | External relational store; project-authored schema, triggers and migrations |
+| MinIO | AGPL-3.0 | Unmodified external object store built from pinned upstream source; project-authored Docker build and file linkage |
+| Flowable REST | Apache-2.0 | External BPMN engine; project-authored process definition, orchestration adapters and recovery |
+| ImmuDB server / official Go client 1.11.0 | **BUSL-1.1** | Source-available external ledger and linked proof client, with a scoped policy exception |
+| React / Vite / NestJS / supporting packages | Respective inventory licenses | Frameworks and tooling for project-authored web/API code |
+| PDFKit / Noto Sans | MIT / SIL OFL-1.1 | PDF renderer and bundled Unicode font; retained upstream notices |
+
+Prometheus and Grafana are planned deployments. APISIX exports metrics, but a fully deployed observability stack is not claimed. BUSL is not currently Apache-2.0 or an OSI-approved license; the ledger's competition eligibility remains [Issue #22](https://github.com/hieunofun/SmartProcure-Pay/issues/22).
 
 Issue #23 adds original React PO/GRN workspaces, typed authenticated requests, four-place fixed-scale quantity helpers, bounded supplier/fulfillment reads and real browser acceptance scenarios. Playwright is development tooling; `caniuse-lite` is unchanged build-time compatibility data with attribution recorded in [the component inventory](OPEN_SOURCE_COMPONENTS.md).
 
-SmartProcure-Pay leverages proven, industry-grade open-source platforms to establish a robust infrastructure layer (based on the DX-OS Open-Core architecture):
+Issue #24 adds original invoice intake/evidence screens, role-based approval workspaces and audit verification/report UX, plus bounded invoice-case lookup and explicit report verification-status headers. No AI, OCR, legal signature or bank execution is attributed to this change.
 
-- **Keycloak** (Apache-2.0): Leveraged for centralized authentication, OAuth2/OIDC token exchange, and Role-Based Access Control (RBAC).
-- **Apache APISIX** (Apache-2.0): Leveraged as the cloud-native API Gateway for microservices routing, SSL termination, and rate limiting.
-- **PostgreSQL** (PostgreSQL License): Leveraged as the enterprise relational data store for structured operational records and transactional consistency.
-- **MinIO** (GNU AGPLv3): Leveraged as S3-compatible high-performance object storage for raw invoice payloads (XML, PDF, scans).
-- **Flowable** (Apache-2.0): Leveraged as the BPMN 2.0 orchestration engine for managing complex approval workflows and exception hierarchies.
-- **ImmuDB** (Apache-2.0): Leveraged as the cryptographic immutable ledger to seal reconciliation decisions and audit packages.
-- **Prometheus & Grafana** (Apache-2.0 / AGPLv3): Leveraged for real-time telemetry, operational metrics, and monitoring dashboards.
+## Implemented project-authored work
 
-All reused components are consumed as unmodified external services via Docker orchestration and standard APIs.
+| Original contribution | Implementation evidence |
+| --- | --- |
+| Monorepo, executable application skeleton and CI acceptance pipeline | [PR #11](https://github.com/hieunofun/SmartProcure-Pay/pull/11) |
+| Procurement domain schema, relational consistency, exact numeric boundaries and reference seed | [PR #12](https://github.com/hieunofun/SmartProcure-Pay/pull/12), migrations 001-014 |
+| Identity adapter, backend JWT audience verification, role guards and frontend PKCE integration | [PR #13](https://github.com/hieunofun/SmartProcure-Pay/pull/13) |
+| Gateway policies and gateway/backend trust boundaries | [PR #14](https://github.com/hieunofun/SmartProcure-Pay/pull/14) |
+| Purchase order lifecycle, decimal arithmetic, optimistic locking and audit writes | [PR #15](https://github.com/hieunofun/SmartProcure-Pay/pull/15) |
+| Goods receipts, accepted/rejected quantity rules, fulfillment and concurrency protection | [PR #16](https://github.com/hieunofun/SmartProcure-Pay/pull/16) |
+| Secure XML adapters, bounded ingestion, private raw-file archival and duplicate handling | [PR #17](https://github.com/hieunofun/SmartProcure-Pay/pull/17) |
+| Deterministic item resolution, three-way rules, historical policy snapshots and real acceptance fixtures | [PR #18](https://github.com/hieunofun/SmartProcure-Pay/pull/18) |
+| Exception BPMN, STP/role routing, decisions and durable workflow recovery | [PR #19](https://github.com/hieunofun/SmartProcure-Pay/pull/19) |
+| Canonical/Merkle audit package construction, ledger adapter, native proof verifier, recovery and JSON/PDF reports | [PR #20](https://github.com/hieunofun/SmartProcure-Pay/pull/20) |
 
----
+The official proof client supplies the cryptographic primitives. Project-authored verifier orchestration and reporting do not relicense the linked BUSL dependency. Financial rules and domain processes are application code; the underlying databases/gateway/process engines are reused services.
 
-## 2. Built by SmartProcure-Pay Team
+## Planned original work
 
-Issue #24 adds original invoice intake/reconciliation, approval task and audit workspaces connected to the implemented APIs. Evidence is displayed from persisted matching/workflow snapshots; exports use the verification status of their own response. The team also adds invoice-case lookup, export status headers and real browser scenarios with identifiable synthetic fixtures. No new third-party component or upstream modification is introduced. Runtime scope and reproduction are recorded in [the invoice workspace guide](docs/testing/INVOICE_WORKSPACE.md); the broader documentation update remains PR #31.
+- Operational PO/GRN/invoice/approval/audit UI.
+- Semantic item-matching suggestions with model provenance and recorded confirmation.
+- Actual OCR extraction with field review; the current PDF provider is a pending stub.
+- Invoice signature trust verification, tax-risk source integration and any later CFO PKI/payment integration.
+- Operational analytics, a versioned demo and validated long-term retention/recovery procedures.
 
-> [!IMPORTANT]
-> **Status: Planned team contributions (Phase 0)**.
-> In accordance with Phase 0 project boundaries, the items listed below represent the planned original contributions to be implemented in upcoming milestones. None of the business logic modules below are claimed as completed in the initial bootstrap phase.
+These are not implementation claims. Their scope and completion criteria are in the [next backlog](docs/project/MVP_ROADMAP.md).
 
-The core business value and algorithmic differentiation created specifically by the SmartProcure-Pay development team include:
+## Upstream source changes and notices
 
-1. **Procurement Domain Model**: Domain-driven data models and relational schemas unifying Purchase Orders, Goods Receipts, and Invoices.
-2. **Purchase Order Business Logic**: Lifecycle management of POs, budget verification, item line allocation, and status progression.
-3. **Goods Receipt Business Logic**: Inventory intake recording, partial fulfillment tracking, and warehouse variance logging.
-4. **Invoice Ingestion Pipeline**: Multi-format ingestion adapter supporting XML electronic invoices, PDF extraction, and schema normalization.
-5. **3-Way Matching Engine**: High-performance algorithmic engine reconciling PO ↔ GRN ↔ Invoice lines across quantity, price, tax, and currency.
-6. **Semantic Matching Policy**: Intelligent rule evaluation layer supporting customizable tolerance thresholds and line-item reconciliation heuristics.
-7. **Exception Workflow**: Automated discrepancy routing, quarantine states, and financial supervisor resolution paths.
-8. **Audit Package Builder**: Cryptographic packager generating deterministic SHA-256 hashes and tamper-evident audit receipts for ImmuDB sealing.
-9. **Business Dashboard**: Unified procurement and finance analytical interface displaying reconciliation rates, variance analysis, and cash flow readiness.
-
----
-
-## 3. Modified Open Source Code
-
-- **Current Status**: None.
-- All external dependencies and platforms currently utilized or planned are incorporated as external services or standard libraries without source code forks or direct modifications.
-- If any upstream open-source code is customized or modified in future phases, detailed diffs, original upstream commit hashes, and licensing attributions will be documented in this section.
+No modified upstream service fork is claimed by this baseline. MinIO is built from unmodified pinned source, while the project maintains build/configuration files and adapters. Retain upstream license/copyright notices in images and distributions, including BUSL for ImmuDB, the MIT notice for the XML dependency, and OFL for Noto Sans. Future upstream modifications must record source commit, patch and license separately.

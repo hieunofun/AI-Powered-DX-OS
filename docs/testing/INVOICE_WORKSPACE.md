@@ -1,6 +1,6 @@
 # Invoice, approval and audit workspace (Issue #24)
 
-This workspace extends the procurement UI in PR #32. Its feature branch contains that unmerged foundation. PR #32 needs maintainer review before this dependent change is merged into `develop`; documentation synchronization remains PR #31.
+This workspace extends the procurement UI integrated through PR #32 and the documentation integrated through PR #31. The original implementation commits remain in their feature branches; the maintainer integration resolves the stacked branch relationship before PR #33 is merged.
 
 ## Running the application
 
