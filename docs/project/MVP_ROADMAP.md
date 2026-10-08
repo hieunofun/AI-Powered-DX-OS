@@ -4,6 +4,10 @@ The initial Issues #1-#10 are merged backend/foundation work. The next delivery 
 
 Documentation refresh: [Issue #21](https://github.com/hieunofun/SmartProcure-Pay/issues/21), branch `docs/21-mvp-documentation-backlog`, owner `huybitvvt`.
 
+## Integration evidence
+
+Documentation is integrated through [PR #31](https://github.com/hieunofun/AI-Powered-DX-OS/pull/31); procurement workspaces through [PR #32](https://github.com/hieunofun/AI-Powered-DX-OS/pull/32); invoice/task/audit workspaces through [PR #33](https://github.com/hieunofun/AI-Powered-DX-OS/pull/33). [Issue #34 / PR #35](https://github.com/hieunofun/AI-Powered-DX-OS/pull/35) adds quantity-reservation protection in this integration. The ledger decision (#22), demo scenarios (#29), release (#30) and third-member assignment remain open. Maintainer reviews performed through Codex are recorded as automated verification, not independent human peer review.
+
 ## Working team allocation
 
 | Member | Account | Working responsibility |

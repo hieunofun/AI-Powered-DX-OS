@@ -6,7 +6,7 @@ SmartProcure replaces manual PO / GRN / invoice comparison with deterministic ma
 
 ## Current implementation
 
-The implementation baseline was verified on **7 October 2026** at `develop@42dd7a3`. The first ten backend/foundation issues have merged. The PO/GRN business workspaces are implemented in Issue #23; invoice/task/audit workspaces are implemented in Issue #24; semantic AI and OCR remain follow-up work; a closed initial backlog does not mean the whole proposed product is complete.
+Integration updated **9 October 2026**. The first ten backend/foundation issues have merged. PO/GRN, invoice, approval and audit workspaces are implemented in Issues #23/#24. Issue #34 protects received quantities across pending and approved invoice decisions. Semantic AI, OCR and the remaining trust/payment integrations are still delivery work; this is not a completed competition release.
 
 Clone **develop** for the current implementation. `main` still contains the initial repository snapshot and has no tagged demo release.
 
@@ -19,7 +19,7 @@ Clone **develop** for the current implementation. `main` still contains the init
 | Procurement | PO creation, draft editing, issuance, cancellation and optimistic locking | [#5](https://github.com/hieunofun/SmartProcure-Pay/issues/5) / [PR #15](https://github.com/hieunofun/SmartProcure-Pay/pull/15) |
 | Receiving | GRN lifecycle, accepted/rejected quantities and cumulative fulfillment | [#6](https://github.com/hieunofun/SmartProcure-Pay/issues/6) / [PR #16](https://github.com/hieunofun/SmartProcure-Pay/pull/16) |
 | Invoice ingestion | Supported XML adapters, private MinIO archival, checksums and duplicate checks | [#7](https://github.com/hieunofun/SmartProcure-Pay/issues/7) / [PR #17](https://github.com/hieunofun/SmartProcure-Pay/pull/17) |
-| Three-way matching | Deterministic item resolution; quantity, price, tax, currency and total rules | [#8](https://github.com/hieunofun/SmartProcure-Pay/issues/8) / [PR #18](https://github.com/hieunofun/SmartProcure-Pay/pull/18) |
+| Three-way matching | Deterministic item resolution; quantity, price, tax, currency and total rules; effective invoice reservations (3WM-1.1) | [#8](https://github.com/hieunofun/SmartProcure-Pay/issues/8) / [PR #18](https://github.com/hieunofun/SmartProcure-Pay/pull/18) |
 | Workflow | Flowable BPMN, straight-through processing, role tasks and durable recovery | [#9](https://github.com/hieunofun/SmartProcure-Pay/issues/9) / [PR #19](https://github.com/hieunofun/SmartProcure-Pay/pull/19) |
 | Audit | Canonical packages, Merkle hashes, native ledger proof validation, JSON/PDF export | [#10](https://github.com/hieunofun/SmartProcure-Pay/issues/10) / [PR #20](https://github.com/hieunofun/SmartProcure-Pay/pull/20) |
 
@@ -53,7 +53,7 @@ flowchart LR
   REJECT --> AUDIT
 ```
 
-Accepted GRN quantities, prior trusted invoices and historical matching policy determine available quantity and discrepancies. Matching does not itself authorize payment. Clean invoices use STP by default; the clean-invoice cap and exception finance threshold are separate workflow policies. The default STP cap is NULL, so the exception finance threshold alone does not require CFO review of every large clean invoice.
+Accepted GRN quantities, effective prior allocations/reservations and historical matching policy determine available quantity and discrepancies. Approvals and recovery recheck current received/ordered capacity under the PO lock before approving. Received GRNs cannot be cancelled if active claims would lose their backing stock; see [quantity reservations](docs/business/QUANTITY_RESERVATIONS.md). Matching does not itself authorize payment. Clean invoices use STP by default; the clean-invoice cap and exception finance threshold are separate workflow policies. The default STP cap is NULL, so the exception finance threshold alone does not require CFO review of every large clean invoice.
 
 Audit seals finalized evidence and detects later changes; hashing is not encryption or a legal digital signature. Ledger proofs require continuity of the verifier's persisted trust state. See the [workflow specification](docs/business/INVOICE_WORKFLOW_MODULE.md) and [audit specification](docs/business/IMMUTABLE_AUDIT_MODULE.md).
 
@@ -154,13 +154,11 @@ npm test
 npm run test:e2e --workspace=apps/api -- --runInBand
 ```
 
-At baseline `42dd7a3`, local build/lint passed with **445 unit tests in 27 suites** and **204 HTTP E2E tests in 8 suites**. HTTP tests use mocks for external orchestration/persistence dependencies; they are not proof of a full live stack.
+Current checks include **454 backend unit tests**, **207 HTTP E2E tests**, **4 exact-decimal web tests** and **11 browser scenarios**: **676 automated tests**. HTTP E2E mocks external orchestration/persistence dependencies. The browser tests and separate integration validators use actual Keycloak, APISIX, PostgreSQL, MinIO, Flowable and native ledger proof verification.
 
-[Baseline CI run 37591846165](https://github.com/hieunofun/SmartProcure-Pay/actions/runs/37591846165) passed Docker, schema, Keycloak, APISIX, PO, GRN, MinIO/ingestion, matching, Flowable and real ledger proof/recovery validation. Matching coverage is measured for the pure matching domain, not for the entire repository. [.github/workflows/ci.yml](.github/workflows/ci.yml) contains the reproducible acceptance sequence; its fault/tamper probes require a disposable test stack.
+The quantity validator adds **7 real-service scenarios** for approved price exceptions, simultaneous decisions, intermediate/failed reservations, rejection/credit release, unresolved mappings and GRN cancellation. Matching coverage reruns existing unit tests and is not counted again. Fault/tamper probes require an isolated development/CI stack.
 
-Issue #23 adds 6 backend DTO unit cases (451 backend tests total), 4 exact-decimal web tests and 5 real browser scenarios. The browser scenarios exercise Keycloak, APISIX and PostgreSQL; only failed-read error presentation is injected. [Original UI CI](https://github.com/hieunofun/AI-Powered-DX-OS/actions/runs/37654219498) passed at `7c33c7d`; the PR checks validate the updated integration.
-
-Issue #24 adds invoice-case lookup and audit export-status contracts: 451 backend unit tests, 206 mocked HTTP E2E tests, 4 decimal tests and 11 real browser scenarios (672 total). [Original invoice UI CI](https://github.com/hieunofun/AI-Powered-DX-OS/actions/runs/37662174473) passed at `2dc7592`; PR checks validate the updated integration.
+[Original quantity-fix CI](https://github.com/hieunofun/AI-Powered-DX-OS/actions/runs/37672262826) passed at `789a868`. Updated PR checks validate the maintainer integration; [develop CI](https://github.com/hieunofun/AI-Powered-DX-OS/actions/workflows/ci.yml?query=branch%3Adevelop) records the merged source. [.github/workflows/ci.yml](.github/workflows/ci.yml) contains the reproducible acceptance sequence.
 
 ## Documentation and delivery
 

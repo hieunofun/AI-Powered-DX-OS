@@ -1,5 +1,7 @@
 # Invoice approval and exception workflow (Issue #9, WF-1.0)
 
+Issue #34 adds a physical-quantity approval guard and durable reservations around this unchanged BPMN routing model. See [quantity reservations](QUANTITY_RESERVATIONS.md), including approval conflicts and operator recovery. It does not turn an exception's saved matching result into PASSED.
+
 ## Lifecycle and boundaries
 
 Issue #8 supplies completed immutable matching evidence. This module never reruns matching or edits PO, GRN, invoice monetary fields, matching results or semantic confidence. A MATCHED invoice with a PASSED result follows STP to READY_FOR_PAYMENT by default, without an approval case or Flowable process. READY_FOR_PAYMENT is clearance only, with no bank transfer, payment gateway or ERP disbursement. Issue #10 owns ImmuDB sealing.

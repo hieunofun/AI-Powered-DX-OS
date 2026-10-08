@@ -89,6 +89,10 @@ export class WorkflowService {
         catch(error) { if(error instanceof EngineError && error.retrySafe) uncertain=false; throw error; }
       };
       try {
+        // Recheck legacy/recovered intents before any remote action or local adoption.
+        // Durable reservations remain held on ambiguity; no silent release/retry.
+        if(op.operation==='COMPLETE' && ['APPROVE','APPROVE_WITH_ADJUSTMENT'].includes(op.payload.action))
+          await this.repository.ensureQuantityReservation(approval.invoice_id);
         let process: any;
         if(op.operation==='START') {
           const matches=await this.engine.processes('approval-case:'+approval.id);

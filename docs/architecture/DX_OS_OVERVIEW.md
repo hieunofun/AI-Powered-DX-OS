@@ -1,6 +1,6 @@
 # DX-OS architecture and component responsibilities
 
-Implementation baseline: `develop@42dd7a3`, 7 October 2026. The DX-OS foundations are deployed as headless services; the domain backend is a modular NestJS API. The current React application demonstrates identity and authorization. Business workspaces are tracked in the [MVP backlog](../project/MVP_ROADMAP.md).
+Integration architecture updated 9 October 2026. The DX-OS foundations are deployed as headless services; the domain backend is a modular NestJS API. React provides role-aware PO/GRN, invoice, approval and audit workspaces. The [MVP backlog](../project/MVP_ROADMAP.md) records the remaining AI/OCR, trust, demo and release work.
 
 ## Three architectural layers
 
@@ -10,8 +10,8 @@ flowchart TB
     Domain[PO / GRN / Invoice / Matching / Approval / Audit modules]
   end
   subgraph Workspace[H-P-D-I user workspace]
-    Web[React web: current SSO and RBAC demo]
-    Next[Planned operational screens and semantic suggestions]
+    Web[React web: PO / GRN / Invoice / Approval / Audit]
+    Next[Planned reviewed semantic suggestions and OCR]
   end
   subgraph Core[Headless core services]
     Gateway[APISIX]
@@ -59,8 +59,8 @@ The existing ImmuDB 1.11.0 server/client uses BUSL-1.1. This is a scoped source-
 
 | Space | Current implementation | Remaining workspace capability |
 | --- | --- | --- |
-| Human | SSO, authenticated actors and buyer/warehouse/accountant/finance_manager/admin roles | Role-specific operational screens and team work queues |
-| Process | PO/GRN lifecycles, rule matching, STP/exception approval and reasons | UI forms/tasks; payment execution and vendor communications are separate future integrations |
+| Human | SSO, authenticated actors, role-aware workspaces and task ownership | Task pagination, delegation and broader team queues |
+| Process | PO/GRN forms and lifecycles, matching evidence, STP/exception tasks and guarded quantity reservations | Payment execution and vendor communications |
 | Data | Structured records, raw file hashes, policy snapshots, audit packages and proof reports | Operational analytics and validated long-term retention/restore procedures |
 | Intelligence | Deterministic normalization and validation | OCR extraction, embeddings, confidence scoring and reviewed AI suggestions |
 

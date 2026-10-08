@@ -12,6 +12,8 @@ import { PurchaseOrderStatus } from '../purchase-orders/domain/po-state-machine'
 import { FulfillmentCalculator } from './domain/fulfillment-calculator';
 import { QueryGoodsReceiptDto } from './dto/query-goods-receipt.dto';
 import { PaginatedResult } from '../purchase-orders/interfaces/purchase-order.interface';
+import { QuantityClaimError, readQuantityClaims, readReceivedQuantities } from '../matching/quantity-claims';
+import { acceptedQuantities, consumedQuantities, D } from '../matching/domain/quantities';
 
 @Injectable()
 export class GoodsReceiptsRepository {
@@ -782,6 +784,7 @@ export class GoodsReceiptsRepository {
     const client = await this.db.getClient();
     try {
       await client.query('BEGIN');
+      await client.query('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
 
       // 1. Lock GRN
       const grnLockRes = await client.query<{
@@ -824,6 +827,22 @@ export class GoodsReceiptsRepository {
         throw new ConflictException(
           `Cannot cancel Goods Receipt '${grnRow.grn_number}' because parent Purchase Order '${poRow.po_number}' is in terminal status '${poRow.status}'.`,
         );
+      }
+
+      if (grnRow.status === GrnStatus.RECEIVED) {
+        try {
+          const claims = consumedQuantities(await readQuantityClaims(client, poRow.id, null), '');
+          const remaining = acceptedQuantities(await readReceivedQuantities(client, poRow.id, id));
+          for (const [itemId, quantity] of claims) {
+            if (quantity.gt(new D(remaining.get(itemId) ?? 0))) {
+              throw new ConflictException({ errorCode: 'GRN_QUANTITY_RESERVED',
+                message: 'This receipt is needed by an active or approved invoice. Resolve pending claims before cancelling it.' });
+            }
+          }
+        } catch (error) {
+          if (error instanceof QuantityClaimError) throw new ConflictException({ errorCode: error.code, message: error.message });
+          throw error;
+        }
       }
 
       // 3. Update GRN status to CANCELLED

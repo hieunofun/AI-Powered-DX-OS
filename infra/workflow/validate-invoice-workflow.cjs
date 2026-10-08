@@ -42,13 +42,19 @@ async function fixture(codes=[],total='100.00'){
     VALUES($1,$2,'VND','ISSUED',CURRENT_DATE,$3,0,$3) RETURNING id`,['WF-PO-'+randomUUID(),supplier,total])).rows[0].id;
   const item=(await db.query(`INSERT INTO purchase_order_items(purchase_order_id,line_number,sku,description,ordered_quantity,unit_price,tax_rate,line_subtotal,tax_amount,line_total)
     VALUES($1,1,'WF-SKU','Workflow fixture',1,$2,0,$2,0,$2) RETURNING id`,[po,total])).rows[0].id;
+  // Routing fixtures retain synthetic discrepancy snapshots, but approval quantity
+  // now also requires real accepted stock and an explicit snapshot tolerance.
+  const grn=(await db.query(`INSERT INTO goods_receipts(grn_number,purchase_order_id,status)
+    VALUES($1,$2,'RECEIVED') RETURNING id`,['WF-GRN-'+randomUUID(),po])).rows[0].id;
+  await db.query(`INSERT INTO goods_receipt_items(goods_receipt_id,purchase_order_item_id,line_number,received_quantity,accepted_quantity,rejected_quantity)
+    VALUES($1,$2,1,1,1,0)`,[grn,item]);
   const invoiceId=(await db.query(`INSERT INTO invoices(invoice_number,supplier_id,purchase_order_id,invoice_date,status,subtotal,tax_amount,total_amount,source_type)
     VALUES($1,$2,$3,CURRENT_DATE,$4,$5,0,$5,'WORKFLOW_TEST_FIXTURE') RETURNING id`,
     ['WF-INV-'+randomUUID(),supplier,po,codes.length?'EXCEPTION':'MATCHED',total])).rows[0].id;
   const line=(await db.query(`INSERT INTO invoice_items(invoice_id,line_number,po_item_id,sku,description,quantity,unit_price,tax_rate,line_subtotal,tax_amount,line_total)
     VALUES($1,1,$2,'WF-SKU','Workflow fixture',1,$3,0,$3,0,$3) RETURNING id`,[invoiceId,item,total])).rows[0].id;
   const matchId=(await db.query(`INSERT INTO match_results(invoice_id,purchase_order_id,status,discrepancy_codes,rule_version,completed_at,policy_snapshot)
-    VALUES($1,$2,$3,$4,'3WM-1.0',now(),'{"policyCode":"WORKFLOW_FIXTURE_MATCH","ruleVersion":"3WM-1.0"}') RETURNING id`,
+    VALUES($1,$2,$3,$4,'3WM-1.0',now(),'{"policyCode":"WORKFLOW_FIXTURE_MATCH","ruleVersion":"3WM-1.0","quantityTolerancePercent":"0"}') RETURNING id`,
     [invoiceId,po,codes.length?'REVIEW_REQUIRED':'PASSED',codes])).rows[0].id;
   await db.query(`INSERT INTO match_result_items(match_result_id,invoice_item_id,purchase_order_item_id,status,discrepancy_codes)
     VALUES($1,$2,$3,$4,$5)`,[matchId,line,item,codes.length?'MISMATCHED':'MATCHED',codes]);

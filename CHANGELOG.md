@@ -24,6 +24,8 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Changed
 
+- Issue #34: reserve effective invoice quantities independently of the original matching outcome. Recheck current PO/receipt capacity before durable approving intents and recovery, retain claims through ambiguous outcomes, release rejected/credit-note claims and block GRN cancellation that removes their stock. New matching uses 3WM-1.1; historical snapshots and seals remain unchanged. CI adds seven real quantity scenarios.
+
 - Procurement workspaces replace the diagnostic-only start page; platform checks remain separate. Reuse Keycloak initialization under StrictMode, preserve bookmark routes and permit clearing the optional PO delivery date.
 
 - Replace obsolete Phase 0 status/attribution with the implemented backend baseline and explicit remaining UI/OCR/AI/trust/payment scope.

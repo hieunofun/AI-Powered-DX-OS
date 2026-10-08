@@ -1,5 +1,7 @@
 # Deterministic 3-Way Matching (Issue #8, 3WM-1.0)
 
+Issue #34 extends new evaluations to **3WM-1.1** with effective pending/approved quantity claims. Historical 3WM-1.0 snapshots are preserved. See [quantity reservations](QUANTITY_RESERVATIONS.md) for current allocation, approval and release rules; the original module scope below describes Issue #8.
+
 ## Scope and lifecycle
 
 The PostgreSQL PO defines purchase terms, RECEIVED GRNs define physically accepted stock, and the invoice defines the supplier claim. Issue #7's structured PARSED invoice is the input. Issue #8 never creates approval_cases or writes APPROVED/READY_FOR_PAYMENT. Issue #9 owns approval/payment routing. SmartProcureInvoice v1 and the verified Matbao/MIFI VAT subset remain Issue #7 ingestion profiles; matching makes no additional XML/provider/signature claim.

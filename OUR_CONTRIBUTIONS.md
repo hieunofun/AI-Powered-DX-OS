@@ -21,6 +21,8 @@ Issue #23 adds original React PO/GRN workspaces, typed authenticated requests, f
 
 Issue #24 adds original invoice intake/evidence screens, role-based approval workspaces and audit verification/report UX, plus bounded invoice-case lookup and explicit report verification-status headers. No AI, OCR, legal signature or bank execution is attributed to this change.
 
+Issue #34 adds original effective-quantity claim queries, approval/recovery capacity guards, stock-backed GRN cancellation and seven actual-service regression scenarios. Original matching evidence and native ledger history are preserved. Maintainer integration reviews use Codex under explicitly authorized `hieunofun`; no independent human peer review is claimed.
+
 ## Implemented project-authored work
 
 | Original contribution | Implementation evidence |

@@ -3,12 +3,12 @@ import { performance } from 'node:perf_hooks';
 import { PoolClient } from 'pg';
 import { DatabaseService } from '../database/database.service';
 import { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
-import { MatchingInput, MatchingInvoice, MatchingPo, MatchingPolicy, InvoiceLine, PoLine,
-  ReceiptQuantity, PreviousQuantity } from './interfaces/matching.interface';
+import { MatchingInput, MatchingInvoice, MatchingPo, MatchingPolicy, InvoiceLine, PoLine } from './interfaces/matching.interface';
 import { evaluateMatching } from './domain/three-way-matching.engine';
 import { snapshotPolicy } from './domain/matching-policy';
 import { UpdateMatchingPolicyDto } from './dto/update-matching-policy.dto';
 import { MatchingError } from './matching-error';
+import { QuantityClaimError, readQuantityClaims, readReceivedQuantities } from './quantity-claims';
 
 const POLICY_COLUMNS = `id, policy_code AS "policyCode", quantity_tolerance_percent::text AS "quantityTolerancePercent",
   price_tolerance_percent::text AS "priceTolerancePercent", tax_tolerance_percent::text AS "taxTolerancePercent",
@@ -80,18 +80,13 @@ export class MatchingRepository {
         ordered_quantity::text AS "orderedQuantity",unit_price::text AS "unitPrice",tax_rate::text AS "taxRate"
         FROM purchase_order_items WHERE purchase_order_id=$1 ORDER BY line_number`, [po.id])).rows;
       // All availability inputs are re-read AFTER the PO lock under PostgreSQL READ COMMITTED.
-      const receipts = (await client.query<ReceiptQuantity>(`SELECT gri.purchase_order_item_id AS "purchaseOrderItemId",
-        gr.status,SUM(gri.accepted_quantity)::text AS "acceptedQuantity"
-        FROM goods_receipts gr JOIN goods_receipt_items gri ON gri.goods_receipt_id=gr.id
-        WHERE gr.purchase_order_id=$1 AND gr.status='RECEIVED'
-        GROUP BY gri.purchase_order_item_id,gr.status`, [po.id])).rows;
-      const previousInvoices = (await client.query<PreviousQuantity>(`SELECT mri.purchase_order_item_id AS "purchaseOrderItemId",
-        i.id AS "invoiceId",i.status AS "invoiceStatus",mr.status AS "resultStatus",SUM(ii.quantity)::text AS quantity
-        FROM match_result_items mri JOIN match_results mr ON mr.id=mri.match_result_id
-        JOIN invoices i ON i.id=mr.invoice_id JOIN invoice_items ii ON ii.id=mri.invoice_item_id AND ii.invoice_id=i.id
-        WHERE mr.purchase_order_id=$1 AND mr.status='PASSED' AND i.id<>$2
-          AND i.status IN ('MATCHED','APPROVED','READY_FOR_PAYMENT') AND mri.purchase_order_item_id IS NOT NULL
-        GROUP BY mri.purchase_order_item_id,i.id,i.status,mr.status`, [po.id, invoiceId])).rows;
+      const receipts = await readReceivedQuantities(client, po.id);
+      let previousInvoices;
+      try { previousInvoices = await readQuantityClaims(client, po.id, invoiceId); }
+      catch (error) {
+        if (error instanceof QuantityClaimError) throw new MatchingError(error.code, error.message, 409);
+        throw error;
+      }
       await client.query("UPDATE invoices SET status='PENDING_MATCH' WHERE id=$1", [invoiceId]);
       const input: MatchingInput = { invoice, po, supplierTaxCode: supplier.taxCode, policy, invoiceItems, poItems, receipts, previousInvoices };
       const started = performance.now();
