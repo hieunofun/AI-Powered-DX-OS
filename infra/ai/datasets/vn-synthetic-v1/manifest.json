@@ -1,0 +1,128 @@
+{
+  "version": "vn-synthetic-v1",
+  "license": "MIT",
+  "synthetic": true,
+  "description": "Team-authored fictional Vietnamese documents; no production data, provider results or real tax identities.",
+  "schema_id": "openresolve.invoice-draft.v1",
+  "fields": [
+    {
+      "path": "/seller_name",
+      "kind": "TEXT",
+      "description": "Tên đơn vị bán"
+    },
+    {
+      "path": "/seller_tax_code",
+      "kind": "TEXT",
+      "description": "Mã số thuế bên bán"
+    },
+    {
+      "path": "/invoice_number",
+      "kind": "TEXT",
+      "description": "Số hóa đơn hoặc chứng từ"
+    },
+    {
+      "path": "/invoice_date",
+      "kind": "DATE",
+      "description": "Ngày lập"
+    },
+    {
+      "path": "/currency",
+      "kind": "CURRENCY",
+      "description": "Mã tiền tệ ISO"
+    },
+    {
+      "path": "/lines/0/quantity",
+      "kind": "DECIMAL",
+      "description": "Số lượng mặt hàng đầu tiên"
+    },
+    {
+      "path": "/lines/0/unit_price",
+      "kind": "DECIMAL",
+      "description": "Đơn giá mặt hàng đầu tiên"
+    },
+    {
+      "path": "/lines/0/tax_rate",
+      "kind": "DECIMAL",
+      "description": "Thuế suất dạng phân số"
+    },
+    {
+      "path": "/total_amount",
+      "kind": "DECIMAL",
+      "description": "Tổng thanh toán được ghi rõ; không tính từ các dòng"
+    }
+  ],
+  "cases": [
+    {
+      "id": "dev-basic",
+      "split": "dev",
+      "source": "sources/dev-basic.pdf",
+      "media_type": "application/pdf",
+      "source_sha256": "0c53fbe259d2a6e4e06552be07f0b0488aff7717a3c00f6044ec58d878049aac",
+      "text_source": "sources/dev-basic.txt",
+      "labels": "labels/dev-basic.json"
+    },
+    {
+      "id": "dev-zero-tax",
+      "split": "dev",
+      "source": "sources/dev-zero-tax.pdf",
+      "media_type": "application/pdf",
+      "source_sha256": "4a4125339e66b9f58791f23922ac8377dce65e12c1f719cfd989efbaa9f9ab27",
+      "text_source": "sources/dev-zero-tax.txt",
+      "labels": "labels/dev-zero-tax.json"
+    },
+    {
+      "id": "dev-missing",
+      "split": "dev",
+      "source": "sources/dev-missing.pdf",
+      "media_type": "application/pdf",
+      "source_sha256": "10e248d5bfd831e16e3287fe505d646cf966746262a579aa9ce7ac82dea85884",
+      "text_source": "sources/dev-missing.txt",
+      "labels": "labels/dev-missing.json"
+    },
+    {
+      "id": "dev-large",
+      "split": "dev",
+      "source": "sources/dev-large.pdf",
+      "media_type": "application/pdf",
+      "source_sha256": "d457024a4a8d14450ea3bc27ad3f3064c600eab3338dd1368541d2362cc3279d",
+      "text_source": "sources/dev-large.txt",
+      "labels": "labels/dev-large.json"
+    },
+    {
+      "id": "holdout-fractional",
+      "split": "held-out",
+      "source": "sources/holdout-fractional.pdf",
+      "media_type": "application/pdf",
+      "source_sha256": "0dc1e532be5a90a17672b594f2e968af3e63427b5b59fc8edf42bd89f6dae0ba",
+      "text_source": "sources/holdout-fractional.txt",
+      "labels": "labels/holdout-fractional.json"
+    },
+    {
+      "id": "holdout-usd",
+      "split": "held-out",
+      "source": "sources/holdout-usd.pdf",
+      "media_type": "application/pdf",
+      "source_sha256": "53cc613c0bad38c0e4e9877013f70e1904822f847404e12a5fb3ac1926a57a64",
+      "text_source": "sources/holdout-usd.txt",
+      "labels": "labels/holdout-usd.json"
+    },
+    {
+      "id": "holdout-missing",
+      "split": "held-out",
+      "source": "sources/holdout-missing.pdf",
+      "media_type": "application/pdf",
+      "source_sha256": "6375c96468b3589d073cdd74391e95621494ff59491b8f78964c6589c2f6db7b",
+      "text_source": "sources/holdout-missing.txt",
+      "labels": "labels/holdout-missing.json"
+    },
+    {
+      "id": "holdout-injection",
+      "split": "held-out",
+      "source": "sources/holdout-injection.pdf",
+      "media_type": "application/pdf",
+      "source_sha256": "90a2dbfd40e2c4dbb67eb41adf3f7efd1f50e880b34ceb875414eafc3ee4892d",
+      "text_source": "sources/holdout-injection.txt",
+      "labels": "labels/holdout-injection.json"
+    }
+  ]
+}

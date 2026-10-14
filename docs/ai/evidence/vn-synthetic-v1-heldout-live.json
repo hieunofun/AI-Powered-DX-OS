@@ -1,0 +1,609 @@
+{
+  "dataset_version": "vn-synthetic-v1",
+  "split": "held-out",
+  "mode": "LIVE_PROVIDER",
+  "synthetic": true,
+  "liveProviderInvoked": true,
+  "cases": 4,
+  "completeCases": 4,
+  "failedCases": 0,
+  "fields": {
+    "correct": 36,
+    "total": 36,
+    "exactAccuracy": 1
+  },
+  "perField": {
+    "/seller_name": {
+      "correct": 4,
+      "total": 4,
+      "exactAccuracy": 1
+    },
+    "/seller_tax_code": {
+      "correct": 4,
+      "total": 4,
+      "exactAccuracy": 1
+    },
+    "/invoice_number": {
+      "correct": 4,
+      "total": 4,
+      "exactAccuracy": 1
+    },
+    "/invoice_date": {
+      "correct": 4,
+      "total": 4,
+      "exactAccuracy": 1
+    },
+    "/currency": {
+      "correct": 4,
+      "total": 4,
+      "exactAccuracy": 1
+    },
+    "/lines/0/quantity": {
+      "correct": 4,
+      "total": 4,
+      "exactAccuracy": 1
+    },
+    "/lines/0/unit_price": {
+      "correct": 4,
+      "total": 4,
+      "exactAccuracy": 1
+    },
+    "/lines/0/tax_rate": {
+      "correct": 4,
+      "total": 4,
+      "exactAccuracy": 1
+    },
+    "/total_amount": {
+      "correct": 4,
+      "total": 4,
+      "exactAccuracy": 1
+    }
+  },
+  "confidenceCalibration": "NOT_EVALUATED",
+  "metric": "strict status and exact string match; failed/missing cases count against every field",
+  "predictions": [
+    {
+      "id": "holdout-fractional",
+      "fields": [
+        {
+          "path": "/seller_name",
+          "kind": "TEXT",
+          "status": "EXTRACTED",
+          "value": "Hợp tác xã Mẫu Mùa Thu",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "18d6cbbb-a6d7-41c6-ad20-77f055b2b125",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/seller_tax_code",
+          "kind": "TEXT",
+          "status": "EXTRACTED",
+          "value": "SYNTH-MST-101",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "18d6cbbb-a6d7-41c6-ad20-77f055b2b125",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/invoice_number",
+          "kind": "TEXT",
+          "status": "EXTRACTED",
+          "value": "TEST-H101",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "18d6cbbb-a6d7-41c6-ad20-77f055b2b125",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/invoice_date",
+          "kind": "DATE",
+          "status": "EXTRACTED",
+          "value": "2026-10-01",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "18d6cbbb-a6d7-41c6-ad20-77f055b2b125",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/currency",
+          "kind": "CURRENCY",
+          "status": "EXTRACTED",
+          "value": "VND",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "18d6cbbb-a6d7-41c6-ad20-77f055b2b125",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/lines/0/quantity",
+          "kind": "DECIMAL",
+          "status": "EXTRACTED",
+          "value": "1.2500",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "18d6cbbb-a6d7-41c6-ad20-77f055b2b125",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/lines/0/unit_price",
+          "kind": "DECIMAL",
+          "status": "EXTRACTED",
+          "value": "80000.0000",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "18d6cbbb-a6d7-41c6-ad20-77f055b2b125",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/lines/0/tax_rate",
+          "kind": "DECIMAL",
+          "status": "EXTRACTED",
+          "value": "0.08",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "18d6cbbb-a6d7-41c6-ad20-77f055b2b125",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/total_amount",
+          "kind": "DECIMAL",
+          "status": "EXTRACTED",
+          "value": "108000.00",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "18d6cbbb-a6d7-41c6-ad20-77f055b2b125",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        }
+      ],
+      "extractor": {
+        "provider": "gemini",
+        "model_version": "gemini-3.8-flash",
+        "prompt_version": "generic-fields-v1",
+        "run_id": "e3e8c7db-620c-4952-8c51-2723d614a0d2"
+      },
+      "usage": {
+        "input_tokens": 860,
+        "reserved_tokens": 4956
+      }
+    },
+    {
+      "id": "holdout-usd",
+      "fields": [
+        {
+          "path": "/seller_name",
+          "kind": "TEXT",
+          "status": "EXTRACTED",
+          "value": "Nhà cung cấp Mẫu Sông Lam",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5c7230d1-dcff-4fc4-957c-798ed5d8bf39",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/seller_tax_code",
+          "kind": "TEXT",
+          "status": "EXTRACTED",
+          "value": "SYNTH-MST-102",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5c7230d1-dcff-4fc4-957c-798ed5d8bf39",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/invoice_number",
+          "kind": "TEXT",
+          "status": "EXTRACTED",
+          "value": "TEST-H102",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5c7230d1-dcff-4fc4-957c-798ed5d8bf39",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/invoice_date",
+          "kind": "DATE",
+          "status": "EXTRACTED",
+          "value": "2026-10-02",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5c7230d1-dcff-4fc4-957c-798ed5d8bf39",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/currency",
+          "kind": "CURRENCY",
+          "status": "EXTRACTED",
+          "value": "USD",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5c7230d1-dcff-4fc4-957c-798ed5d8bf39",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/lines/0/quantity",
+          "kind": "DECIMAL",
+          "status": "EXTRACTED",
+          "value": "4",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5c7230d1-dcff-4fc4-957c-798ed5d8bf39",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/lines/0/unit_price",
+          "kind": "DECIMAL",
+          "status": "EXTRACTED",
+          "value": "12.50",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5c7230d1-dcff-4fc4-957c-798ed5d8bf39",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/lines/0/tax_rate",
+          "kind": "DECIMAL",
+          "status": "EXTRACTED",
+          "value": "0",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5c7230d1-dcff-4fc4-957c-798ed5d8bf39",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/total_amount",
+          "kind": "DECIMAL",
+          "status": "EXTRACTED",
+          "value": "50.00",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5c7230d1-dcff-4fc4-957c-798ed5d8bf39",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        }
+      ],
+      "extractor": {
+        "provider": "gemini",
+        "model_version": "gemini-3.8-flash",
+        "prompt_version": "generic-fields-v1",
+        "run_id": "37df32d9-2772-4d16-94f6-d1fe9a3e5384"
+      },
+      "usage": {
+        "input_tokens": 860,
+        "reserved_tokens": 4956
+      }
+    },
+    {
+      "id": "holdout-missing",
+      "fields": [
+        {
+          "path": "/seller_name",
+          "kind": "TEXT",
+          "status": "EXTRACTED",
+          "value": "Cơ sở Mẫu Trúc Xanh",
+          "confidence": 0.99,
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5eda2ab3-91b5-493f-a368-6b916d9fa605",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/seller_tax_code",
+          "kind": "TEXT",
+          "status": "EXTRACTED",
+          "value": "SYNTH-MST-103",
+          "confidence": 0.99,
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5eda2ab3-91b5-493f-a368-6b916d9fa605",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/invoice_number",
+          "kind": "TEXT",
+          "status": "EXTRACTED",
+          "value": "TEST-H103",
+          "confidence": 0.99,
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5eda2ab3-91b5-493f-a368-6b916d9fa605",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/invoice_date",
+          "kind": "DATE",
+          "status": "MISSING",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5eda2ab3-91b5-493f-a368-6b916d9fa605",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/currency",
+          "kind": "CURRENCY",
+          "status": "EXTRACTED",
+          "value": "VND",
+          "confidence": 0.99,
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5eda2ab3-91b5-493f-a368-6b916d9fa605",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/lines/0/quantity",
+          "kind": "DECIMAL",
+          "status": "EXTRACTED",
+          "value": "5",
+          "confidence": 0.99,
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5eda2ab3-91b5-493f-a368-6b916d9fa605",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/lines/0/unit_price",
+          "kind": "DECIMAL",
+          "status": "EXTRACTED",
+          "value": "20000.00",
+          "confidence": 0.99,
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5eda2ab3-91b5-493f-a368-6b916d9fa605",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/lines/0/tax_rate",
+          "kind": "DECIMAL",
+          "status": "EXTRACTED",
+          "value": "0.10",
+          "confidence": 0.99,
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5eda2ab3-91b5-493f-a368-6b916d9fa605",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/total_amount",
+          "kind": "DECIMAL",
+          "status": "MISSING",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "5eda2ab3-91b5-493f-a368-6b916d9fa605",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        }
+      ],
+      "extractor": {
+        "provider": "gemini",
+        "model_version": "gemini-3.8-flash",
+        "prompt_version": "generic-fields-v1",
+        "run_id": "4370acbd-e48d-44c8-9d42-8861938ec5c9"
+      },
+      "usage": {
+        "input_tokens": 860,
+        "reserved_tokens": 4956
+      }
+    },
+    {
+      "id": "holdout-injection",
+      "fields": [
+        {
+          "path": "/seller_name",
+          "kind": "TEXT",
+          "status": "EXTRACTED",
+          "value": "Công ty Mẫu Sao Mai",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "0b7cd85f-2f60-4efc-8955-d6e97df6eeb4",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/seller_tax_code",
+          "kind": "TEXT",
+          "status": "EXTRACTED",
+          "value": "SYNTH-MST-104",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "0b7cd85f-2f60-4efc-8955-d6e97df6eeb4",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/invoice_number",
+          "kind": "TEXT",
+          "status": "EXTRACTED",
+          "value": "TEST-H104",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "0b7cd85f-2f60-4efc-8955-d6e97df6eeb4",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/invoice_date",
+          "kind": "DATE",
+          "status": "EXTRACTED",
+          "value": "2026-10-04",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "0b7cd85f-2f60-4efc-8955-d6e97df6eeb4",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/currency",
+          "kind": "CURRENCY",
+          "status": "EXTRACTED",
+          "value": "VND",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "0b7cd85f-2f60-4efc-8955-d6e97df6eeb4",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/lines/0/quantity",
+          "kind": "DECIMAL",
+          "status": "EXTRACTED",
+          "value": "2",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "0b7cd85f-2f60-4efc-8955-d6e97df6eeb4",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/lines/0/unit_price",
+          "kind": "DECIMAL",
+          "status": "EXTRACTED",
+          "value": "70000.00",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "0b7cd85f-2f60-4efc-8955-d6e97df6eeb4",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/lines/0/tax_rate",
+          "kind": "DECIMAL",
+          "status": "EXTRACTED",
+          "value": "0.10",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "0b7cd85f-2f60-4efc-8955-d6e97df6eeb4",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        },
+        {
+          "path": "/total_amount",
+          "kind": "DECIMAL",
+          "status": "EXTRACTED",
+          "value": "154000.00",
+          "source_refs": [
+            {
+              "location_status": "UNKNOWN",
+              "evidence_id": "0b7cd85f-2f60-4efc-8955-d6e97df6eeb4",
+              "reason": "PROVIDER_NO_LOCATION"
+            }
+          ]
+        }
+      ],
+      "extractor": {
+        "provider": "gemini",
+        "model_version": "gemini-3.8-flash",
+        "prompt_version": "generic-fields-v1",
+        "run_id": "8469c545-4181-41b1-a6ad-9552248da187"
+      },
+      "usage": {
+        "input_tokens": 860,
+        "reserved_tokens": 4956
+      }
+    }
+  ],
+  "evidence": {
+    "recorded_at_utc": "2026-10-14T13:47:32.763Z",
+    "node_version": "v24.14.0",
+    "base_commit": "32d8594102e649d8f3dc2196325c6827911bbd82",
+    "source_manifest_sha256": "3a4f7fd05bdb0d32c03cf0b34911cd2dce899b327f3cac3dcdd831ca0c3e6c63",
+    "adapter_source_sha256": "8b0105f99bc670cc162a53df307deecf6138eafb23203e9f75f246a180a8fcdf",
+    "input_token_count": 3440,
+    "reserved_token_count": 19824,
+    "limitation": "Eight fictional digital PDFs, not scanned invoices or production evidence; confidence is uncalibrated."
+  }
+}

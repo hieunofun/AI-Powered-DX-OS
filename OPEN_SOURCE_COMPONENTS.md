@@ -6,6 +6,12 @@ Issue #10 corrects the stale ImmuDB license entry: the selected release is BUSL-
 
 ---
 
+### AI provider adapter (Issue #38, local review candidate)
+
+The primary provider selected by the owner is the hosted **Gemini Developer API**, REST `v1beta` `models:countTokens` and `models:generateContent`, configured as `gemini-3.8-flash`. This is an external proprietary service, not an OSI open-source model/runtime or team-authored AI algorithm. The service/model identifier is configurable and may change upstream; record the returned `modelVersion` plus prompt version, run ID, source hash and dataset version for each evaluation. No Google SDK, model weights, runtime package or new npm dependency is added. The adapter uses Node's built-in fetch; dataset generation reuses the already pinned PDFKit 0.20.2 (MIT) and Noto Sans (OFL-1.1), retaining the existing font notice in `infra/audit/fonts/OFL.txt`.
+
+Official references verified on 2026-10-14: [REST generation](https://ai.google.dev/api/generate-content), [token counting](https://ai.google.dev/api/tokens), [model identifiers](https://ai.google.dev/gemini-api/docs/models), [terms and document disclosure](https://ai.google.dev/gemini-api/terms), [current pricing](https://ai.google.dev/gemini-api/docs/pricing). Gemini service prices and terms govern external usage; the source adapter and fictional dataset are project-authored MIT code/data. The default policy allows synthetic documents only. Approved real documents require a reviewed paid-project disclosure policy and an authorized evidence worker. No provider accuracy, calibrated confidence or contest eligibility is inferred from these tests.
+
 ## Component Registry
 
 ### Procurement workspace build and test tooling (Issue #23)
