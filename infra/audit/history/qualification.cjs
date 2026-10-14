@@ -68,6 +68,11 @@ async function run() {
     } else if(mode==='cutover') {
       const adapter=new ImmudbClient();
       try {
+        const current=JSON.parse(await fs.readFile(file+'.new.json'));
+        const active=await adapter.proof(current.seal_key,current);
+        assert.equal(active.ledgerEpoch,'apache-d5f425e-opendx-1');assert.equal(active.serverUUID,current.receipt.serverUUID);
+        assert.equal(active.txId,current.immudb_tx_id);assert.equal(active.txHash,current.immudb_tx_hash);
+        assert.deepEqual(await adapter.get(current.seal_key,current),active.entry);
         for(const record of records) {
           const proof=await adapter.proof(record.seal.seal_key,record.seal);
           assert.equal(proof.txId,record.seal.immudb_tx_id);assert.equal(proof.txHash,record.seal.immudb_tx_hash);
@@ -83,7 +88,7 @@ async function run() {
         await fs.rename(file,file+'.missing');
         await assert.rejects(adapter.proof(records[0].seal.seal_key,records[0].seal));
         await fs.rename(file+'.missing',file);
-        console.log('PASS real project adapter routes original historical receipts after old server stops; corrupt/missing archives and forged anchors fail closed');
+        console.log('PASS real adapter verifies old and new epochs together; copied active rows cannot replace originals; corrupt/missing archives and forged anchors fail closed');
       } finally{await adapter.onModuleDestroy();}
     } else throw Error('Unknown mode');
     assert.equal(await snapshot(),before,'Migration must not update any historical PostgreSQL package or receipt');

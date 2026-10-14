@@ -228,6 +228,39 @@ func TestLedgerHistoricalMigrationAcrossRealEpochs(t *testing.T) {
 	}
 	t.Setenv("IMMUDB_HISTORY_DIR", archive)
 	t.Setenv("IMMUDB_HISTORY_MANIFEST_SHA256", string(pin))
+	// Exercise both epochs together. A privileged row copy in the new ledger
+	// is a NEW transaction and must never replace the archived original proof.
+	newCtx, newCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer newCancel()
+	newWriter := nativeClient(t, apache, t.TempDir())
+	_, err = newWriter.SQLExec(newCtx, `CREATE TABLE smartprocure_audit_seals (seal_key VARCHAR[150],invoice_id VARCHAR[36],audit_package_id VARCHAR[36],package_version VARCHAR[30],package_sha256 VARCHAR[64],merkle_root VARCHAR[64],final_business_state VARCHAR[50],sealed_at VARCHAR[40],PRIMARY KEY seal_key)`, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	newID := "33333333-3333-4333-8333-333333333333"
+	newKey := "smartprocure:audit:invoice:" + newID + ":v1"
+	for _, values := range []map[string]interface{}{
+		{"key": newKey, "id": newID, "package": newID, "version": "SMARTPROCURE-AUDIT-1", "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "root": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "state": "READY_FOR_PAYMENT", "time": "2026-10-15T00:00:00.000000Z"},
+		{"key": records[0].Seal["seal_key"], "id": records[0].Package["invoice_id"], "package": records[0].Package["id"], "version": records[0].Package["package_version"], "sha": records[0].Package["package_sha256"], "root": records[0].Package["merkle_root"], "state": records[0].Package["final_business_state"], "time": "2026-10-14T00:00:00.000000Z"},
+	} {
+		_, err = newWriter.SQLExec(newCtx, "INSERT INTO "+table+" ("+columns+") VALUES (@key,@id,@package,@version,@sha,@root,@state,@time)", values)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	code, newReceipt := verifierCall(t, newKey, nil)
+	if code != 200 {
+		t.Fatal("new Apache epoch native proof failed")
+	}
+	newSeal := map[string]any{"status": "SEALED", "seal_key": newKey, "receipt": newReceipt, "immudb_tx_id": newReceipt["txId"], "immudb_tx_hash": newReceipt["txHash"], "immudb_state_tx_id": newReceipt["stateTxId"], "immudb_state_hash": newReceipt["stateHash"]}
+	raw, _ = json.Marshal(newSeal)
+	if os.WriteFile(file+".new.json", raw, 0600) != nil {
+		t.Fatal("save actual new-epoch native receipt")
+	}
+	code, copied := verifierCall(t, records[0].Seal["seal_key"].(string), nil)
+	if code != 200 || copied["txId"] == records[0].Receipt["txId"] || copied["txHash"] == records[0].Receipt["txHash"] {
+		t.Fatal("row copy did not have a distinct genuine transaction")
+	}
 	run("cutover")
 	t.Log("PASS separate old/new data and trust-state directories; old receipts verify without old server or resealing")
 }
