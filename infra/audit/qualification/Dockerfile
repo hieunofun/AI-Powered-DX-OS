@@ -58,6 +58,7 @@ LABEL org.opencontainers.image.source="https://github.com/codenotary/immudb" \
       org.opencontainers.image.revision="d5f425e46b4bfd0771274cb4c2ea77634421600c" \
       org.opencontainers.image.licenses="Apache-2.0" \
       org.opencontainers.image.description="Disposable OpenDX ledger qualification; not a production cutover"
-USER 3322:3322
+RUN addgroup -g 3322 qualification && adduser -D -u 3322 -G qualification qualification
+USER qualification:qualification
 ENV IMMUDB_QUALIFICATION_BINARY=/immudb
 ENTRYPOINT ["/qualification", "-test.v", "-test.timeout=180s"]
