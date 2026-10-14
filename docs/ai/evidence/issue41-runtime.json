@@ -1,0 +1,198 @@
+{
+  "started": "2026-10-14T15:07:23.351Z",
+  "completed": "2026-10-14T15:07:25.603Z",
+  "command": "node infra/evidence/validate-runtime.cjs",
+  "gitHead": "c63e8307433ae444bf8f68e857f3274d6b1e8beb",
+  "worktreeDirty": true,
+  "sourceHashes": {
+    "clamav.scanner.ts": "bc129856f08e0143317ec13fe0dae625ec4186d012b1bae61d6cea2396dec524",
+    "evidence-context.ts": "41409188b369396514ee58d4790e7521c5c318822f5e452aea212c3d3e1b734f",
+    "evidence-storage.ts": "52f6cca7eaf2c0c7faf4973f42c39f50ba70c1c9431f8c7e8cd9ae5fe2cc1eaa",
+    "evidence.controller.ts": "6fb9a0eec799fcf77319e53f4447e3de8627a97a7ade533e88f061ddd71eef76",
+    "evidence.module.ts": "581de09b460f0f9239dcb5199d709dab51e47dc9f2dec3f08b8498faca6a16ff",
+    "evidence.repository.ts": "18044b67f8a524ac21c1272cb16f62d0a4356283b4868e44ab3f347e4a54caf8",
+    "evidence.service.ts": "e2c67c6114d2f7e180667478d1cff1511a70e663fefc8680d3eec3ddb7ed6927",
+    "evidence.types.ts": "7044d375babffe9e8fa3780e275bf94ccc9b5da96138eb59584616d02c0cb4a5",
+    "file-safety.ts": "8fab7042139c234e4fd8ad71517afcf1f2bb0b4f5f0776dd745861508f2d0130"
+  },
+  "environment": {
+    "node": "v24.14.0",
+    "platform": "win32",
+    "scannerImage": "clamav/clamav:1.4.6@sha256:b5b910ce43d595bf8a2fe401e34db56434602b2c755b7c2b07f00c917d04d469",
+    "identity": "static server-side test identities; not production JWT/membership",
+    "persistence": "real isolated PostgreSQL/MinIO/clamd",
+    "aiCalls": 0
+  },
+  "checks": [
+    {
+      "id": "scanner readiness exact engine/fresh definitions/complete INSTREAM",
+      "status": "PASS",
+      "detail": {
+        "engine": "1.4.6",
+        "definitions": "28153",
+        "definitionsAt": "2026-10-14T06:24:15.000Z"
+      }
+    },
+    {
+      "id": "EI-01/02/03 registration and server identity HTTP",
+      "status": "PASS"
+    },
+    {
+      "id": "EI-04 tenant-predicated HTTP/DB resources and operations",
+      "status": "PASS"
+    },
+    {
+      "id": "EI-07/18 blocked bytes, bad SHA and readback SHA before acknowledgement",
+      "status": "PASS"
+    },
+    {
+      "id": "EI-08/09 real concurrent PostgreSQL idempotency and upload replay",
+      "status": "PASS"
+    },
+    {
+      "id": "EI-10/27 real clean scan, provenance, attachment and private object",
+      "status": "PASS",
+      "detail": {
+        "engine": "1.4.6",
+        "definitions": "28153",
+        "definitionsAt": "2026-10-14T06:24:15.000Z"
+      }
+    },
+    {
+      "id": "EI-11/12 embedded harmless EICAR with misleading filename remains blocked",
+      "status": "PASS",
+      "detail": {
+        "signature": "Eicar-Test-Signature"
+      }
+    },
+    {
+      "id": "EI-15 actual encrypted PDF and decompression limit",
+      "status": "PASS",
+      "detail": {
+        "encrypted": "Heuristics.Encrypted.PDF",
+        "decompression": "Heuristics.Limits.Exceeded.MaxFileSize"
+      }
+    },
+    {
+      "id": "EI-17 XML safety through HTTP before scan dispatch",
+      "status": "PASS"
+    },
+    {
+      "id": "EI-20 real MinIO corruption with unchanged hash metadata revokes CLEAN",
+      "status": "PASS"
+    },
+    {
+      "id": "EI-22 fault-injected finalization with real persisted intent/object and stable retry",
+      "status": "PASS"
+    },
+    {
+      "id": "EI-13/24/25 unavailable real scanner, persisted due times, recreated workers exhaust at three",
+      "status": "PASS"
+    },
+    {
+      "id": "EI-26 cursor binding and private storage context",
+      "status": "PASS"
+    }
+  ],
+  "resources": [
+    {
+      "id": "b7c6591a-99cc-4efc-b0e1-fe58561c5e42",
+      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "media": "application/pdf"
+    },
+    {
+      "id": "497ebcee-2da6-4ee2-a718-3ed04da17454",
+      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "media": "application/pdf"
+    },
+    {
+      "id": "9148feb7-1943-46f8-85da-9f711c102471",
+      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "media": "application/pdf"
+    },
+    {
+      "id": "9148feb7-1943-46f8-85da-9f711c102471",
+      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "media": "application/pdf"
+    },
+    {
+      "id": "9148feb7-1943-46f8-85da-9f711c102471",
+      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "media": "application/pdf"
+    },
+    {
+      "id": "9148feb7-1943-46f8-85da-9f711c102471",
+      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "media": "application/pdf"
+    },
+    {
+      "id": "9148feb7-1943-46f8-85da-9f711c102471",
+      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "media": "application/pdf"
+    },
+    {
+      "id": "9148feb7-1943-46f8-85da-9f711c102471",
+      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "media": "application/pdf"
+    },
+    {
+      "id": "9148feb7-1943-46f8-85da-9f711c102471",
+      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "media": "application/pdf"
+    },
+    {
+      "id": "9148feb7-1943-46f8-85da-9f711c102471",
+      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "media": "application/pdf"
+    },
+    {
+      "id": "9148feb7-1943-46f8-85da-9f711c102471",
+      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "media": "application/pdf"
+    },
+    {
+      "id": "9148feb7-1943-46f8-85da-9f711c102471",
+      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "media": "application/pdf"
+    },
+    {
+      "id": "46f31f92-fe7d-479d-bdef-c38961be6a94",
+      "sha256": "bf6f4e0d16a64844e6cdda3857d0ce3bf4d9e0716c48edb1a2ab282f561f71f8",
+      "media": "application/pdf"
+    },
+    {
+      "id": "3d34406b-772f-4c3b-8154-01153ddeee43",
+      "sha256": "2464480cd29d0ed45fe1758de2ddd1fa994c39833dfd64c7298c49d7af87fa99",
+      "media": "application/xml"
+    },
+    {
+      "id": "2b112ee5-01f4-41fd-b63e-d221b3b22519",
+      "sha256": "7d0bb6f1bf9b3f5a54b1e46ef0235c050a9f989dc96034bab28c6c3814417199",
+      "media": "application/xml"
+    },
+    {
+      "id": "06923419-ac1f-4ab2-8ab9-fc0a8c663ccb",
+      "sha256": "5a35cdcf8a8dfd1040a03603ae7fdd8db7379bd5f9b12ac603952e68b54efba2",
+      "media": "application/xml"
+    },
+    {
+      "id": "2530ed4d-49b3-4039-9bc8-2425b243c2fc",
+      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "media": "application/pdf"
+    },
+    {
+      "id": "373c6e20-744b-4654-a2b2-1a8ead534563",
+      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "media": "application/pdf"
+    }
+  ],
+  "pendingReleaseGates": [
+    "PR #68 peer acceptance",
+    "#43 verified tenant/JWT/ACL integration",
+    "A-owned numbered migration and shared composition review",
+    "EI-16 daemon hang supervisor recovery",
+    "EI-19 real membership revocation",
+    "EI-29 coordinated snapshot restore",
+    "EI-30 full legacy real-stack regression"
+  ]
+}
