@@ -25,9 +25,9 @@ volumes:
   flowable_postgres_data:
     name: smartprocure_flowable_postgres_data
   immudb_data:
-    name: smartprocure_immudb_data
+    name: smartprocure_immudb_apache_d5f425e_data
   immudb_verifier_state:
-    name: smartprocure_immudb_verifier_state
+    name: smartprocure_immudb_apache_d5f425e_verifier_state
 
 services:
   # ----------------------------------------------------------------------------
@@ -100,6 +100,7 @@ services:
       IMMUDB_TIMEOUT_MS: ${IMMUDB_TIMEOUT_MS:-10000}
       IMMUDB_VERIFIER_URL: http://smartprocure-audit-verifier:8081
       IMMUDB_VERIFIER_TOKEN: ${IMMUDB_VERIFIER_TOKEN:-audit_verifier_dev_only_token}
+      IMMUDB_LEDGER_EPOCH: apache-d5f425e-opendx-1
     ports:
       - "${API_PORT:-4000}:4000"
     networks:
@@ -273,14 +274,17 @@ services:
       start_period: 40s
       retries: 30
 
-  # Issue #10: source-available BUSL-1.1; see the exact release license notice.
+  # Issue #22: exact Apache source and hardened dependencies, NEW volume epoch.
   smartprocure-immudb:
-    image: codenotary/immudb:1.11.0@sha256:460cb34bb0a690ee743336a174c59f2f24edf79dd00c26d936717495db32d1cf
+    image: opendx-immudb:apache-d5f425e-opendx-1
+    build:
+      context: .
+      dockerfile: infra/audit/server/Dockerfile
     platform: linux/amd64
     container_name: smartprocure-immudb
     restart: unless-stopped
     environment:
-      IMMUDB_DIR: /var/lib/immudb
+      IMMUDB_DIR: /data
       IMMUDB_AUTH: "true"
       IMMUDB_DEVMODE: "false"
       IMMUDB_ADMIN_PASSWORD: ${IMMUDB_PASSWORD:-immudb_dev_only_password}
@@ -289,11 +293,11 @@ services:
     ports:
       - "127.0.0.1:${IMMUDB_HOST_PGSQL_PORT:-5433}:5432"
     volumes:
-      - immudb_data:/var/lib/immudb
+      - immudb_data:/data
     networks:
       - smartprocure-network
     healthcheck:
-      test: ["CMD", "/usr/local/bin/immuadmin", "status"]
+      test: ["CMD", "/immudb", "health"]
       interval: 5s
       timeout: 3s
       start_period: 10s
@@ -315,8 +319,12 @@ services:
       IMMUDB_PASSWORD: ${IMMUDB_PASSWORD:-immudb_dev_only_password}
       IMMUDB_STATE_DIR: /state
       IMMUDB_VERIFIER_TOKEN: ${IMMUDB_VERIFIER_TOKEN:-audit_verifier_dev_only_token}
+      IMMUDB_LEDGER_EPOCH: apache-d5f425e-opendx-1
+      IMMUDB_HISTORY_DIR: /history
+      IMMUDB_HISTORY_MANIFEST_SHA256: ${IMMUDB_HISTORY_MANIFEST_SHA256:-}
     volumes:
       - immudb_verifier_state:/state
+      - ${IMMUDB_HISTORY_ARCHIVE_PATH:-./infra/audit/history/empty}:/history:ro
     networks:
       - smartprocure-network
     depends_on:

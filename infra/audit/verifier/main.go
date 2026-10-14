@@ -94,20 +94,24 @@ func safeError(w http.ResponseWriter, err error) {
 	}
 	reply(w, 503, map[string]string{"errorCode": "LEDGER_VERIFIER_UNAVAILABLE"})
 }
+func authorized(r *http.Request) bool {
+	token := os.Getenv("IMMUDB_VERIFIER_TOKEN")
+	return token != "" && subtle.ConstantTimeCompare([]byte(r.Header.Get("Authorization")), []byte("Bearer "+token)) == 1
+}
 func verify(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		reply(w, 405, map[string]string{"errorCode": "METHOD_NOT_ALLOWED"})
 		return
 	}
-	token := os.Getenv("IMMUDB_VERIFIER_TOKEN")
-	if token == "" || subtle.ConstantTimeCompare([]byte(r.Header.Get("Authorization")), []byte("Bearer "+token)) != 1 {
+	if !authorized(r) {
 		reply(w, 401, map[string]string{"errorCode": "UNAUTHORIZED"})
 		return
 	}
 	var input struct {
-		SealKey   string `json:"sealKey"`
-		StateTxID string `json:"stateTxId"`
-		StateHash string `json:"stateHash"`
+		SealKey    string `json:"sealKey"`
+		StateTxID  string `json:"stateTxId"`
+		StateHash  string `json:"stateHash"`
+		ServerUUID string `json:"serverUUID"`
 	}
 	decoder := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1024))
 	decoder.DisallowUnknownFields()
@@ -144,6 +148,15 @@ func verify(w http.ResponseWriter, r *http.Request) {
 		defer closeCancel()
 		_ = c.CloseSession(closeCtx)
 	}()
+	serverUUID, err := clientstate.NewUUIDProvider(c.GetServiceClient()).CurrentUUID(ctx)
+	if err != nil {
+		safeError(w, err)
+		return
+	}
+	if input.ServerUUID != "" && input.ServerUUID != serverUUID {
+		reply(w, 409, map[string]string{"errorCode": "LEDGER_PROOF_INVALID"})
+		return
+	}
 	result, err := c.SQLQuery(ctx, "SELECT "+columns+" FROM "+table+" WHERE seal_key=@key", map[string]interface{}{"key": input.SealKey}, true)
 	if err != nil {
 		safeError(w, err)
@@ -203,11 +216,27 @@ func verify(w http.ResponseWriter, r *http.Request) {
 		entry[parts[len(parts)-1]] = result.Rows[0].Values[i].GetS()
 	}
 	reply(w, 200, map[string]any{"verified": true, "method": "immudb-go-v" + clientVersion() + " VerifyRow + VerifiedTxByID",
+		"serverUUID": serverUUID, "ledgerEpoch": env("IMMUDB_LEDGER_EPOCH", "apache-d5f425e-opendx-1"),
 		"entry": entry, "txId": strconv.FormatUint(rowProof.SqlEntry.Tx, 10), "txHash": hex.EncodeToString(txHash[:]),
 		"stateTxId": strconv.FormatUint(state.TxId, 10), "stateHash": hex.EncodeToString(state.TxHash),
 		"rowProof": rowProof, "transactionHeader": tx.Header})
 }
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "verify-history-file" {
+		var input struct {
+			Receipt json.RawMessage `json:"receipt"`
+			Anchor  historyAnchor   `json:"anchor"`
+		}
+		decoder := json.NewDecoder(io.LimitReader(os.Stdin, 32<<20))
+		if decoder.Decode(&input) != nil || decoder.Decode(new(any)) != io.EOF {
+			os.Exit(1)
+		}
+		if _, err := verifyArchivedReceipt(input.Receipt, input.Anchor); err != nil {
+			os.Exit(1)
+		}
+		_ = json.NewEncoder(os.Stdout).Encode(map[string]bool{"verified": true})
+		return
+	}
 	if len(os.Args) > 1 && os.Args[1] == "health" {
 		c := &http.Client{Timeout: 2 * time.Second}
 		resp, err := c.Get("http://127.0.0.1:8081/health")
@@ -225,6 +254,7 @@ func main() {
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/verify", verify)
+	mux.HandleFunc("/historical/verify", historicalVerify)
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		reply(w, 200, map[string]string{"status": "ok", "clientVersion": clientVersion()})
 	})

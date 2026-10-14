@@ -6,7 +6,7 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
-- Issue #22: isolated exact-source Apache v1.9DOM.1 ledger/SDK qualification, real inclusion/consistency/tamper/trust-state/process-recovery tests and CI provenance artifacts; ADR-003 defines the pending historical migration/adoption gates. Production ledger and receipt history are retained.
+- Issue #22: exact Apache ledger/server SDK with pinned transport security updates, source/binary vulnerability gates, linked-module CycloneDX SBOMs/notices, a separate ledger/storage epoch, read-only historical receipt exports, independent manifest pins and isolated restore tools. Real two-ledger/PostgreSQL migration tests preserve original receipts and exact decimal evidence; peer review/merge and deployment-specific acceptance remain pending.
 
 - Issue #24: Vietnamese XML/PDF intake status, saved three-way comparison, role-based task decisions and native audit verification/JSON/PDF export workspaces. Add direct invoice-case lookup and explicit export-status headers; CI runs 11 real browser scenarios.
 

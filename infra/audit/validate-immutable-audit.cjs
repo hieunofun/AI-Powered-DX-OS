@@ -9,6 +9,7 @@ const {Pool}=require('pg');
 const {Client:MinioClient}=require('minio');
 const {buildPackage}=require('../../apps/api/dist/audit/domain/audit-package');
 const {hashJson}=require('../../apps/api/dist/audit/domain/canonical-json');
+const {normalizeLedgerRow}=require('../../apps/api/dist/audit/immudb/immudb.client');
 const db=new Pool({host:'localhost',port:Number(process.env.POSTGRES_PORT||5432),database:process.env.POSTGRES_DB||'smartprocure_db',
   user:process.env.POSTGRES_USER||'smartprocure_user',password:process.env.POSTGRES_PASSWORD||'postgres_password',connectionTimeoutMillis:5000});
 const ledger=new Pool({host:'localhost',port:Number(process.env.IMMUDB_HOST_PGSQL_PORT||5433),database:process.env.IMMUDB_DATABASE||'defaultdb',
@@ -74,7 +75,8 @@ async function sealed(invoiceId,state){
   const rebuilt=buildPackage(e,detail.pkg.package_json.builtAt,detail.pkg.package_json.capturedAt,detail.pkg.package_json.captureMode);
   assert.equal(rebuilt.packageSha256,detail.pkg.package_sha256);assert.equal(rebuilt.manifest.merkleRoot,detail.pkg.merkle_root);
   assert.equal(buildPackage(e,detail.pkg.package_json.builtAt,detail.pkg.package_json.capturedAt,detail.pkg.package_json.captureMode).manifest.merkleRoot,rebuilt.manifest.merkleRoot);
-  const rows=(await ledger.query('SELECT seal_key,merkle_root FROM smartprocure_audit_seals WHERE seal_key=$1',[detail.seal.seal_key])).rows;
+  const rows=(await ledger.query('SELECT seal_key,merkle_root FROM smartprocure_audit_seals WHERE seal_key=$1',[detail.seal.seal_key])).rows
+    .map(row=>Object.fromEntries(Object.entries(row).map(([name,value])=>[name.replace(/^\(smartprocure_audit_seals\.(\w+)\)$/,'$1'),value])));
   assert.equal(rows.length,1);assert.equal(rows[0].seal_key,detail.seal.seal_key);assert.equal(rows[0].merkle_root,detail.pkg.merkle_root);
   return {verification,detail};
 }
@@ -132,11 +134,9 @@ async function main(){
   // the separate native proof above remains the cryptographic authority.
   assert.match(detail.seal.seal_key,/^smartprocure:audit:invoice:[0-9a-f-]{36}:v1$/);
   assert.match(detail.seal.immudb_tx_id,/^[1-9]\d*$/);
-  const wireRow=(await ledger.query("SELECT immudb_verify_row('smartprocure_audit_seals', '"+detail.seal.seal_key+"')")).rows[0];
-  const wireTx=(await ledger.query('SELECT immudb_verify_tx('+detail.seal.immudb_tx_id+')')).rows[0];
-  assert.equal(wireRow.verified,'true');assert.equal(String(wireRow.tx_id),detail.seal.immudb_tx_id);
-  assert.equal(wireTx.verified,'true');assert.equal(String(wireTx.tx_id),detail.seal.immudb_tx_id);
-  console.log('PASS exact v1.11.0 immudb_verify_row/immudb_verify_tx signatures against the real sealed row/transaction');
+  assert.equal(detail.seal.receipt.ledgerEpoch,'apache-d5f425e-opendx-1');
+  assert.match(detail.seal.receipt.serverUUID,/^[a-z0-9-]+$/);
+  console.log('PASS exact Apache ledger epoch and server identity, with real native row/transaction proofs');
   const file=detail.pkg.package_json.evidence.files[0];
   const minio=new MinioClient({endPoint:'localhost',port:Number(process.env.MINIO_PORT||9000),useSSL:false,
     accessKey:process.env.MINIO_ACCESS_KEY||'minio_dev_only',secretKey:process.env.MINIO_SECRET_KEY||'minio_dev_password_only'});
@@ -186,7 +186,7 @@ async function main(){
   await request('GET',base(outage.invoiceId)+'/verify','accountant',undefined,503);
   const report=docker(['exec','-T','smartprocure-api','node','infra/audit/reconcile-audit-seals.cjs','--invoice',outage.invoiceId]);assert.ok(report.includes('"mutations":0'));assert.ok(report.includes(outage.invoiceId));
   docker(['start','smartprocure-immudb']);stopped=false;
-  for(let n=0;n<60;n++){try{await ledger.query('SELECT immudb_state()');break;}catch{if(n===59)throw Error('ImmuDB restart timeout');await new Promise(r=>setTimeout(r,1000));}}
+  for(let n=0;n<60;n++){try{await ledger.query('SELECT seal_key FROM smartprocure_audit_seals LIMIT 0');break;}catch{if(n===59)throw Error('ImmuDB restart timeout');await new Promise(r=>setTimeout(r,1000));}}
   const attempts=await Promise.all([api('POST',base(outage.invoiceId)+'/seal','admin'),api('POST',base(outage.invoiceId)+'/seal','admin')]);
   assert.ok(attempts.some(r=>r.status===200));assert.ok(attempts.every(r=>[200,409].includes(r.status)));
   await sealed(outage.invoiceId,'READY_FOR_PAYMENT');

@@ -38,7 +38,7 @@ Issue #34 adds original effective-quantity claim queries, approval/recovery capa
 | Exception BPMN, STP/role routing, decisions and durable workflow recovery | [PR #19](https://github.com/hieunofun/SmartProcure-Pay/pull/19) |
 | Canonical/Merkle audit package construction, ledger adapter, native proof verifier, recovery and JSON/PDF reports | [PR #20](https://github.com/hieunofun/SmartProcure-Pay/pull/20) |
 
-The official proof client supplies the cryptographic primitives. Project-authored verifier orchestration and reporting do not relicense the linked BUSL dependency. Financial rules and domain processes are application code; the underlying databases/gateway/process engines are reused services.
+The official proof client supplies the cryptographic primitives. Project-authored verifier orchestration and reporting do not relicense upstream dependencies. PR #69 uses exact Apache server/client source; historical BUSL backups retain their original terms. Financial rules and domain processes are application code; the underlying databases/gateway/process engines are reused services.
 
 ## Planned original work
 
@@ -52,7 +52,7 @@ These are not implementation claims. Their scope and completion criteria are in 
 
 ## Upstream source changes and notices
 
-Issue #22 qualification adds a project-authored source-build recipe, real TCP/wire/proof/recovery test harness and ADR. The server and candidate SDK source at `d5f425e46b4bfd0771274cb4c2ea77634421600c` are unmodified Apache-2.0 upstream work. Inclusion/consistency verification is performed by that official SDK. Fault injection corrupts real returned evidence or disposable rows; it never substitutes a successful mock proof. Production BUSL server/SDK pins and historical receipts remain unchanged. The candidate image retains source/module/toolchain provenance and dependency notices. The verifier reports its linked SDK version from Go build metadata instead of always labeling a qualification build v1.11.0.
+Issue #22 adds project-authored launch/build recipes, explicit transport dependency overrides, real TCP/wire/proof/recovery tests, immutable historical archive routing, read-only inventory/export/restore tools and ADR. Server and SDK code at `d5f425e46b4bfd0771274cb4c2ea77634421600c` remain Apache-2.0 upstream work. Native upstream proof primitives and SQL decoders perform archived receipt verification; no custom hash algorithm or successful mock proof is substituted. Historical PostgreSQL packages/receipts and original ledger/state volumes are retained. New runtime images carry linked-module SBOMs/checksums/notices; the test-only migration image carries the legacy BUSL notice separately. The verifier reports its actual linked SDK version.
 
 No modified upstream service fork is claimed by this baseline. MinIO is built from unmodified pinned source, while the project maintains build/configuration files and adapters. Retain upstream license/copyright notices in images and distributions, including BUSL for ImmuDB, the MIT notice for the XML dependency, and OFL for Noto Sans. Future upstream modifications must record source commit, patch and license separately.
 

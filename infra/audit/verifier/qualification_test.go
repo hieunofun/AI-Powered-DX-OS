@@ -117,9 +117,11 @@ func nativeClient(t *testing.T, ledger *realLedger, stateDir string) client.Immu
 func verifierCall(t *testing.T, key string, anchor map[string]any) (int, map[string]any) {
 	t.Helper()
 	input := map[string]any{"sealKey": key}
-	for _, name := range []string{"stateTxId", "stateHash"} {
+	for _, name := range []string{"stateTxId", "stateHash", "serverUUID"} {
 		if anchor != nil {
-			input[name] = anchor[name]
+			if value, exists := anchor[name]; exists {
+				input[name] = value
+			}
 		}
 	}
 	body, err := json.Marshal(input)
@@ -219,6 +221,11 @@ func TestLedgerQualificationNativeProofTrustTamperAndRecovery(t *testing.T) {
 	code, original := verifierCall(t, keys[0], nil)
 	if code != 200 || original["verified"] != true || original["rowProof"] == nil || original["transactionHeader"] == nil {
 		t.Fatalf("real original proof: %d %v", code, original)
+	}
+	checkArchivedProof(t, keys[0], original)
+	wrongIdentity := map[string]any{"serverUUID": "replaced-server"}
+	if code, _ := verifierCall(t, keys[0], wrongIdentity); code != 409 {
+		t.Fatal("server identity replacement accepted")
 	}
 	if code, later := verifierCall(t, keys[1], original); code != 200 || later["verified"] != true || later["stateTxId"] == original["txId"] {
 		t.Fatalf("real consistency proof across rows: %d %v", code, later)

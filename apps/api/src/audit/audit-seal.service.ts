@@ -28,17 +28,17 @@ export class AuditSealService {
         const inspection=inspectPackage(pkg.package_json);
         if(inspection.packageSha256!==pkg.package_sha256 || inspection.merkleRoot!==pkg.merkle_root || !inspection.manifestMatches)
           throw new AuditError('AUDIT_PACKAGE_TAMPERED','Historical package evidence does not agree; resealing is prohibited.',409);
-        let entry=await this.ledger.get(seal.seal_key);
+        let entry=await this.ledger.get(seal.seal_key,seal);
         if(!entry) {
           if(seal.status==='SEALED') throw new AuditError('AUDIT_LEDGER_MISMATCH','Sealed ledger entry is missing.',409);
           await this.repository.dispatch(c,op.id);
           // An uncertain previous INSERT is resolved by stable-key lookup. The
           // ledger primary key prevents duplicates even if an old INSERT finishes late.
           try {await this.ledger.insert(pkg,seal);} catch(error) {
-            entry=await this.ledger.get(seal.seal_key);
+            entry=await this.ledger.get(seal.seal_key,seal);
             if(!entry) throw error;
           }
-          entry=await this.ledger.get(seal.seal_key);
+          entry=await this.ledger.get(seal.seal_key,seal);
         }
         if(!entryMatches(entry,pkg,seal)) throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger entry identity/root does not agree; overwrite is prohibited.',409);
         const receipt=await this.ledger.proof(seal.seal_key,seal.status==='SEALED'?seal:null);
@@ -94,7 +94,7 @@ export class AuditSealService {
       let immudbEntryMatches=false,immudbCryptographicProofValid=false,available=true,receipt:any=null;
       const ledgerStart=performance.now();
       try {
-        const entry=await this.ledger.get(seal.seal_key);
+        const entry=await this.ledger.get(seal.seal_key,seal);
         immudbEntryMatches=entryMatches(entry,pkg,seal);
         if(entry) {
           receipt=await this.ledger.proof(seal.seal_key,seal.status==='SEALED'?seal:null);

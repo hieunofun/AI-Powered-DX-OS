@@ -48,6 +48,8 @@ The [component inventory](../../OPEN_SOURCE_COMPONENTS.md#immudb-and-pdf-issue-1
 
 ## 6. Issue #23 build-time compatibility data review
 
+Issue #22 continuation on PR #69 replaces the default runtime/server SDK with immutable Apache commit `d5f425e46b4bfd0771274cb4c2ea77634421600c`, identified by module `v1.9.0-RC2.0.20231116103301-d5f425e46b4b`. Server and client dependency overrides are explicit in their locked module files; no newer BUSL source is imported. Preserve Apache copyright/license notices and all transitive notices generated into the images. The old v1.11 image appears only in disposable migration qualification; it is test-only BUSL software with its exact notice retained, not part of the new production runtime. Original backups retain their original terms. License classification is not an assertion of organizer approval or peer acceptance.
+
 The maintainer review for PR #32 verifies the pinned `caniuse-lite@1.0.30001815` package, its CC-BY-4.0 license and upstream attribution. The scoped exception covers the unchanged browser compatibility dataset consumed by the existing Babel/Browserslist build toolchain. CC-BY-4.0 is a data/content license, not an OSI software license. Preserve its packaged license and attribution; the production Nginx image copies compiled web files only. Playwright/Chromium tooling remains in development and CI.
 
 This maintainer decision does not establish contest-organizer acceptance, resolve Issue #22 or authorize other non-OSI software dependencies. The explicitly authorized Codex review is automated; no independent human review is claimed.

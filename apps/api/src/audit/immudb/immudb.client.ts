@@ -45,7 +45,11 @@ export class ImmudbClient implements OnModuleDestroy {
   constructor() {this.pool.on('error',()=>{/* safe operation errors are recorded by the service */});}
   async onModuleDestroy() {await this.pool.end();}
   async state() {return (await this.pool.query('SELECT immudb_state()')).rows[0];}
-  async get(sealKey:string) {
+  private historical(seal:any) {
+    return seal?.status==='SEALED' && process.env.IMMUDB_LEDGER_EPOCH && seal.receipt?.ledgerEpoch!==process.env.IMMUDB_LEDGER_EPOCH;
+  }
+  async get(sealKey:string,seal:any=null) {
+    if(this.historical(seal)) return (await this.proof(sealKey,seal)).entry;
     const rows=(await this.pool.query('SELECT '+LEDGER_COLUMNS+' FROM smartprocure_audit_seals WHERE seal_key=$1',[sealKey])).rows;
     if(rows.length>1) throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger identity is inconsistent.',409);
     return rows[0]?normalizeLedgerRow(rows[0]):null;
@@ -57,9 +61,11 @@ export class ImmudbClient implements OnModuleDestroy {
   }
   async proof(sealKey:string,seal:any=null) {
     const url=process.env.IMMUDB_VERIFIER_URL||'http://smartprocure-audit-verifier:8081';
-    const response=await fetch(url+'/verify',{method:'POST',headers:{'Content-Type':'application/json',
+    const history=this.historical(seal);
+    const response=await fetch(url+(history?'/historical/verify':'/verify'),{method:'POST',headers:{'Content-Type':'application/json',
       Authorization:'Bearer '+(process.env.IMMUDB_VERIFIER_TOKEN||'')},body:JSON.stringify({sealKey,
-        ...(seal?{stateTxId:seal.immudb_state_tx_id,stateHash:seal.immudb_state_hash}:{})}),
+        ...(seal?{stateTxId:seal.immudb_state_tx_id,stateHash:seal.immudb_state_hash,
+          ...(history?{txId:seal.immudb_tx_id,txHash:seal.immudb_tx_hash}:{serverUUID:seal.receipt?.serverUUID})}:{})}),
       signal:AbortSignal.timeout(immudbOptions().query_timeout)});
     if(response.status===409 || response.status===404) throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger cryptographic evidence does not agree.',409);
     if(!response.ok) throw new AuditError('AUDIT_LEDGER_UNAVAILABLE','Ledger verifier is unavailable.');

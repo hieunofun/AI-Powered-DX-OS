@@ -20,10 +20,36 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build exact Apache server and candidate SDK from source
         run: docker build -f infra/audit/qualification/Dockerfile -t opendx-ledger-qualification .
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build:api
+      - name: Verify immutable volume backup and isolated restore mechanics
+        run: node infra/audit/history/validate-volumes.cjs
       - name: Verify actual native inclusion, consistency, tamper, trust state and outage recovery
         run: docker run --rm --network none opendx-ledger-qualification -test.run 'TestReceipt|TestLedgerQualificationNative'
       - name: Gate candidate compatibility with the actual project Node pg adapter
         run: docker run --rm --network none opendx-ledger-qualification -test.run TestLedgerQualificationProjectWireCompatibility
+      - name: Gate historical v1.11-to-Apache migration with real PostgreSQL and two independent ledgers
+        run: |
+          docker network create ledger-history-qualification
+          docker run -d --name ledger-history-postgres --network ledger-history-qualification \
+            -e POSTGRES_USER=qualification -e POSTGRES_PASSWORD=disposable-postgres-qualification-only postgres:16-alpine
+          ready=0
+          for attempt in $(seq 1 30); do
+            if docker exec ledger-history-postgres pg_isready -U qualification; then ready=1; break; fi
+            sleep 1
+          done
+          test "$ready" = 1
+          docker run --rm --network ledger-history-qualification -e POSTGRES_HOST=ledger-history-postgres \
+            opendx-ledger-qualification -test.run TestLedgerHistoricalMigrationAcrossRealEpochs
+      - name: Clean disposable migration services
+        if: always()
+        run: |
+          if docker container inspect ledger-history-postgres >/dev/null 2>&1; then docker rm -fv ledger-history-postgres; fi
+          if docker network inspect ledger-history-qualification >/dev/null 2>&1; then docker network rm ledger-history-qualification; fi
       - name: Export source, module, toolchain and license provenance
         if: always()
         run: |
