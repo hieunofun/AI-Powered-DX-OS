@@ -30,4 +30,4 @@ async function run() {
     if(root.startsWith(join(tmpdir(),'opendx22-volumes-'))) await fs.rm(root,{recursive:true,force:true});
   }
 }
-run().catch(()=>{console.error('SYNTHETIC_VOLUME_DRILL_FAILED');process.exitCode=1;});
+run().catch(error=>{console.error('SYNTHETIC_VOLUME_DRILL_FAILED: '+error.message);process.exitCode=1;});

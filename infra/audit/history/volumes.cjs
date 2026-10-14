@@ -32,7 +32,9 @@ async function main(args=process.argv.slice(2)) {
     const volumes=[];
     for(const name of names) {
       docker(['run','--rm','--network','none','--read-only','--mount','type=volume,source='+name+',target=/source,readonly',
-        '--mount','type=bind,source='+dir+',target=/backup',alpine,'tar','-cf','/backup/'+name+'.tar','-C','/source','.']);
+        '--mount','type=bind,source='+dir+',target=/backup',alpine,'sh','-c',
+        'tar -cf "$1" -C /source . && chown "$2:$3" "$1" && chmod 600 "$1"','sh','/backup/'+name+'.tar',
+        String(process.getuid()),String(process.getgid())]);
       volumes.push({name,sha256:await fileHash(path.join(dir,name+'.tar'))});
     }
     const raw=JSON.stringify({version:'OPENDX-VOLUMES-1',volumes})+'\n';
