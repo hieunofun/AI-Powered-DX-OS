@@ -28,163 +28,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "200": {
             "description": "Authorized result",
@@ -238,163 +103,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "201": {
             "description": "Authorized result",
@@ -494,163 +224,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "200": {
             "description": "Authorized result",
@@ -720,163 +315,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "200": {
             "description": "Authorized result",
@@ -945,163 +405,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "202": {
             "description": "Accepted durable operation; not completed",
@@ -1136,42 +461,10 @@
             }
           },
           "413": {
-            "description": "Byte limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/FileTooLarge"
           },
           "415": {
-            "description": "Media type or magic mismatch",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/UnsupportedMediaType"
           }
         },
         "x-required-permission": "evidence.upload",
@@ -1226,163 +519,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "200": {
             "description": "Authorized clean document bytes",
@@ -1433,163 +591,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "202": {
             "description": "Accepted durable operation; not completed",
@@ -1663,163 +686,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "200": {
             "description": "Authorized result",
@@ -1907,163 +795,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "200": {
             "description": "Authorized result",
@@ -2172,163 +925,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "202": {
             "description": "Accepted durable operation; not completed",
@@ -2417,163 +1035,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "200": {
             "description": "Authorized result",
@@ -2633,163 +1116,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "200": {
             "description": "Authorized result",
@@ -2834,163 +1182,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "202": {
             "description": "Accepted durable operation; not completed",
@@ -3098,163 +1311,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "200": {
             "description": "Authorized result",
@@ -3330,163 +1408,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "202": {
             "description": "Accepted durable operation; not completed",
@@ -3549,163 +1492,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "202": {
             "description": "Accepted durable operation; not completed",
@@ -3780,163 +1588,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "200": {
             "description": "Authorized result",
@@ -3992,163 +1665,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "201": {
             "description": "Authorized result",
@@ -4276,163 +1814,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "200": {
             "description": "Authorized result",
@@ -4528,163 +1931,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "202": {
             "description": "Accepted durable operation; not completed",
@@ -4762,163 +2030,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "201": {
             "description": "Authorized result",
@@ -4999,163 +2132,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "201": {
             "description": "Authorized result",
@@ -5241,163 +2239,28 @@
         ],
         "responses": {
           "400": {
-            "description": "Invalid request or missing tenant context",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
-            "description": "Invalid or expired bearer token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Unauthenticated"
           },
           "403": {
-            "description": "Permission or separation of duties denied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Forbidden"
           },
           "404": {
-            "description": "Resource missing or outside the effective tenant",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
-            "description": "Idempotency, revision or state conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/Conflict"
           },
           "422": {
-            "description": "Invalid field, decimal, source reference or checksum",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/ValidationFailed"
           },
           "429": {
-            "description": "Quota exceeded; Retry-After applies",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds before safe retry",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 1
-                }
-              }
-            }
+            "$ref": "#/components/responses/QuotaExceeded"
           },
           "503": {
-            "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "headers": {
-              "X-Correlation-ID": {
-                "description": "Server request correlation identifier",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              }
-            }
+            "$ref": "#/components/responses/DependencyUnavailable"
           },
           "200": {
             "description": "Authorized result",
@@ -7556,6 +4419,205 @@
           "format": "uuid"
         },
         "description": "Optional tracing identifier; generated by server if absent. Never an authorization input."
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid request or missing tenant context",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        },
+        "headers": {
+          "X-Correlation-ID": {
+            "description": "Server request correlation identifier",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "Unauthenticated": {
+        "description": "Invalid or expired bearer token",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        },
+        "headers": {
+          "X-Correlation-ID": {
+            "description": "Server request correlation identifier",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Permission or separation of duties denied",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        },
+        "headers": {
+          "X-Correlation-ID": {
+            "description": "Server request correlation identifier",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource missing or outside the effective tenant",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        },
+        "headers": {
+          "X-Correlation-ID": {
+            "description": "Server request correlation identifier",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Idempotency, revision or state conflict",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        },
+        "headers": {
+          "X-Correlation-ID": {
+            "description": "Server request correlation identifier",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "ValidationFailed": {
+        "description": "Invalid field, decimal, source reference or checksum",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        },
+        "headers": {
+          "X-Correlation-ID": {
+            "description": "Server request correlation identifier",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "QuotaExceeded": {
+        "description": "Quota exceeded; Retry-After applies",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        },
+        "headers": {
+          "X-Correlation-ID": {
+            "description": "Server request correlation identifier",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "Retry-After": {
+            "description": "Seconds before safe retry",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      },
+      "DependencyUnavailable": {
+        "description": "Dependency unavailable or uncertain outcome; inspect operation before retry",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        },
+        "headers": {
+          "X-Correlation-ID": {
+            "description": "Server request correlation identifier",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "FileTooLarge": {
+        "description": "Byte limit exceeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        },
+        "headers": {
+          "X-Correlation-ID": {
+            "description": "Server request correlation identifier",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "UnsupportedMediaType": {
+        "description": "Media type or magic mismatch",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        },
+        "headers": {
+          "X-Correlation-ID": {
+            "description": "Server request correlation identifier",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
       }
     }
   },

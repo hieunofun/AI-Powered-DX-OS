@@ -1,6 +1,6 @@
 # Foundation validation evidence
 
-Local worktree based on develop@32d8594102e649d8f3dc2196325c6827911bbd82, 2026-10-14 (Asia/Saigon). Target routes are not implemented by this PR.
+Local worktree based on develop@32d8594102e649d8f3dc2196325c6827911bbd82, 2026-10-14 (Asia/Saigon). Local environment: Windows PowerShell, Node v24.16.0, npm 11.13.0. CI uses Node 20; its exact-SHA result is reported separately. Target routes are not implemented by this PR.
 
 | Check | Observed result |
 | --- | --- |

@@ -23,6 +23,9 @@ async function main() {
     ajv.addSchema(schema, file);
     for (const name of Object.keys(schema.definitions)) {
       assert(ajv.getSchema(file + '#/definitions/' + name), `Cannot compile ${file}/${name}`);
+      const prefix = file === 'openresolve.schema.json' ? 'OpenResolve' : '';
+      const converted = JSON.parse(JSON.stringify(schema.definitions[name]).replace(/#\/definitions\//g, '#/components/schemas/' + prefix));
+      assert.deepEqual(api.components.schemas[prefix + name], converted, `OAS/standalone schema drift: ${name}`);
       definitions++;
     }
   }
@@ -87,7 +90,8 @@ async function main() {
       if (['post', 'put', 'patch', 'delete'].includes(method)) {
         assert(op.parameters.some(p => p.$ref === '#/components/parameters/IdempotencyKey'), `${route} mutation missing idempotency`);
       }
-      assert(op.responses['429'].headers['Retry-After'], '429 missing Retry-After');
+      const quotaResponse = op.responses['429'].$ref ? api.components.responses[op.responses['429'].$ref.split('/').at(-1)] : op.responses['429'];
+      assert(quotaResponse.headers['Retry-After'], '429 missing Retry-After');
       operations++;
     }
   }
