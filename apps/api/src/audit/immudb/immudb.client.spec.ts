@@ -39,8 +39,17 @@ describe('Historical receipt routing',()=>{
   });
   it('checks a new receipt on the active epoch with its retained server UUID',async()=>{
     const current={...seal,receipt:{...receipt,ledgerEpoch:'apache-d5f425e-opendx-1',serverUUID:'original-server'}};
-    const fetcher=jest.spyOn(global,'fetch').mockResolvedValue(new Response(JSON.stringify(receipt),{status:200}));
+    const fetcher=jest.spyOn(global,'fetch').mockResolvedValue(new Response(JSON.stringify(current.receipt),{status:200}));
     await adapter.proof(key,current);expect(fetcher.mock.calls[0][0]).toMatch(/\/verify$/);
     expect(JSON.parse(fetcher.mock.calls[0][1]!.body as string).serverUUID).toBe('original-server');
+  });
+  it('rejects loss of a retained new-epoch UUID before contacting the ledger',async()=>{
+    const current={...seal,receipt:{...receipt,ledgerEpoch:'apache-d5f425e-opendx-1'}};
+    const fetcher=jest.spyOn(global,'fetch');await expect(adapter.proof(key,current)).rejects.toThrow();expect(fetcher).not.toHaveBeenCalled();
+  });
+  it.each([{ledgerEpoch:'another-epoch',serverUUID:'original-server'},{ledgerEpoch:'apache-d5f425e-opendx-1',serverUUID:'replaced-server'}])('rejects a returned epoch/UUID replacement %j',async identity=>{
+    const current={...seal,receipt:{...receipt,ledgerEpoch:'apache-d5f425e-opendx-1',serverUUID:'original-server'}};
+    jest.spyOn(global,'fetch').mockResolvedValue(new Response(JSON.stringify({...receipt,...identity}),{status:200}));
+    await expect(adapter.proof(key,current)).rejects.toThrow();
   });
 });

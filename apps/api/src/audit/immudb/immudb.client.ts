@@ -61,6 +61,9 @@ export class ImmudbClient implements OnModuleDestroy {
   async proof(sealKey:string,seal:any=null) {
     const url=process.env.IMMUDB_VERIFIER_URL||'http://smartprocure-audit-verifier:8081';
     const history=this.historical(seal);
+    const epoch=process.env.IMMUDB_LEDGER_EPOCH;
+    if(epoch && !history && seal?.status==='SEALED' && !/^[a-z0-9-]+$/.test(seal.receipt?.serverUUID||''))
+      throw new AuditError('AUDIT_LEDGER_MISMATCH','Retained ledger server identity is missing.',409);
     const response=await fetch(url+(history?'/historical/verify':'/verify'),{method:'POST',headers:{'Content-Type':'application/json',
       Authorization:'Bearer '+(process.env.IMMUDB_VERIFIER_TOKEN||'')},body:JSON.stringify({sealKey,
         ...(seal?{stateTxId:seal.immudb_state_tx_id,stateHash:seal.immudb_state_hash,
@@ -72,6 +75,9 @@ export class ImmudbClient implements OnModuleDestroy {
     if(proof.verified!==true || !/^[1-9]\d*$/.test(proof.txId) || !/^[1-9]\d*$/.test(proof.stateTxId) ||
       !/^[0-9a-f]{64}$/.test(proof.txHash) || !/^[0-9a-f]{64}$/.test(proof.stateHash) || !proof.rowProof || !proof.transactionHeader)
       throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger cryptographic evidence is incomplete.',409);
+    if(epoch && !history && (proof.ledgerEpoch!==epoch || !/^[a-z0-9-]+$/.test(proof.serverUUID||'') ||
+      (seal?.status==='SEALED' && proof.serverUUID!==seal.receipt.serverUUID)))
+      throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger epoch/server identity does not agree.',409);
     return proof;
   }
 }
