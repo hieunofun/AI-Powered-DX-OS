@@ -1,6 +1,6 @@
 # Gemini extraction adapter — issue #38
 
-Local implementation candidate on `feat/38-ai-provider-contract`, based on `develop@32d8594`. PR #67/#37 was not merged when this work began; integration remains blocked. Rebase onto the newly fetched develop and check contracts again after merge. This change does not close #38 or implement the #26 OCR persistence/review API.
+Implementation candidate on `feat/38-ai-provider-contract`, rebased onto `develop@02b6748` after PR #67 merged. Contract validation is rerun on the integrated branch; the live synthetic evidence below records the earlier evaluation base explicitly. This change does not close #38 or implement the #26 OCR persistence/review API. Peer review and latest-commit CI remain required.
 
 ## Boundary and resulting behavior
 
