@@ -52,6 +52,8 @@ These are not implementation claims. Their scope and completion criteria are in 
 
 ## Upstream source changes and notices
 
+Issue #40 extracts project-authored identity/data/workflow adapters into a headless platform module with compatibility re-exports, typed ports, static import/vocabulary policy and composition/failure tests. The existing TypeScript compiler supplies parsing/resolution; NestJS, pg, JWT/JWKS and Flowable remain unmodified upstream dependencies. No new dependency, business algorithm or upstream implementation is claimed by this extraction.
+
 No modified upstream service fork is claimed by this baseline. MinIO is built from unmodified pinned source, while the project maintains build/configuration files and adapters. Retain upstream license/copyright notices in images and distributions, including BUSL for ImmuDB, the MIT notice for the XML dependency, and OFL for Noto Sans. Future upstream modifications must record source commit, patch and license separately.
 
 

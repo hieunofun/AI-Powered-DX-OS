@@ -1,0 +1,7 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testMatch": ["<rootDir>/platform-headless.spec.ts", "<rootDir>/flowable-transport.spec.ts"],
+  "transform": { "^.+\\.(t|j)s$": "ts-jest" }
+}

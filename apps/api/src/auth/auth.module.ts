@@ -1,14 +1,12 @@
 import { Module, Global } from '@nestjs/common';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { RolesGuard } from './guards/roles.guard';
+import { IdentityModule } from '../platform/identity/identity.module';
 
 @Global()
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, JwtAuthGuard, RolesGuard],
-  exports: [AuthService, JwtAuthGuard, RolesGuard],
+  imports: [IdentityModule],
+  exports: [IdentityModule],
 })
 export class AuthModule {}
 

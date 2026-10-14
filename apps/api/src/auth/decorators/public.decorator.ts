@@ -1,4 +1,2 @@
-import { SetMetadata } from '@nestjs/common';
-
-export const IS_PUBLIC_KEY = 'isPublic';
-export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+// Legacy import path; the platform owns this implementation.
+export * from '../../platform/identity/decorators/public.decorator';

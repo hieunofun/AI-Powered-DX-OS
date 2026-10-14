@@ -1,14 +1,2 @@
-export interface KeycloakJwtPayload {
-  sub: string;
-  iss: string;
-  exp: number;
-  iat: number;
-  preferred_username?: string;
-  email?: string;
-  realm_access?: {
-    roles?: string[];
-  };
-  resource_access?: Record<string, { roles?: string[] }>;
-  aud?: string | string[];
-  [key: string]: unknown;
-}
+// Legacy import path; the platform owns this implementation.
+export * from '../../platform/identity/interfaces/keycloak-jwt-payload.interface';
