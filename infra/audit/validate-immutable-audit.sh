@@ -9,7 +9,7 @@ for service in smartprocure-immudb smartprocure-audit-verifier; do
   done
   if [ "$ready" != 1 ]; then echo "Audit service health timed out: $service"; exit 1; fi
 done
-docker compose exec -T smartprocure-immudb /usr/sbin/immudb version | grep -E '1\.11\.0'
+docker compose exec -T smartprocure-immudb /immudb version | grep -F '1.9DOM.1-opendx.1'
 docker compose exec -T smartprocure-api node infra/audit/bootstrap-immudb.cjs
 if [ "${1:-}" = --bootstrap-only ]; then exit 0; fi
 if ! command -v pdftotext >/dev/null; then
