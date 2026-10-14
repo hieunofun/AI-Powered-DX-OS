@@ -93,7 +93,7 @@ The domain backend is one modular NestJS application, not a fleet of separately 
 
 ### Prerequisites
 
-Git, Docker Engine/Desktop with Compose v2, and available local ports. Install Node.js >=20 and npm >=10 for host builds and tests. The root `.env` is consumed by Docker Compose; host API code reads process environment variables directly.
+Git, Docker Engine/Desktop with Compose v2, and available local ports. Install Node.js >=24.14 and npm >=10 for host builds and tests (the bounded PDF.js parser requires a current Node runtime). The root `.env` is consumed by Docker Compose; host API code reads process environment variables directly.
 
 ```bash
 git clone --branch develop https://github.com/hieunofun/SmartProcure-Pay.git
