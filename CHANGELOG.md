@@ -6,6 +6,8 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
+- Issue #41 (draft): tenant-scoped evidence registration/upload/read ports, private source hashes, durable scan leases/retries, ClamAV quarantine and guarded clean-byte delivery. An isolated PostgreSQL/MinIO/clamd fixture exercises the runtime; production tenant composition and migration integration await review.
+
 - Issue #24: Vietnamese XML/PDF intake status, saved three-way comparison, role-based task decisions and native audit verification/JSON/PDF export workspaces. Add direct invoice-case lookup and explicit export-status headers; CI runs 11 real browser scenarios.
 
 - Issue #23: Vietnamese PO/GRN lists, detail views and guarded draft/lifecycle actions; bounded supplier lookup and finalized receipt quantities. Real browser acceptance and exact-decimal tests run in CI.
