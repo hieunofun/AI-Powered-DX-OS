@@ -6,6 +6,8 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
+- Proposed evidence lineage (#46): atomic raw/run/correction/confirmation snapshots and typed links, immutable history/deduplication, authorized graph pagination with encrypted cursors, literal filename/retention search and a verified identity/current membership boundary. Production #43 and match/decision integration remain pending.
+
 - Issue #26 (draft): durable PDF/image OCR suggestions, trusted PDF text spans, append-only corrections, exact invoice validation and atomic reviewed confirmation/outbox. The bounded PDF parser uses PDF.js 6.4.299 and proposes Node 24; real synthetic Gemini/PG/MinIO/AV acceptance is recorded, with tenant/domain integration gates explicit.
 
 - Issue #38 (local review candidate): replaceable backend Gemini extraction adapter with bounded HTTP/deadline/quota/token controls, untrusted field suggestions and provenance; versioned synthetic Vietnamese PDF dev/held-out corpus and exact-field evaluation tooling. Runtime OCR intake/persistence remains gated by #37/#41/#26.

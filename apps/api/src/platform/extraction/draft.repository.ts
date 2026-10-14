@@ -4,6 +4,7 @@ import { DatabaseService } from '../../database/database.service';
 import { CommandIdentity } from '../evidence/evidence.repository';
 import { EvidenceContext, EvidenceRecord, fail } from '../evidence/evidence.types';
 import { DraftRecord } from './draft.types';
+import type { DraftLineageSink } from '../lineage/lineage.types';
 export interface DraftStore {
   read(context: EvidenceContext, id: string): Promise<DraftRecord | undefined>;
   operation(context: EvidenceContext, id: string): Promise<DraftRecord | undefined>;
@@ -12,7 +13,7 @@ export interface DraftStore {
     work: (record: DraftRecord | undefined, source: EvidenceRecord, client: PoolClient, replay: boolean, cached?: T) => Promise<{ record: DraftRecord; source?: EvidenceRecord; result: T }>): Promise<T>;
 }
 export class PostgresDraftStore implements DraftStore {
-  constructor(private readonly db: Pick<DatabaseService, 'query' | 'transaction'>) {}
+  constructor(private readonly db: Pick<DatabaseService, 'query' | 'transaction'>, private readonly lineage?: DraftLineageSink) {}
   async read(context: EvidenceContext, id: string) {
     const result = await this.db.query('SELECT data FROM platform_extraction_records WHERE tenant_id=$1 AND id=$2', [context.tenantId, id]);
     return result.rows[0]?.data;
@@ -58,6 +59,7 @@ export class PostgresDraftStore implements DraftStore {
         await client.query('UPDATE platform_evidence_records SET updated_at=$3,data=$4::jsonb WHERE tenant_id=$1 AND id=$2',
           [context.tenantId, evidenceId, result.source.evidence.updated_at, JSON.stringify(result.source)]);
       }
+      if (this.lineage && !replay) await this.lineage.capture(client, context, result.record, result.source || raw.rows[0].data);
       if (command && !replay) await client.query('INSERT INTO platform_extraction_commands(tenant_id,scope_hash,request_hash,record_id,response) VALUES($1,$2,$3,$4,$5::jsonb)',
         [context.tenantId, command.scope, command.hash, id, JSON.stringify(result.result)]);
       return result.result;

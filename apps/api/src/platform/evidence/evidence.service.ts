@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: MIT */
 import { randomUUID, createHmac, timingSafeEqual } from 'node:crypto';
 import { EvidenceAccess, EvidenceContext, EvidenceError, EvidenceOperation, EvidenceRecord, EvidenceScanner, EvidenceStorage, OperationReader, fail } from './evidence.types';
-import { EvidenceStore } from './evidence.repository';
+import { EvidenceSearch, EvidenceStore } from './evidence.repository';
 import { boundedBytes, byteLimit, checksum, contextValid, fingerprint, idempotencyKey, registration, storageKey, UUID, validateContent } from './file-safety';
 export class EvidenceService {
   private active = 0;
@@ -60,9 +60,13 @@ export class EvidenceService {
     await this.authorize(context, 'operation.read', record.evidence.id);
     return record.operation;
   }
-  async page(context: EvidenceContext, limit = 25, cursor?: string) {
+  async page(context: EvidenceContext, limit = 25, cursor?: string, search: EvidenceSearch = {}) {
     await this.authorize(context, 'evidence.read');
     if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) fail('INVALID_REQUEST');
+    if (!search || Object.keys(search).some(key => !['q', 'retentionClass'].includes(key)) ||
+      search.q !== undefined && (typeof search.q !== 'string' || !search.q.trim() || search.q.length > 128) ||
+      search.retentionClass !== undefined && !['STANDARD', 'RESTRICTED'].includes(search.retentionClass)) fail('INVALID_REQUEST');
+    const filter = 'evidence:' + fingerprint(search);
     let before: { at: string; id: string } | undefined;
     if (cursor) {
       if (cursor.length > 1024) fail('INVALID_REQUEST');
@@ -72,18 +76,20 @@ export class EvidenceService {
         !timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) fail('INVALID_REQUEST');
       let decoded: any;
       try { decoded = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')); } catch { fail('INVALID_REQUEST'); }
-      if (decoded.tenant !== context.tenantId || decoded.subject !== context.subject || decoded.filter !== 'evidence' ||
+      if (decoded.tenant !== context.tenantId || decoded.subject !== context.subject || decoded.filter !== filter ||
         !UUID.test(decoded.id) || typeof decoded.at !== 'string' || !Number.isFinite(Date.parse(decoded.at))) fail('INVALID_REQUEST');
       before = { at: decoded.at, id: decoded.id };
     }
-    const rows = await this.store.page(context, limit + 1, before), items = [];
+    const rows = await this.store.page(context, limit + 1, before, search), items = [];
     for (const row of rows.slice(0, limit)) {
       try { await this.authorize(context, 'evidence.read', row.evidence.id); items.push(row.evidence); }
       catch (cause) { if (!(cause instanceof EvidenceError) || cause.getStatus() !== 403 && cause.getStatus() !== 404) throw cause; }
     }
+    for (const item of items) await this.authorize(context, 'evidence.read', item.id);
+    await this.authorize(context, 'evidence.read');
     if (rows.length <= limit) return { items };
     const last = rows[limit - 1].evidence;
-    const payload = Buffer.from(JSON.stringify({ tenant: context.tenantId, subject: context.subject, filter: 'evidence', at: last.created_at, id: last.id })).toString('base64url');
+    const payload = Buffer.from(JSON.stringify({ tenant: context.tenantId, subject: context.subject, filter, at: last.created_at, id: last.id })).toString('base64url');
     return { items, next_cursor: payload + '.' + createHmac('sha256', this.cursorSecret).update(payload).digest('base64url') };
   }
   async upload(context: EvidenceContext, id: string, source: AsyncIterable<Buffer>, contentType: string, key: string): Promise<EvidenceOperation> {

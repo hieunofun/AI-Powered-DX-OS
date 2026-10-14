@@ -1,5 +1,7 @@
 # Attribution and original contributions
 
+Issue #46 adds team-authored transactional lineage derivation/storage, current resource authorization, encrypted pagination, literal evidence search and membership bridge. Existing upstream engines remain separately attributed. Acceptance fixtures do not replace #43 production tenancy or owning domain adapters. See `docs/ai/EVIDENCE_LINEAGE.md`.
+
 Implementation baseline: `develop@42dd7a3`, 7 October 2026. This inventory distinguishes integrated third-party software from project-authored modules. It does not assign copyright or contributions to an unidentified team member. Exact upstream versions, licenses and notices are in [OPEN_SOURCE_COMPONENTS.md](OPEN_SOURCE_COMPONENTS.md).
 
 ## Integrated third-party components

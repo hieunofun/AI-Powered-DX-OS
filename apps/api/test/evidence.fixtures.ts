@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT */
 import { randomUUID } from 'node:crypto';
-import { EvidenceStore, CommandIdentity } from '../src/platform/evidence/evidence.repository';
+import { EvidenceStore, CommandIdentity, EvidenceSearch } from '../src/platform/evidence/evidence.repository';
 import { EvidenceContext, EvidenceRecord, EvidenceStorage, fail } from '../src/platform/evidence/evidence.types';
 import { checksum } from '../src/platform/evidence/file-safety';
 export const context = { tenantId: '00000000-0000-4000-8000-000000000041', subject: 'fixture-member' };
@@ -23,8 +23,9 @@ export class MemoryEvidenceStore implements EvidenceStore {
   async operation(ctx: EvidenceContext, id: string) {
     return copy([...this.records.values()].find(row => row.evidence.tenant_id === ctx.tenantId && row.operation?.id === id));
   }
-  async page(ctx: EvidenceContext, limit: number, before?: { at: string; id: string }) {
+  async page(ctx: EvidenceContext, limit: number, before?: { at: string; id: string }, search: EvidenceSearch = {}) {
     return copy([...this.records.values()].filter(row => row.evidence.tenant_id === ctx.tenantId &&
+      (!search.q || row.evidence.filename.toLowerCase().includes(search.q.toLowerCase())) && (!search.retentionClass || row.evidence.retention_class === search.retentionClass) &&
       (!before || row.evidence.created_at < before.at || row.evidence.created_at === before.at && row.evidence.id < before.id))
       .sort((a, b) => b.evidence.created_at.localeCompare(a.evidence.created_at) || b.evidence.id.localeCompare(a.evidence.id)).slice(0, limit));
   }

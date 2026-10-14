@@ -51,10 +51,12 @@ export class EvidenceController {
   }
   @Get('evidence')
   page(@Req() request: EvidenceRequest, @Query() query: Record<string, unknown>) {
-    if (Object.keys(query).some(key => !['limit', 'cursor'].includes(key)) ||
+    if (Object.keys(query).some(key => !['limit', 'cursor', 'q', 'retention_class'].includes(key)) ||
       query.limit !== undefined && (typeof query.limit !== 'string' || !/^[1-9][0-9]{0,2}$/.test(query.limit)) ||
-      query.cursor !== undefined && typeof query.cursor !== 'string') fail('INVALID_REQUEST');
-    return this.service.page(request.evidenceContext, query.limit === undefined ? 25 : Number(query.limit), query.cursor as string);
+      query.cursor !== undefined && typeof query.cursor !== 'string' ||
+      query.q !== undefined && typeof query.q !== 'string' || query.retention_class !== undefined && typeof query.retention_class !== 'string') fail('INVALID_REQUEST');
+    return this.service.page(request.evidenceContext, query.limit === undefined ? 25 : Number(query.limit), query.cursor as string,
+      { ...(query.q !== undefined ? { q: query.q as string } : {}), ...(query.retention_class !== undefined ? { retentionClass: query.retention_class as 'STANDARD' | 'RESTRICTED' } : {}) });
   }
   @Get('evidence/:id')
   detail(@Req() request: EvidenceRequest, @Param('id') id: string) { return this.service.detail(request.evidenceContext, id); }

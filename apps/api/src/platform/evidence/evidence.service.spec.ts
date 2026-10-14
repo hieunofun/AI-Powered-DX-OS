@@ -172,6 +172,17 @@ describe('secure evidence boundary (transaction/storage/ACL doubles)', () => {
     await uploaded(); await Promise.all([service.processNextScan(context), service.processNextScan(context)]);
     expect(scan).toHaveBeenCalledTimes(1);
   });
+  test('literal filename/retention search remains tenant-scoped and binds the cursor filters', async () => {
+    for (const filename of ['Hóa đơn [1]%.pdf', 'Hóa đơn [2]%.pdf', 'unrelated.pdf']) await service.register(context, { ...metadata(), filename }, key());
+    await service.register(foreign, { ...metadata(), filename: 'Hóa đơn [foreign]%.pdf' }, key());
+    const first = await service.page(context, 1, undefined, { q: 'HÓA ĐƠN', retentionClass: 'STANDARD' });
+    expect(first.items).toHaveLength(1); expect(first.next_cursor).toBeDefined();
+    const second = await service.page(context, 1, first.next_cursor, { q: 'HÓA ĐƠN', retentionClass: 'STANDARD' });
+    expect(second.items).toHaveLength(1); expect(second.items[0].id).not.toBe(first.items[0].id);
+    await expect(service.page(context, 1, first.next_cursor, { q: 'unrelated' })).rejects.toMatchObject({ code: 'INVALID_REQUEST' });
+    expect((await service.page(context, 100, undefined, { q: '%' })).items).toHaveLength(2);
+    expect((await service.page(context, 100, undefined, { retentionClass: 'RESTRICTED' })).items).toEqual([]);
+  });
   test('cursor tampering and cross-principal reuse fail; pages have no duplicates', async () => {
     for (let i = 0; i < 4; i++) { time++; await service.register(context, metadata(), key()); }
     const first = await service.page(context, 2), second = await service.page(context, 2, first.next_cursor);
