@@ -6,6 +6,8 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
+- Issue #26 (draft): durable PDF/image OCR suggestions, trusted PDF text spans, append-only corrections, exact invoice validation and atomic reviewed confirmation/outbox. The bounded PDF parser uses PDF.js 6.4.299 and proposes Node 24; real synthetic Gemini/PG/MinIO/AV acceptance is recorded, with tenant/domain integration gates explicit.
+
 - Issue #38 (local review candidate): replaceable backend Gemini extraction adapter with bounded HTTP/deadline/quota/token controls, untrusted field suggestions and provenance; versioned synthetic Vietnamese PDF dev/held-out corpus and exact-field evaluation tooling. Runtime OCR intake/persistence remains gated by #37/#41/#26.
 
 - Issue #41 (draft): tenant-scoped evidence registration/upload/read ports, private source hashes, durable scan leases/retries, ClamAV quarantine and guarded clean-byte delivery. An isolated PostgreSQL/MinIO/clamd fixture exercises the runtime; production tenant composition and migration integration await review.

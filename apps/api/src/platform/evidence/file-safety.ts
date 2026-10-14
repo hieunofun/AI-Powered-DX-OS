@@ -3,11 +3,11 @@ import { createHash } from 'node:crypto';
 import { TextDecoder } from 'node:util';
 import { Worker } from 'node:worker_threads';
 import { EvidenceContext, EvidenceRegistration, fail } from './evidence.types';
-export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}(?![\s\S])/;
 const SHA = /^[a-f0-9]{64}$/;
 export const checksum = (bytes: Buffer): string => createHash('sha256').update(bytes).digest('hex');
 export function contextValid(context: EvidenceContext): void {
-  if (!context || !UUID.test(context.tenantId) || typeof context.subject !== 'string' || !context.subject || context.subject.length > 200) {
+  if (!context || typeof context.tenantId !== 'string' || !UUID.test(context.tenantId) || typeof context.subject !== 'string' || !context.subject || context.subject.length > 200) {
     fail('TENANT_CONTEXT_REQUIRED');
   }
 }
@@ -21,7 +21,7 @@ export function registration(input: unknown): EvidenceRegistration {
   if (!object(input) || !only(input, ['filename', 'media_type', 'size_bytes', 'sha256', 'source', 'retention_class']) ||
     typeof input.filename !== 'string' || !input.filename || input.filename.length > 255 ||
     !['application/xml', 'application/pdf', 'image/png', 'image/jpeg'].includes(input.media_type) ||
-    !Number.isSafeInteger(input.size_bytes) || input.size_bytes < 1 || typeof input.sha256 !== 'string' || !SHA.test(input.sha256) ||
+    !Number.isSafeInteger(input.size_bytes) || input.size_bytes < 1 || typeof input.sha256 !== 'string' || input.sha256.length !== 64 || !SHA.test(input.sha256) ||
     !['STANDARD', 'RESTRICTED'].includes(input.retention_class) || !object(input.source) ||
     !only(input.source, ['kind', 'source_id', 'observed_at']) || !['USER_UPLOAD', 'CONNECTOR'].includes(input.source.kind) ||
     (input.source.source_id !== undefined && (typeof input.source.source_id !== 'string' || !input.source.source_id || input.source.source_id.length > 200)) ||

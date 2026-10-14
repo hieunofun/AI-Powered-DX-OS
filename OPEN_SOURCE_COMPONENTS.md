@@ -18,6 +18,12 @@ The [implementation](infra/evidence/README.md) uses an unmodified external ClamA
 
 ## Component Registry
 
+### Reviewed OCR parsing (Issue #26; integration draft)
+
+Concrete need: enforce actual PDF page/text/image budgets and derive verifiable page-text locations before forwarding documents to the selected provider. No existing runtime PDF reader was available; existing PDFKit generates documents. Added exact `pdfjs-dist@6.4.299` (Apache-2.0), upstream [Mozilla release](https://github.com/mozilla/pdf.js/releases/tag/v6.4.299), release commit `d0991a0` (full revision in upstream release). Its declared runtime requires Node >=22.13/24, so the draft proposes Node >=24.14 and pins `node:24-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f` for API/web builds. This is a shared-runtime integration review, not an already deployed upgrade.
+
+The lockfile adds PDF.js plus optional `@napi-rs/canvas@1.0.11` and its platform binaries (MIT); no existing package version changed. Preserve the [packaged notices](docs/open-source/notices/issue26-pdfjs/) for PDF.js, bundled fonts, CMaps, ICC/WASM and canvas, including their embedded third-party notices. Runtime packages/images retain their original license files. No upstream source/binary was modified. The team owns the worker supervision/budgets, source-span checks, schema/domain validation, persistence/correction/confirmation/outbox logic and fixture/evaluation orchestration; it does not claim PDF parsing, image decoding or Gemini inference algorithms. Corpus generation reuses existing PDFKit/Playwright and Noto Sans OFL; local Chrome fallback is recorded, not shipped as an application dependency. Hosted Gemini disclosure/terms remain the #38 dependency policy.
+
 ### Procurement workspace build and test tooling (Issue #23)
 
 | Component | Official upstream | Exact version | License | Purpose |

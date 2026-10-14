@@ -1,13 +1,13 @@
 /* SPDX-License-Identifier: MIT */
 import { randomUUID, createHmac, timingSafeEqual } from 'node:crypto';
-import { EvidenceAccess, EvidenceContext, EvidenceError, EvidenceOperation, EvidenceRecord, EvidenceScanner, EvidenceStorage, fail } from './evidence.types';
+import { EvidenceAccess, EvidenceContext, EvidenceError, EvidenceOperation, EvidenceRecord, EvidenceScanner, EvidenceStorage, OperationReader, fail } from './evidence.types';
 import { EvidenceStore } from './evidence.repository';
 import { boundedBytes, byteLimit, checksum, contextValid, fingerprint, idempotencyKey, registration, storageKey, UUID, validateContent } from './file-safety';
 export class EvidenceService {
   private active = 0;
   constructor(private readonly store: EvidenceStore, private readonly storage: EvidenceStorage,
     private readonly scanner: EvidenceScanner, private readonly access: EvidenceAccess,
-    private readonly cursorSecret: string, private readonly now: () => number = Date.now) {
+    private readonly cursorSecret: string, private readonly now: () => number = Date.now, private readonly extraOperations?: OperationReader) {
     if (Buffer.byteLength(cursorSecret || '') < 32) throw new Error('Evidence cursor secret must contain at least 32 bytes.');
   }
   private async authorize(context: EvidenceContext, action: string, id?: string, policy?: { retentionClass: 'STANDARD' | 'RESTRICTED' }): Promise<void> {
@@ -55,7 +55,8 @@ export class EvidenceService {
   }
   async operation(context: EvidenceContext, id: string) {
     contextValid(context); if (!UUID.test(id)) fail('INVALID_REQUEST');
-    const record = await this.store.operation(context, id); if (!record) fail('NOT_FOUND', 404);
+    const record = await this.store.operation(context, id);
+    if (!record) { const extra = await this.extraOperations?.read(context, id); if (!extra) fail('NOT_FOUND', 404); return extra; }
     await this.authorize(context, 'operation.read', record.evidence.id);
     return record.operation;
   }
@@ -162,7 +163,7 @@ export class EvidenceService {
           this.error(record, 'DEPENDENCY_UNAVAILABLE', false); delete record.lease; this.touch(record);
           return { record, result: { record, scan: false } };
         }
-        record.scanAttempts++; record.evidence.quarantine_state = 'PENDING_SCAN'; record.operation.state = 'RUNNING';
+        record.scanAttempts++; record.evidence.quarantine_state = 'PENDING_SCAN'; record.evidence.processing_state = 'NOT_STARTED'; record.operation.state = 'RUNNING';
         record.lease = { token, phase: 'SCAN', until: new Date(this.now() + 60000).toISOString() };
         delete record.nextAttemptAt; this.touch(record);
         return { record, result: { record, scan: true } };
@@ -186,6 +187,7 @@ export class EvidenceService {
         record.history.push({ ...verdict, at: new Date(this.now()).toISOString(), attempt: record.scanAttempts,
           sha256: record.evidence.sha256, revision: record.evidence.revision, leaseToken: token, objectKey: record.objectKey });
         record.evidence.quarantine_state = verdict.state;
+        if (verdict.state !== 'CLEAN') record.evidence.processing_state = 'NOT_STARTED';
         record.operation.state = verdict.state === 'CLEAN' ? 'SUCCEEDED' : verdict.retryable && record.scanAttempts < 3 ? 'PENDING' : 'FAILED';
         if (verdict.state === 'CLEAN') delete record.operation.error;
         else this.error(record, verdict.retryable ? 'DEPENDENCY_UNAVAILABLE' : 'DRAFT_INVALID', verdict.retryable && record.scanAttempts < 3);
@@ -209,7 +211,7 @@ export class EvidenceService {
           await this.store.change(context, id, undefined, current => {
             if (!current) fail('NOT_FOUND', 404);
             if (current.evidence.revision === record.evidence.revision && current.objectKey === record.objectKey) {
-              current.evidence.quarantine_state = 'SCAN_FAILED'; current.operation.state = 'RECONCILIATION_REQUIRED';
+              current.evidence.quarantine_state = 'SCAN_FAILED'; current.evidence.processing_state = 'NOT_STARTED'; current.operation.state = 'RECONCILIATION_REQUIRED';
               this.error(current, cause.code, false); delete current.lease;
               current.history.push({ state: 'SCAN_FAILED', reason: cause.code, retryable: false, at: new Date(this.now()).toISOString(),
                 attempt: current.scanAttempts, sha256: current.evidence.sha256, revision: current.evidence.revision });

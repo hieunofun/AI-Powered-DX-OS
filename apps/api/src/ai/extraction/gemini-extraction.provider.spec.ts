@@ -46,6 +46,26 @@ describe('Gemini extraction adapter', () => {
     expect(result.fields[0].status).toBe('MISSING');
   });
 
+  it('records valid reported usage separately from conservative reservations', async () => {
+    const call = jest.fn(async (url: string) => new Response(JSON.stringify(url.endsWith(':countTokens') ? { totalTokens: 100 } : {
+      ...envelope(), usageMetadata: { promptTokenCount: 101, candidatesTokenCount: 20, thoughtsTokenCount: 30, totalTokenCount: 151 },
+    })));
+    const budget = new LocalProviderBudget(config());
+    const result = await new GeminiExtractionProvider(config(), call as typeof fetch, budget).extract(input());
+    expect(result.usage).toEqual({ input_tokens: 100, reserved_tokens: 4196,
+      reported: { prompt: 101, candidates: 20, thoughts: 30, cached: 0, total: 151 } });
+    expect(budget.snapshot()).toMatchObject({ request_attempts: 2, reserved_tokens: 4196 });
+  });
+
+  it.each([-1, 1.5, '100', Number.MAX_SAFE_INTEGER + 1])('rejects invalid usage counters without refunding reservations (%s)', async count => {
+    const call = jest.fn(async (url: string) => new Response(JSON.stringify(url.endsWith(':countTokens') ? { totalTokens: 100 } : {
+      ...envelope(), usageMetadata: { totalTokenCount: count },
+    })));
+    const budget = new LocalProviderBudget(config());
+    await expect(new GeminiExtractionProvider(config(), call as typeof fetch, budget).extract(input())).rejects.toMatchObject({ code: 'INVALID_OUTPUT' });
+    expect(budget.snapshot()).toMatchObject({ request_attempts: 2, reserved_tokens: 4196 });
+  });
+
   it.each([
     { fields: [{ path: '/total_amount', status: 'EXTRACTED', value: 100 }] },
     { fields: [{ path: '/total_amount', status: 'EXTRACTED', value: '1e6' }] },
@@ -153,6 +173,8 @@ describe('configuration and quota controls', () => {
     time = 60000; budget.consumeRequest();
     expect(() => budget.consumeRequest()).toThrow('BUDGET_EXCEEDED');
     time = 86400000; budget.consumeRequest(); budget.reserveTokens(10);
+    expect(budget.snapshot()).toEqual({ request_attempts: 3, reserved_tokens: 20,
+      utc_day: 1, day_request_attempts: 1, day_reserved_tokens: 10 });
   });
 });
 

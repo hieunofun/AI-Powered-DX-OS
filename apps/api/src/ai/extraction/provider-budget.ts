@@ -15,6 +15,8 @@ export class LocalProviderBudget implements ProviderBudget {
   private minuteRequests = 0;
   private dayRequests = 0;
   private dayTokens = 0;
+  private totalRequests = 0;
+  private totalReservedTokens = 0;
   constructor(private readonly config: GeminiConfig, private readonly now: () => number = Date.now) {}
   private windows(): number {
     const time = this.now();
@@ -29,7 +31,7 @@ export class LocalProviderBudget implements ProviderBudget {
     if (this.minuteRequests >= this.config.requestsPerMinute) {
       throw new AiProviderError('RATE_LIMITED', true, Math.ceil((60000 - time % 60000) / 1000));
     }
-    this.minuteRequests++; this.dayRequests++;
+    this.minuteRequests++; this.dayRequests++; this.totalRequests++;
   }
   reserveTokens(tokens: number): void {
     this.windows();
@@ -37,6 +39,8 @@ export class LocalProviderBudget implements ProviderBudget {
       throw new AiProviderError('BUDGET_EXCEEDED');
     }
     // No refund on timeout/invalid output: an ambiguous remote call may be billed.
-    this.dayTokens += tokens;
+    this.dayTokens += tokens; this.totalReservedTokens += tokens;
   }
+  snapshot() { return { request_attempts: this.totalRequests, reserved_tokens: this.totalReservedTokens,
+    utc_day: this.day, day_request_attempts: this.dayRequests, day_reserved_tokens: this.dayTokens }; }
 }

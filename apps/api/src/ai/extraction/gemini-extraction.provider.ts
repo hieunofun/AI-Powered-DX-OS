@@ -118,9 +118,20 @@ export class GeminiExtractionProvider implements ExtractionProvider {
     if (typeof modelVersion !== 'string' || !/^gemini-[a-z0-9.-]{1,100}$/.test(modelVersion)) {
       throw new AiProviderError('INVALID_OUTPUT');
     }
+    let reported: ExtractionSuggestion['usage']['reported'];
+    if (response.usageMetadata !== undefined) {
+      const metadata = response.usageMetadata;
+      if (!record(metadata)) throw new AiProviderError('INVALID_OUTPUT');
+      const names = { prompt: 'promptTokenCount', candidates: 'candidatesTokenCount', thoughts: 'thoughtsTokenCount', cached: 'cachedContentTokenCount', total: 'totalTokenCount' };
+      reported = Object.fromEntries(Object.entries(names).map(([name, key]) => {
+        const value = metadata[key] ?? 0;
+        if (!Number.isSafeInteger(value) || value < 0) throw new AiProviderError('INVALID_OUTPUT');
+        return [name, value];
+      })) as ExtractionSuggestion['usage']['reported'];
+    }
     return { state: 'REVIEW_REQUIRED', evidence_id: input.evidenceId, schema_id: input.schemaId, fields,
       extractor: { provider: 'gemini', model_version: modelVersion, prompt_version: EXTRACTION_PROMPT_VERSION, run_id: runId },
-      usage: { input_tokens: count.totalTokens, reserved_tokens: reserved } };
+      usage: { input_tokens: count.totalTokens, reserved_tokens: reserved, ...(reported ? { reported } : {}) } };
   }
 
   private validateOutput(output: unknown, input: ExtractionInput): ExtractionField[] {

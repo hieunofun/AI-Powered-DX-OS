@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS platform_evidence_records (
   CHECK (data->'evidence'->>'id'=id::text),
   CHECK (data->'evidence'->>'tenant_id'=tenant_id::text),
   CHECK (data->'evidence'->>'quarantine_state' IN ('PENDING_UPLOAD','PENDING_SCAN','CLEAN','INFECTED','SCAN_FAILED')),
-  CHECK (data->'evidence'->>'processing_state'='NOT_STARTED')
+  CONSTRAINT platform_evidence_processing_guard CHECK (
+    data->'evidence'->>'processing_state' IN ('NOT_STARTED','QUEUED','PROCESSING','REVIEW_REQUIRED','CONFIRMED','FAILED') AND
+    (data->'evidence'->>'quarantine_state'='CLEAN' OR data->'evidence'->>'processing_state'='NOT_STARTED'))
 );
 CREATE INDEX IF NOT EXISTS platform_evidence_page_idx ON platform_evidence_records(tenant_id,created_at DESC,id DESC);
 CREATE INDEX IF NOT EXISTS platform_evidence_operation_idx ON platform_evidence_records(tenant_id,((data->'operation'->>'id')));

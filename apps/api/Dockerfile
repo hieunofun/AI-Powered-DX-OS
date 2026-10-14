@@ -3,7 +3,7 @@
 # ==============================================================================
 
 # Stage 1: Build stage
-FROM node:20-alpine AS builder
+FROM node:24-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f AS builder
 WORKDIR /app
 
 # Copy monorepo manifests
@@ -19,7 +19,7 @@ COPY apps/api/ ./apps/api/
 RUN npm run build:api
 
 # Stage 2: Production runner stage
-FROM node:20-alpine AS runner
+FROM node:24-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=4000
@@ -33,6 +33,7 @@ RUN npm install --omit=dev
 # @nodable/entities 3.1.0 omits its license file from the npm archive.
 # Preserve the verified official upstream MIT notice with the runtime artifact.
 COPY docs/open-source/notices/nodable-val-parsers-MIT.txt ./licenses/nodable-val-parsers-MIT.txt
+COPY docs/open-source/notices/issue26-pdfjs/ ./licenses/issue26-pdfjs/
 
 # Copy compiled artifacts from builder
 COPY --from=builder /app/apps/api/dist ./apps/api/dist

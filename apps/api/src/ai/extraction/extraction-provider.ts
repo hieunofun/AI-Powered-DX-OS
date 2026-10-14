@@ -23,7 +23,8 @@ export interface ExtractionField {
   status: 'EXTRACTED' | 'MISSING';
   value?: string;
   confidence?: number;
-  source_refs: { location_status: 'UNKNOWN'; evidence_id: string; reason: 'PROVIDER_NO_LOCATION' }[];
+  source_refs: ({ location_status: 'UNKNOWN'; evidence_id: string; reason: 'PROVIDER_NO_LOCATION' | 'NOT_APPLICABLE' | 'MISSING_SOURCE' } |
+    { location_status: 'KNOWN'; evidence_id: string; page: number; text_span?: { start: number; end: number }; bbox?: number[] })[];
 }
 export interface ExtractionSuggestion {
   state: 'REVIEW_REQUIRED';
@@ -31,7 +32,8 @@ export interface ExtractionSuggestion {
   schema_id: string;
   fields: ExtractionField[];
   extractor: { provider: 'gemini'; model_version: string; prompt_version: string; run_id: string };
-  usage: { input_tokens: number; reserved_tokens: number };
+  usage: { input_tokens: number; reserved_tokens: number;
+    reported?: { prompt: number; candidates: number; thoughts: number; cached: number; total: number } };
 }
 export interface ExtractionProvider { extract(input: ExtractionInput): Promise<ExtractionSuggestion>; }
 export type ProviderFailure = 'NOT_CONFIGURED' | 'INVALID_INPUT' | 'DISCLOSURE_DENIED' | 'TIMEOUT' |

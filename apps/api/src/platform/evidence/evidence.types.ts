@@ -11,13 +11,21 @@ export interface EvidenceRegistration {
   retention_class: 'STANDARD' | 'RESTRICTED';
 }
 export interface Evidence extends EvidenceRegistration {
-  id: string; tenant_id: string; revision: number; quarantine_state: Quarantine; processing_state: 'NOT_STARTED';
+  id: string; tenant_id: string; revision: number; quarantine_state: Quarantine;
+  processing_state: 'NOT_STARTED' | 'QUEUED' | 'PROCESSING' | 'REVIEW_REQUIRED' | 'CONFIRMED' | 'FAILED';
   created_at: string; updated_at: string; created_by: string; legal_hold: boolean;
 }
 export interface EvidenceOperation {
   id: string; tenant_id: string; kind: 'EVIDENCE_UPLOAD'; state: 'PENDING' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'RECONCILIATION_REQUIRED';
   created_at: string; updated_at: string; resource_ref: { pack_id: 'platform'; type: 'evidence'; id: string };
   error?: { code: string; message: string; correlation_id: string; retryable: boolean };
+}
+export interface OperationReader {
+  // Implementations reauthorize the original resource before returning a view.
+  read(context: EvidenceContext, id: string): Promise<{
+    id: string; tenant_id: string; kind: string; state: EvidenceOperation['state'];
+    created_at: string; updated_at: string; resource_ref: { pack_id: string; type: string; id: string };
+  } | undefined>;
 }
 export interface ScanResult {
   state: 'CLEAN' | 'INFECTED' | 'SCAN_FAILED'; reason?: string; retryable: boolean;
