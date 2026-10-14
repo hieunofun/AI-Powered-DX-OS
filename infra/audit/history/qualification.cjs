@@ -81,13 +81,13 @@ async function run() {
           const forged={...record.seal,immudb_state_hash:'f'.repeat(64)};
           await assert.rejects(adapter.proof(record.seal.seal_key,forged));
         }
-        const file=path.join(dir,filename(records[0].seal.seal_key)),raw=await fs.readFile(file);
-        await fs.writeFile(file,Buffer.concat([raw,Buffer.from(' ')]));
+        const archiveFile=path.join(dir,filename(records[0].seal.seal_key)),raw=await fs.readFile(archiveFile);
+        await fs.writeFile(archiveFile,Buffer.concat([raw,Buffer.from(' ')]));
         await assert.rejects(adapter.get(records[0].seal.seal_key,records[0].seal));
-        await fs.writeFile(file,raw);
-        await fs.rename(file,file+'.missing');
+        await fs.writeFile(archiveFile,raw);
+        await fs.rename(archiveFile,archiveFile+'.missing');
         await assert.rejects(adapter.proof(records[0].seal.seal_key,records[0].seal));
-        await fs.rename(file+'.missing',file);
+        await fs.rename(archiveFile+'.missing',archiveFile);
         console.log('PASS real adapter verifies old and new epochs together; copied active rows cannot replace originals; corrupt/missing archives and forged anchors fail closed');
       } finally{await adapter.onModuleDestroy();}
     } else throw Error('Unknown mode');
