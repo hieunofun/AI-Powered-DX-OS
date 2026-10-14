@@ -16,7 +16,7 @@ Issue ──► Branch ──► Code ──► Test ──► Pull Request ─�
 2. **Branch**: Create a dedicated working branch branching from `develop`.
 3. **Code**: Implement changes respecting architectural boundaries and coding standards.
 4. **Test**: Write automated tests and ensure all existing checks pass.
-5. **Pull Request**: Open a PR targeting `develop`. Link the PR to the issue using `Closes #<issue>` or `Fixes #<issue>`.
+5. **Pull Request**: Open a PR targeting `develop`. Link with `Refs #<issue>` for partial/draft deliveries. Use `Closes #<issue>` only when the acceptance is complete and closure is appropriate after review.
 6. **Code Review**: At least one maintainer review and approval is required.
 7. **Merge**: Merged into `develop` via squash/rebase merge. Production/demo releases are tagged on `main`.
 
@@ -29,8 +29,8 @@ Issue ──► Branch ──► Code ──► Test ──► Pull Request ─�
 
 Branches must follow the naming pattern with the issue number and a short descriptive kebab-case name:
 
-- Feature branches: `feature/<issue-number>-<short-name>`
-  - Example: `feature/5-purchase-order-crud`
+- Feature branches: `feat/<issue-number>-<short-name>`
+  - Example: `feat/5-purchase-order-crud`
 - Bug fixes: `fix/<issue-number>-<short-name>`
   - Example: `fix/8-tolerance-rounding-error`
 - Documentation: `docs/<issue-number>-<short-name>`
@@ -80,7 +80,7 @@ Common scopes include:
 When submitting a Pull Request:
 1. Provide a clear description of what changed and why.
 2. Link the corresponding issue in the PR description:
-   - `Closes #<issue-number>` or `Fixes #<issue-number>`
+   - `Refs #<issue-number>` for drafts/partial scope; `Closes`/`Fixes` only for completed acceptance.
 3. Ensure no secrets, tokens, credentials, or `.env` files are included.
 4. Verify that any new third-party dependency is evaluated for license compatibility and documented in [OPEN_SOURCE_COMPONENTS.md](OPEN_SOURCE_COMPONENTS.md).
 5. Ensure automated linter, formatting, and unit tests pass locally before opening PR.
@@ -91,3 +91,7 @@ When submitting a Pull Request:
 
 By contributing to SmartProcure-Pay, you agree that your contributions will be licensed under the project's [MIT License](LICENSE).
 For third-party libraries and reused code, please review our [License Policy](docs/open-source/LICENSE_POLICY.md).
+
+## Project 4 governance
+
+See [PR4 workflow, roles and Definition of Done](docs/project4/GOVERNANCE.md). New branches use `feat/`, `fix/`, `docs/` or `chore/` with real issue numbers; historical `feature/` branches remain valid. Business UI defaults to Vietnamese; code/API keys stay English.
