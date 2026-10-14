@@ -1,0 +1,145 @@
+{
+  "started": "2026-10-14T22:48:58.696Z",
+  "completed": "2026-10-14T22:49:13.825Z",
+  "gitHead": "c46f7d6bcbd5a573b3c93a46042f0501b7f51a6a",
+  "worktreeDirty": true,
+  "sourceHashes": {
+    "apps/api/src/platform/lineage/draft-lineage.writer.ts": "f27348a0d0c73925c6a8b58b7848cbd88a26a3212852e6b378105bfd1d85f991",
+    "apps/api/src/platform/lineage/evaluation-lineage.writer.ts": "8ec18dad023fc12981aaf591179b73369b31a538810ea63176460584872ca425",
+    "apps/api/src/platform/lineage/lineage.module.ts": "abcea20b5ee018dba6f8dbae499f710151760136879f1cc04e685f0a282a129b",
+    "apps/api/src/platform/lineage/lineage.repository.ts": "e1f9d670980283edaf74f78e393eb5c02cf3a344dbdf6611e97a01b33e409fab",
+    "apps/api/src/platform/lineage/lineage.service.ts": "98e09512b3b1bcfce894bbe6ed1bded91021ebd872eecfa8d1d76c134fba6f90",
+    "apps/api/src/platform/lineage/lineage.types.ts": "526e7ba7274ab378fc486b836f78c3936e3542ff17dfaa95167d317ca0289f0e",
+    "apps/api/src/platform/lineage/verified-evidence-access.ts": "dda8e76b906afa586fa7fc7558645fa01780fd4ae9f1cfb9dc306ccea961aa7f",
+    "apps/api/src/platform/evidence/clamav.scanner.ts": "3e8ee7cb2e39779b15a4973dff7df9f16cafca9190414fd1fc219e20b5f6c75d",
+    "apps/api/src/platform/evidence/evidence-context.ts": "8d29c82ed2c5f4019e3882b9e49a994127f4d0fe6af94a78c081f97fd16f53c6",
+    "apps/api/src/platform/evidence/evidence-storage.ts": "f676892673f8f096227e7a4dcd6b68aee1ab9951ec604020c3ba3cfdde71928e",
+    "apps/api/src/platform/evidence/evidence.controller.ts": "387c8a7d01ff8b3de45bb242a6e89e231a7fb5d3fd97311e0a75b16ba03e3351",
+    "apps/api/src/platform/evidence/evidence.module.ts": "62130e481b5d962d49cf866fa2e1261fc27789c7c3a7f756fe2cc8087ebd6914",
+    "apps/api/src/platform/evidence/evidence.repository.ts": "e42a0a5bb5cf9e78be48111c829fb299126140a84c51c98fbab2fa975c0158e1",
+    "apps/api/src/platform/evidence/evidence.service.ts": "6695a01a7ff7434668e10b1b7077361308bbf76f21575c46e9b9e660ea2e5d40",
+    "apps/api/src/platform/evidence/evidence.types.ts": "aa9563612b761fce742aec86ee737e1dddd7eee70224103c9d3d2382a0eeddc5",
+    "apps/api/src/platform/evidence/file-safety.ts": "af23babcb99da10c40f5d2081adefaa5baf16eda88e8977c913a11895c08eaea",
+    "apps/api/src/platform/extraction/draft.module.ts": "f23c31981758506790e1d1322018ae72b0072cafd5d58bca263e972fe8fe42f3",
+    "apps/api/src/platform/extraction/draft.repository.ts": "816935acca73707cfc0cad4138e107c520cc8e233d32f7aa8bb7c1c155589119",
+    "apps/api/src/platform/extraction/draft.service.ts": "a6c793c79a504991fc5f0d9bcbcfef8d21c8a72584d8bc3bc405fd17a3cb5c65",
+    "apps/api/src/platform/extraction/draft.types.ts": "7dc9b5a6387d0910f3f3129d0088a06870919d97f43fb91c04194a35ed5ed85e",
+    "apps/api/src/platform/extraction/media-inspection.ts": "9b470be5d77f53546698b74e91687545d3460274103046d22034df956998b097",
+    "apps/api/src/packs/openresolve/extraction/invoice-draft.profile.ts": "e3ca9bbe2e34237eaf65be42b0edeab1bfb814c9ca801adda7eac68ce48c4250",
+    "apps/api/src/packs/openresolve/extraction/invoice-draft.target.ts": "514d1d88e40326f9784d23d9ccec9989cba444eff97538a38be08458d6568462",
+    "apps/api/src/packs/openresolve/extraction/invoice-ocr.extractor.ts": "b71fbc3393bc3a57cdff3acab9e4896e7df0e8008fa38af0b1b37401c89639e1"
+  },
+  "environment": {
+    "node": "v24.14.0",
+    "platform": "win32",
+    "services": "real PostgreSQL/MinIO/ClamAV/Gemini",
+    "identity": "real existing AuthService RS256 verification against ephemeral local JWKS; labelled SQL membership/ACL/PO fixtures; not production Keycloak/#43 migration",
+    "failure": "injected exception after actual lineage SQL, actual transaction rollback",
+    "budget": {
+      "request_attempts": 4,
+      "reserved_tokens": 10045,
+      "utc_day": 20740,
+      "day_request_attempts": 4,
+      "day_reserved_tokens": 10045
+    }
+  },
+  "checks": [
+    {
+      "name": "exact real ClamAV engine/fresh loaded definitions/complete stream",
+      "status": "PASS"
+    },
+    {
+      "name": "real RS256/JWKS rejects forged, expired and wrong-audience tokens",
+      "status": "PASS"
+    },
+    {
+      "name": "verified admin role and tenant selector cannot bypass current membership",
+      "status": "PASS"
+    },
+    {
+      "name": "revoked SQL membership prevents worker/provider dispatch and preserves durable intent",
+      "status": "PASS"
+    },
+    {
+      "name": "actual raw/run/draft lineage with typed tenant-scoped links",
+      "status": "PASS"
+    },
+    {
+      "name": "actual SQL lineage/outbox/confirmation rollback together after injected sink failure",
+      "status": "PASS"
+    },
+    {
+      "name": "confirmed immutable snapshots and same-key retry produce no duplicate edges/outbox",
+      "status": "PASS"
+    },
+    {
+      "name": "foreign JWT tenant cannot list/search/download/read drafts/operations/lineage",
+      "status": "PASS"
+    },
+    {
+      "name": "real filename/retention filtering and current resource ACL",
+      "status": "PASS"
+    },
+    {
+      "name": "lineage cursor pagination and SQL append-only history enforcement",
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent real SQL replay deduplicates and a conflicting immutable snapshot rolls back new nodes",
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "evidenceId": "76aa8c38-d90e-43df-8b33-4bec9cb859fb",
+    "draftId": "af858479-bf27-424d-88f3-37f96228daed",
+    "extractionMs": 10946,
+    "confirmationId": "8c56077d-3ed4-4950-9e03-20200d524a23",
+    "providerCalls": 2,
+    "providerRuns": [
+      {
+        "extractor": {
+          "run_id": "6f23678e-a965-4aa6-a120-585cb332f618",
+          "provider": "gemini",
+          "model_version": "gemini-3.8-flash",
+          "prompt_version": "generic-fields-v1"
+        },
+        "usage": {
+          "reported": {
+            "total": 952,
+            "cached": 0,
+            "prompt": 682,
+            "thoughts": 243,
+            "candidates": 27
+          },
+          "input_tokens": 710,
+          "reserved_tokens": 4806
+        }
+      },
+      {
+        "extractor": {
+          "run_id": "397972cb-54fb-4fea-94ba-3b0d17af4072",
+          "provider": "gemini",
+          "model_version": "gemini-3.8-flash",
+          "prompt_version": "generic-fields-v1"
+        },
+        "usage": {
+          "reported": {
+            "total": 1833,
+            "cached": 0,
+            "prompt": 1115,
+            "thoughts": 260,
+            "candidates": 458
+          },
+          "input_tokens": 1143,
+          "reserved_tokens": 5239
+        }
+      }
+    ]
+  },
+  "limitations": [
+    "One repeated synthetic dev PDF; not independent quality evaluation",
+    "No production tenant/backfill/legacy bridge or executed match/decision adapter",
+    "No process-kill or coordinated restore claim",
+    "PENDING outbox is not matched/approved/paid"
+  ]
+}

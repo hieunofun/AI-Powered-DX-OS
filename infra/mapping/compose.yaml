@@ -1,0 +1,38 @@
+name: opendx-issue25
+# Isolated fictional mapping acceptance; preserve all volumes and original bytes.
+services:
+  postgres:
+    extends:
+      file: ../lineage/compose.yaml
+      service: postgres
+    environment:
+      POSTGRES_DB: mapping_issue25
+      POSTGRES_USER: mapping_fixture
+      POSTGRES_PASSWORD: mapping_fixture_local_only
+    ports: !override ["127.0.0.1:15425:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mapping_fixture -d mapping_issue25"]
+    volumes: !override
+      - postgres:/var/lib/postgresql/data
+      - ../../database/proposed/issue41-evidence-intake.sql:/docker-entrypoint-initdb.d/001-evidence.sql:ro
+      - ../../database/proposed/issue26-reviewed-drafts.sql:/docker-entrypoint-initdb.d/002-drafts.sql:ro
+      - ../../database/proposed/issue25-reviewed-item-mapping.sql:/docker-entrypoint-initdb.d/003-mapping.sql:ro
+  minio:
+    extends:
+      file: ../lineage/compose.yaml
+      service: minio
+    environment:
+      MINIO_ROOT_USER: mapping_fixture
+      MINIO_ROOT_PASSWORD: mapping_fixture_local_only
+    ports: !override ["127.0.0.1:19425:9000"]
+    volumes: !override ["minio:/data"]
+  scanner:
+    extends:
+      file: ../evidence/compose.yaml
+      service: scanner
+    ports: !override ["127.0.0.1:33125:3310"]
+    volumes: !override ["definitions:/var/lib/clamav"]
+volumes:
+  postgres:
+  minio:
+  definitions:

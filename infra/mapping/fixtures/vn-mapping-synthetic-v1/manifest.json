@@ -1,0 +1,83 @@
+{
+  "version": "vn-mapping-synthetic-v1",
+  "synthetic": true,
+  "created": "2026-10-15",
+  "limitations": [
+    "Ten fictional text identities, not production catalog accuracy",
+    "Four dev/six held-out; no calibrated confidence",
+    "Product aliases are supplied explicitly in the synthetic catalog",
+    "No quantities, prices, tax or payment decisions"
+  ],
+  "cases": [
+    {
+      "id": "dev-alias",
+      "split": "dev",
+      "source": "sources/dev-alias.json",
+      "label": "labels/dev-alias.json",
+      "sha256": "c687f76a4cddee6b532b868c55a3ee4935139d5a51e10ea324086692a5857e27"
+    },
+    {
+      "id": "dev-exact-sku",
+      "split": "dev",
+      "source": "sources/dev-exact-sku.json",
+      "label": "labels/dev-exact-sku.json",
+      "sha256": "54358f715c2b5950aebb8f544240c560083456532d0c792ddf91487ffad105f4"
+    },
+    {
+      "id": "dev-unknown",
+      "split": "dev",
+      "source": "sources/dev-unknown.json",
+      "label": "labels/dev-unknown.json",
+      "sha256": "c84514b8f44f79beceaffa2b011694c863bb28fbe322ed231f559237332dbc99"
+    },
+    {
+      "id": "dev-duplicate-sku",
+      "split": "dev",
+      "source": "sources/dev-duplicate-sku.json",
+      "label": "labels/dev-duplicate-sku.json",
+      "sha256": "1bbec5925c6d4e29e65e557e9702f579ebb6a70fd78e6e3181fc67b6e1bedd2e"
+    },
+    {
+      "id": "held-reordered-alias",
+      "split": "held-out",
+      "source": "sources/held-reordered-alias.json",
+      "label": "labels/held-reordered-alias.json",
+      "sha256": "4eba2b54d7e9c554351625c09789e53962fa437fef3866874b9b8cf0123696a4"
+    },
+    {
+      "id": "held-paper-alias",
+      "split": "held-out",
+      "source": "sources/held-paper-alias.json",
+      "label": "labels/held-paper-alias.json",
+      "sha256": "ff81ed471daae77d2986f1e68e1ba49fdec15db56f8e4b733c577527a3ea0b4c"
+    },
+    {
+      "id": "held-ambiguous-variants",
+      "split": "held-out",
+      "source": "sources/held-ambiguous-variants.json",
+      "label": "labels/held-ambiguous-variants.json",
+      "sha256": "5c30a49379ca831d286e80b9c4a8ffa74ba99c5e95960cefbeae1745f8aa571c"
+    },
+    {
+      "id": "held-duplicate-alias",
+      "split": "held-out",
+      "source": "sources/held-duplicate-alias.json",
+      "label": "labels/held-duplicate-alias.json",
+      "sha256": "6c5e3bfdd6c350b68d2e8a427d201b713c6c3c2a20546ae3ff35c860d05077d1"
+    },
+    {
+      "id": "held-unrelated",
+      "split": "held-out",
+      "source": "sources/held-unrelated.json",
+      "label": "labels/held-unrelated.json",
+      "sha256": "28062d570f695a000d946d64c8880296cf8d82b865608e4740e97e77cba5516c"
+    },
+    {
+      "id": "held-injection",
+      "split": "held-out",
+      "source": "sources/held-injection.json",
+      "label": "labels/held-injection.json",
+      "sha256": "17763a08cd6707f75c43710e028121c589ff34d299f438ec7903ad66fa58b0cf"
+    }
+  ]
+}

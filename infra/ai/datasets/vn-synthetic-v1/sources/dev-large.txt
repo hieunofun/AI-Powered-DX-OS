@@ -1,0 +1,12 @@
+HÓA ĐƠN MẪU — DỮ LIỆU TỔNG HỢP
+Tài liệu hoàn toàn hư cấu. Không dùng để thanh toán.
+
+Tên đơn vị bán: Doanh nghiệp Mẫu Đại Ngàn
+Mã số thuế bên bán: SYNTH-MST-004
+Số hóa đơn hoặc chứng từ: SYNTH-004
+Ngày lập: 2026-09-04
+Mã tiền tệ ISO: VND
+Số lượng mặt hàng đầu tiên: 1000
+Đơn giá mặt hàng đầu tiên: 9007199254740.9930
+Thuế suất dạng phân số: 0
+Tổng thanh toán được ghi rõ; không tính từ các dòng: 9007199254740993.00
