@@ -1,8 +1,8 @@
 {
-  "started": "2026-10-14T15:07:23.351Z",
-  "completed": "2026-10-14T15:07:25.603Z",
+  "started": "2026-10-14T22:35:59.755Z",
+  "completed": "2026-10-14T22:36:10.370Z",
   "command": "node infra/evidence/validate-runtime.cjs",
-  "gitHead": "c63e8307433ae444bf8f68e857f3274d6b1e8beb",
+  "gitHead": "a5d041f983d68eda4691fb2ada14d61b72dd4ef2",
   "worktreeDirty": true,
   "sourceHashes": {
     "clamav.scanner.ts": "bc129856f08e0143317ec13fe0dae625ec4186d012b1bae61d6cea2396dec524",
@@ -96,93 +96,93 @@
   ],
   "resources": [
     {
-      "id": "b7c6591a-99cc-4efc-b0e1-fe58561c5e42",
-      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "id": "9dba92a1-c775-4e7b-881a-7d8a915f7f62",
+      "sha256": "04230bdbac8f0ac2c72fe18152d4c97c79b7f2d6b73c52bc18e024f63fe73f13",
       "media": "application/pdf"
     },
     {
-      "id": "497ebcee-2da6-4ee2-a718-3ed04da17454",
-      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "id": "41e546c6-121f-42f2-85ec-cdad710b2c06",
+      "sha256": "04230bdbac8f0ac2c72fe18152d4c97c79b7f2d6b73c52bc18e024f63fe73f13",
       "media": "application/pdf"
     },
     {
-      "id": "9148feb7-1943-46f8-85da-9f711c102471",
-      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "id": "49a25ba3-19bd-49aa-8896-e6c18357235d",
+      "sha256": "04230bdbac8f0ac2c72fe18152d4c97c79b7f2d6b73c52bc18e024f63fe73f13",
       "media": "application/pdf"
     },
     {
-      "id": "9148feb7-1943-46f8-85da-9f711c102471",
-      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "id": "49a25ba3-19bd-49aa-8896-e6c18357235d",
+      "sha256": "04230bdbac8f0ac2c72fe18152d4c97c79b7f2d6b73c52bc18e024f63fe73f13",
       "media": "application/pdf"
     },
     {
-      "id": "9148feb7-1943-46f8-85da-9f711c102471",
-      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "id": "49a25ba3-19bd-49aa-8896-e6c18357235d",
+      "sha256": "04230bdbac8f0ac2c72fe18152d4c97c79b7f2d6b73c52bc18e024f63fe73f13",
       "media": "application/pdf"
     },
     {
-      "id": "9148feb7-1943-46f8-85da-9f711c102471",
-      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "id": "49a25ba3-19bd-49aa-8896-e6c18357235d",
+      "sha256": "04230bdbac8f0ac2c72fe18152d4c97c79b7f2d6b73c52bc18e024f63fe73f13",
       "media": "application/pdf"
     },
     {
-      "id": "9148feb7-1943-46f8-85da-9f711c102471",
-      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "id": "49a25ba3-19bd-49aa-8896-e6c18357235d",
+      "sha256": "04230bdbac8f0ac2c72fe18152d4c97c79b7f2d6b73c52bc18e024f63fe73f13",
       "media": "application/pdf"
     },
     {
-      "id": "9148feb7-1943-46f8-85da-9f711c102471",
-      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "id": "49a25ba3-19bd-49aa-8896-e6c18357235d",
+      "sha256": "04230bdbac8f0ac2c72fe18152d4c97c79b7f2d6b73c52bc18e024f63fe73f13",
       "media": "application/pdf"
     },
     {
-      "id": "9148feb7-1943-46f8-85da-9f711c102471",
-      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "id": "49a25ba3-19bd-49aa-8896-e6c18357235d",
+      "sha256": "04230bdbac8f0ac2c72fe18152d4c97c79b7f2d6b73c52bc18e024f63fe73f13",
       "media": "application/pdf"
     },
     {
-      "id": "9148feb7-1943-46f8-85da-9f711c102471",
-      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "id": "49a25ba3-19bd-49aa-8896-e6c18357235d",
+      "sha256": "04230bdbac8f0ac2c72fe18152d4c97c79b7f2d6b73c52bc18e024f63fe73f13",
       "media": "application/pdf"
     },
     {
-      "id": "9148feb7-1943-46f8-85da-9f711c102471",
-      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "id": "49a25ba3-19bd-49aa-8896-e6c18357235d",
+      "sha256": "04230bdbac8f0ac2c72fe18152d4c97c79b7f2d6b73c52bc18e024f63fe73f13",
       "media": "application/pdf"
     },
     {
-      "id": "9148feb7-1943-46f8-85da-9f711c102471",
-      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "id": "49a25ba3-19bd-49aa-8896-e6c18357235d",
+      "sha256": "04230bdbac8f0ac2c72fe18152d4c97c79b7f2d6b73c52bc18e024f63fe73f13",
       "media": "application/pdf"
     },
     {
-      "id": "46f31f92-fe7d-479d-bdef-c38961be6a94",
-      "sha256": "bf6f4e0d16a64844e6cdda3857d0ce3bf4d9e0716c48edb1a2ab282f561f71f8",
+      "id": "ecdd820c-6121-4a57-9f03-a213cc106479",
+      "sha256": "ec4dbc9c8bccd407f38e25cf474d2522403f29d8d70d64843ec57b73c7cdf970",
       "media": "application/pdf"
     },
     {
-      "id": "3d34406b-772f-4c3b-8154-01153ddeee43",
+      "id": "77f0ed62-4d7a-478e-9d4a-804e8604e7a2",
       "sha256": "2464480cd29d0ed45fe1758de2ddd1fa994c39833dfd64c7298c49d7af87fa99",
       "media": "application/xml"
     },
     {
-      "id": "2b112ee5-01f4-41fd-b63e-d221b3b22519",
+      "id": "e32115a3-991e-4781-971c-80401ad98cd2",
       "sha256": "7d0bb6f1bf9b3f5a54b1e46ef0235c050a9f989dc96034bab28c6c3814417199",
       "media": "application/xml"
     },
     {
-      "id": "06923419-ac1f-4ab2-8ab9-fc0a8c663ccb",
+      "id": "f165c162-099d-4f00-ad78-5d088a4a9297",
       "sha256": "5a35cdcf8a8dfd1040a03603ae7fdd8db7379bd5f9b12ac603952e68b54efba2",
       "media": "application/xml"
     },
     {
-      "id": "2530ed4d-49b3-4039-9bc8-2425b243c2fc",
-      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "id": "2dd80053-9883-48ca-99be-3e98e3c52464",
+      "sha256": "04230bdbac8f0ac2c72fe18152d4c97c79b7f2d6b73c52bc18e024f63fe73f13",
       "media": "application/pdf"
     },
     {
-      "id": "373c6e20-744b-4654-a2b2-1a8ead534563",
-      "sha256": "49cf1d06984d1c393444bacf70e17f3d551d05dbfb0e4303cb67e876180c3fb0",
+      "id": "75edb16f-a644-4c84-af9f-c8c45be6d6ff",
+      "sha256": "04230bdbac8f0ac2c72fe18152d4c97c79b7f2d6b73c52bc18e024f63fe73f13",
       "media": "application/pdf"
     }
   ],

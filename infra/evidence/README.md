@@ -25,7 +25,7 @@ docker compose -f infra/evidence/compose.yaml up -d
 node infra/evidence/validate-runtime.cjs
 ```
 
-The runner's first gate requires exact engine, loaded signature age <=24 hours and complete clean INSTREAM. It refuses stale signatures; it never weakens freshness or inserts CLEAN. First startup can download/load signatures for several minutes. Freshclam notifies clamd after updates and SelfCheck runs every 60 seconds. If an update raced initial daemon startup, readiness can remain blocked until reload finishes; inspect logs and retry after the actual loaded version updates.
+The runner's first gate requires exact engine, loaded signature age <=24 hours and complete clean INSTREAM. It refuses stale signatures; it never weakens freshness or inserts CLEAN. The container first runs freshclam in the foreground and only then starts clamd, so startup cannot load bundled stale definitions before the initial update finishes. An update failure blocks startup. First startup can download/load signatures for several minutes. Subsequent freshclam updates notify clamd and SelfCheck runs every 60 seconds; readiness still checks the actual loaded version.
 
 ```powershell
 docker compose -f infra/evidence/compose.yaml logs scanner --tail 30

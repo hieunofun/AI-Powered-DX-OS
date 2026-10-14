@@ -30,6 +30,8 @@ services:
     cpus: 1
   scanner:
     image: clamav/clamav:1.4.6@sha256:b5b910ce43d595bf8a2fe401e34db56434602b2c755b7c2b07f00c917d04d469
+    # Complete the initial update before clamd loads its databases; bundled signatures may be stale.
+    entrypoint: ["/bin/sh", "-ec", "freshclam --foreground --stdout; exec /init"]
     environment:
       TZ: UTC
       FRESHCLAM_CHECKS: "12"
