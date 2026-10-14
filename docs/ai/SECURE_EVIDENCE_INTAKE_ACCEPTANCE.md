@@ -1,6 +1,6 @@
 # Issue #41 runtime acceptance matrix
 
-Status: proposed tests, none executed by this docs-only branch. See [design](SECURE_EVIDENCE_INTAKE_SPEC.md). All integration tests use an isolated stack/tenant and retain command, environment, exact SHA, raw result and CI URL. Unit doubles demonstrate contract handling only; they do not establish real clamd/MinIO/tenant behavior.
+Status: implementation draft with partial runtime acceptance. See [design](SECURE_EVIDENCE_INTAKE_SPEC.md), [run instructions](../../infra/evidence/README.md) and [isolated raw report](evidence/issue41-runtime.json). The table below defines release requirements, not a claim that all 30 cases passed. The report records real PostgreSQL/MinIO/clamd checks and exact source hashes. Static server identities and injected faults are explicitly labelled; they do not establish production JWT/membership or real crash/snapshot behavior. Local execution has no CI URL.
 
 | ID | Trigger | Observable result / required evidence |
 | --- | --- | --- |
@@ -41,4 +41,14 @@ Run protocol/size/reply tests with a socket double, then confirm positive and co
 
 For each case capture test ID, fixture provenance/hash, backend/scanner source or image digest, definition version/timestamp, policy version, tenant-safe resource/operation/revision/attempt IDs, command/result and CI URL/SHA. Record test doubles and unfinished acceptance separately. Scanner image pinning, resources and versioned migration ownership require A's integration review.
 
-After #37/#38 merge: fetch develop, create feat/41-secure-evidence-intake, implement accepted ports/limits/lifecycle, run the matrix and PR3 regressions, open an English PR with Refs #41, obtain peer review and latest-SHA CI, merge, then assess issue closure. Docs/review requests do not complete EI-01..30.
+Implementation is based on merged #37; #38 PR #68 awaits peer review. Keep the #41 PR draft until verified tenancy/shared composition, migration ownership, daemon hang recovery, real revocation, restore and legacy real-stack checks are complete. Only peer acceptance and latest-SHA CI can establish merge readiness; #41 remains open.
+
+## Observed coverage and pending portions
+
+- EI-01/02: actual HTTP registration plus strict schema/server metadata and retention-grant checks in doubles.
+- EI-03/04/19/26: real HTTP/tenant-predicated PostgreSQL/private MinIO with static server identities; invalid/absent token behavior and mid-read/mid-scan ACL revocation use doubles. Production JWT and active membership remain #43 gates.
+- EI-05/06/17: exact 5/20 MiB and overflow, magic/UTF-8, XML depth/elements/entity/encoding guards in unit tests; DTD/malformed/depth rejection also ran through real HTTP/storage fixture. Domain profile and PDF/image decoder budgets remain #26.
+- EI-07/08/09/10/11/12/18/20/27: actual readback/hash, database idempotency, clean PDF/attachment/private storage, embedded PDF EICAR, blocked states and object corruption. Concurrency/lease/stream guards also use doubles. Scanner verdicts do not establish safety for every possible embedded representation.
+- EI-13/14/15: absent real scanner and fresh exact-version real scanner; encrypted PDF and gzip size-limit alerts verified. Stale/version/reply fragmentation/malformed/EOF/deadline handling uses actual TCP with a scripted daemon.
+- EI-21/22/23/24/25: failed finalization and real retained object/intent/retry were exercised with an injected commit fault. Service recreation, persisted backoff/three attempts and unavailable TCP scanner ran against real PostgreSQL. Mid-write failures and stale/crashed lease owners use doubles. Actual process termination, uncertain commit restore, authorized manual rescan and daemon hang supervision remain pending.
+- EI-16/28/29/30: no automatic object deletion exists; history and attempted object references are retained. Daemon hang recovery, retention administration, coordinated restore and full PR3 real-stack regression remain release gates. Full unit/Nest E2E/build/lint/contract regression results are recorded in the runtime README.

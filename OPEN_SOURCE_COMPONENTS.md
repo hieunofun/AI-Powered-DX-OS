@@ -6,9 +6,9 @@ Issue #10 corrects the stale ImmuDB license entry: the selected release is BUSL-
 
 ---
 
-### Secure evidence intake scanner candidate (Issue #41; not installed)
+### Secure evidence intake scanner (Issue #41; isolated implementation fixture)
 
-The [proposed design](docs/ai/SECURE_EVIDENCE_INTAKE_SPEC.md) selects an unmodified external ClamAV 1.4.6 LTS daemon candidate, upstream [Cisco-Talos/clamav release](https://github.com/Cisco-Talos/clamav/releases/tag/clamav-1.4.6), source commit `5853e1396777bae4d909cd3dd44f58352e7cf9b3`. Its tagged [GPLv2 license](https://github.com/Cisco-Talos/clamav/blob/clamav-1.4.6/COPYING.txt) and applicable source/distribution notices must remain with the scanner service. The planned Node socket adapter is team-authored code and does not link libclamav. No package, scanner binary/container, vendor source, license exception or runtime service is introduced by this documentation branch. A deployable image digest/security patch and notice/SBOM review remain prerequisites for the implementation PR. The proposed policy and tests are in the [acceptance matrix](docs/ai/SECURE_EVIDENCE_INTAKE_ACCEPTANCE.md).
+The [implementation](infra/evidence/README.md) uses an unmodified external ClamAV 1.4.6 LTS daemon, upstream [release](https://github.com/Cisco-Talos/clamav/releases/tag/clamav-1.4.6), source commit `5853e1396777bae4d909cd3dd44f58352e7cf9b3`, image `clamav/clamav:1.4.6@sha256:b5b910ce43d595bf8a2fe401e34db56434602b2c755b7c2b07f00c917d04d469`. Its exact [GPLv2 COPYING](docs/open-source/notices/clamav-1.4.6-COPYING.txt) is preserved from that source commit; service distribution must also retain applicable upstream notices/source obligations. The team-authored MIT Node TCP adapter does not link libclamav. No npm dependency was added: XML validation reuses locked fast-xml-parser@5.11.2, and persistence reuses existing PostgreSQL/MinIO packages and the source-pinned MinIO Dockerfile. Production integration/security/SBOM/source distribution review remains pending; this entry makes no competition-eligibility assertion. The [acceptance matrix](docs/ai/SECURE_EVIDENCE_INTAKE_ACCEPTANCE.md) distinguishes real isolated checks from doubles and pending gates.
 
 ## Component Registry
 
