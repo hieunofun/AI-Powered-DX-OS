@@ -137,3 +137,26 @@ Exact versions and declared licenses below were verified from installed npm pack
 | xml-naming | [upstream](https://github.com/NaturalIntelligence/xml-naming) | 0.3.0 | MIT | SDK/XML transitive dependency |
 | xml2js | [upstream](https://github.com/Leonidas-from-XIV/node-xml2js) | 0.6.2 | MIT | SDK/XML transitive dependency |
 | xmlbuilder | [upstream](https://github.com/oozcitak/xmlbuilder-js) | 11.0.1 | MIT | SDK/XML transitive dependency |
+
+
+## Project 4 contract validation tooling (development only)
+
+Concrete need: independently validate OAS structure/references plus JSON Schema and every positive/negative/embedded example before frontend/AI implementation. `@apidevtools/swagger-parser@10.1.0` and `ajv@6.15.0` are exact direct dev dependencies; Ajv already existed transitively. No pre-existing locked package version changes and no runtime packages were added. The lockfile pins archive integrity; installed manifests and packaged MIT/BSD-3-Clause notices were inspected and preserved under `docs/open-source/notices/pr4-*`. Dependency terms do not decide the existing ImmuDB eligibility gate (#22).
+
+| Package | Upstream | Exact version | License | Integration role |
+| --- | --- | --- | --- | --- |
+| ajv | [upstream](https://github.com/ajv-validator/ajv) | 6.15.0 | MIT | JSON Schema/fixture validation (dev; previously transitive) |
+| @apidevtools/json-schema-ref-parser | [https://github.com/APIDevTools/json-schema-ref-parser](https://github.com/APIDevTools/json-schema-ref-parser) | 9.0.6 | MIT | Contract validation only (dev) |
+| @apidevtools/openapi-schemas | [https://github.com/APIDevTools/openapi-schemas](https://github.com/APIDevTools/openapi-schemas) | 2.1.0 | MIT | Contract validation only (dev) |
+| @apidevtools/swagger-methods | [https://github.com/APIDevTools/swagger-methods](https://github.com/APIDevTools/swagger-methods) | 3.0.2 | MIT | Contract validation only (dev) |
+| @apidevtools/swagger-parser | [https://github.com/APIDevTools/swagger-parser](https://github.com/APIDevTools/swagger-parser) | 10.1.0 | MIT | Contract validation only (dev) |
+| ajv | [upstream](https://github.com/ajv-validator/ajv) | 8.20.0 | MIT | Contract validation only (dev) |
+| ajv-draft-04 | [https://github.com/ajv-validator/ajv-draft-04](https://github.com/ajv-validator/ajv-draft-04) | 1.0.0 | MIT | Contract validation only (dev) |
+| json-schema-traverse | [https://github.com/epoberezkin/json-schema-traverse](https://github.com/epoberezkin/json-schema-traverse) | 1.0.0 | MIT | Contract validation only (dev) |
+| @jsdevtools/ono | [https://github.com/JS-DevTools/ono](https://github.com/JS-DevTools/ono) | 7.1.3 | MIT | Contract validation only (dev) |
+| call-me-maybe | [https://github.com/limulus/call-me-maybe](https://github.com/limulus/call-me-maybe) | 1.0.2 | MIT | Contract validation only (dev) |
+| fast-uri | [https://github.com/fastify/fast-uri](https://github.com/fastify/fast-uri) | 3.1.8 | BSD-3-Clause | Contract validation only (dev) |
+| openapi-types | [https://github.com/kogosoftwarellc/open-api/tree/master/packages/openapi-types](https://github.com/kogosoftwarellc/open-api/tree/master/packages/openapi-types) | 12.1.3 | MIT | Contract validation only (dev) |
+| require-from-string | [upstream](https://github.com/floatdrop/require-from-string) | 2.0.2 | MIT | Contract validation only (dev) |
+
+Team-authored work is the contracts, fixtures, ADR/BRS and validation orchestration. Upstream validators provide parsing/schema validation; the team does not claim their algorithms as its own. These tooling dependencies do not implement tenant/OCR/decision APIs. Distribution preserves their packaged notices; the added runtime target contracts are currently proposals.

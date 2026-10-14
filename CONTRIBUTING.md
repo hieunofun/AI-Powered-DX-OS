@@ -95,3 +95,15 @@ For third-party libraries and reused code, please review our [License Policy](do
 ## Project 4 governance
 
 See [PR4 workflow, roles and Definition of Done](docs/project4/GOVERNANCE.md). New branches use `feat/`, `fix/`, `docs/` or `chore/` with real issue numbers; historical `feature/` branches remain valid. Business UI defaults to Vietnamese; code/API keys stay English.
+
+
+## Team naming and writing conventions
+
+Issue titles and bodies, commit messages, branch names, and PR titles/bodies use English consistently, continuing the PR3 repository convention. Vietnamese belongs in business UI and user documentation. A person's proper name and a product name are preserved. The source plan's Vietnamese work-item names are translated without changing scope. Do not alternate languages within issue or commit text.
+
+- Issue: `[P4-06] Extract a headless platform core from PR3` — the planning ID supports scope tracing; GitHub issue #40 provides the actual tracking link.
+- Branch: `feat/40-headless-core` — type + real issue number + short English kebab-case result; also `fix/`, `docs/`, `chore/`. Historical `feature/` branches are retained.
+- Commit: `feat(core): extract generic workflow port`, body `Refs #40` — Conventional Commits type/scope describes an actual change; no quota or fabricated activity.
+- PR: English problem/result title, real issue references, scope/migration/validation and peer review evidence. Use `Refs` for partial drafts; close only completed acceptance after review/merge.
+
+These simple rules make changes searchable, connect code to acceptance, help reviewers identify intent, and keep shared ownership understandable. They do not require equal issue or commit counts across contributors.

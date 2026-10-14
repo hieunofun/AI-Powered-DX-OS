@@ -53,3 +53,8 @@ These are not implementation claims. Their scope and completion criteria are in 
 ## Upstream source changes and notices
 
 No modified upstream service fork is claimed by this baseline. MinIO is built from unmodified pinned source, while the project maintains build/configuration files and adapters. Retain upstream license/copyright notices in images and distributions, including BUSL for ImmuDB, the MIT notice for the XML dependency, and OFL for Noto Sans. Future upstream modifications must record source commit, patch and license separately.
+
+
+## Project 4 foundation delivery (review candidate)
+
+P4-01 #36 and P4-02 #37 add project-authored governance, migration/boundary ADRs, BRS, versioned OpenAPI/JSON Schemas, synthetic positive/negative fixtures and validation orchestration. Ajv and Swagger Parser supply upstream validation engines; no upstream source was modified. The agent submitted this work through the authorized hieunofun account; assigning role owners does not claim they authored or reviewed the changes. The contracts remain proposals and do not establish implemented PR4 runtime, AI accuracy, immutable-ledger eligibility, tenant isolation or completed Onboarding/replay.

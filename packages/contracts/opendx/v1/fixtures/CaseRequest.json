@@ -1,0 +1,12 @@
+{
+  "reason": "SHORT_DELIVERY",
+  "subject_ref": {
+    "pack_id": "openresolve",
+    "type": "receipt",
+    "id": "00000000-0000-4000-8000-000000000008"
+  },
+  "evidence_ids": [
+    "00000000-0000-4000-8000-000000000001"
+  ],
+  "severity": "HIGH"
+}

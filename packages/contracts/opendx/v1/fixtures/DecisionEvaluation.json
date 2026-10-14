@@ -1,0 +1,25 @@
+{
+  "subject_ref": {
+    "pack_id": "openresolve",
+    "type": "document",
+    "id": "00000000-0000-4000-8000-000000000001"
+  },
+  "confirmed_facts_ref": {
+    "pack_id": "openresolve",
+    "type": "document",
+    "id": "00000000-0000-4000-8000-000000000001"
+  },
+  "evidence_ids": [
+    "00000000-0000-4000-8000-000000000001"
+  ],
+  "policy_ref": {
+    "id": "00000000-0000-4000-8000-000000000009",
+    "version": "1.0.0",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "workflow_ref": {
+    "id": "00000000-0000-4000-8000-000000000009",
+    "version": "1.0.0",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
+}

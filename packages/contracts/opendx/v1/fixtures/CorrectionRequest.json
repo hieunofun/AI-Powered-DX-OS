@@ -1,0 +1,11 @@
+{
+  "expected_revision": 1,
+  "corrections": [
+    {
+      "field_path": "/total_amount",
+      "previous_value": "1050000.00",
+      "new_value": "1100000.00",
+      "reason": "Compared against the permitted original document"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "path": "/invoice_number",
+  "kind": "TEXT",
+  "status": "MISSING",
+  "value": "invented",
+  "source_refs": [
+    {
+      "location_status": "UNKNOWN",
+      "evidence_id": "00000000-0000-4000-8000-000000000001",
+      "reason": "PROVIDER_NO_LOCATION"
+    }
+  ]
+}

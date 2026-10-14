@@ -47,3 +47,15 @@ Estimate = ngày công 6 giờ; kế hoạch 75.5 ngày + 25% dự phòng ≈94.
 Kế thừa Keycloak, APISIX, PostgreSQL, MinIO, Flowable; không nhận phần upstream là code nhóm. `OPEN_SOURCE_COMPONENTS.md` ghi source/version/license/role và `OUR_CONTRIBUTIONS.md` ghi phần tự viết. Ledger BUSL xử lý riêng #22; API AI là dependency dịch vụ được công khai, provider/model chưa chọn ở nền tảng. Không thêm runtime package/framework khi chưa cần.
 
 Sau review+merge contract: A `feat/22-ledger-license` rồi `feat/40-headless-core`; B `feat/38-ai-provider-contract`; C `feat/39-vietnamese-shell`. Fetch develop lại, tạo branch đúng HEAD lúc đó, cập nhật issue gate. Hiện các branch này chưa được tạo.
+
+
+## Team naming and writing conventions
+
+Issue titles and bodies, commit messages, branch names, and PR titles/bodies use English consistently, continuing the PR3 repository convention. Vietnamese belongs in business UI and user documentation. A person's proper name and a product name are preserved. The source plan's Vietnamese work-item names are translated without changing scope. Do not alternate languages within issue or commit text.
+
+- Issue: `[P4-06] Extract a headless platform core from PR3` — the planning ID supports scope tracing; GitHub issue #40 provides the actual tracking link.
+- Branch: `feat/40-headless-core` — type + real issue number + short English kebab-case result; also `fix/`, `docs/`, `chore/`. Historical `feature/` branches are retained.
+- Commit: `feat(core): extract generic workflow port`, body `Refs #40` — Conventional Commits type/scope describes an actual change; no quota or fabricated activity.
+- PR: English problem/result title, real issue references, scope/migration/validation and peer review evidence. Use `Refs` for partial drafts; close only completed acceptance after review/merge.
+
+These simple rules make changes searchable, connect code to acceptance, help reviewers identify intent, and keep shared ownership understandable. They do not require equal issue or commit counts across contributors.

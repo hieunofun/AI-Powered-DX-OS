@@ -1,0 +1,38 @@
+{
+  "id": "00000000-0000-4000-8000-000000000003",
+  "tenant_id": "00000000-0000-4000-8000-000000000002",
+  "evidence_id": "00000000-0000-4000-8000-000000000001",
+  "schema_id": "openresolve.invoice-draft.v1",
+  "revision": 1,
+  "state": "REVIEW_REQUIRED",
+  "fields": [
+    {
+      "path": "/total_amount",
+      "kind": "DECIMAL",
+      "value": "1050000.00",
+      "source_refs": [
+        {
+          "location_status": "KNOWN",
+          "evidence_id": "00000000-0000-4000-8000-000000000001",
+          "page": 1,
+          "bbox": [
+            0.1,
+            0.2,
+            0.5,
+            0.3
+          ]
+        }
+      ],
+      "confidence": 0.81,
+      "status": "EXTRACTED"
+    }
+  ],
+  "extractor": {
+    "provider": "synthetic-fixture",
+    "model_version": "fixture-v1",
+    "run_id": "00000000-0000-4000-8000-000000000006"
+  },
+  "created_at": "2026-10-14T03:00:00Z",
+  "updated_at": "2026-10-14T03:00:00Z",
+  "corrections": []
+}

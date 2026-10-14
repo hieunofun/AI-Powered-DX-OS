@@ -1,0 +1,13 @@
+{
+  "subject": "synthetic-reviewer",
+  "kind": "USER",
+  "tenant_id": "00000000-0000-4000-8000-000000000002",
+  "roles": [
+    "document_reviewer"
+  ],
+  "permissions": [
+    "evidence.read",
+    "extraction.correct"
+  ],
+  "correlation_id": "00000000-0000-4000-8000-000000000015"
+}

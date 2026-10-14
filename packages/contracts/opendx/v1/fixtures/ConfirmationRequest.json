@@ -1,0 +1,6 @@
+{
+  "expected_revision": 2,
+  "reviewed_field_paths": [
+    "/total_amount"
+  ]
+}

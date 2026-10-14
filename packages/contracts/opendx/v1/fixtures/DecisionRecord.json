@@ -1,0 +1,46 @@
+{
+  "id": "00000000-0000-4000-8000-000000000013",
+  "tenant_id": "00000000-0000-4000-8000-000000000002",
+  "subject_ref": {
+    "pack_id": "openresolve",
+    "type": "document",
+    "id": "00000000-0000-4000-8000-000000000001"
+  },
+  "facts_snapshot_ref": {
+    "pack_id": "openresolve",
+    "type": "verified-facts",
+    "id": "00000000-0000-4000-8000-000000000014"
+  },
+  "facts_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "evidence_refs": [
+    {
+      "evidence_id": "00000000-0000-4000-8000-000000000001",
+      "revision": 1,
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ],
+  "policy_ref": {
+    "id": "00000000-0000-4000-8000-000000000009",
+    "version": "1.0.0",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "workflow_ref": {
+    "id": "00000000-0000-4000-8000-000000000009",
+    "version": "1.0.0",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "evaluation": {
+    "verdict": "REVIEW",
+    "rule_ids": [
+      "price.tolerance"
+    ],
+    "evaluator_version": "fixture-v1"
+  },
+  "authorization": {
+    "state": "PENDING",
+    "proposer_subject": "synthetic-requester"
+  },
+  "execution_state": "NOT_REQUESTED",
+  "created_at": "2026-10-14T03:00:00Z",
+  "revision": 1
+}

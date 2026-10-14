@@ -1,0 +1,18 @@
+{
+  "definition_ref": {
+    "id": "00000000-0000-4000-8000-000000000009",
+    "version": "1.0.0",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "subject_ref": {
+    "pack_id": "openresolve",
+    "type": "document",
+    "id": "00000000-0000-4000-8000-000000000001"
+  },
+  "input_schema_id": "openresolve.case-input.v1",
+  "input_ref": {
+    "pack_id": "openresolve",
+    "type": "document",
+    "id": "00000000-0000-4000-8000-000000000001"
+  }
+}

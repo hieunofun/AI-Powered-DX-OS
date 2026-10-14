@@ -1,0 +1,23 @@
+{
+  "id": "00000000-0000-4000-8000-000000000017",
+  "mode": "SIMULATION",
+  "decision_id": "00000000-0000-4000-8000-000000000013",
+  "facts_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "policy_a": {
+    "id": "00000000-0000-4000-8000-000000000009",
+    "version": "1.0.0",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "policy_b": {
+    "id": "00000000-0000-4000-8000-000000000009",
+    "version": "2.0.0",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "verdict_a": "REVIEW",
+  "verdict_b": "PASS",
+  "changed_rule_ids": [
+    "price.tolerance"
+  ],
+  "side_effects": "NONE",
+  "created_at": "2026-10-14T03:00:00Z"
+}

@@ -1,0 +1,22 @@
+{
+  "purchase_order_id": "00000000-0000-4000-8000-000000000007",
+  "seller_tax_code": "SYNTHETIC-SELLER",
+  "buyer_tax_code": "SYNTHETIC-BUYER",
+  "invoice_number": "SYNTHETIC-001",
+  "invoice_date": "2026-10-14",
+  "currency": "VND",
+  "lines": [
+    {
+      "description": "Mực in tổng hợp",
+      "quantity": "10.0000",
+      "unit_price": "100000.0000",
+      "tax_rate": "0.1000",
+      "line_subtotal": "1000000.00",
+      "tax_amount": "100000.00",
+      "line_total": "1100000.00"
+    }
+  ],
+  "subtotal": "1000000.00",
+  "tax_amount": "100000.00",
+  "total_amount": "1100000.00"
+}

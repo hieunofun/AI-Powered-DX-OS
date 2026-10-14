@@ -1,0 +1,31 @@
+{
+  "pack_id": "onboarding",
+  "version": "0.1.0",
+  "publisher": "OpenDX team",
+  "license": "MIT",
+  "compatible_core": "^1.0.0",
+  "permissions": [
+    "evidence.read",
+    "workflow.start"
+  ],
+  "entity_schema_ids": [
+    "onboarding.case.v1"
+  ],
+  "workflow_refs": [
+    {
+      "id": "00000000-0000-4000-8000-000000000009",
+      "version": "1.0.0",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ],
+  "published_events": [
+    "onboarding.case.opened.v1"
+  ],
+  "consumed_events": [
+    "evidence.confirmed.v1"
+  ],
+  "evidence_schema_ids": [
+    "onboarding.document.v1"
+  ],
+  "migration_policy": "FORWARD_ONLY"
+}

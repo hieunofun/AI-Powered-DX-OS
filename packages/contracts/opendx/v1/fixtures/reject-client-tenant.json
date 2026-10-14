@@ -1,0 +1,11 @@
+{
+  "filename": "hoa-don-tong-hop.pdf",
+  "media_type": "application/pdf",
+  "size_bytes": 1234,
+  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "source": {
+    "kind": "USER_UPLOAD"
+  },
+  "retention_class": "STANDARD",
+  "tenant_id": "00000000-0000-4000-8000-000000000002"
+}

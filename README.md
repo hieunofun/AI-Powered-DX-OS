@@ -4,6 +4,10 @@ Procure-to-Pay and three-way invoice reconciliation for the OLP PMNM 2026 DX-OS 
 
 SmartProcure replaces manual PO / GRN / invoice comparison with deterministic matching, role-based exception handling and verifiable audit evidence. The application code is MIT-licensed. The integrated ImmuDB 1.11.0 server/client uses **BUSL-1.1 source-available licensing**, with a scoped repository exception; competition eligibility remains an open delivery gate. See [component provenance](OPEN_SOURCE_COMPONENTS.md) and [license policy](docs/open-source/LICENSE_POLICY.md).
 
+## Project 4 foundation (proposed)
+
+The next phase is documented in [OpenDX Fabric Project 4](docs/project4/README.md), including reviewed-delivery gates, proposed contracts and the 36-item backlog. Platform/tenant/OCR/replay/Onboarding targets in that documentation are not implemented by the foundation PR. The current PR3 behavior remains below.
+
 ## Current implementation
 
 Integration updated **9 October 2026**. The first ten backend/foundation issues have merged. PO/GRN, invoice, approval and audit workspaces are implemented in Issues #23/#24. Issue #34 protects received quantities across pending and approved invoice decisions. Semantic AI, OCR and the remaining trust/payment integrations are still delivery work; this is not a completed competition release.

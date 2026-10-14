@@ -1,0 +1,14 @@
+{
+  "expected": "100.0000",
+  "shipped": "100.0000",
+  "physically_counted": "95.0000",
+  "inspected": "95.0000",
+  "accepted": "95.0000",
+  "rejected": "0.0000",
+  "held": "0.0000",
+  "pending_inspection": "0.0000",
+  "missing": "5.0000",
+  "billable": "95.0000",
+  "package_count": 10,
+  "billable_policy_ref": "synthetic-accepted-only-v1"
+}

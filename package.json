@@ -18,11 +18,14 @@
     "test": "npm run test:api && npm run test:web",
     "lint:web": "npm run lint --workspace=apps/web",
     "lint:api": "npm run lint --workspace=apps/api",
-    "lint": "npm run lint:api && npm run lint:web"
+    "lint": "npm run lint:api && npm run lint:web",
+    "test:contracts": "node packages/contracts/opendx/validate.cjs"
   },
   "devDependencies": {
+    "@apidevtools/swagger-parser": "10.1.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
+    "ajv": "6.15.0",
     "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.2",
