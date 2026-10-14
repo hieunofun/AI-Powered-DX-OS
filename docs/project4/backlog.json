@@ -1,0 +1,878 @@
+[
+  {
+    "id": "P4-01",
+    "legacy": null,
+    "owner_role": "C",
+    "assignee": "lehoangnam206",
+    "milestone": "M0",
+    "estimate_days": 1.0,
+    "title": "Preserve the PR3 baseline and define the contribution workflow",
+    "depends_on": [],
+    "acceptance": "Record baseline SHA 32d8594 and the annotated tag; preserve history. Provide old/new issue mapping, labels, templates, ownership and reviewers. Report actual CI and reviews.",
+    "planned_branch": "chore/p4-01-baseline-governance",
+    "status": "In review",
+    "priority": "P0",
+    "branch": "chore/36-baseline-governance",
+    "number": 36,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/36",
+    "dependency_numbers": []
+  },
+  {
+    "id": "P4-02",
+    "legacy": null,
+    "owner_role": "A",
+    "assignee": "hieunofun",
+    "milestone": "M0",
+    "estimate_days": 2.0,
+    "title": "Define the BRS, core boundaries and first-wave API contracts",
+    "depends_on": [
+      "P4-01"
+    ],
+    "acceptance": "Propose ADRs for core/pack boundaries, tenancy, ownership and evidence/decision/OCR schemas. Supply OpenAPI, event schemas and shared fixtures. Define counted quantities, QC, billable policy, returns and incidents in the BRS. Keep PO/GRN/Invoice/Employee vocabulary outside core contracts.",
+    "planned_branch": "feat/p4-02-platform-contracts",
+    "status": "In review",
+    "priority": "P0",
+    "branch": "feat/37-platform-contracts",
+    "number": 37,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/37",
+    "dependency_numbers": [
+      36
+    ]
+  },
+  {
+    "id": "P4-03",
+    "legacy": null,
+    "owner_role": "B",
+    "assignee": "huybitvvt",
+    "milestone": "M0",
+    "estimate_days": 1.5,
+    "title": "Implement the AI provider adapter and evaluation dataset",
+    "depends_on": [
+      "P4-02"
+    ],
+    "acceptance": "Select one primary disclosed Gemini/Claude/GPT provider through a replaceable backend adapter. Define timeouts, quotas and budgets; keys stay on the server. Use permitted or synthetic Vietnamese documents, versioned ground truth and separate development/held-out sets. Do not treat model self-reported confidence as calibrated probability.",
+    "planned_branch": "feat/p4-03-ai-provider-contract",
+    "status": "Blocked",
+    "priority": "P1",
+    "branch": "feat/38-ai-provider-contract",
+    "number": 38,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/38",
+    "dependency_numbers": [
+      37
+    ]
+  },
+  {
+    "id": "P4-04",
+    "legacy": null,
+    "owner_role": "C",
+    "assignee": "lehoangnam206",
+    "milestone": "M0",
+    "estimate_days": 2.0,
+    "title": "Build the Vietnamese application shell",
+    "depends_on": [
+      "P4-02"
+    ],
+    "acceptance": "Provide H-P-D-I navigation, terminology and i18n keys; complete vi-VN business text. Implement consistent loading/error/empty states, responsive behavior and keyboard access. Keep internal technical names out of business screens.",
+    "planned_branch": "feat/p4-04-vietnamese-shell",
+    "status": "Blocked",
+    "priority": "P1",
+    "branch": "feat/39-vietnamese-shell",
+    "number": 39,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/39",
+    "dependency_numbers": [
+      37
+    ]
+  },
+  {
+    "id": "P4-05",
+    "legacy": 22,
+    "owner_role": "A",
+    "assignee": "hieunofun",
+    "milestone": "M1",
+    "estimate_days": 2.0,
+    "title": "Resolve ledger licensing and migrate the adapter if required",
+    "depends_on": [
+      "P4-01"
+    ],
+    "acceptance": "Choose exact ledger/server/client revisions and licenses, supported source builds and notices/SBOM. Preserve proof verification, exports and historic receipts if replacing the adapter. Test tampering, lost trust state and unavailability. Internal exceptions do not establish organizer acceptance.",
+    "planned_branch": "feat/22-ledger-license",
+    "status": "Blocked",
+    "priority": "P0",
+    "branch": "feat/22-ledger-license",
+    "number": 22,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/22",
+    "dependency_numbers": [
+      36
+    ]
+  },
+  {
+    "id": "P4-06",
+    "legacy": null,
+    "owner_role": "A",
+    "assignee": "hieunofun",
+    "milestone": "M1",
+    "estimate_days": 3.0,
+    "title": "Extract a headless platform core from PR3",
+    "depends_on": [
+      "P4-02"
+    ],
+    "acceptance": "Separate identity/gateway/data/workflow ports from domain code. Check imports and retain compatibility APIs plus PR3 regression behavior. Keep the modular monolith; do not require new microservices.",
+    "planned_branch": "feat/p4-06-headless-core",
+    "status": "Blocked",
+    "priority": "P0",
+    "branch": "feat/40-headless-core",
+    "number": 40,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/40",
+    "dependency_numbers": [
+      37
+    ]
+  },
+  {
+    "id": "P4-07",
+    "legacy": null,
+    "owner_role": "B",
+    "assignee": "huybitvvt",
+    "milestone": "M1",
+    "estimate_days": 2.0,
+    "title": "Implement secure document intake and file quarantine",
+    "depends_on": [
+      "P4-02",
+      "P4-03"
+    ],
+    "acceptance": "Register evidence/object metadata with hashes, MIME/magic-byte validation, size limits and scan/quarantine states. Non-clean files cannot reach OCR or download. Scan timeouts/errors remain blocked. Storage ports receive verified tenant context; full tenancy integration follows P4-13.",
+    "planned_branch": "feat/p4-07-secure-evidence-intake",
+    "status": "Blocked",
+    "priority": "P0",
+    "branch": "feat/41-secure-evidence-intake",
+    "number": 41,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/41",
+    "dependency_numbers": [
+      37,
+      38
+    ]
+  },
+  {
+    "id": "P4-08",
+    "legacy": null,
+    "owner_role": "C",
+    "assignee": "lehoangnam206",
+    "milestone": "M1",
+    "estimate_days": 1.5,
+    "title": "Add a typed API client and authorization context",
+    "depends_on": [
+      "P4-02",
+      "P4-04"
+    ],
+    "acceptance": "Generate or schema-check a typed client. Read principal/tenant permissions from the backend; frontend filters do not provide authorization. Handle 401/403/409, expired sessions and tenant state. Fixtures are development aids.",
+    "planned_branch": "feat/p4-08-typed-api-client",
+    "status": "Blocked",
+    "priority": "P1",
+    "branch": "feat/42-typed-api-client",
+    "number": 42,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/42",
+    "dependency_numbers": [
+      37,
+      39
+    ]
+  },
+  {
+    "id": "P4-09",
+    "legacy": null,
+    "owner_role": "A",
+    "assignee": "hieunofun",
+    "milestone": "M1",
+    "estimate_days": 3.0,
+    "title": "Enforce backend tenant isolation and resource authorization",
+    "depends_on": [
+      "P4-06"
+    ],
+    "acceptance": "Backfill PR3 data into the default tenant and scope queries, object keys, workflow and service identities. Derive tenancy from verified identity. Changing resource IDs cannot cross tenant boundaries. Enforce least privilege and basic separation of duties.",
+    "planned_branch": "feat/p4-09-tenant-isolation",
+    "status": "Blocked",
+    "priority": "P0",
+    "branch": "feat/43-tenant-isolation",
+    "number": 43,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/43",
+    "dependency_numbers": [
+      40
+    ]
+  },
+  {
+    "id": "P4-10",
+    "legacy": 26,
+    "owner_role": "B",
+    "assignee": "huybitvvt",
+    "milestone": "M2",
+    "estimate_days": 3.0,
+    "title": "Persist reviewed OCR drafts from PDF and image documents",
+    "depends_on": [
+      "P4-03",
+      "P4-07"
+    ],
+    "acceptance": "Replace OCR_REQUIRED persistence gaps with PDF/image draft storage. Capture invoice fields, lines, tax/currency and supported source spans; unknown locations remain unknown. Persist original suggestions and actor corrections; confirmation precedes matching. Test text/scanned Vietnamese PDFs, images, malformed inputs, timeout and retries.",
+    "planned_branch": "feat/26-ocr-reviewed-drafts",
+    "status": "Blocked",
+    "priority": "P0",
+    "branch": "feat/26-ocr-reviewed-drafts",
+    "number": 26,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/26",
+    "dependency_numbers": [
+      38,
+      41
+    ]
+  },
+  {
+    "id": "P4-11",
+    "legacy": null,
+    "owner_role": "C",
+    "assignee": "lehoangnam206",
+    "milestone": "M2",
+    "estimate_days": 2.0,
+    "title": "Build the OCR review and correction screen",
+    "depends_on": [
+      "P4-08",
+      "P4-10"
+    ],
+    "acceptance": "Display document and extracted values together. Permit correction/confirmation under backend permissions with decimal validation. Reload retains edits and provenance. OCR failures must not display successful intake. Final integration includes tenant-aware P4-13.",
+    "planned_branch": "feat/p4-11-ocr-review-ui",
+    "status": "Blocked",
+    "priority": "P1",
+    "branch": "feat/44-ocr-review-ui",
+    "number": 44,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/44",
+    "dependency_numbers": [
+      42,
+      26
+    ]
+  },
+  {
+    "id": "P4-12",
+    "legacy": null,
+    "owner_role": "A",
+    "assignee": "hieunofun",
+    "milestone": "M2",
+    "estimate_days": 2.5,
+    "title": "Provide generic workflow runtime and task APIs",
+    "depends_on": [
+      "P4-09"
+    ],
+    "acceptance": "Expose versioned generic start/task/claim/complete APIs. Move invoice and purchasing-role rules into the pack. Preserve PR3 idempotency, durable operations and reconciliation. Validate both the existing domain process and a generic process.",
+    "planned_branch": "feat/p4-12-workflow-runtime",
+    "status": "Blocked",
+    "priority": "P0",
+    "branch": "feat/45-workflow-runtime",
+    "number": 45,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/45",
+    "dependency_numbers": [
+      43
+    ]
+  },
+  {
+    "id": "P4-13",
+    "legacy": null,
+    "owner_role": "B",
+    "assignee": "huybitvvt",
+    "milestone": "M2",
+    "estimate_days": 2.0,
+    "title": "Add tenant-scoped evidence and data lineage",
+    "depends_on": [
+      "P4-07",
+      "P4-09"
+    ],
+    "acceptance": "Authorize evidence APIs and lineage raw→extraction→correction→match/decision. Include version and retention metadata. Isolate download URLs, listing/search, workers and corrections by tenant. Run the P4-10 pipeline with actual tenant context.",
+    "planned_branch": "feat/p4-13-evidence-lineage",
+    "status": "Blocked",
+    "priority": "P0",
+    "branch": "feat/46-evidence-lineage",
+    "number": 46,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/46",
+    "dependency_numbers": [
+      41,
+      43
+    ]
+  },
+  {
+    "id": "P4-14",
+    "legacy": null,
+    "owner_role": "C",
+    "assignee": "lehoangnam206",
+    "milestone": "M2",
+    "estimate_days": 2.0,
+    "title": "Build the shared work inbox",
+    "depends_on": [
+      "P4-08",
+      "P4-12"
+    ],
+    "acceptance": "Show mine/group tasks with pagination, filters, claim/approve/reject/reason, pending status and basic SLA. Reuse the inbox across packs. The backend continues to enforce permissions.",
+    "planned_branch": "feat/p4-14-universal-inbox",
+    "status": "Blocked",
+    "priority": "P1",
+    "branch": "feat/47-universal-inbox",
+    "number": 47,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/47",
+    "dependency_numbers": [
+      42,
+      45
+    ]
+  },
+  {
+    "id": "P4-15",
+    "legacy": null,
+    "owner_role": "A",
+    "assignee": "hieunofun",
+    "milestone": "M3",
+    "estimate_days": 2.0,
+    "title": "Version policies and enforce approval controls",
+    "depends_on": [
+      "P4-09",
+      "P4-12"
+    ],
+    "acceptance": "Version tenant policies with effective dates and hashes/snapshots; use deterministic decimal arithmetic. Specify running-workflow policy and separation of duties. Changes cannot rewrite historical decisions. Test thresholds and self-approval denial.",
+    "planned_branch": "feat/p4-15-versioned-policy",
+    "status": "Blocked",
+    "priority": "P0",
+    "branch": "feat/48-versioned-policy",
+    "number": 48,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/48",
+    "dependency_numbers": [
+      43,
+      45
+    ]
+  },
+  {
+    "id": "P4-16",
+    "legacy": 25,
+    "owner_role": "B",
+    "assignee": "huybitvvt",
+    "milestone": "M3",
+    "estimate_days": 1.5,
+    "title": "Add reviewed AI suggestions for line-item mapping",
+    "depends_on": [
+      "P4-03",
+      "P4-10"
+    ],
+    "acceptance": "Permit disclosed AI APIs. Candidate IDs must belong to the authorized PO and tenant. Record human mapping confirmation; ambiguous/unknown values cannot auto-match. Measure held-out precision and timeout behavior. Keep deterministic fallback and prohibit AI financial arithmetic.",
+    "planned_branch": "feat/25-semantic-suggestions",
+    "status": "Blocked",
+    "priority": "P1",
+    "branch": "feat/25-semantic-suggestions",
+    "number": 25,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/25",
+    "dependency_numbers": [
+      38,
+      26
+    ]
+  },
+  {
+    "id": "P4-17",
+    "legacy": null,
+    "owner_role": "C",
+    "assignee": "lehoangnam206",
+    "milestone": "M3",
+    "estimate_days": 2.0,
+    "title": "Build the evidence workspace",
+    "depends_on": [
+      "P4-08",
+      "P4-13"
+    ],
+    "acceptance": "Search authorized evidence and inspect lineage/raw/corrections/versions. Export only under resource permissions. Distinguish failed integrity verification from an unavailable verifier.",
+    "planned_branch": "feat/p4-17-evidence-center",
+    "status": "Blocked",
+    "priority": "P1",
+    "branch": "feat/49-evidence-center",
+    "number": 49,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/49",
+    "dependency_numbers": [
+      42,
+      46
+    ]
+  },
+  {
+    "id": "P4-18",
+    "legacy": null,
+    "owner_role": "A",
+    "assignee": "hieunofun",
+    "milestone": "M3",
+    "estimate_days": 2.5,
+    "title": "Implement the shared Evidence-to-Decision record",
+    "depends_on": [
+      "P4-05",
+      "P4-13",
+      "P4-15"
+    ],
+    "acceptance": "Freeze facts, evidence references/hashes, policy/workflow versions, actors, evaluation, authorization and execution references. Export/verify under a stated threat model. Use durable pending or fail-closed audit behavior by risk. Never silently rewrite history.",
+    "planned_branch": "feat/p4-18-decision-record",
+    "status": "Blocked",
+    "priority": "P0",
+    "branch": "feat/50-decision-record",
+    "number": 50,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/50",
+    "dependency_numbers": [
+      22,
+      46,
+      48
+    ]
+  },
+  {
+    "id": "P4-19",
+    "legacy": null,
+    "owner_role": "B",
+    "assignee": "huybitvvt",
+    "milestone": "M3",
+    "estimate_days": 3.0,
+    "title": "Connect external systems and demonstrate one IT/OT flow",
+    "depends_on": [
+      "P4-09",
+      "P4-13"
+    ],
+    "acceptance": "Connect two independent source contracts: an external order system and receiving/sensor events. Persist source IDs/time/schema, mappings, retries/dedup and conflicts. Publish simulator limitations; use real ingress to trigger P4-21 cases. Do not claim production connectivity or a complete digital twin.",
+    "planned_branch": "feat/p4-19-cross-system-connectors",
+    "status": "Needs specification",
+    "priority": "P1",
+    "branch": "feat/51-cross-system-connectors",
+    "number": 51,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/51",
+    "dependency_numbers": [
+      43,
+      46
+    ]
+  },
+  {
+    "id": "P4-20",
+    "legacy": null,
+    "owner_role": "C",
+    "assignee": "lehoangnam206",
+    "milestone": "M3",
+    "estimate_days": 2.5,
+    "title": "Build the OpenResolve exception workspace",
+    "depends_on": [
+      "P4-08",
+      "P4-21"
+    ],
+    "acceptance": "Display case owner/severity/SLA, deterministic comparison, evidence timeline and permissioned actions. Separate counted/QC/billable quantities, post-handover incidents and payment readiness. Show conflicts/retry states. Close only after real P4-21 API integration.",
+    "planned_branch": "feat/p4-20-exception-workspace",
+    "status": "Blocked",
+    "priority": "P1",
+    "branch": "feat/52-exception-workspace",
+    "number": 52,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/52",
+    "dependency_numbers": [
+      42,
+      53
+    ]
+  },
+  {
+    "id": "P4-21",
+    "legacy": null,
+    "owner_role": "A",
+    "assignee": "hieunofun",
+    "milestone": "M3",
+    "estimate_days": 3.0,
+    "title": "Implement exception cases and missing business invariants",
+    "depends_on": [
+      "P4-12",
+      "P4-15"
+    ],
+    "acceptance": "Preserve PR3 matching/reservations. Open cases before or after matching; separate package count, physical counts, QC and billable policy. Add post-handover incidents and minimal append-only return/adjustment/credit behavior. Test 100→95, four failures after assignment, concurrency and invoice-before-receipt. Full RMA/warranty stays in P4-39.",
+    "planned_branch": "feat/p4-21-exception-domain",
+    "status": "Blocked",
+    "priority": "P0",
+    "branch": "feat/53-exception-domain",
+    "number": 53,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/53",
+    "dependency_numbers": [
+      45,
+      48
+    ]
+  },
+  {
+    "id": "P4-22",
+    "legacy": null,
+    "owner_role": "B",
+    "assignee": "huybitvvt",
+    "milestone": "M4",
+    "estimate_days": 3.0,
+    "title": "Mediate AI explanations and action proposals",
+    "depends_on": [
+      "P4-03",
+      "P4-18"
+    ],
+    "acceptance": "Explain only authorized case evidence and report missing evidence. Implement propose→schema validation→resource authorization/policy→approval→execution. Allowlist risk tiers R0-R3; deny automated transfers. Record model/prompt versions, idempotency and kill switch. Injection cannot expand permissions. Enterprise-wide RAG stays out of scope.",
+    "planned_branch": "feat/p4-22-ai-action-gateway",
+    "status": "Needs specification",
+    "priority": "P1",
+    "branch": "feat/54-ai-action-gateway",
+    "number": 54,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/54",
+    "dependency_numbers": [
+      38,
+      50
+    ]
+  },
+  {
+    "id": "P4-23",
+    "legacy": null,
+    "owner_role": "C",
+    "assignee": "lehoangnam206",
+    "milestone": "M3",
+    "estimate_days": 1.5,
+    "title": "Build process and policy inspection screens",
+    "depends_on": [
+      "P4-08",
+      "P4-15"
+    ],
+    "acceptance": "Inspect process versions/history/pending work; edit and publish permitted policy parameters. Validate forms and permissions. A full drag-and-drop BPMN/form designer is out of scope.",
+    "planned_branch": "feat/p4-23-process-policy-ui",
+    "status": "Blocked",
+    "priority": "P1",
+    "branch": "feat/55-process-policy-ui",
+    "number": 55,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/55",
+    "dependency_numbers": [
+      42,
+      48
+    ]
+  },
+  {
+    "id": "P4-24",
+    "legacy": null,
+    "owner_role": "A",
+    "assignee": "hieunofun",
+    "milestone": "M4",
+    "estimate_days": 2.0,
+    "title": "Simulate historical decisions with a different policy",
+    "depends_on": [
+      "P4-18"
+    ],
+    "acceptance": "Use frozen facts and historical decision snapshots with a second policy to produce a labeled simulation and rule/verdict differences. No business-state mutation, action dispatch or audit-history replacement. Test missing snapshots, permissions and dependency outages.",
+    "planned_branch": "feat/p4-24-decision-replay",
+    "status": "Blocked",
+    "priority": "P0",
+    "branch": "feat/56-decision-replay",
+    "number": 56,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/56",
+    "dependency_numbers": [
+      50
+    ]
+  },
+  {
+    "id": "P4-25",
+    "legacy": null,
+    "owner_role": "B",
+    "assignee": "huybitvvt",
+    "milestone": "M4",
+    "estimate_days": 2.0,
+    "title": "Separate hot transactions from cold history and reporting",
+    "depends_on": [
+      "P4-13",
+      "P4-18"
+    ],
+    "acceptance": "Project snapshots/events into separate historical storage/reporting with watermarks, dedup, retention and lineage. Report case/time/error metrics from actual or labeled synthetic data. Replaying a projection job cannot duplicate rows. A full lakehouse stack is unnecessary.",
+    "planned_branch": "feat/p4-25-data-lifecycle",
+    "status": "Needs specification",
+    "priority": "P1",
+    "branch": "feat/57-data-lifecycle",
+    "number": 57,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/57",
+    "dependency_numbers": [
+      46,
+      50
+    ]
+  },
+  {
+    "id": "P4-26",
+    "legacy": null,
+    "owner_role": "C",
+    "assignee": "lehoangnam206",
+    "milestone": "M4",
+    "estimate_days": 1.5,
+    "title": "Build the decision comparison screen",
+    "depends_on": [
+      "P4-17",
+      "P4-24"
+    ],
+    "acceptance": "Select historical decisions/policies and compare A/B verdicts and changed rules. Label simulation visibly and expose no implicit execution control. Handle missing snapshots, permissions and unavailable services.",
+    "planned_branch": "feat/p4-26-replay-ui",
+    "status": "Blocked",
+    "priority": "P1",
+    "branch": "feat/58-replay-ui",
+    "number": 58,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/58",
+    "dependency_numbers": [
+      49,
+      56
+    ]
+  },
+  {
+    "id": "P4-27",
+    "legacy": null,
+    "owner_role": "A",
+    "assignee": "hieunofun",
+    "milestone": "M4",
+    "estimate_days": 2.0,
+    "title": "Define the minimum Capability Pack contract and SDK",
+    "depends_on": [
+      "P4-06",
+      "P4-12",
+      "P4-18"
+    ],
+    "acceptance": "Define a versioned manifest with permissions/workflows/events/evidence and pack-owned schemas/migrations. Register packs, check compatibility and deny undeclared permissions. Install/disable/error handling must preserve core stability. Hot unload and complex upgrades stay in P4-41.",
+    "planned_branch": "feat/p4-27-capability-pack",
+    "status": "Needs specification",
+    "priority": "P0",
+    "branch": "feat/59-capability-pack",
+    "number": 59,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/59",
+    "dependency_numbers": [
+      40,
+      45,
+      50
+    ]
+  },
+  {
+    "id": "P4-28",
+    "legacy": null,
+    "owner_role": "B",
+    "assignee": "huybitvvt",
+    "milestone": "M4",
+    "estimate_days": 2.0,
+    "title": "Implement an Onboarding pack that reuses the core",
+    "depends_on": [
+      "P4-13",
+      "P4-27"
+    ],
+    "acceptance": "Create a separate Onboarding pack that reuses identity/workflow/evidence/decision APIs. Complete one checklist/access-request case with approval. Do not provision real external accounts in the MVP. Demonstrate zero HR-specific core edits and measure integration time.",
+    "planned_branch": "feat/p4-28-onboarding-pack",
+    "status": "Needs specification",
+    "priority": "P0",
+    "branch": "feat/60-onboarding-pack",
+    "number": 60,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/60",
+    "dependency_numbers": [
+      46,
+      59
+    ]
+  },
+  {
+    "id": "P4-29",
+    "legacy": null,
+    "owner_role": "C",
+    "assignee": "lehoangnam206",
+    "milestone": "M4",
+    "estimate_days": 1.5,
+    "title": "Build Onboarding screens on shared workspaces",
+    "depends_on": [
+      "P4-14",
+      "P4-28"
+    ],
+    "acceptance": "Provide Onboarding forms/checklist/detail; share inbox and evidence center. Test two domains with the same principal/tenant/role context. Do not duplicate Procurement backend code.",
+    "planned_branch": "feat/p4-29-onboarding-ui",
+    "status": "Blocked",
+    "priority": "P1",
+    "branch": "feat/61-onboarding-ui",
+    "number": 61,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/61",
+    "dependency_numbers": [
+      47,
+      60
+    ]
+  },
+  {
+    "id": "P4-30",
+    "legacy": null,
+    "owner_role": "A",
+    "assignee": "hieunofun",
+    "milestone": "M5",
+    "estimate_days": 2.0,
+    "title": "Integrate data migrations and transaction recovery",
+    "depends_on": [
+      "P4-18",
+      "P4-21",
+      "P4-24",
+      "P4-27",
+      "P4-28"
+    ],
+    "acceptance": "Upgrade PR3/PR4 data with verified migrations. Inject failures between Flowable/storage/AI/audit/database operations; preserve reservations, workflow versions and history. Validate concurrency/reconciliation without deleting volumes.",
+    "planned_branch": "feat/p4-30-recovery-migrations",
+    "status": "Blocked",
+    "priority": "P0",
+    "branch": "feat/62-recovery-migrations",
+    "number": 62,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/62",
+    "dependency_numbers": [
+      50,
+      53,
+      56,
+      59,
+      60
+    ]
+  },
+  {
+    "id": "P4-31",
+    "legacy": null,
+    "owner_role": "B",
+    "assignee": "huybitvvt",
+    "milestone": "M5",
+    "estimate_days": 2.0,
+    "title": "Evaluate AI quality and adversarial tenant/upload security",
+    "depends_on": [
+      "P4-11",
+      "P4-13",
+      "P4-16",
+      "P4-22",
+      "P4-28"
+    ],
+    "acceptance": "Report held-out per-field OCR, mapping and grounded-answer metrics with denominators. Test document injection, cross-tenant candidates/URLs and unauthorized worker/tool actions. Route failures to the responsible owner and publish limitations.",
+    "planned_branch": "feat/p4-31-security-ai-evaluation",
+    "status": "Blocked",
+    "priority": "P0",
+    "branch": "feat/63-security-ai-evaluation",
+    "number": 63,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/63",
+    "dependency_numbers": [
+      44,
+      46,
+      25,
+      54,
+      60
+    ]
+  },
+  {
+    "id": "P4-32",
+    "legacy": null,
+    "owner_role": "C",
+    "assignee": "lehoangnam206",
+    "milestone": "M5",
+    "estimate_days": 2.0,
+    "title": "Document source provenance and pack development",
+    "depends_on": [
+      "P4-25",
+      "P4-27",
+      "P4-29"
+    ],
+    "acceptance": "Update Vietnamese user/developer guides, APIs, architecture/ADRs, quickstart, changelog, notices and CONTRIBUTING. Verify that an external developer can create a sample pack. Align repository/product naming and preserve attribution/license headers.",
+    "planned_branch": "docs/p4-32-developer-docs",
+    "status": "Blocked",
+    "priority": "P1",
+    "branch": "docs/64-developer-docs",
+    "number": 64,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/64",
+    "dependency_numbers": [
+      57,
+      59,
+      61
+    ]
+  },
+  {
+    "id": "P4-33",
+    "legacy": null,
+    "owner_role": "A",
+    "assignee": "hieunofun",
+    "milestone": "M5",
+    "estimate_days": 2.0,
+    "title": "Demonstrate configuration reconciliation and backup restore",
+    "depends_on": [
+      "P4-05",
+      "P4-09",
+      "P4-27"
+    ],
+    "acceptance": "Declare and pin demo configuration; demonstrate reconciliation after drift, beyond CI alone. Record health/traces/backlog. Restore backups into an isolated environment and verify evidence/trust state with measured RPO/RTO.",
+    "planned_branch": "feat/p4-33-gitops-restore",
+    "status": "Needs specification",
+    "priority": "P0",
+    "branch": "feat/65-gitops-restore",
+    "number": 65,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/65",
+    "dependency_numbers": [
+      22,
+      43,
+      59
+    ]
+  },
+  {
+    "id": "P4-34",
+    "legacy": null,
+    "owner_role": "B",
+    "assignee": "huybitvvt",
+    "milestone": "M5",
+    "estimate_days": 2.0,
+    "title": "Run system acceptance and measure operating behavior",
+    "depends_on": [
+      "P4-19",
+      "P4-25",
+      "P4-30",
+      "P4-31",
+      "P4-33"
+    ],
+    "acceptance": "Run AT-01..12 and mandatory core, hot/cold, IT/OT, external ingress→case→decision→export and Onboarding reuse acceptance. Test fresh clones/upgrades and document workload/environment for p95/resource/AI-cost metrics. Route blockers to owners.",
+    "planned_branch": "feat/p4-34-release-acceptance",
+    "status": "Blocked",
+    "priority": "P0",
+    "branch": "feat/66-release-acceptance",
+    "number": 66,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/66",
+    "dependency_numbers": [
+      51,
+      57,
+      62,
+      63,
+      65
+    ]
+  },
+  {
+    "id": "P4-35",
+    "legacy": 29,
+    "owner_role": "C",
+    "assignee": "lehoangnam206",
+    "milestone": "M5",
+    "estimate_days": 2.0,
+    "title": "Prepare reproducible demos and collect user feedback",
+    "depends_on": [
+      "P4-20",
+      "P4-22",
+      "P4-26",
+      "P4-29"
+    ],
+    "acceptance": "Use reproducible fixtures via real APIs and isolate demo resets. Rehearse a 15-minute deviation→evidence→AI→approval→replay→reuse demo plus a failure. Collect genuine outside-team feedback. Clearly label backup video.",
+    "planned_branch": "docs/29-demo-evidence",
+    "status": "Blocked",
+    "priority": "P1",
+    "branch": "docs/29-demo-evidence",
+    "number": 29,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/29",
+    "dependency_numbers": [
+      52,
+      54,
+      58,
+      61
+    ]
+  },
+  {
+    "id": "P4-36",
+    "legacy": 30,
+    "owner_role": "C",
+    "assignee": "lehoangnam206",
+    "milestone": "M6",
+    "estimate_days": 2.0,
+    "title": "Publish a reviewed reproducible contest release",
+    "depends_on": [
+      "P4-05",
+      "P4-32",
+      "P4-34",
+      "P4-35"
+    ],
+    "acceptance": "Review the release candidate, lock dependencies/SBOM, run CI on the exact commit and complete contest gates. Review develop→main; tag only the merged main SHA and fresh-clone that tag. Revalidate later changes and confirm organizer submission deadlines.",
+    "planned_branch": "chore/30-contest-release",
+    "status": "Blocked",
+    "priority": "P0",
+    "branch": "chore/30-contest-release",
+    "number": 30,
+    "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/30",
+    "dependency_numbers": [
+      22,
+      64,
+      66,
+      29
+    ]
+  }
+]

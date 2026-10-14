@@ -1,0 +1,275 @@
+{
+  "description": "Synthetic contract examples only; no executed API or financial event.",
+  "cases": [
+    {
+      "file": "PrincipalContext.json",
+      "schema": "../schemas/platform.schema.json#/definitions/PrincipalContext",
+      "valid": true,
+      "purpose": "PrincipalContext"
+    },
+    {
+      "file": "EvidenceRegistration.json",
+      "schema": "../schemas/platform.schema.json#/definitions/EvidenceRegistration",
+      "valid": true,
+      "purpose": "EvidenceRegistration"
+    },
+    {
+      "file": "RegistrationResult.json",
+      "schema": "../schemas/platform.schema.json#/definitions/RegistrationResult",
+      "valid": true,
+      "purpose": "RegistrationResult"
+    },
+    {
+      "file": "Evidence.json",
+      "schema": "../schemas/platform.schema.json#/definitions/Evidence",
+      "valid": true,
+      "purpose": "Evidence"
+    },
+    {
+      "file": "Operation.json",
+      "schema": "../schemas/platform.schema.json#/definitions/Operation",
+      "valid": true,
+      "purpose": "Operation"
+    },
+    {
+      "file": "ExtractionRequest.json",
+      "schema": "../schemas/platform.schema.json#/definitions/ExtractionRequest",
+      "valid": true,
+      "purpose": "ExtractionRequest"
+    },
+    {
+      "file": "ExtractionDraft.json",
+      "schema": "../schemas/platform.schema.json#/definitions/ExtractionDraft",
+      "valid": true,
+      "purpose": "ExtractionDraft"
+    },
+    {
+      "file": "CorrectionRequest.json",
+      "schema": "../schemas/platform.schema.json#/definitions/CorrectionRequest",
+      "valid": true,
+      "purpose": "CorrectionRequest"
+    },
+    {
+      "file": "ConfirmationRequest.json",
+      "schema": "../schemas/platform.schema.json#/definitions/ConfirmationRequest",
+      "valid": true,
+      "purpose": "ConfirmationRequest"
+    },
+    {
+      "file": "Confirmation.json",
+      "schema": "../schemas/platform.schema.json#/definitions/Confirmation",
+      "valid": true,
+      "purpose": "Confirmation"
+    },
+    {
+      "file": "EvidencePage.json",
+      "schema": "../schemas/platform.schema.json#/definitions/EvidencePage",
+      "valid": true,
+      "purpose": "EvidencePage"
+    },
+    {
+      "file": "EvidenceLineage.json",
+      "schema": "../schemas/platform.schema.json#/definitions/EvidenceLineage",
+      "valid": true,
+      "purpose": "EvidenceLineage"
+    },
+    {
+      "file": "WorkflowStart.json",
+      "schema": "../schemas/platform.schema.json#/definitions/WorkflowStart",
+      "valid": true,
+      "purpose": "WorkflowStart"
+    },
+    {
+      "file": "TaskPage.json",
+      "schema": "../schemas/platform.schema.json#/definitions/TaskPage",
+      "valid": true,
+      "purpose": "TaskPage"
+    },
+    {
+      "file": "TaskAction.json",
+      "schema": "../schemas/platform.schema.json#/definitions/TaskAction",
+      "valid": true,
+      "purpose": "TaskAction"
+    },
+    {
+      "file": "AuthorizationRequest.json",
+      "schema": "../schemas/platform.schema.json#/definitions/AuthorizationRequest",
+      "valid": true,
+      "purpose": "AuthorizationRequest"
+    },
+    {
+      "file": "PolicyVersion.json",
+      "schema": "../schemas/platform.schema.json#/definitions/PolicyVersion",
+      "valid": true,
+      "purpose": "PolicyVersion"
+    },
+    {
+      "file": "DecisionEvaluation.json",
+      "schema": "../schemas/platform.schema.json#/definitions/DecisionEvaluation",
+      "valid": true,
+      "purpose": "DecisionEvaluation"
+    },
+    {
+      "file": "DecisionRecord.json",
+      "schema": "../schemas/platform.schema.json#/definitions/DecisionRecord",
+      "valid": true,
+      "purpose": "DecisionRecord"
+    },
+    {
+      "file": "ReplayRequest.json",
+      "schema": "../schemas/platform.schema.json#/definitions/ReplayRequest",
+      "valid": true,
+      "purpose": "ReplayRequest"
+    },
+    {
+      "file": "ReplayResult.json",
+      "schema": "../schemas/platform.schema.json#/definitions/ReplayResult",
+      "valid": true,
+      "purpose": "ReplayResult"
+    },
+    {
+      "file": "PackManifest.json",
+      "schema": "../schemas/platform.schema.json#/definitions/PackManifest",
+      "valid": true,
+      "purpose": "PackManifest"
+    },
+    {
+      "file": "EventEnvelope.json",
+      "schema": "../schemas/platform.schema.json#/definitions/EventEnvelope",
+      "valid": true,
+      "purpose": "EventEnvelope"
+    },
+    {
+      "file": "InvoiceDraftPayload.json",
+      "schema": "../schemas/openresolve.schema.json#/definitions/InvoiceDraftPayload",
+      "valid": true,
+      "purpose": "InvoiceDraftPayload"
+    },
+    {
+      "file": "CaseRequest.json",
+      "schema": "../schemas/openresolve.schema.json#/definitions/CaseRequest",
+      "valid": true,
+      "purpose": "CaseRequest"
+    },
+    {
+      "file": "Case.json",
+      "schema": "../schemas/openresolve.schema.json#/definitions/Case",
+      "valid": true,
+      "purpose": "Case"
+    },
+    {
+      "file": "ReceiptQuantities.json",
+      "schema": "../schemas/openresolve.schema.json#/definitions/ReceiptQuantities",
+      "valid": true,
+      "purpose": "ReceiptQuantities"
+    },
+    {
+      "file": "KnownSource.json",
+      "schema": "../schemas/platform.schema.json#/definitions/SourceReference",
+      "valid": true,
+      "purpose": "KnownSource"
+    },
+    {
+      "file": "UnknownSource.json",
+      "schema": "../schemas/platform.schema.json#/definitions/SourceReference",
+      "valid": true,
+      "purpose": "UnknownSource"
+    },
+    {
+      "file": "large-exact-amount.json",
+      "schema": "../schemas/openresolve.schema.json#/definitions/Amount",
+      "valid": true,
+      "purpose": "Preserve values beyond JavaScript safe integer range as strings"
+    },
+    {
+      "file": "missing-field.json",
+      "schema": "../schemas/platform.schema.json#/definitions/ExtractedField",
+      "valid": true,
+      "purpose": "missing-field"
+    },
+    {
+      "file": "fill-missing-field.json",
+      "schema": "../schemas/platform.schema.json#/definitions/CorrectionRequest",
+      "valid": true,
+      "purpose": "fill-missing-field"
+    },
+    {
+      "file": "reject-client-tenant.json",
+      "schema": "../schemas/platform.schema.json#/definitions/EvidenceRegistration",
+      "valid": false,
+      "purpose": "Client cannot inject effective tenant"
+    },
+    {
+      "file": "reject-actor-in-correction.json",
+      "schema": "../schemas/platform.schema.json#/definitions/CorrectionRequest",
+      "valid": false,
+      "purpose": "Actor must be server-derived"
+    },
+    {
+      "file": "reject-numeric-total.json",
+      "schema": "../schemas/openresolve.schema.json#/definitions/InvoiceDraftPayload",
+      "valid": false,
+      "purpose": "Financial values must be decimal strings"
+    },
+    {
+      "file": "reject-exponent-quantity.json",
+      "schema": "../schemas/openresolve.schema.json#/definitions/InvoiceLineDraft",
+      "valid": false,
+      "purpose": "No exponent notation"
+    },
+    {
+      "file": "reject-excess-price-scale.json",
+      "schema": "../schemas/openresolve.schema.json#/definitions/InvoiceLineDraft",
+      "valid": false,
+      "purpose": "Preserve NUMERIC(18,4)"
+    },
+    {
+      "file": "reject-negative-page.json",
+      "schema": "../schemas/platform.schema.json#/definitions/SourceReference",
+      "valid": false,
+      "purpose": "Source pages are one-based"
+    },
+    {
+      "file": "reject-unknown-with-bbox.json",
+      "schema": "../schemas/platform.schema.json#/definitions/SourceReference",
+      "valid": false,
+      "purpose": "Unknown sources cannot invent locations"
+    },
+    {
+      "file": "reject-replay-execute.json",
+      "schema": "../schemas/platform.schema.json#/definitions/ReplayRequest",
+      "valid": false,
+      "purpose": "Replay cannot request execution"
+    },
+    {
+      "file": "reject-invalid-time.json",
+      "schema": "../schemas/platform.schema.json#/definitions/Evidence",
+      "valid": false,
+      "purpose": "Timestamps require UTC time"
+    },
+    {
+      "file": "reject-invalid-vat.json",
+      "schema": "../schemas/openresolve.schema.json#/definitions/InvoiceLineDraft",
+      "valid": false,
+      "purpose": "VAT is a fraction between zero and one"
+    },
+    {
+      "file": "reject-zero-line-quantity.json",
+      "schema": "../schemas/openresolve.schema.json#/definitions/InvoiceLineDraft",
+      "valid": false,
+      "purpose": "reject-zero-line-quantity"
+    },
+    {
+      "file": "reject-processing-quarantined.json",
+      "schema": "../schemas/platform.schema.json#/definitions/Evidence",
+      "valid": false,
+      "purpose": "reject-processing-quarantined"
+    },
+    {
+      "file": "reject-invented-missing-value.json",
+      "schema": "../schemas/platform.schema.json#/definitions/ExtractedField",
+      "valid": false,
+      "purpose": "reject-invented-missing-value"
+    }
+  ]
+}

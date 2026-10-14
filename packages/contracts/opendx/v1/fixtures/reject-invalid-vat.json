@@ -1,0 +1,9 @@
+{
+  "description": "Mực in tổng hợp",
+  "quantity": "10.0000",
+  "unit_price": "100000.0000",
+  "tax_rate": "1.2",
+  "line_subtotal": "1000000.00",
+  "tax_amount": "100000.00",
+  "line_total": "1100000.00"
+}

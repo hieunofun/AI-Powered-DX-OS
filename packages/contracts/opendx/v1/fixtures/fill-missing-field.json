@@ -1,0 +1,10 @@
+{
+  "expected_revision": 1,
+  "corrections": [
+    {
+      "field_path": "/invoice_number",
+      "new_value": "SYNTHETIC-001",
+      "reason": "Manually transcribed from permitted document"
+    }
+  ]
+}

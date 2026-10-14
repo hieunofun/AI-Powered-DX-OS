@@ -40,3 +40,9 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 ### Release gates
 
 - Operational UI and reproducible demo scenarios, a licensing decision, real-stack acceptance and genuine peer review remain prerequisites for a tagged MVP demo release.
+
+## Unreleased — Project 4 foundation
+
+- Preserve the annotated PR3 code baseline; document contribution gates and the 36-item issue mapping.
+- Propose core/pack, tenancy and compatibility ADRs; add OpenAPI/JSON Schemas and synthetic contract fixtures with CI validation.
+- Runtime PR3 routes remain unchanged; PR4 targets await review and implementation.

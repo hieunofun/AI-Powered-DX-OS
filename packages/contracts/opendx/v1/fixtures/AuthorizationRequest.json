@@ -1,0 +1,5 @@
+{
+  "expected_revision": 1,
+  "action": "APPROVE",
+  "reason": "Reviewed by a different authorized actor"
+}
