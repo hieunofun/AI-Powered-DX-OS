@@ -1,6 +1,2 @@
-export interface AuthenticatedUser {
-  sub: string;
-  username: string;
-  email?: string;
-  roles: string[];
-}
+// Legacy import path; the platform owns this implementation.
+export * from '../../platform/identity/interfaces/authenticated-user.interface';

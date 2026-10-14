@@ -31,6 +31,9 @@ jobs:
       - name: Validate proposed OpenDX API contracts and fixtures
         run: npm run test:contracts
 
+      - name: Enforce headless platform import boundaries
+        run: npm run test:boundaries
+
       - name: Build monorepo applications
         run: npm run build
 
@@ -39,6 +42,9 @@ jobs:
 
       - name: Run unit tests
         run: npm run test
+
+      - name: Verify headless platform composition and transport failure semantics
+        run: npm run test:platform --workspace=apps/api
 
       - name: Run e2e tests
         run: npm run test:e2e --workspace=apps/api
