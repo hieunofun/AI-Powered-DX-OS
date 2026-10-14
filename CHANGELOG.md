@@ -6,6 +6,8 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
+- Issue #22: exact Apache ledger/server SDK with pinned transport security updates, source/binary vulnerability gates, linked-module CycloneDX SBOMs/notices, a separate ledger/storage epoch, read-only historical receipt exports, independent manifest pins and isolated restore tools. Real two-ledger/PostgreSQL migration tests preserve original receipts and exact decimal evidence; peer review/merge and deployment-specific acceptance remain pending.
+
 - Issue #24: Vietnamese XML/PDF intake status, saved three-way comparison, role-based task decisions and native audit verification/JSON/PDF export workspaces. Add direct invoice-case lookup and explicit export-status headers; CI runs 11 real browser scenarios.
 
 - Issue #23: Vietnamese PO/GRN lists, detail views and guarded draft/lifecycle actions; bounded supplier lookup and finalized receipt quantities. Real browser acceptance and exact-decimal tests run in CI.

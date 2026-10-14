@@ -8,6 +8,25 @@ export const LEDGER_TABLE_SQL=`CREATE TABLE IF NOT EXISTS smartprocure_audit_sea
   package_sha256 VARCHAR[64],merkle_root VARCHAR[64],final_business_state VARCHAR[50],sealed_at VARCHAR[40],
   PRIMARY KEY seal_key)`;
 export const LEDGER_COLUMNS='seal_key,invoice_id,audit_package_id,package_version,package_sha256,merkle_root,final_business_state,sealed_at';
+export function ledgerColumnName(name:string) {
+  // Apache v1.9DOM.1 returns qualified labels; v1.11.0 returns bare names.
+  // Accept only the exact columns/table selected by our static query.
+  const column=LEDGER_COLUMNS.split(',').find(candidate=>name===candidate || name==='(smartprocure_audit_seals.'+candidate+')');
+  if(!column) throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger column identity is inconsistent.',409);
+  return column;
+}
+export function normalizeLedgerRow(row:Record<string,unknown>) {
+  const normalized:Record<string,unknown>={};
+  for(const [name,value] of Object.entries(row)) {
+    const column=ledgerColumnName(name);
+    if(Object.prototype.hasOwnProperty.call(normalized,column))
+      throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger column identity is ambiguous.',409);
+    normalized[column]=value;
+  }
+  if(Object.keys(normalized).length!==LEDGER_COLUMNS.split(',').length)
+    throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger row identity is incomplete.',409);
+  return normalized;
+}
 export function immudbOptions() {
   const raw=Number(process.env.IMMUDB_TIMEOUT_MS||10000);
   const timeout=Number.isFinite(raw)?Math.min(30000,Math.max(100,raw)):10000;
@@ -25,11 +44,14 @@ export class ImmudbClient implements OnModuleDestroy {
   private readonly pool=new Pool(immudbOptions());
   constructor() {this.pool.on('error',()=>{/* safe operation errors are recorded by the service */});}
   async onModuleDestroy() {await this.pool.end();}
-  async state() {return (await this.pool.query('SELECT immudb_state()')).rows[0];}
-  async get(sealKey:string) {
+  private historical(seal:any) {
+    return seal?.status==='SEALED' && process.env.IMMUDB_LEDGER_EPOCH && seal.receipt?.ledgerEpoch!==process.env.IMMUDB_LEDGER_EPOCH;
+  }
+  async get(sealKey:string,seal:any=null) {
+    if(this.historical(seal)) return (await this.proof(sealKey,seal)).entry;
     const rows=(await this.pool.query('SELECT '+LEDGER_COLUMNS+' FROM smartprocure_audit_seals WHERE seal_key=$1',[sealKey])).rows;
     if(rows.length>1) throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger identity is inconsistent.',409);
-    return rows[0]??null;
+    return rows[0]?normalizeLedgerRow(rows[0]):null;
   }
   async insert(pkg:any,seal:any) {
     // INSERT only. Never UPSERT/UPDATE an existing historical ledger entry.
@@ -38,9 +60,14 @@ export class ImmudbClient implements OnModuleDestroy {
   }
   async proof(sealKey:string,seal:any=null) {
     const url=process.env.IMMUDB_VERIFIER_URL||'http://smartprocure-audit-verifier:8081';
-    const response=await fetch(url+'/verify',{method:'POST',headers:{'Content-Type':'application/json',
+    const history=this.historical(seal);
+    const epoch=process.env.IMMUDB_LEDGER_EPOCH;
+    if(epoch && !history && seal?.status==='SEALED' && !/^[a-z0-9-]+$/.test(seal.receipt?.serverUUID||''))
+      throw new AuditError('AUDIT_LEDGER_MISMATCH','Retained ledger server identity is missing.',409);
+    const response=await fetch(url+(history?'/historical/verify':'/verify'),{method:'POST',headers:{'Content-Type':'application/json',
       Authorization:'Bearer '+(process.env.IMMUDB_VERIFIER_TOKEN||'')},body:JSON.stringify({sealKey,
-        ...(seal?{stateTxId:seal.immudb_state_tx_id,stateHash:seal.immudb_state_hash}:{})}),
+        ...(seal?{stateTxId:seal.immudb_state_tx_id,stateHash:seal.immudb_state_hash,
+          ...(history?{txId:seal.immudb_tx_id,txHash:seal.immudb_tx_hash}:{serverUUID:seal.receipt?.serverUUID})}:{})}),
       signal:AbortSignal.timeout(immudbOptions().query_timeout)});
     if(response.status===409 || response.status===404) throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger cryptographic evidence does not agree.',409);
     if(!response.ok) throw new AuditError('AUDIT_LEDGER_UNAVAILABLE','Ledger verifier is unavailable.');
@@ -48,6 +75,9 @@ export class ImmudbClient implements OnModuleDestroy {
     if(proof.verified!==true || !/^[1-9]\d*$/.test(proof.txId) || !/^[1-9]\d*$/.test(proof.stateTxId) ||
       !/^[0-9a-f]{64}$/.test(proof.txHash) || !/^[0-9a-f]{64}$/.test(proof.stateHash) || !proof.rowProof || !proof.transactionHeader)
       throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger cryptographic evidence is incomplete.',409);
+    if(epoch && !history && (proof.ledgerEpoch!==epoch || !/^[a-z0-9-]+$/.test(proof.serverUUID||'') ||
+      (seal?.status==='SEALED' && proof.serverUUID!==seal.receipt.serverUUID)))
+      throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger epoch/server identity does not agree.',409);
     return proof;
   }
 }

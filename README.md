@@ -2,7 +2,7 @@
 
 Procure-to-Pay and three-way invoice reconciliation for the OLP PMNM 2026 DX-OS Open-Core topic.
 
-SmartProcure replaces manual PO / GRN / invoice comparison with deterministic matching, role-based exception handling and verifiable audit evidence. The application code is MIT-licensed. The integrated ImmuDB 1.11.0 server/client uses **BUSL-1.1 source-available licensing**, with a scoped repository exception; competition eligibility remains an open delivery gate. See [component provenance](OPEN_SOURCE_COMPONENTS.md) and [license policy](docs/open-source/LICENSE_POLICY.md).
+SmartProcure replaces manual PO / GRN / invoice comparison with deterministic matching, role-based exception handling and verifiable audit evidence. The application code is MIT-licensed. PR #69 builds the ledger/server client from exact **Apache-2.0** source with explicit security dependency overrides and a separate storage epoch. Existing v1.11 BUSL receipts require the [verified historical migration](infra/audit/history/README.md). Peer review, merged acceptance and competition eligibility remain delivery gates. See [component provenance](OPEN_SOURCE_COMPONENTS.md) and [license policy](docs/open-source/LICENSE_POLICY.md).
 
 ## Project 4 foundation (proposed)
 
@@ -82,7 +82,7 @@ The domain backend is one modular NestJS application, not a fleet of separately 
 | PostgreSQL | 16-alpine | PostgreSQL License |
 | MinIO | RELEASE.2025-10-15T17-29-55Z | AGPL-3.0; built from pinned unmodified upstream source |
 | Flowable REST | 8.0.0, pinned image digest | Apache-2.0 |
-| ImmuDB server and Go client | 1.11.0, pinned image/client | BUSL-1.1; future Change License Apache-2.0 |
+| ImmuDB server and Go client | Apache commit d5f425e + pinned OpenDX transport dependencies | Apache-2.0 upstream; MIT launcher/adapters |
 | React / Vite / NestJS | Locked by package-lock.json | MIT |
 | TypeScript | Locked by package-lock.json | Apache-2.0 |
 | Prometheus / Grafana | Planned deployment | APISIX exports metrics; no complete monitoring stack is claimed |

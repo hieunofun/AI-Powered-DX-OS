@@ -2,11 +2,22 @@
 
 This document tracks external software evaluated and integrated into **SmartProcure-Pay**, including open-source and explicitly identified source-available components.
 
-Issue #10 corrects the stale ImmuDB license entry: the selected release is BUSL-1.1 source-available software, not currently Apache-2.0 or OSI-approved open source. Version-specific provenance and limitations follow the registry.
+Issue #22 changes the runtime to exact Apache-2.0 source in a new ledger epoch. The historical Issue #10 BUSL provenance is retained below for old backups and test-only migration qualification; it does not describe the new server/client distribution.
 
 ---
 
 ## Component Registry
+
+Issue #22's adoption implementation is described in [ADR-003](docs/project4/adr/003-ledger-license-qualification.md). Runtime rows describe the PR #69 distribution; operator cutover, peer acceptance and organizer approval are separate gates.
+
+| Qualification component | Exact provenance | License | Role and team-authored portion |
+| --- | --- | --- | --- |
+| ImmuDB server and SDK | [official v1.9DOM.1 source](https://github.com/codenotary/immudb/tree/d5f425e46b4bfd0771274cb4c2ea77634421600c); commit `d5f425e46b4bfd0771274cb4c2ea77634421600c`; Go SDK `v1.9.0-RC2.0.20231116103301-d5f425e46b4b` | Apache-2.0; [preserved full notice](docs/open-source/notices/immudb-v1.9DOM.1-Apache-2.0.txt) | Unmodified upstream server/proof code imported by an MIT launcher; team maintains dependency overrides, adapter, archive orchestration and tests |
+| Go qualification toolchain | [official Go releases](https://go.dev/dl/), 1.27.2 | BSD-3-Clause | Build/test toolchain; its license and metadata are retained in the qualification image |
+
+`infra/audit/server/go.mod/go.sum` and `infra/audit/verifier/go.mod/go.sum` pin the hardened runtime graphs. `candidate.mod/candidate.sum` mirror the adopted verifier graph for the earlier documented commands. Explicit updates include gRPC v1.84.0 (Apache-2.0), x/net v0.60.0, x/crypto v0.58.0, x/sys v0.49.0, x/term v0.47.0, x/text v0.43.0 (Go BSD-3-Clause), protobuf v1.36.11 (BSD-3-Clause), and pinned genproto snapshots (Apache-2.0). The server retains the Apache release's daemon replacement. Exact linked module versions/h1 checksums and original license/notice files are generated into `/provenance/server` and `/provenance/verifier` with CycloneDX 1.5 SBOMs and binary SHA-256. These SBOMs cover linked Go modules; base-image contents retain their own inventory/licenses and are pinned separately. The qualification image additionally retains Node lockfile/toolchain metadata and test-only v1.11 BUSL notice. Production server/verifier images contain no v1.11 module or image. Node `pg` remains unchanged.
+
+Official `govulncheck v1.9.0` source and binary scans are build gates. Source and binary scans retain the module-only unmaintained OpenPGP advisory [GO-2026-5932](https://pkg.go.dev/vuln/GO-2026-5932); neither binary imports or calls `golang.org/x/crypto/openpgp`. This is documented non-reachability, not a suppressed finding or a claim that the whole module is vulnerability-free. Historical failed unmodified-candidate reports remain in `docs/project4/evidence`.
 
 ### Procurement workspace build and test tooling (Issue #23)
 
@@ -28,8 +39,8 @@ The Can I Use compatibility dataset is maintained upstream by Alexis Deveria and
 | **@types/multer** | [DefinitelyTyped/DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/multer) | `2.3.0` exact | MIT | Compile-time multipart upload types | Dev dependency | Integrated (Issue #7) |
 | **Go** | [golang/go](https://github.com/golang/go/tree/go1.24.9) | `1.24.9` | BSD-3-Clause | Build unmodified MinIO source in container | Build tool | Integrated (Issue #7) |
 | **Flowable** | [flowable/flowable-engine](https://github.com/flowable/flowable-engine) | `8.0.0` | Apache-2.0 | Invoice approval/exception BPMN orchestration | Official REST Docker service; native Node fetch client | Integrated (Issue #9) |
-| **ImmuDB** | [codenotary/immudb v1.11.0](https://github.com/codenotary/immudb/tree/v1.11.0) | `1.11.0` exact | BUSL-1.1; future Change License Apache-2.0 | Independent tamper-evident audit ledger | Pinned official Docker service; PostgreSQL wire SQL | Integrated (Issue #10) |
-| **ImmuDB Go client** | [tagged client source](https://github.com/codenotary/immudb/tree/v1.11.0/pkg/client) | `v1.11.0` exact | BUSL-1.1, same tagged LICENSE | Actual inclusion/dual proof validation | Internal isolated native gRPC verifier | Integrated (Issue #10) |
+| **ImmuDB** | [Apache immutable source](https://github.com/codenotary/immudb/tree/d5f425e46b4bfd0771274cb4c2ea77634421600c) | `v1.9DOM.1-opendx.1`, source d5f425e | Apache-2.0 upstream; MIT launcher | Independent tamper-evident audit ledger | Source-built container; new data epoch | Adoption PR #69, pending review |
+| **ImmuDB Go client** | [Apache client source](https://github.com/codenotary/immudb/tree/d5f425e46b4bfd0771274cb4c2ea77634421600c/pkg/client) | `v1.9.0-RC2.0.20231116103301-d5f425e46b4b` | Apache-2.0 | Actual inclusion/dual proof validation | Internal isolated native verifier and offline archive verification | Adoption PR #69, pending review |
 | **Go (audit verifier)** | [golang/go](https://github.com/golang/go/tree/go1.27.1) | `1.27.1` | BSD-3-Clause | Build and test isolated verifier | Build tool | Integrated (Issue #10) |
 | **PDFKit** | [foliojs/pdfkit v0.20.2](https://github.com/foliojs/pdfkit/tree/v0.20.2) | `0.20.2` exact | MIT | Human-readable audit PDF with paired JSON attachment | API dependency | Integrated (Issue #10) |
 | **@types/pdfkit** | [DefinitelyTyped types](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/pdfkit) | `0.17.6` exact | MIT | PDFKit compile-time types | Dev dependency | Integrated (Issue #10) |
