@@ -1,0 +1,38 @@
+name: Apache ledger qualification
+
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'infra/audit/**'
+      - 'docs/project4/adr/003-ledger-license-qualification.md'
+      - '.github/workflows/ledger-qualification.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-candidate-proofs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build exact Apache server and candidate SDK from source
+        run: docker build -f infra/audit/qualification/Dockerfile -t opendx-ledger-qualification .
+      - name: Verify actual native inclusion, consistency, tamper, trust state and outage recovery
+        run: docker run --rm --network none opendx-ledger-qualification -test.run 'TestReceipt|TestLedgerQualificationNative'
+      - name: Gate candidate compatibility with the actual project Node pg adapter
+        run: docker run --rm --network none opendx-ledger-qualification -test.run TestLedgerQualificationProjectWireCompatibility
+      - name: Export source, module, toolchain and license provenance
+        if: always()
+        run: |
+          container=$(docker create opendx-ledger-qualification)
+          docker cp "$container:/provenance" ledger-provenance
+          docker rm "$container"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: apache-ledger-provenance-${{ github.sha }}
+          path: ledger-provenance/
+          if-no-files-found: error

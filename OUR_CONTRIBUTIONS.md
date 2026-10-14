@@ -52,6 +52,8 @@ These are not implementation claims. Their scope and completion criteria are in 
 
 ## Upstream source changes and notices
 
+Issue #22 qualification adds a project-authored source-build recipe, real TCP/wire/proof/recovery test harness and ADR. The server and candidate SDK source at `d5f425e46b4bfd0771274cb4c2ea77634421600c` are unmodified Apache-2.0 upstream work. Inclusion/consistency verification is performed by that official SDK. Fault injection corrupts real returned evidence or disposable rows; it never substitutes a successful mock proof. Production BUSL server/SDK pins and historical receipts remain unchanged. The candidate image retains source/module/toolchain provenance and dependency notices. The verifier reports its linked SDK version from Go build metadata instead of always labeling a qualification build v1.11.0.
+
 No modified upstream service fork is claimed by this baseline. MinIO is built from unmodified pinned source, while the project maintains build/configuration files and adapters. Retain upstream license/copyright notices in images and distributions, including BUSL for ImmuDB, the MIT notice for the XML dependency, and OFL for Noto Sans. Future upstream modifications must record source commit, patch and license separately.
 
 

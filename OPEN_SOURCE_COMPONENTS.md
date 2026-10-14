@@ -8,6 +8,15 @@ Issue #10 corrects the stale ImmuDB license entry: the selected release is BUSL-
 
 ## Component Registry
 
+Issue #22 adds an isolated qualification artifact, described in [ADR-003](docs/project4/adr/003-ledger-license-qualification.md). Production rows below still describe the deployed baseline; qualification is not a cutover or organizer approval.
+
+| Qualification component | Exact provenance | License | Role and team-authored portion |
+| --- | --- | --- | --- |
+| ImmuDB server and SDK candidate | [official v1.9DOM.1 source](https://github.com/codenotary/immudb/tree/d5f425e46b4bfd0771274cb4c2ea77634421600c); commit `d5f425e46b4bfd0771274cb4c2ea77634421600c`; Go SDK `v1.9.0-RC2.0.20231116103301-d5f425e46b4b` | Apache-2.0; [preserved full notice](docs/open-source/notices/immudb-v1.9DOM.1-Apache-2.0.txt) | Unmodified source build and official cryptographic proof engines; project writes the orchestration and disposable qualification tests |
+| Go qualification toolchain | [official Go releases](https://go.dev/dl/), 1.27.2 | BSD-3-Clause | Build/test toolchain; its license and metadata are retained in the qualification image |
+
+`infra/audit/verifier/candidate.mod/candidate.sum` pin the candidate SDK graph separately from production `go.mod/go.sum`. Wire tests call the actual compiled project adapter with the existing locked Node `pg` package; no driver dependency is added. The unmodified server retains its exact source module files. The qualification image exports full module inventories, binary-linked build metadata and packaged dependency licenses/notices under `/provenance/`; all transitive dependencies retain their own terms. The 2023 server and its older dependency versions require security qualification before adoption. The image is a test artifact with temporary synthetic storage, not a supported production server distribution.
+
 ### Procurement workspace build and test tooling (Issue #23)
 
 | Component | Official upstream | Exact version | License | Purpose |

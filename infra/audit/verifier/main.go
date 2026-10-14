@@ -1,4 +1,4 @@
-// Internal proof verifier. The linked official immudb v1.11.0 client is BUSL-1.1.
+// Internal proof verifier. License/provenance follow the exact linked SDK revision.
 // No custom proof algorithm: VerifyRow and VerifiedTxByID are the authority.
 package main
 
@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -31,6 +32,17 @@ const columns = "seal_key,invoice_id,audit_package_id,package_version,package_sh
 
 var validKey = regexp.MustCompile(`^smartprocure:audit:invoice:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:v1$`)
 var proofMu sync.Mutex // one persistent trust-state writer in this verifier instance
+
+func clientVersion() string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, dependency := range info.Deps {
+			if dependency.Path == "github.com/codenotary/immudb" {
+				return strings.TrimPrefix(dependency.Version, "v")
+			}
+		}
+	}
+	return "unknown"
+}
 
 // Capture the exact RPC response consumed and verified by the official SDK.
 // Fetching a second unverified proof afterward would not establish that the
@@ -190,7 +202,7 @@ func verify(w http.ResponseWriter, r *http.Request) {
 		parts := strings.Split(strings.Trim(name, "()"), ".")
 		entry[parts[len(parts)-1]] = result.Rows[0].Values[i].GetS()
 	}
-	reply(w, 200, map[string]any{"verified": true, "method": "immudb-go-v1.11.0 VerifyRow + VerifiedTxByID",
+	reply(w, 200, map[string]any{"verified": true, "method": "immudb-go-v" + clientVersion() + " VerifyRow + VerifiedTxByID",
 		"entry": entry, "txId": strconv.FormatUint(rowProof.SqlEntry.Tx, 10), "txHash": hex.EncodeToString(txHash[:]),
 		"stateTxId": strconv.FormatUint(state.TxId, 10), "stateHash": hex.EncodeToString(state.TxHash),
 		"rowProof": rowProof, "transactionHeader": tx.Header})
@@ -214,7 +226,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/verify", verify)
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		reply(w, 200, map[string]string{"status": "ok", "clientVersion": "1.11.0"})
+		reply(w, 200, map[string]string{"status": "ok", "clientVersion": clientVersion()})
 	})
 	server := &http.Server{Addr: ":8081", Handler: mux, ReadHeaderTimeout: 3 * time.Second, ReadTimeout: 5 * time.Second, WriteTimeout: 15 * time.Second, IdleTimeout: 30 * time.Second}
 	log.Fatal(server.ListenAndServe())

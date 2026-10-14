@@ -8,6 +8,25 @@ export const LEDGER_TABLE_SQL=`CREATE TABLE IF NOT EXISTS smartprocure_audit_sea
   package_sha256 VARCHAR[64],merkle_root VARCHAR[64],final_business_state VARCHAR[50],sealed_at VARCHAR[40],
   PRIMARY KEY seal_key)`;
 export const LEDGER_COLUMNS='seal_key,invoice_id,audit_package_id,package_version,package_sha256,merkle_root,final_business_state,sealed_at';
+export function ledgerColumnName(name:string) {
+  // Apache v1.9DOM.1 returns qualified labels; v1.11.0 returns bare names.
+  // Accept only the exact columns/table selected by our static query.
+  const column=LEDGER_COLUMNS.split(',').find(candidate=>name===candidate || name==='(smartprocure_audit_seals.'+candidate+')');
+  if(!column) throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger column identity is inconsistent.',409);
+  return column;
+}
+export function normalizeLedgerRow(row:Record<string,unknown>) {
+  const normalized:Record<string,unknown>={};
+  for(const [name,value] of Object.entries(row)) {
+    const column=ledgerColumnName(name);
+    if(Object.prototype.hasOwnProperty.call(normalized,column))
+      throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger column identity is ambiguous.',409);
+    normalized[column]=value;
+  }
+  if(Object.keys(normalized).length!==LEDGER_COLUMNS.split(',').length)
+    throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger row identity is incomplete.',409);
+  return normalized;
+}
 export function immudbOptions() {
   const raw=Number(process.env.IMMUDB_TIMEOUT_MS||10000);
   const timeout=Number.isFinite(raw)?Math.min(30000,Math.max(100,raw)):10000;
@@ -29,7 +48,7 @@ export class ImmudbClient implements OnModuleDestroy {
   async get(sealKey:string) {
     const rows=(await this.pool.query('SELECT '+LEDGER_COLUMNS+' FROM smartprocure_audit_seals WHERE seal_key=$1',[sealKey])).rows;
     if(rows.length>1) throw new AuditError('AUDIT_LEDGER_MISMATCH','Ledger identity is inconsistent.',409);
-    return rows[0]??null;
+    return rows[0]?normalizeLedgerRow(rows[0]):null;
   }
   async insert(pkg:any,seal:any) {
     // INSERT only. Never UPSERT/UPDATE an existing historical ledger entry.

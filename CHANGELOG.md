@@ -6,6 +6,8 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
+- Issue #22: isolated exact-source Apache v1.9DOM.1 ledger/SDK qualification, real inclusion/consistency/tamper/trust-state/process-recovery tests and CI provenance artifacts; ADR-003 defines the pending historical migration/adoption gates. Production ledger and receipt history are retained.
+
 - Issue #24: Vietnamese XML/PDF intake status, saved three-way comparison, role-based task decisions and native audit verification/JSON/PDF export workspaces. Add direct invoice-case lookup and explicit export-status headers; CI runs 11 real browser scenarios.
 
 - Issue #23: Vietnamese PO/GRN lists, detail views and guarded draft/lifecycle actions; bounded supplier lookup and finalized receipt quantities. Real browser acceptance and exact-decimal tests run in CI.
