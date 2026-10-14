@@ -44,7 +44,6 @@ export class ImmudbClient implements OnModuleDestroy {
   private readonly pool=new Pool(immudbOptions());
   constructor() {this.pool.on('error',()=>{/* safe operation errors are recorded by the service */});}
   async onModuleDestroy() {await this.pool.end();}
-  async state() {return (await this.pool.query('SELECT immudb_state()')).rows[0];}
   private historical(seal:any) {
     return seal?.status==='SEALED' && process.env.IMMUDB_LEDGER_EPOCH && seal.receipt?.ledgerEpoch!==process.env.IMMUDB_LEDGER_EPOCH;
   }

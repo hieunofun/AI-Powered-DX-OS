@@ -1,13 +1,13 @@
 # ADR-003 — Qualify an Apache ledger before changing historical proof storage
 
-Date: 2026-10-14 (Asia/Saigon). Status: proposed for peer review in #22.
+Date: 2026-10-14; adoption continuation 2026-10-15 (Asia/Saigon). Status: implementation proposed for independent peer review in #22.
 Owner: A, hieunofun. Reviewers: huybitvvt and lehoangnam206.
 
 ## Context and exact provenance
 
 PR #67 is merged at `02b67484e2c177d215b38779988e206a008f402b`, verified in fetched `origin/develop`. Its actual HEAD `55dec1672d51153c37d56818480751cce898d505` has a successful [CI run](https://github.com/hieunofun/AI-Powered-DX-OS/actions/runs/38540784186) and approval from huybitvvt. This accepts the contract foundation, not PR4 runtime APIs.
 
-The existing server image and verifier SDK use ImmuDB **v1.11.0**. The [exact tagged LICENSE](https://github.com/codenotary/immudb/blob/v1.11.0/LICENSE) is **BUSL-1.1**, with a limited production grant and a per-version future Apache change license. BUSL is source-available; a future change license does not establish present OSI eligibility. The internal #10 exception is not organizer acceptance.
+The PR3 baseline server image and verifier SDK used ImmuDB **v1.11.0**. The [exact tagged LICENSE](https://github.com/codenotary/immudb/blob/v1.11.0/LICENSE) is **BUSL-1.1**, with a limited production grant and a per-version future Apache change license. BUSL is source-available; a future change license does not establish present OSI eligibility. The internal #10 exception is not organizer acceptance.
 
 The official **v1.9DOM.1** tag resolves to immutable commit `d5f425e46b4bfd0771274cb4c2ea77634421600c`, released on 2023-11-16. Its [source LICENSE](https://github.com/codenotary/immudb/blob/d5f425e46b4bfd0771274cb4c2ea77634421600c/LICENSE) is Apache-2.0, including the server and client source at that revision. Apache-2.0 is [OSI approved](https://opensource.org/license/apache-2.0). The exact Go module is `v1.9.0-RC2.0.20231116103301-d5f425e46b4b`; the pseudo-version identifies the commit and must not be confused with a different v1.9.x tag. Dependencies retain separate licenses. Preserve the license, copyright and any applicable upstream notices when distributing binaries; do not label upstream work as project MIT code.
 
@@ -32,7 +32,9 @@ Historical adoption uses a read-only proof archive, pinned by an independently r
 
 The cutover tools never delete old volumes, modify financial evidence, or rewrite receipts. Operators stop writers, archive the original database/ledger/trust volumes, inventory and verify exports, restore into isolated volumes, then opt into the new Compose deployment after peer review. Rollback is allowed only before new-epoch writes; after writes, forward recovery preserves both epochs. Real disposable v1.11-to-Apache migration, archive corruption/missing-anchor rejection, interrupted export, idempotent rerun and isolated restore tests are required. Local implementation and CI do not substitute for peer review, deployment-specific backup drills, or organizer acceptance.
 
-Split #22 into qualification and adoption. First deliver an executable, reproducible candidate server/SDK source build and real native proof, tamper, trust-state and outage tests. Keep the production Compose image, verifier module, ledger volume and receipts unchanged in this first PR. A 2023 Apache header and a compile test alone cannot justify replacing a ledger.
+### Historical first-pass qualification (superseded by adoption above)
+
+The initial delivery split #22 into qualification and adoption, preserving baseline runtime pins while testing an isolated source build. This exposed actual security/wire limitations below. The adoption continuation on this PR now changes runtime pins, implements preserved history and keeps all real old volumes; a 2023 Apache header or compile test alone never justified replacing the ledger.
 
 The candidate does **not** implement v1.11.0's `immudb_state`, `immudb_verify_row` or `immudb_verify_tx` SQL wrappers. Tests must exercise the actual official SDK `VerifyRow` and `VerifiedTxByID`; replacing missing wrappers with local `true` results is prohibited. The candidate harness uses the project's verifier orchestration compiled with a separate exact candidate module file. Production proof code and dependency pins remain independently exercised by existing CI.
 
