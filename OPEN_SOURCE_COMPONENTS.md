@@ -6,6 +6,10 @@ Issue #10 corrects the stale ImmuDB license entry: the selected release is BUSL-
 
 ---
 
+### Secure evidence intake scanner candidate (Issue #41; not installed)
+
+The [proposed design](docs/ai/SECURE_EVIDENCE_INTAKE_SPEC.md) selects an unmodified external ClamAV 1.4.6 LTS daemon candidate, upstream [Cisco-Talos/clamav release](https://github.com/Cisco-Talos/clamav/releases/tag/clamav-1.4.6), source commit `5853e1396777bae4d909cd3dd44f58352e7cf9b3`. Its tagged [GPLv2 license](https://github.com/Cisco-Talos/clamav/blob/clamav-1.4.6/COPYING.txt) and applicable source/distribution notices must remain with the scanner service. The planned Node socket adapter is team-authored code and does not link libclamav. No package, scanner binary/container, vendor source, license exception or runtime service is introduced by this documentation branch. A deployable image digest/security patch and notice/SBOM review remain prerequisites for the implementation PR. The proposed policy and tests are in the [acceptance matrix](docs/ai/SECURE_EVIDENCE_INTAKE_ACCEPTANCE.md).
+
 ## Component Registry
 
 ### Procurement workspace build and test tooling (Issue #23)
