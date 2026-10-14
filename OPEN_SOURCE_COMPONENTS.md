@@ -6,7 +6,23 @@ Issue #10 corrects the stale ImmuDB license entry: the selected release is BUSL-
 
 ---
 
+### AI provider adapter (Issue #38, local review candidate)
+
+The primary provider selected by the owner is the hosted **Gemini Developer API**, REST `v1beta` `models:countTokens` and `models:generateContent`, configured as `gemini-3.8-flash`. This is an external proprietary service, not an OSI open-source model/runtime or team-authored AI algorithm. The service/model identifier is configurable and may change upstream; record the returned `modelVersion` plus prompt version, run ID, source hash and dataset version for each evaluation. No Google SDK, model weights, runtime package or new npm dependency is added. The adapter uses Node's built-in fetch; dataset generation reuses the already pinned PDFKit 0.20.2 (MIT) and Noto Sans (OFL-1.1), retaining the existing font notice in `infra/audit/fonts/OFL.txt`.
+
+Official references verified on 2026-10-14: [REST generation](https://ai.google.dev/api/generate-content), [token counting](https://ai.google.dev/api/tokens), [model identifiers](https://ai.google.dev/gemini-api/docs/models), [terms and document disclosure](https://ai.google.dev/gemini-api/terms), [current pricing](https://ai.google.dev/gemini-api/docs/pricing). Gemini service prices and terms govern external usage; the source adapter and fictional dataset are project-authored MIT code/data. The default policy allows synthetic documents only. Approved real documents require a reviewed paid-project disclosure policy and an authorized evidence worker. No provider accuracy, calibrated confidence or contest eligibility is inferred from these tests.
+
+### Secure evidence intake scanner (Issue #41; isolated implementation fixture)
+
+The [implementation](infra/evidence/README.md) uses an unmodified external ClamAV 1.4.6 LTS daemon, upstream [release](https://github.com/Cisco-Talos/clamav/releases/tag/clamav-1.4.6), source commit `5853e1396777bae4d909cd3dd44f58352e7cf9b3`, image `clamav/clamav:1.4.6@sha256:b5b910ce43d595bf8a2fe401e34db56434602b2c755b7c2b07f00c917d04d469`. Its exact [GPLv2 COPYING](docs/open-source/notices/clamav-1.4.6-COPYING.txt) is preserved from that source commit; service distribution must also retain applicable upstream notices/source obligations. The team-authored MIT Node TCP adapter does not link libclamav. No npm dependency was added: XML validation reuses locked fast-xml-parser@5.11.2, and persistence reuses existing PostgreSQL/MinIO packages and the source-pinned MinIO Dockerfile. Production integration/security/SBOM/source distribution review remains pending; this entry makes no competition-eligibility assertion. The [acceptance matrix](docs/ai/SECURE_EVIDENCE_INTAKE_ACCEPTANCE.md) distinguishes real isolated checks from doubles and pending gates.
+
 ## Component Registry
+
+### Reviewed OCR parsing (Issue #26; integration draft)
+
+Concrete need: enforce actual PDF page/text/image budgets and derive verifiable page-text locations before forwarding documents to the selected provider. No existing runtime PDF reader was available; existing PDFKit generates documents. Added exact `pdfjs-dist@6.4.299` (Apache-2.0), upstream [Mozilla release](https://github.com/mozilla/pdf.js/releases/tag/v6.4.299), release commit `d0991a0` (full revision in upstream release). Its declared runtime requires Node >=22.13/24, so the draft proposes Node >=24.14 and pins `node:24-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f` for API/web builds. This is a shared-runtime integration review, not an already deployed upgrade.
+
+The lockfile adds PDF.js plus optional `@napi-rs/canvas@1.0.11` and its platform binaries (MIT); no existing package version changed. Preserve the [packaged notices](docs/open-source/notices/issue26-pdfjs/) for PDF.js, bundled fonts, CMaps, ICC/WASM and canvas, including their embedded third-party notices. Runtime packages/images retain their original license files. No upstream source/binary was modified. The team owns the worker supervision/budgets, source-span checks, schema/domain validation, persistence/correction/confirmation/outbox logic and fixture/evaluation orchestration; it does not claim PDF parsing, image decoding or Gemini inference algorithms. Corpus generation reuses existing PDFKit/Playwright and Noto Sans OFL; local Chrome fallback is recorded, not shipped as an application dependency. Hosted Gemini disclosure/terms remain the #38 dependency policy.
 
 ### Procurement workspace build and test tooling (Issue #23)
 

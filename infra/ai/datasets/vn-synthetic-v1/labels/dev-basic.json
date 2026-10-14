@@ -1,0 +1,50 @@
+{
+  "case_id": "dev-basic",
+  "fields": [
+    {
+      "path": "/seller_name",
+      "status": "EXTRACTED",
+      "value": "Công ty Mẫu Ánh Dương"
+    },
+    {
+      "path": "/seller_tax_code",
+      "status": "EXTRACTED",
+      "value": "SYNTH-MST-001"
+    },
+    {
+      "path": "/invoice_number",
+      "status": "EXTRACTED",
+      "value": "SYNTH-001"
+    },
+    {
+      "path": "/invoice_date",
+      "status": "EXTRACTED",
+      "value": "2026-09-01"
+    },
+    {
+      "path": "/currency",
+      "status": "EXTRACTED",
+      "value": "VND"
+    },
+    {
+      "path": "/lines/0/quantity",
+      "status": "EXTRACTED",
+      "value": "2"
+    },
+    {
+      "path": "/lines/0/unit_price",
+      "status": "EXTRACTED",
+      "value": "125000.00"
+    },
+    {
+      "path": "/lines/0/tax_rate",
+      "status": "EXTRACTED",
+      "value": "0.10"
+    },
+    {
+      "path": "/total_amount",
+      "status": "EXTRACTED",
+      "value": "275000.00"
+    }
+  ]
+}

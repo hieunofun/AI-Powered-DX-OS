@@ -1,0 +1,63 @@
+name: opendx-issue41
+# Isolated local acceptance fixture. These credentials grant no production access.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: evidence_issue41
+      POSTGRES_USER: evidence_fixture
+      POSTGRES_PASSWORD: evidence_fixture_local_only
+    ports: ["127.0.0.1:15441:5432"]
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ../../database/proposed/issue41-evidence-intake.sql:/docker-entrypoint-initdb.d/001-evidence.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evidence_fixture -d evidence_issue41"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 512m
+    cpus: 1
+  minio:
+    build: ../minio
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: evidence_fixture
+      MINIO_ROOT_PASSWORD: evidence_fixture_local_only
+    ports: ["127.0.0.1:19441:9000"]
+    volumes: ["minio:/data"]
+    mem_limit: 512m
+    cpus: 1
+  scanner:
+    image: clamav/clamav:1.4.6@sha256:b5b910ce43d595bf8a2fe401e34db56434602b2c755b7c2b07f00c917d04d469
+    # Complete the initial update before clamd loads its databases; bundled signatures may be stale.
+    entrypoint: ["/bin/sh", "-ec", "freshclam --foreground --stdout; exec /init"]
+    environment:
+      TZ: UTC
+      FRESHCLAM_CHECKS: "12"
+      FRESHCLAM_CONF_NotifyClamd: /etc/clamav/clamd.conf
+      CLAMD_CONF_SelfCheck: "60"
+      CLAMD_CONF_StreamMaxLength: 20M
+      CLAMD_CONF_MaxFileSize: 20M
+      CLAMD_CONF_MaxScanSize: 100M
+      CLAMD_CONF_MaxRecursion: "10"
+      CLAMD_CONF_MaxFiles: "1000"
+      CLAMD_CONF_MaxScanTime: "25000"
+      CLAMD_CONF_MaxThreads: "2"
+      CLAMD_CONF_MaxQueue: "4"
+      CLAMD_CONF_ReadTimeout: "15"
+      CLAMD_CONF_CommandReadTimeout: "5"
+      CLAMD_CONF_AlertExceedsMax: "yes"
+      CLAMD_CONF_AlertEncryptedArchive: "yes"
+      CLAMD_CONF_AlertEncryptedDoc: "yes"
+      CLAMD_CONF_AlertBrokenExecutables: "yes"
+    ports: ["127.0.0.1:33141:3310"]
+    volumes: ["definitions:/var/lib/clamav"]
+    restart: on-failure:3
+    mem_limit: 4g
+    cpus: 2
+    stop_grace_period: 30s
+volumes:
+  postgres:
+  minio:
+  definitions:

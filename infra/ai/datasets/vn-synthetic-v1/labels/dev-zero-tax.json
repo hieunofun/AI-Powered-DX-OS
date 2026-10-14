@@ -1,0 +1,50 @@
+{
+  "case_id": "dev-zero-tax",
+  "fields": [
+    {
+      "path": "/seller_name",
+      "status": "EXTRACTED",
+      "value": "Cửa hàng Mẫu Bình Minh"
+    },
+    {
+      "path": "/seller_tax_code",
+      "status": "EXTRACTED",
+      "value": "SYNTH-MST-002"
+    },
+    {
+      "path": "/invoice_number",
+      "status": "EXTRACTED",
+      "value": "SYNTH-002"
+    },
+    {
+      "path": "/invoice_date",
+      "status": "EXTRACTED",
+      "value": "2026-09-02"
+    },
+    {
+      "path": "/currency",
+      "status": "EXTRACTED",
+      "value": "VND"
+    },
+    {
+      "path": "/lines/0/quantity",
+      "status": "EXTRACTED",
+      "value": "3"
+    },
+    {
+      "path": "/lines/0/unit_price",
+      "status": "EXTRACTED",
+      "value": "50000.00"
+    },
+    {
+      "path": "/lines/0/tax_rate",
+      "status": "EXTRACTED",
+      "value": "0"
+    },
+    {
+      "path": "/total_amount",
+      "status": "EXTRACTED",
+      "value": "150000.00"
+    }
+  ]
+}
