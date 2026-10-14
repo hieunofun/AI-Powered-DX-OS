@@ -1,5 +1,7 @@
 # Open Source Components Inventory
 
+Issue #25 adds no dependency. Its team-authored semantic mapping adapter reuses the recorded Gemini REST service, Node/Nest/PostgreSQL and existing deterministic resolver. Provider disclosure/terms, notices and the separation between upstream engines and original orchestration remain applicable; see `docs/ai/REVIEWED_ITEM_MAPPING.md`.
+
 This document tracks external software evaluated and integrated into **SmartProcure-Pay**, including open-source and explicitly identified source-available components.
 
 Issue #10 corrects the stale ImmuDB license entry: the selected release is BUSL-1.1 source-available software, not currently Apache-2.0 or OSI-approved open source. Version-specific provenance and limitations follow the registry.
