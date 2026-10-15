@@ -68,8 +68,13 @@ async function createFixture() {
     const access = { check: async (ctx, action, id, policy) => db.transaction(async client => {
       const m = await member(client, ctx); if (policy?.retentionClass === 'RESTRICTED') fail('FORBIDDEN', 403);
       if (!id) { if (m.role !== 'PROCESSOR' || !['evidence.register', 'evidence.scan', 'evidence.read'].includes(action)) fail('FORBIDDEN', 403); return; }
-      if (!['evidence.read', 'evidence.download', 'evidence.upload', 'evidence.scan', 'operation.read'].includes(action)) fail('FORBIDDEN', 403);
+      if (!['evidence.register', 'evidence.read', 'evidence.download', 'evidence.upload', 'evidence.scan', 'operation.read'].includes(action)) fail('FORBIDDEN', 403);
       const found = (await client.query('SELECT data FROM platform_evidence_records WHERE tenant_id=$1 AND id=$2', [ctx.tenantId, id])).rows[0]; if (!found) fail('NOT_FOUND', 404);
+      // EvidenceService reauthorizes the just-created registration before returning its ID.
+      // Only its actual current processor/creator can pass; explicit read grants are added next.
+      if (action === 'evidence.register') {
+        if (m.role !== 'PROCESSOR' || found.data.evidence.created_by !== ctx.subject || found.data.evidence.retention_class !== 'STANDARD') fail('FORBIDDEN', 403); return;
+      }
       if (!(await client.query('SELECT 1 FROM mediation_fixture_evidence_grants WHERE tenant_id=$1 AND subject=$2 AND evidence_id=$3', [ctx.tenantId, ctx.subject, id])).rows.length ||
         found.data.evidence.retention_class !== 'STANDARD' || ['evidence.upload', 'evidence.scan'].includes(action) && m.role !== 'PROCESSOR') fail('FORBIDDEN', 403);
     }) };
