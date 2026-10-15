@@ -4,6 +4,8 @@ Issue #54 adds team-authored extractive fact/citation validation, registered ris
 
 Issue #25 adds team-authored reviewed mapping orchestration, candidate guards, semantic prompt/REST adapter, durable human decision/outbox and labelled evaluation/acceptance fixtures. The existing deterministic algorithm and upstream engines remain attributed separately. See `docs/ai/REVIEWED_ITEM_MAPPING.md`; no model suggestion authorizes financial actions.
 
+Issue #51 adds team-authored independent source contracts, durable native receipt/idempotency/lease storage, cumulative sensor reconciliation, source-to-order authorization ports, atomic case-intent/lineage handoff and two explicit HTTP simulator clients. Existing PostgreSQL, MinIO, ClamAV, Node and Nest engines remain upstream contributions. No new dependency or upstream patch is introduced. See `docs/ai/CONNECTOR_INGRESS.md` for implementation, evidence and external integration gates.
+
 Issue #46 adds team-authored transactional lineage derivation/storage, current resource authorization, encrypted pagination, literal evidence search and membership bridge. Existing upstream engines remain separately attributed. Acceptance fixtures do not replace #43 production tenancy or owning domain adapters. See `docs/ai/EVIDENCE_LINEAGE.md`.
 
 Implementation baseline: `develop@42dd7a3`, 7 October 2026. This inventory distinguishes integrated third-party software from project-authored modules. It does not assign copyright or contributions to an unidentified team member. Exact upstream versions, licenses and notices are in [OPEN_SOURCE_COMPONENTS.md](OPEN_SOURCE_COMPONENTS.md).

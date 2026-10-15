@@ -20,6 +20,14 @@ describe('secure evidence boundary (transaction/storage/ACL doubles)', () => {
     return { id: registered.evidence.id, operation };
   }
   async function clean() { const item = await uploaded(); await service.processNextScan(context); return item; }
+  test('a scoped connector worker can scan its known evidence ID without touching an unrelated queued file', async () => {
+    const unrelated = await uploaded(), own = await uploaded();
+    access.mockImplementation(async (_ctx, action, id) => { if (action === 'evidence.scan' && id === unrelated.id) fail('FORBIDDEN', 403); });
+    await service.processNextScan(context, own.id);
+    expect(scan).toHaveBeenCalledTimes(1);
+    expect((await store.read(context, own.id)).evidence.quarantine_state).toBe('CLEAN');
+    expect((await store.read(context, unrelated.id)).evidence.quarantine_state).toBe('PENDING_SCAN');
+  });
   test('register derives identity, 15 minute entitlement and blocked initial states', async () => {
     const result = await service.register(context, metadata(), key());
     expect(result.evidence).toMatchObject({ tenant_id: context.tenantId, created_by: context.subject, revision: 1,
