@@ -1,5 +1,9 @@
 # Attribution and original contributions
 
+Issue #51 adds team-authored independent source contracts, durable native receipt/idempotency/lease storage, cumulative sensor reconciliation, source-to-order authorization ports, atomic case-intent/lineage handoff and two explicit HTTP simulator clients. Existing PostgreSQL, MinIO, ClamAV, Node and Nest engines remain upstream contributions. No new dependency or upstream patch is introduced. See `docs/ai/CONNECTOR_INGRESS.md` for implementation, evidence and external integration gates.
+
+Issue #46 adds team-authored transactional lineage derivation/storage, current resource authorization, encrypted pagination, literal evidence search and membership bridge. Existing upstream engines remain separately attributed. Acceptance fixtures do not replace #43 production tenancy or owning domain adapters. See `docs/ai/EVIDENCE_LINEAGE.md`.
+
 Implementation baseline: `develop@42dd7a3`, 7 October 2026. This inventory distinguishes integrated third-party software from project-authored modules. It does not assign copyright or contributions to an unidentified team member. Exact upstream versions, licenses and notices are in [OPEN_SOURCE_COMPONENTS.md](OPEN_SOURCE_COMPONENTS.md).
 
 ## Integrated third-party components
@@ -58,3 +62,11 @@ No modified upstream service fork is claimed by this baseline. MinIO is built fr
 ## Project 4 foundation delivery (review candidate)
 
 P4-01 #36 and P4-02 #37 add project-authored governance, migration/boundary ADRs, BRS, versioned OpenAPI/JSON Schemas, synthetic positive/negative fixtures and validation orchestration. Ajv and Swagger Parser supply upstream validation engines; no upstream source was modified. The agent submitted this work through the authorized hieunofun account; assigning role owners does not claim they authored or reviewed the changes. The contracts remain proposals and do not establish implemented PR4 runtime, AI accuracy, immutable-ledger eligibility, tenant isolation or completed Onboarding/replay.
+
+## Issue #41 implementation draft
+
+Under the authorized huybitvvt account, the project adds the evidence service/controller, strict file guards, tenant-predicated transaction/idempotency/lease/history repository, private storage boundary, Node TCP scan framing/freshness/provenance, guarded clean-byte delivery, and isolated runtime/failure acceptance orchestration. PostgreSQL and MinIO provide upstream persistence; ClamAV supplies malware signatures/decoders; fast-xml-parser supplies XML well-formedness validation and PDFKit supplies fictional test documents. Their engines and detection capability are not project-authored algorithms. No upstream service was modified or runtime npm package added. The [implementation README](infra/evidence/README.md) and [acceptance matrix](docs/ai/SECURE_EVIDENCE_INTAKE_ACCEPTANCE.md) record observed checks, test identities/faults and pending production/review gates. This draft does not claim independent peer review, complete malware detection, production tenancy, automatic AI confirmation or completed #41 acceptance.
+
+## Issue #26 reviewed draft implementation
+
+The project-authored contribution is durable tenant/source-scoped OCR orchestration, strict registered invoice fields, trusted text-source matching, original/correction/confirmation histories, current requester/worker and PO-binding boundaries, decimal reconciliation and transactional facts/outbox/idempotency. PDF.js/canvas provide upstream PDF/image parsing; Gemini provides disclosed hosted inference; existing PostgreSQL/MinIO/ClamAV/PDFKit/Playwright/Noto Sans are reused. The [runtime report and limits](docs/ai/REVIEWED_OCR.md) distinguish actual provider output from explicit fixture review, static test identity and injected faults. There is no claim of model training, general production accuracy, independent peer review, financial approval, executed domain matching or completed program acceptance.

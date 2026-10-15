@@ -4,3 +4,10 @@
 *.pdf -text
 # Keep byte-sensitive XML fixture mutations and archival hashes identical across platforms.
 infra/invoice/fixtures/*.xml text eol=lf
+# Keep connector acceptance source/support hashes reproducible in Windows and Linux CI.
+apps/api/src/packs/openresolve/connectors/*.ts text eol=lf
+apps/api/src/platform/evidence/*.ts text eol=lf
+apps/api/src/platform/lineage/*.ts text eol=lf
+infra/connectors/*.cjs text eol=lf
+database/proposed/issue51-external-itot-ingress.sql text eol=lf
+packages/contracts/opendx/proposed/issue51-connectors.schema.json text eol=lf
