@@ -1,0 +1,43 @@
+name: Connector ingress acceptance
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'apps/api/src/packs/openresolve/connectors/**'
+      - 'apps/api/src/platform/evidence/**'
+      - 'apps/api/src/platform/lineage/**'
+      - 'database/proposed/issue51-external-itot-ingress.sql'
+      - 'infra/connectors/**'
+      - '.github/workflows/connector-ingress-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ingress-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build:api
+      - name: Start isolated PostgreSQL, MinIO and pinned ClamAV
+        run: docker compose -f infra/connectors/compose.yaml up -d --build
+      - name: Wait for actual database and fresh scanner, then exercise both HTTP source simulators
+        run: node infra/connectors/validate-runtime.cjs --wait-ready
+      - name: Retain real acceptance artifacts, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: connector-ingress-runtime
+          path: docs/ai/evidence/issue51-ingress-runtime-*.json
+          if-no-files-found: warn
+      - name: Print fixture status on failure
+        if: failure()
+        run: docker compose -f infra/connectors/compose.yaml ps
+      - name: Stop isolated fixtures
+        if: always()
+        run: docker compose -f infra/connectors/compose.yaml stop

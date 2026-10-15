@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://contracts.opendx.invalid/proposed/issue51-connectors.schema.json",
+  "title": "Issue 51 two-source ingress candidate — A/C review and production integration pending",
+  "definitions": {
+    "Identifier": { "type": "string", "minLength": 1, "maxLength": 100, "pattern": "^[^\\u0000-\\u001f\\u007f]+$" },
+    "Quantity": { "type": "string", "maxLength": 100, "pattern": "^0*[0-9]{1,14}(?:\\.[0-9]{1,4})?$" },
+    "PositiveQuantity": { "allOf": [{ "$ref": "#/definitions/Quantity" }, { "not": { "pattern": "^0+(?:\\.0+)?$" } }] },
+    "TaxRate": { "type": "string", "maxLength": 100, "pattern": "^(?:0+(?:\\.[0-9]{1,4})?|0*1(?:\\.0{1,4})?)$" },
+    "Timestamp": { "type": "string", "format": "date-time", "pattern": "Z$" },
+    "ExternalOrderEvent": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "source_event_id": { "$ref": "#/definitions/Identifier" }, "schema_id": { "const": "openresolve.external-order.v1" }, "observed_at": { "$ref": "#/definitions/Timestamp" },
+        "data": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "external_order_id": { "$ref": "#/definitions/Identifier" }, "source_revision": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+            "supplier_ref": { "$ref": "#/definitions/Identifier" }, "currency": { "type": "string", "minLength": 3, "maxLength": 3, "pattern": "^[A-Z]{3}$" },
+            "lines": { "type": "array", "minItems": 1, "maxItems": 100, "items": {
+              "type": "object", "additionalProperties": false,
+              "properties": { "external_item_id": { "$ref": "#/definitions/Identifier" }, "sku": { "$ref": "#/definitions/Identifier" }, "description": { "type": "string", "minLength": 1, "maxLength": 500 },
+                "ordered_quantity": { "$ref": "#/definitions/PositiveQuantity" }, "unit_price": { "$ref": "#/definitions/Quantity" }, "tax_rate": { "$ref": "#/definitions/TaxRate" } },
+              "required": ["external_item_id", "sku", "description", "ordered_quantity", "unit_price", "tax_rate"]
+            } }
+          }, "required": ["external_order_id", "source_revision", "supplier_ref", "currency", "lines"]
+        }
+      }, "required": ["source_event_id", "schema_id", "observed_at", "data"]
+    },
+    "ReceivingSensorEvent": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "source_event_id": { "$ref": "#/definitions/Identifier" }, "schema_id": { "const": "openresolve.receiving-sensor.v1" }, "observed_at": { "$ref": "#/definitions/Timestamp" },
+        "data": {
+          "type": "object", "additionalProperties": false,
+          "properties": { "external_order_id": { "$ref": "#/definitions/Identifier" }, "external_item_id": { "$ref": "#/definitions/Identifier" }, "device_id": { "$ref": "#/definitions/Identifier" },
+            "sequence": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 }, "received_quantity": { "$ref": "#/definitions/Quantity" },
+            "quality": { "enum": ["ACCEPTED", "DAMAGED", "UNKNOWN"] }, "is_final": { "type": "boolean" } },
+          "required": ["external_order_id", "external_item_id", "device_id", "sequence", "received_quantity", "quality", "is_final"]
+        }
+      }, "required": ["source_event_id", "schema_id", "observed_at", "data"]
+    },
+    "Observation": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "format": "uuid" }, "tenant_id": { "type": "string", "format": "uuid" }, "source_id": { "type": "string", "format": "uuid" },
+        "source_kind": { "enum": ["EXTERNAL_ORDER", "RECEIVING_SENSOR"] }, "simulated": { "type": "boolean" }, "source_event_id": { "$ref": "#/definitions/Identifier" },
+        "schema_id": { "enum": ["openresolve.external-order.v1", "openresolve.receiving-sensor.v1"] }, "observed_at": { "$ref": "#/definitions/Timestamp" }, "received_at": { "$ref": "#/definitions/Timestamp" },
+        "raw_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }, "content_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "operation": { "$ref": "https://contracts.opendx.invalid/v1/platform.schema.json#/definitions/Operation" },
+        "original_observation_id": { "type": "string", "format": "uuid" }, "evidence_id": { "type": "string", "format": "uuid" }, "evidence_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "outcome": { "type": "object", "additionalProperties": false,
+          "properties": { "purchase_order_id": { "type": "string", "format": "uuid" }, "source_version": { "type": "string", "minLength": 1, "maxLength": 200 },
+            "case_dispatch": { "enum": ["NONE", "PENDING"] }, "reason": { "enum": ["SOURCE_CONFLICT", "SHORT_DELIVERY", "QUALITY"] }, "severity": { "enum": ["LOW", "MEDIUM", "HIGH"] } },
+          "required": ["purchase_order_id", "source_version", "case_dispatch"] }
+      },
+      "required": ["id", "tenant_id", "source_id", "source_kind", "simulated", "source_event_id", "schema_id", "observed_at", "received_at", "raw_sha256", "content_sha256", "operation"]
+    }
+  }
+}

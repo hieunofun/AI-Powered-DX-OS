@@ -1,5 +1,7 @@
 # Open Source Components Inventory
 
+Issue #51 adds no upstream dependency or patch. Connector SQL/runtime/simulators reuse the exact PostgreSQL, MinIO, ClamAV, NestJS, Node, decimal and schema-validator versions already recorded below and pinned by the existing lockfile/service images. Existing notices and licensing gates apply; the project-authored reconciliation and fixture orchestration do not claim the upstream engines.
+
 This document tracks external software evaluated and integrated into **SmartProcure-Pay**, including open-source and explicitly identified source-available components.
 
 Issue #10 corrects the stale ImmuDB license entry: the selected release is BUSL-1.1 source-available software, not currently Apache-2.0 or OSI-approved open source. Version-specific provenance and limitations follow the registry.

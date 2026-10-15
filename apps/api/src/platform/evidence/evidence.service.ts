@@ -151,10 +151,11 @@ export class EvidenceService {
       }
     });
   }
-  async processNextScan(context: EvidenceContext): Promise<EvidenceOperation | undefined> {
+  async processNextScan(context: EvidenceContext, preferredId?: string): Promise<EvidenceOperation | undefined> {
     await this.authorize(context, 'evidence.scan');
+    if (preferredId !== undefined && !UUID.test(preferredId)) fail('INVALID_REQUEST');
     return this.slot(async () => {
-      const id = await this.store.candidate(context, new Date(this.now()).toISOString()); if (!id) return;
+      const id = preferredId || await this.store.candidate(context, new Date(this.now()).toISOString()); if (!id) return;
       await this.authorize(context, 'evidence.scan', id);
       const token = randomUUID();
       const claim = await this.store.change(context, id, undefined, record => {

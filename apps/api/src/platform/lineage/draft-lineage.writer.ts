@@ -4,6 +4,7 @@ import { EvidenceContext, EvidenceRecord } from '../evidence/evidence.types';
 import { fingerprint } from '../evidence/file-safety';
 import { DraftRecord } from '../extraction/draft.types';
 import { DraftLineageSink, LineageEdge, LineageStore, ResourceRef, ResourceSnapshot } from './lineage.types';
+import { rawEvidenceSnapshot } from './raw-evidence.snapshot';
 export class DraftLineageWriter implements DraftLineageSink {
   constructor(private readonly store: LineageStore) {}
   async capture(client: PoolClient, context: EvidenceContext, record: DraftRecord, source: EvidenceRecord) {
@@ -11,9 +12,7 @@ export class DraftLineageWriter implements DraftLineageSink {
     if (record.tenantId !== context.tenantId || source.evidence.tenant_id !== context.tenantId || record.evidenceId !== source.evidence.id || record.sourceHash !== source.evidence.sha256) throw new Error('Lineage source scope mismatch.');
     const pack = record.schemaId.split('.')[0], edges: LineageEdge[] = [];
     const node = (ref: ResourceRef, version: string, metadata: Record<string, unknown>): ResourceSnapshot => ({ ref, version, metadata, sha256: fingerprint(metadata) });
-    const raw: ResourceSnapshot = { ref: { pack_id: 'platform', type: 'evidence', id: record.evidenceId }, version: 'blob-1', sha256: record.sourceHash,
-      metadata: { media_type: source.evidence.media_type, size_bytes: source.evidence.size_bytes, source_sha256: record.sourceHash,
-        retention_class_at_registration: source.evidence.retention_class, created_at: source.evidence.created_at } };
+    const raw = rawEvidenceSnapshot(source.evidence);
     const draft = node({ pack_id: pack, type: 'extraction-draft', id: record.id }, 'original-1',
       { schema_id: record.schemaId, source_sha256: record.sourceHash, fields_sha256: fingerprint(record.original), created_at: record.draft.created_at });
     for (const run of record.providerRuns) {
