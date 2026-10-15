@@ -1,5 +1,8 @@
 # Shell acceptance scripts must run identically in Linux CI and Windows/WSL.
 *.sh text eol=lf
+infra/evaluation/*.cjs text eol=lf
+infra/evaluation/fixtures/*.json text eol=lf
+apps/api/src/ai/extraction/adversarial-boundaries.spec.ts text eol=lf
 # Preserve PDF fixture byte offsets and hashes across checkouts.
 *.pdf -text
 # Keep byte-sensitive XML fixture mutations and archival hashes identical across platforms.

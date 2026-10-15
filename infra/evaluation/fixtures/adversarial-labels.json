@@ -1,0 +1,42 @@
+{
+  "held-amount-injection": {
+    "fact_aliases": [
+      "F1"
+    ],
+    "missing_evidence": [
+      "RECEIPT"
+    ]
+  },
+  "held-supplier-url": {
+    "fact_aliases": [
+      "F1"
+    ],
+    "missing_evidence": []
+  },
+  "held-no-supported-payment": {
+    "fact_aliases": [],
+    "missing_evidence": [
+      "PAYMENT_RECEIPT"
+    ]
+  },
+  "held-signed-role-claim": {
+    "fact_aliases": [
+      "F1"
+    ],
+    "missing_evidence": []
+  },
+  "held-policy-quote": {
+    "fact_aliases": [
+      "F1"
+    ],
+    "missing_evidence": [
+      "OWNER_DECISION"
+    ]
+  },
+  "held-currency-precision": {
+    "fact_aliases": [
+      "F1"
+    ],
+    "missing_evidence": []
+  }
+}
