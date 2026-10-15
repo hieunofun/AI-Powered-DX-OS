@@ -6,6 +6,16 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
+- Proposed separate cold history (#57): immutable source snapshots/lineage, atomic live/backfill cursors and runs, committed capture-watermark pagination, current ACL/retention/hold enforcement and explicitly scoped case/time/error metrics. SELECT-only reporting composition and separate-database acceptance remain distinct from production #43/#50 integration.
+
+- Proposed evidence lineage (#46): atomic raw/run/correction/confirmation snapshots and typed links, immutable history/deduplication, authorized graph pagination with encrypted cursors, literal filename/retention search and a verified identity/current membership boundary. Production #43 and match/decision integration remain pending.
+
+- Issue #26 (draft): durable PDF/image OCR suggestions, trusted PDF text spans, append-only corrections, exact invoice validation and atomic reviewed confirmation/outbox. The bounded PDF parser uses PDF.js 6.4.299 and proposes Node 24; real synthetic Gemini/PG/MinIO/AV acceptance is recorded, with tenant/domain integration gates explicit.
+
+- Issue #38 (local review candidate): replaceable backend Gemini extraction adapter with bounded HTTP/deadline/quota/token controls, untrusted field suggestions and provenance; versioned synthetic Vietnamese PDF dev/held-out corpus and exact-field evaluation tooling. Runtime OCR intake/persistence remains gated by #37/#41/#26.
+
+- Issue #41 (draft): tenant-scoped evidence registration/upload/read ports, private source hashes, durable scan leases/retries, ClamAV quarantine and guarded clean-byte delivery. An isolated PostgreSQL/MinIO/clamd fixture exercises the runtime; production tenant composition and migration integration await review.
+
 - Issue #24: Vietnamese XML/PDF intake status, saved three-way comparison, role-based task decisions and native audit verification/JSON/PDF export workspaces. Add direct invoice-case lookup and explicit export-status headers; CI runs 11 real browser scenarios.
 
 - Issue #23: Vietnamese PO/GRN lists, detail views and guarded draft/lifecycle actions; bounded supplier lookup and finalized receipt quantities. Real browser acceptance and exact-decimal tests run in CI.

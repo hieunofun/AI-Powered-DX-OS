@@ -1,5 +1,7 @@
 # API conventions, authorization and failure semantics
 
+Issue #46 proposes lineage pagination and evidence filename/retention filters; see `docs/ai/EVIDENCE_LINEAGE.md`. Optional `next_cursor` pages scan at most 100 committed links; encrypted cursors bind tenant/principal/source/watermark/expiry. Every link requires current access to both endpoints; unauthorized links are omitted and outages fail closed. Literal filename search uses tenant predicates and per-resource grants; its cursor binds exact filters. A/C review, #43 production tenancy and actual match/decision integration remain gates.
+
 Status: proposed review contract, P4-02 #37, 2026-10-14. Existing API routes keep their current camelCase fields and error shapes; these target snake_case contracts are not exposed by this PR.
 
 ## Representation
