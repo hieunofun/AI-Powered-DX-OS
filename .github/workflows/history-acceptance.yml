@@ -1,0 +1,43 @@
+name: Cold history acceptance
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'apps/api/src/platform/history/**'
+      - 'apps/api/test/history*'
+      - 'database/proposed/issue57-cold-history.sql'
+      - 'packages/contracts/opendx/proposed/issue57-history.schema.json'
+      - 'infra/history/**'
+      - '.github/workflows/history-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  history-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build:api
+      - name: Start isolated PostgreSQL fixture
+        run: docker compose -f infra/history/compose.yaml up -d
+      - name: Verify separate databases, read-only SQL role, native replay and current history access
+        run: node infra/history/validate-runtime.cjs --wait-ready
+      - name: Retain successful and failed actual acceptance reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cold-history-runtime
+          path: docs/ai/evidence/issue57-history-runtime-*.json
+          if-no-files-found: warn
+      - name: Print fixture status on failure
+        if: failure()
+        run: docker compose -f infra/history/compose.yaml ps
+      - name: Stop isolated fixture without deleting history
+        if: always()
+        run: docker compose -f infra/history/compose.yaml stop

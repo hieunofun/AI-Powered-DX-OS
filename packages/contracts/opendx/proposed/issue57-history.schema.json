@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://contracts.opendx.invalid/proposed/issue57-history.schema.json",
+  "description": "Proposed separate cold history reads. Metrics cover authorized visible latest cases in this page, not a whole-tenant total. Native/capture cursors remain encrypted/internal.",
+  "definitions": {
+    "Uuid": { "type": "string", "format": "uuid" },
+    "Hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "Ref": { "$ref": "https://contracts.opendx.invalid/v1/platform.schema.json#/definitions/ResourceRef" },
+    "Json": { "oneOf": [{ "type": ["string", "boolean", "null"] }, { "type": "integer", "minimum": -9007199254740991, "maximum": 9007199254740991 }, { "type": "array", "maxItems": 3000, "items": { "$ref": "#/definitions/Json" } }, { "$ref": "#/definitions/JsonObject" }] },
+    "JsonObject": { "type": "object", "maxProperties": 3000, "additionalProperties": { "$ref": "#/definitions/Json" } },
+    "VersionedRef": { "type": "object", "additionalProperties": false, "properties": { "ref": { "$ref": "#/definitions/Ref" }, "version": { "type": "string", "minLength": 1, "maxLength": 120 }, "sha256": { "$ref": "#/definitions/Hash" } }, "required": ["ref", "version", "sha256"] },
+    "Snapshot": { "type": "object", "additionalProperties": false, "properties": { "ref": { "$ref": "#/definitions/Ref" }, "version": { "type": "string", "minLength": 1, "maxLength": 120 }, "sha256": { "$ref": "#/definitions/Hash" }, "payload": { "$ref": "#/definitions/JsonObject" } }, "required": ["ref", "version", "sha256", "payload"] },
+    "Retention": { "type": "object", "additionalProperties": false, "properties": { "retention_class": { "enum": ["STANDARD", "RESTRICTED"] }, "retain_until": { "type": "string", "format": "date-time" }, "legal_hold": { "type": "boolean" }, "policy_version": { "type": "string", "minLength": 1, "maxLength": 120 } }, "required": ["retention_class", "retain_until", "legal_hold", "policy_version"] },
+    "CaseMetric": { "type": "object", "additionalProperties": false,
+      "properties": { "ref": { "$ref": "#/definitions/Ref" }, "classification": { "enum": ["ACTIVE", "COMPLETED", "ERROR"] }, "started_at": { "type": "string", "format": "date-time" }, "finished_at": { "type": "string", "format": "date-time" }, "error_code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,79}$" } },
+      "required": ["ref", "classification", "started_at"],
+      "allOf": [{ "if": { "properties": { "classification": { "enum": ["COMPLETED", "ERROR"] } } }, "then": { "required": ["finished_at"] } }, { "if": { "properties": { "classification": { "const": "ERROR" } } }, "then": { "required": ["error_code"] } }]
+    },
+    "Row": { "type": "object", "additionalProperties": false,
+      "properties": { "id": { "$ref": "#/definitions/Uuid" }, "tenant_id": { "$ref": "#/definitions/Uuid" }, "stream": { "type": "string", "pattern": "^[a-z][a-z0-9.-]{0,99}$" }, "captured_at": { "type": "string", "format": "date-time" }, "native_sha256": { "$ref": "#/definitions/Hash" },
+        "event": { "$ref": "https://contracts.opendx.invalid/v1/platform.schema.json#/definitions/EventEnvelope" }, "snapshot": { "$ref": "#/definitions/Snapshot" }, "case_metric": { "$ref": "#/definitions/CaseMetric" }, "evidence": { "type": "array", "maxItems": 32, "items": { "$ref": "#/definitions/VersionedRef" } }, "captured_retention": { "$ref": "#/definitions/Retention" }, "simulated": { "type": "boolean" },
+        "lineage": { "type": "array", "minItems": 1, "maxItems": 33, "items": { "type": "object", "additionalProperties": false, "properties": { "from": { "$ref": "#/definitions/VersionedRef" }, "to": { "$ref": "#/definitions/VersionedRef" }, "relation": { "const": "DERIVED_FROM" } }, "required": ["from", "to", "relation"] } } },
+      "required": ["id", "tenant_id", "stream", "captured_at", "native_sha256", "event", "snapshot", "case_metric", "evidence", "captured_retention", "simulated", "lineage"]
+    },
+    "Metrics": { "type": "object", "additionalProperties": false,
+      "properties": { "scope": { "const": "AUTHORIZED_VISIBLE_PAGE" }, "case_count": { "type": "integer", "minimum": 0, "maximum": 100 }, "classification_counts": { "type": "object", "additionalProperties": false, "properties": { "ACTIVE": { "type": "integer", "minimum": 0 }, "COMPLETED": { "type": "integer", "minimum": 0 }, "ERROR": { "type": "integer", "minimum": 0 } }, "required": ["ACTIVE", "COMPLETED", "ERROR"] },
+        "completed_duration_count": { "type": "integer", "minimum": 0 }, "total_duration_ms": { "type": "string", "pattern": "^(0|[1-9][0-9]*)$" }, "p95_duration_ms": { "type": ["integer", "null"], "minimum": 0 }, "data_origin": { "enum": ["EMPTY", "SIMULATED", "ACTUAL", "MIXED"] },
+        "errors": { "type": "array", "maxItems": 100, "items": { "type": "object", "additionalProperties": false, "properties": { "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,79}$" }, "count": { "type": "integer", "minimum": 1 } }, "required": ["code", "count"] } } },
+      "required": ["scope", "case_count", "classification_counts", "completed_duration_count", "total_duration_ms", "p95_duration_ms", "data_origin", "errors"]
+    },
+    "EventPage": { "type": "object", "additionalProperties": false, "properties": { "items": { "type": "array", "maxItems": 100, "items": { "$ref": "#/definitions/Row" } }, "query_created_at": { "type": "string", "format": "date-time" }, "complete": { "type": "boolean" }, "next_cursor": { "type": "string", "maxLength": 2048 } }, "required": ["items", "query_created_at", "complete"], "if": { "properties": { "complete": { "const": false } } }, "then": { "required": ["next_cursor"] } },
+    "CasePage": { "type": "object", "additionalProperties": false, "properties": { "items": { "type": "array", "maxItems": 100, "items": { "$ref": "#/definitions/Row" } }, "query_created_at": { "type": "string", "format": "date-time" }, "complete": { "type": "boolean" }, "next_cursor": { "type": "string", "maxLength": 2048 }, "metrics": { "$ref": "#/definitions/Metrics" } }, "required": ["items", "query_created_at", "complete", "metrics"], "if": { "properties": { "complete": { "const": false } } }, "then": { "required": ["next_cursor"] } }
+  }
+}

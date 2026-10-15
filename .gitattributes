@@ -4,3 +4,8 @@
 *.pdf -text
 # Keep byte-sensitive XML fixture mutations and archival hashes identical across platforms.
 infra/invoice/fixtures/*.xml text eol=lf
+# Cold history acceptance uses exact source/support hashes across Windows and Linux.
+apps/api/src/platform/history/*.ts text eol=lf
+infra/history/*.cjs text eol=lf
+database/proposed/issue57-cold-history.sql text eol=lf
+packages/contracts/opendx/proposed/issue57-history.schema.json text eol=lf
