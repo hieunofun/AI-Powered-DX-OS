@@ -199,6 +199,19 @@ jobs:
           node infra/web/bootstrap-web-fixtures.cjs
           npm run test:browser --workspace=apps/web
 
+      - name: Measure bounded direct legacy API read baseline and actual container resources
+        env:
+          ACCEPTANCE_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node infra/acceptance/measure-legacy-baseline.cjs --legacy-fixture
+
+      - name: Retain actual operating baseline on success or failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legacy-operating-baseline
+          path: docs/acceptance/evidence/issue66-operating-baseline-*.json
+          if-no-files-found: warn
+
       - name: Check container status
         run: docker compose ps
 

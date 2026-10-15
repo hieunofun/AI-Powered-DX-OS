@@ -55,6 +55,9 @@ async function main() {
     resources.containers = { source: sourceId, restore: restoreId }; resources.postgresVersion = { source: (await f.hot.query('SELECT version() AS value')).rows[0].value, restore: (await control.query('SELECT version() AS value')).rows[0].value };
   });
   await check('actual source append and cold projector retain IDs/sequences/lineage beyond JS safe integers', async () => {
+    // Never rewind the source sequence or mix a previous rehearsal's rows into this three-snapshot workload.
+    assert.equal((await f.hot.query('SELECT count(*)::text AS n FROM history_fixture_events')).rows[0].n, '0', 'Use a new isolated Compose project; preserve the previous source volume');
+    assert.equal((await f.cold.query('SELECT count(*)::text AS n FROM platform_history_snapshots')).rows[0].n, '0', 'Use a new isolated Compose project; never reset existing cold history');
     await f.hot.query("SELECT setval(pg_get_serial_sequence('history_fixture_events','sequence'),9007199254740993,false)");
     const id = randomUUID(), first = await f.append(f.contexts.worker, entry(f.contexts.worker, id)); assert.equal(first.sequence, '9007199254740993');
     await f.append(f.contexts.worker, entry(f.contexts.worker, id, '2')); await f.append(f.contexts.worker, entry(f.contexts.worker, randomUUID()));
@@ -104,9 +107,11 @@ async function main() {
   });
 }
 main().catch(error => { failure = { code: error.code || error.name, message: error.message }; console.error('FAIL ' + failure.message); process.exitCode = 1; }).finally(async () => {
-  const files = ['infra/acceptance/compose.yaml', 'infra/acceptance/restore-rehearsal.cjs', 'infra/history/runtime-fixture.cjs', 'database/proposed/issue57-cold-history.sql'];
+  const files = ['infra/acceptance/compose.yaml', 'infra/acceptance/restore-rehearsal.cjs', 'infra/history/runtime-fixture.cjs', 'database/proposed/issue57-cold-history.sql',
+    'apps/api/src/platform/evidence/file-safety.ts', 'apps/api/src/platform/evidence/evidence.controller.ts', 'apps/api/src/platform/evidence/evidence-context.ts', 'apps/api/src/platform/evidence/evidence.types.ts',
+    ...fs.readdirSync(path.join(root, 'apps/api/src/platform/history')).filter(name => name.endsWith('.ts') && !name.endsWith('.spec.ts')).map(name => 'apps/api/src/platform/history/' + name)];
   const sourceHashes = Object.fromEntries(files.map(file => [file, sha(fs.readFileSync(path.join(root, file)))]));
-  const report = { issue: 66, profile: 'COMPONENT_RESTORE_REHEARSAL', acceptanceStatus: 'PARTIAL', startedAt, finishedAt: new Date().toISOString(), commit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(), environment: { node: process.version, platform: process.platform, architecture: process.arch, cpuThreads: os.cpus().length, hostMemoryBytes: os.totalmem(), kernel: os.release() },
+  const report = { issue: 66, profile: 'COMPONENT_RESTORE_REHEARSAL', acceptanceStatus: 'PARTIAL', startedAt, finishedAt: new Date().toISOString(), candidateCommit: process.env.ACCEPTANCE_CANDIDATE_SHA || null, commit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(), environment: { node: process.version, platform: process.platform, architecture: process.arch, cpuThreads: os.cpus().length, hostMemoryBytes: os.totalmem(), kernel: os.release() },
     checks, resources, times, sourceHashes, actualAiCalls: 0, limitations: ['Synthetic owning source/identity/evidence-reference ports, not production #43/#50 authority', 'No original object bytes, native Flowable/ImmuDB/trust backup or verification; complete AT-12 blocked on #65',
       'New empty target databases only; no production restore, volume deletion, live-worker quiescence or destructive rollback', 'Fresh source fixture plus forward schema initialization is not a legacy upgrade proof', 'No full AT-01..12 or release qualification claim'], ...(failure ? { failure } : {}) };
   const directory = path.join(root, 'docs/acceptance/evidence'); fs.mkdirSync(directory, { recursive: true }); const target = path.join(directory, 'issue66-restore-rehearsal-' + new Date().toISOString().replace(/\D/g, '') + '.json'); fs.writeFileSync(target, JSON.stringify(report, null, 2) + '\n', { flag: 'wx' }); console.log('Retained ' + path.relative(root, target));

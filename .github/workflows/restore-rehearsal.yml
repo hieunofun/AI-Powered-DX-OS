@@ -15,6 +15,9 @@ jobs:
   native-history-restore:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      ACCEPTANCE_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      COMPOSE_PROJECT_NAME: opendx-issue66-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,7 +32,6 @@ jobs:
       - name: Record current acceptance dependencies without qualifying component fixtures
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          ACCEPTANCE_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: node infra/acceptance/collect-github.cjs
       - name: Start isolated source and separate restore target
         run: |
