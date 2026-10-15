@@ -6,6 +6,8 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
+- System acceptance candidate (#66): read-only BRS/GitHub release qualification audit, native isolated hot/cold PostgreSQL restore rehearsal with exact hashes/BIGINT preservation and actual SELECT-only role checks, plus scoped workload/resource evidence. Integrated AT-01..12 and owner production/restore/review gates remain explicit.
+
 - AI quality/security evaluation candidate (#63): fixed-denominator OCR/mapping/grounded-answer scorers, separately frozen synthetic document-injection corpus and source-bound citation metrics, malicious upload/tenant/worker/tool probes with retained failures and explicit owner integration gates.
 
 - Proposed AI mediation (#54): source-bound extractive Gemini explanations, server missing-evidence reporting, closed R0–R2 action registry with R3/transfer denial, current policy/independent decision/transactional execution ports, persisted leases/idempotency/history and tenant control epochs. Real synthetic model evaluation and labelled runtime fixtures are separate; production #43/#50 integration remains gated.

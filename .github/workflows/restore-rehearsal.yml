@@ -1,0 +1,50 @@
+name: Component restore rehearsal
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'infra/acceptance/**'
+      - 'docs/acceptance/**'
+      - '.github/workflows/restore-rehearsal.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-history-restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build:api
+      - run: node --test infra/acceptance/assess.test.cjs
+      - name: Record current acceptance dependencies without qualifying component fixtures
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          ACCEPTANCE_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node infra/acceptance/collect-github.cjs
+      - name: Start isolated source and separate restore target
+        run: docker compose -f infra/acceptance/compose.yaml up -d
+      - name: Rehearse native hot/cold restore with exact IDs, hashes and real SQL roles
+        run: node infra/acceptance/restore-rehearsal.cjs --isolated-rehearsal --wait-ready
+      - name: Retain component reports and native synthetic database dumps
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: component-history-restore
+          path: |
+            docs/acceptance/evidence/issue66-*.json
+            tmp/issue66-*/*.dump
+          if-no-files-found: warn
+      - name: Print isolated fixture status on failure
+        if: failure()
+        run: docker compose -f infra/acceptance/compose.yaml ps
+      - name: Stop source/restore fixtures without deleting data
+        if: always()
+        run: docker compose -f infra/acceptance/compose.yaml stop

@@ -1,5 +1,7 @@
 # Shell acceptance scripts must run identically in Linux CI and Windows/WSL.
 *.sh text eol=lf
+infra/acceptance/*.cjs text eol=lf
+infra/acceptance/*.yaml text eol=lf
 infra/evaluation/*.cjs text eol=lf
 infra/evaluation/fixtures/*.json text eol=lf
 apps/api/src/ai/extraction/adversarial-boundaries.spec.ts text eol=lf
