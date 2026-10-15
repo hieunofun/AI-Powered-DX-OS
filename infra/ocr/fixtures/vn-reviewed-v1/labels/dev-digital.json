@@ -1,0 +1,21 @@
+{
+  "values": {
+    "/purchase_order_id": "00000000-0000-4000-8000-000000000126",
+    "/seller_tax_code": "SYNTH-MST-001",
+    "/buyer_tax_code": "SYNTH-MST-101",
+    "/invoice_number": "OCR-DEV-001",
+    "/invoice_date": "2026-10-01",
+    "/currency": "VND",
+    "/subtotal": "1000000.00",
+    "/tax_amount": "100000.00",
+    "/total_amount": "1100000.00",
+    "/lines/0/description": "Hộp mực mẫu",
+    "/lines/0/sku": "CE285A",
+    "/lines/0/quantity": "2",
+    "/lines/0/unit_price": "500000.00",
+    "/lines/0/tax_rate": "0.10",
+    "/lines/0/line_subtotal": "1000000.00",
+    "/lines/0/tax_amount": "100000.00",
+    "/lines/0/line_total": "1100000.00"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "values": {
+    "/purchase_order_id": "00000000-0000-4000-8000-000000000426",
+    "/seller_tax_code": "SYNTH-MST-004",
+    "/buyer_tax_code": "SYNTH-MST-104",
+    "/invoice_number": "OCR-HOLD-102",
+    "/invoice_date": "2026-10-04",
+    "/currency": "VND",
+    "/subtotal": "125000.00",
+    "/tax_amount": "10000.00",
+    "/total_amount": "135000.00",
+    "/lines/0/description": "Thiết bị mẫu",
+    "/lines/0/sku": null,
+    "/lines/0/quantity": "1",
+    "/lines/0/unit_price": "125000.00",
+    "/lines/0/tax_rate": "0.08",
+    "/lines/0/line_subtotal": "125000.00",
+    "/lines/0/tax_amount": "10000.00",
+    "/lines/0/line_total": "135000.00"
+  }
+}

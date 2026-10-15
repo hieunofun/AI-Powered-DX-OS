@@ -1,0 +1,93 @@
+{
+  "started": "2026-10-15T14:11:16.942Z",
+  "completed": "2026-10-15T14:11:35.277Z",
+  "gitHead": "07de11e842bce8fa6c6643fdcf914ac32420bcef",
+  "worktreeDirty": false,
+  "sourceHashes": {
+    "apps/api/src/packs/openresolve/mediation/gemini-explanation.provider.ts": "73ef16906eef798aeee5131f8e10695ce9a0b8d27dea0988f324af9a45ae20db",
+    "apps/api/src/packs/openresolve/mediation/mediation-validation.ts": "e674586a87d0f4a467c39f874bbc7deec04b7e30e3fee05b6e219bafd524cc32",
+    "apps/api/src/packs/openresolve/mediation/mediation.module.ts": "d7c0bb251dc4c9eb4bd3e668e095a03723b5a0f5155c3ea17c237d00ffa93d97",
+    "apps/api/src/packs/openresolve/mediation/mediation.repository.ts": "b39a5ca37dae8eb84d4e2716a76314f02321165e8cda89b898aa337ab48c226f",
+    "apps/api/src/packs/openresolve/mediation/mediation.service.ts": "08e0f94e5e85f5c0258145565d6477c581b219584304c467ec4bdf4943a74b80",
+    "apps/api/src/packs/openresolve/mediation/mediation.types.ts": "751fe295d0399870d1a9dd6bea50f856b0e6f21126e0f6c13610c5bd53179a1e",
+    "apps/api/src/platform/evidence/clamav.scanner.ts": "bc129856f08e0143317ec13fe0dae625ec4186d012b1bae61d6cea2396dec524",
+    "apps/api/src/platform/evidence/evidence-context.ts": "41409188b369396514ee58d4790e7521c5c318822f5e452aea212c3d3e1b734f",
+    "apps/api/src/platform/evidence/evidence-storage.ts": "52f6cca7eaf2c0c7faf4973f42c39f50ba70c1c9431f8c7e8cd9ae5fe2cc1eaa",
+    "apps/api/src/platform/evidence/evidence.controller.ts": "9b5cbd49df360a6a7666948b60b62a3920ece3766ea1457bb975ab2ea93e135c",
+    "apps/api/src/platform/evidence/evidence.module.ts": "581de09b460f0f9239dcb5199d709dab51e47dc9f2dec3f08b8498faca6a16ff",
+    "apps/api/src/platform/evidence/evidence.repository.ts": "26729f4a3b12dd47180fe34eee5afc310c158fc1a6281cbafb2943a6bd282a98",
+    "apps/api/src/platform/evidence/evidence.service.ts": "0b82ba9273346c71ad9b574de250781963606ff3fb7d5bc048463da8222a2eff",
+    "apps/api/src/platform/evidence/evidence.types.ts": "ed6f37a0526e74ef9ad96151cd28f1bf3366f0b07d83424f459554c8b1cce83c",
+    "apps/api/src/platform/evidence/file-safety.ts": "0a0f1c6e957da3cef0377203792c302c5bc41ab08eeb88fc96591a0a67baf4f4"
+  },
+  "supportHashes": {
+    "infra/mediation/runtime-fixture.cjs": "6ed890c650bcb8faf338bd02838ca488ee2a4aa478d4447ebffec21d58391bb2",
+    "infra/mediation/validate-runtime.cjs": "d024a461416cff6fe073e3c90862a095b43647a84fc974a6ea5e334610611623",
+    "database/proposed/issue41-evidence-intake.sql": "458376107d74362b092a13edc711ec3d5a3e0ebec7c561b3f4b28dc15fcd1222",
+    "database/proposed/issue54-ai-mediation.sql": "bf89aa6c003a9776061c6495cfdb9739242c89a27a300fbf805ba867daca5ae8",
+    "packages/contracts/opendx/proposed/issue54-mediation.schema.json": "ef39586e84198953987c866a3ffd4d1a95ecc52afefc1d7dd7b9718294b7001d"
+  },
+  "checks": [
+    {
+      "name": "actual exact-engine fresh-definition complete-stream scanner readiness",
+      "status": "PASS"
+    },
+    {
+      "name": "actual private evidence bytes are scanned before labelled reviewed case facts, unscanned source stays quarantined",
+      "status": "FAIL",
+      "code": "FORBIDDEN"
+    }
+  ],
+  "resources": {},
+  "retainedState": {
+    "explanations": [],
+    "proposals": [],
+    "history": [],
+    "actualFixtureActions": [],
+    "evidence": [
+      {
+        "history": [],
+        "accepted": false,
+        "evidence": {
+          "id": "073cb756-6387-4b66-a723-5207c85b717a",
+          "sha256": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+          "source": {
+            "kind": "USER_UPLOAD"
+          },
+          "filename": "FICTIONAL-case-evidence.xml",
+          "revision": 1,
+          "tenant_id": "6f910d12-fd64-44ea-a8da-00b1d4955284",
+          "created_at": "2026-10-15T14:11:35.262Z",
+          "created_by": "fixture-worker",
+          "legal_hold": false,
+          "media_type": "application/xml",
+          "size_bytes": 79,
+          "updated_at": "2026-10-15T14:11:35.262Z",
+          "retention_class": "STANDARD",
+          "processing_state": "NOT_STARTED",
+          "quarantine_state": "PENDING_UPLOAD"
+        },
+        "expiresAt": "2026-10-15T14:26:35.262Z",
+        "scanAttempts": 0,
+        "uploadAttempts": 0
+      }
+    ]
+  },
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "linux",
+    "services": "actual isolated PostgreSQL/MinIO/pinned fresh ClamAV/Nest HTTP",
+    "identity": "static server identities and actual SQL membership/case/evidence grants, not production SSO",
+    "model": "explicit deterministic selection double; actual Gemini evaluation is a separate report",
+    "policyDecisionExecution": "actual SQL-backed fixture ports and append-only local case-action rows, not owning #50 production integration",
+    "fault": "injected exception after actual SQL, not process-kill recovery"
+  },
+  "workerDurationsMs": [],
+  "providerDoubleCalls": 0,
+  "actualProviderRequests": 0,
+  "limitations": [
+    "No production #43/#50 Case/policy/decision adapter, ledger receipt or workflow integration",
+    "No bank/HTTP/arbitrary code or R3 executor",
+    "No production load, process-kill or coordinated restore claim"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "version": "case-extractive-synthetic-v1",
+  "disclosure": "SYNTHETIC",
+  "cases": 8,
+  "dev": 4,
+  "heldOut": 4,
+  "sources": {
+    "path": "selection-inputs.json",
+    "sha256": "f73f9bf2af8ca53f2cd32223259cc4844894a8678712e880aded05e35cbb8bd7"
+  },
+  "labels": {
+    "path": "selection-labels.json",
+    "sha256": "c8a32864fc7a47a3551a1c599f749b700025185af220cb71e59f0a7a63a3dce5"
+  },
+  "limitations": [
+    "Small team-authored fictional corpus, not independent production accuracy",
+    "Standalone selection evaluation uses explicit authorized-facts fixtures; real SQL/AV/policy/decision acceptance is separate",
+    "Exact relevant-alias matching is measured; schema validation alone is not answer relevance",
+    "No tool, approval or payment can be executed by this runner"
+  ]
+}
