@@ -14,6 +14,8 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 - Proposed external-order and cumulative receiving-sensor ingress (#51): immutable native receipts before acknowledgement, independent source schemas, tenant/source authorization, replay/conflict handling, bounded durable workers, CLEAN evidence witnesses and atomic pending case-intent/lineage handoff. Independent loopback HTTP simulators and isolated runtime acceptance retain their limitations; production #43/#53 integration and review remain gates.
 
+- Proposed separate cold history (#57): immutable source snapshots/lineage, atomic live/backfill cursors and runs, committed capture-watermark pagination, current ACL/retention/hold enforcement and explicitly scoped case/time/error metrics. SELECT-only reporting composition and separate-database acceptance remain distinct from production #43/#50 integration.
+
 - Proposed evidence lineage (#46): atomic raw/run/correction/confirmation snapshots and typed links, immutable history/deduplication, authorized graph pagination with encrypted cursors, literal filename/retention search and a verified identity/current membership boundary. Production #43 and match/decision integration remain pending.
 
 - Issue #26 (draft): durable PDF/image OCR suggestions, trusted PDF text spans, append-only corrections, exact invoice validation and atomic reviewed confirmation/outbox. The bounded PDF parser uses PDF.js 6.4.299 and proposes Node 24; real synthetic Gemini/PG/MinIO/AV acceptance is recorded, with tenant/domain integration gates explicit.

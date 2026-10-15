@@ -6,6 +6,8 @@ Issue #25 adds no dependency. Its team-authored semantic mapping adapter reuses 
 
 Issue #51 adds no upstream dependency or patch. Connector SQL/runtime/simulators reuse the exact PostgreSQL, MinIO, ClamAV, NestJS, Node, decimal and schema-validator versions already recorded below and pinned by the existing lockfile/service images. Existing notices and licensing gates apply; the project-authored reconciliation and fixture orchestration do not claim the upstream engines.
 
+Issue #57 adds no upstream dependency or patch. Cold projection/reporting reuses the existing exact PostgreSQL image, pg driver, Node crypto, Nest and Ajv versions pinned and attributed below. Existing notices/licensing gates remain; native persistence and validation engines are not project-authored algorithms.
+
 This document tracks external software evaluated and integrated into **SmartProcure-Pay**, including open-source and explicitly identified source-available components.
 
 Issue #10 corrects the stale ImmuDB license entry: the selected release is BUSL-1.1 source-available software, not currently Apache-2.0 or OSI-approved open source. Version-specific provenance and limitations follow the registry.

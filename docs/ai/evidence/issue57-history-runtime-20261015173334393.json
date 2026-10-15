@@ -1,0 +1,1591 @@
+{
+  "started": "2026-10-15T17:33:34.393Z",
+  "completed": "2026-10-15T17:33:39.289Z",
+  "gitHead": "fc148fad70f1f3c34f6d7e3a5980fa913f69e81b",
+  "worktreeDirty": false,
+  "sourceHashes": {
+    "apps/api/src/platform/history/history-projector.ts": "c1892b0ba70a80ec522cb3ed2252daa3383a915ef8ee196741781f1dbb4ac344",
+    "apps/api/src/platform/history/history-query.service.ts": "638426420a5e0c040a170e98f9e473f22a97927d9e0fda6b368dcce35c2abd42",
+    "apps/api/src/platform/history/history-validation.ts": "976d21090b17a1d91bd0b5f148ccf995600250c836cb0c5babaf9b530c24b619",
+    "apps/api/src/platform/history/history.module.ts": "465ac6f47335229a1c2ca88e745cb248eb471606c422ecf79ecb6793422eafdf",
+    "apps/api/src/platform/history/history.repository.ts": "f95c835a1ad7bf158dc3cc14b21a73e11ff2a56a730a540a03e0b66c95876b0e",
+    "apps/api/src/platform/history/history.types.ts": "5556d56d0adb84c426082b6be8f650fd8058ea2ac321eda70f303fb73fe7358c"
+  },
+  "supportHashes": {
+    "infra/history/runtime-fixture.cjs": "d49c81181d671a7f0f55e9deb08302ea60e808e81c8dad65f265ccfe1698abe6",
+    "infra/history/validate-runtime.cjs": "66fb0446c43bef9d4a6e6abd161ca55cda75d32ec6b964f1b3842e6d5a7d048b",
+    "database/proposed/issue57-cold-history.sql": "3137d136a7b3fc6fc3f259fc607210f5acea7b5b9bcea7aad1dded1479e03aba",
+    "packages/contracts/opendx/proposed/issue57-history.schema.json": "01873a8ad3379b6041cd7f2b9906eddd383658810e718c896eddf9d9a0c0d156"
+  },
+  "checks": [
+    {
+      "name": "actual hot and cold database separation with an unprivileged reporting identity",
+      "status": "PASS"
+    },
+    {
+      "name": "source commit/native snapshot preparation is explicitly synthetic and immutable",
+      "status": "PASS"
+    },
+    {
+      "name": "actual cold projection commits native snapshots, source/evidence lineage, cursor and immutable run together",
+      "status": "PASS"
+    },
+    {
+      "name": "read-only real SQL reports latest case/time/error metrics and canonical hashes, never hot mutations",
+      "status": "PASS"
+    },
+    {
+      "name": "backfill freezes its committed source watermark and replays originals without duplicate rows",
+      "status": "PASS"
+    },
+    {
+      "name": "new live events cannot enter a frozen historical page or an already-started backfill",
+      "status": "PASS"
+    },
+    {
+      "name": "actual write-role exception rolls back cold snapshots/lineage/cursor/run, recreated projector resumes once",
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent actual source/cold workers serialize or reject stale cursors without duplicated snapshots",
+      "status": "PASS"
+    },
+    {
+      "name": "current ACL excludes historical case payload/lineage and its contribution to metrics",
+      "status": "PASS"
+    },
+    {
+      "name": "expiry/legal hold retains originals, denies normal reads and requires an explicit current auditor grant",
+      "status": "PASS"
+    },
+    {
+      "name": "active foreign tenant uses its own projection while private tenant data and encrypted cursors remain isolated",
+      "status": "PASS"
+    },
+    {
+      "name": "live membership revocation and actual unavailable authority TCP connection fail closed",
+      "status": "PASS"
+    },
+    {
+      "name": "actual reporting role cannot INSERT into hot OLTP or cold history even in a read-write SQL transaction",
+      "status": "PASS"
+    },
+    {
+      "name": "append-only cold history/lineage/runs and monotonic checkpoints retain source hashes",
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "caseA": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+    "caseB": "ca31b1c5-fdc4-4b53-8948-b5f036d1f206",
+    "caseC": "1c19c9b4-5c7b-4956-b47b-3541a0458c33",
+    "backfillThrough": "4"
+  },
+  "retainedState": {
+    "sourceEvents": [
+      {
+        "event": {
+          "id": "50af0bfc-b65d-4936-b2f7-111a4cbcc73f",
+          "type": "openresolve.case.history.v1",
+          "schema_id": "openresolve.case-history.v1",
+          "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+          "occurred_at": "2026-01-02T00:00:00Z",
+          "payload_ref": {
+            "id": "ff736d77-05c8-4220-88d1-cc52d86e2f4c",
+            "type": "case-snapshot",
+            "pack_id": "openresolve"
+          },
+          "subject_ref": {
+            "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "correlation_id": "80bae37a-43d2-4117-b5eb-47e3fb690b4a"
+        },
+        "evidence": [
+          {
+            "ref": {
+              "id": "9d7b78a3-21a1-4542-9887-01b48f8ca7d6",
+              "type": "evidence",
+              "pack_id": "platform"
+            },
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "version": "synthetic-reference-1"
+          }
+        ],
+        "sequence": "1",
+        "snapshot": {
+          "ref": {
+            "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "sha256": "817fc55beee04474569ece9d08f5e601ed8a950b7de4995ccbf3e85b85034dc9",
+          "payload": {
+            "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+            "fixture": "fictional-case-history-v1",
+            "invoice_total": "550000.0000",
+            "classification": "ACTIVE",
+            "source_version": "1"
+          },
+          "version": "1"
+        },
+        "retention": {
+          "legal_hold": false,
+          "retain_until": "2099-01-01T00:00:00Z",
+          "policy_version": "fixture-retention-1",
+          "retention_class": "STANDARD"
+        },
+        "simulated": true,
+        "case_metric": {
+          "ref": {
+            "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "started_at": "2026-01-01T00:00:00Z",
+          "classification": "ACTIVE"
+        }
+      },
+      {
+        "event": {
+          "id": "0ce48605-6e23-49c8-92f3-ece2be980997",
+          "type": "openresolve.case.history.v1",
+          "schema_id": "openresolve.case-history.v1",
+          "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+          "occurred_at": "2026-01-02T00:00:00Z",
+          "payload_ref": {
+            "id": "4d3eb5e3-6e65-41e4-a1d7-3dc7abf111ff",
+            "type": "case-snapshot",
+            "pack_id": "openresolve"
+          },
+          "subject_ref": {
+            "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "correlation_id": "a3a6c2a1-39e3-4c0b-b25c-465a7ec22391"
+        },
+        "evidence": [
+          {
+            "ref": {
+              "id": "46baef6c-c6c1-4e70-ac0e-8ae1da38b274",
+              "type": "evidence",
+              "pack_id": "platform"
+            },
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "version": "synthetic-reference-1"
+          }
+        ],
+        "sequence": "2",
+        "snapshot": {
+          "ref": {
+            "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "sha256": "cd13c143c8e4e7ed3c7f8bf6d17e7c3abcf3d2d5d47677d86ad4e4bd65f211f1",
+          "payload": {
+            "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+            "fixture": "fictional-case-history-v1",
+            "invoice_total": "550000.0000",
+            "classification": "COMPLETED",
+            "source_version": "2"
+          },
+          "version": "2"
+        },
+        "retention": {
+          "legal_hold": false,
+          "retain_until": "2099-01-01T00:00:00Z",
+          "policy_version": "fixture-retention-1",
+          "retention_class": "STANDARD"
+        },
+        "simulated": true,
+        "case_metric": {
+          "ref": {
+            "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "started_at": "2026-01-01T00:00:00Z",
+          "finished_at": "2026-01-01T00:01:00.000Z",
+          "classification": "COMPLETED"
+        }
+      },
+      {
+        "event": {
+          "id": "6602ac84-abda-4a22-b587-1bce784e2b34",
+          "type": "openresolve.case.history.v1",
+          "schema_id": "openresolve.case-history.v1",
+          "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+          "occurred_at": "2026-01-02T00:00:00Z",
+          "payload_ref": {
+            "id": "d9a26de1-16b4-4117-a223-1913703840b4",
+            "type": "case-snapshot",
+            "pack_id": "openresolve"
+          },
+          "subject_ref": {
+            "id": "ca31b1c5-fdc4-4b53-8948-b5f036d1f206",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "correlation_id": "48e24ab2-2cda-4d93-b6d4-6c8065e88996"
+        },
+        "evidence": [
+          {
+            "ref": {
+              "id": "acb5d2db-d67b-4d8d-91a9-4f631242789a",
+              "type": "evidence",
+              "pack_id": "platform"
+            },
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "version": "synthetic-reference-1"
+          }
+        ],
+        "sequence": "3",
+        "snapshot": {
+          "ref": {
+            "id": "ca31b1c5-fdc4-4b53-8948-b5f036d1f206",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "sha256": "e18b13e2ea3c3b8496313e96dee06297f33754212dc129fecda86e90ac946db3",
+          "payload": {
+            "id": "ca31b1c5-fdc4-4b53-8948-b5f036d1f206",
+            "fixture": "fictional-case-history-v1",
+            "invoice_total": "550000.0000",
+            "classification": "ERROR",
+            "source_version": "1"
+          },
+          "version": "1"
+        },
+        "retention": {
+          "legal_hold": false,
+          "retain_until": "2099-01-01T00:00:00Z",
+          "policy_version": "fixture-retention-1",
+          "retention_class": "STANDARD"
+        },
+        "simulated": true,
+        "case_metric": {
+          "ref": {
+            "id": "ca31b1c5-fdc4-4b53-8948-b5f036d1f206",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "error_code": "UPSTREAM_TIMEOUT",
+          "started_at": "2026-01-01T00:00:00Z",
+          "finished_at": "2026-01-01T00:02:00.000Z",
+          "classification": "ERROR"
+        }
+      },
+      {
+        "event": {
+          "id": "078bca67-af30-448c-8a30-c4a06c3d22ce",
+          "type": "openresolve.case.history.v1",
+          "schema_id": "openresolve.case-history.v1",
+          "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+          "occurred_at": "2026-01-02T00:00:00Z",
+          "payload_ref": {
+            "id": "c21cde70-9243-4281-a372-40b403185a6a",
+            "type": "case-snapshot",
+            "pack_id": "openresolve"
+          },
+          "subject_ref": {
+            "id": "1c19c9b4-5c7b-4956-b47b-3541a0458c33",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "correlation_id": "25f483c0-e16c-4cf8-8de5-2f2743bf4712"
+        },
+        "evidence": [
+          {
+            "ref": {
+              "id": "b0be7670-a329-410e-9672-562710205fba",
+              "type": "evidence",
+              "pack_id": "platform"
+            },
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "version": "synthetic-reference-1"
+          }
+        ],
+        "sequence": "4",
+        "snapshot": {
+          "ref": {
+            "id": "1c19c9b4-5c7b-4956-b47b-3541a0458c33",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "sha256": "2555766dabbf32e5e73ff2389642f43f8edd1584fd865dffd0e21a490baf8277",
+          "payload": {
+            "id": "1c19c9b4-5c7b-4956-b47b-3541a0458c33",
+            "fixture": "fictional-case-history-v1",
+            "invoice_total": "550000.0000",
+            "classification": "ACTIVE",
+            "source_version": "1"
+          },
+          "version": "1"
+        },
+        "retention": {
+          "legal_hold": false,
+          "retain_until": "2099-01-01T00:00:00Z",
+          "policy_version": "fixture-retention-1",
+          "retention_class": "STANDARD"
+        },
+        "simulated": true,
+        "case_metric": {
+          "ref": {
+            "id": "1c19c9b4-5c7b-4956-b47b-3541a0458c33",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "started_at": "2026-01-01T00:00:00Z",
+          "classification": "ACTIVE"
+        }
+      },
+      {
+        "event": {
+          "id": "be985da8-d99d-4c26-b59d-dbcac67b4dfe",
+          "type": "openresolve.case.history.v1",
+          "schema_id": "openresolve.case-history.v1",
+          "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+          "occurred_at": "2026-01-02T00:00:00Z",
+          "payload_ref": {
+            "id": "e96cf14a-71ea-498c-9c2f-567844a6d163",
+            "type": "case-snapshot",
+            "pack_id": "openresolve"
+          },
+          "subject_ref": {
+            "id": "7444de49-c3c1-4bc9-b43d-f48d8e4c9f3b",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "correlation_id": "9c288caa-940b-40eb-8e9d-ce0a0a250280"
+        },
+        "evidence": [
+          {
+            "ref": {
+              "id": "66c96aac-8916-48c4-b176-8640fda1e83f",
+              "type": "evidence",
+              "pack_id": "platform"
+            },
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "version": "synthetic-reference-1"
+          }
+        ],
+        "sequence": "6",
+        "snapshot": {
+          "ref": {
+            "id": "7444de49-c3c1-4bc9-b43d-f48d8e4c9f3b",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "sha256": "d8fe08c25f715e61a2dc84f4f41998eedfbaef73b817933e48516c34be996e51",
+          "payload": {
+            "id": "7444de49-c3c1-4bc9-b43d-f48d8e4c9f3b",
+            "fixture": "fictional-case-history-v1",
+            "invoice_total": "550000.0000",
+            "classification": "COMPLETED",
+            "source_version": "1"
+          },
+          "version": "1"
+        },
+        "retention": {
+          "legal_hold": false,
+          "retain_until": "2099-01-01T00:00:00Z",
+          "policy_version": "fixture-retention-1",
+          "retention_class": "STANDARD"
+        },
+        "simulated": true,
+        "case_metric": {
+          "ref": {
+            "id": "7444de49-c3c1-4bc9-b43d-f48d8e4c9f3b",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "started_at": "2026-01-01T00:00:00Z",
+          "finished_at": "2026-01-01T00:00:30.000Z",
+          "classification": "COMPLETED"
+        }
+      },
+      {
+        "event": {
+          "id": "6c8e5412-8af9-450f-be9c-16d77357a505",
+          "type": "openresolve.case.history.v1",
+          "schema_id": "openresolve.case-history.v1",
+          "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+          "occurred_at": "2026-01-02T00:00:00Z",
+          "payload_ref": {
+            "id": "144b980c-0590-4260-8e3d-8cd5d365a8db",
+            "type": "case-snapshot",
+            "pack_id": "openresolve"
+          },
+          "subject_ref": {
+            "id": "2f0a0853-e3b7-4058-88f0-a117865aa1df",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "correlation_id": "b742c9dd-0cdb-48a9-81f3-897cfe68b506"
+        },
+        "evidence": [
+          {
+            "ref": {
+              "id": "ada47a35-1f2d-4afb-90a7-b8b060cb97de",
+              "type": "evidence",
+              "pack_id": "platform"
+            },
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "version": "synthetic-reference-1"
+          }
+        ],
+        "sequence": "7",
+        "snapshot": {
+          "ref": {
+            "id": "2f0a0853-e3b7-4058-88f0-a117865aa1df",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "sha256": "314466305fd08327d766d0e8ff69e801f964037ecb95bd3a1c13fdc4a6cfac18",
+          "payload": {
+            "id": "2f0a0853-e3b7-4058-88f0-a117865aa1df",
+            "fixture": "fictional-case-history-v1",
+            "invoice_total": "550000.0000",
+            "classification": "COMPLETED",
+            "source_version": "1"
+          },
+          "version": "1"
+        },
+        "retention": {
+          "legal_hold": false,
+          "retain_until": "2099-01-01T00:00:00Z",
+          "policy_version": "fixture-retention-1",
+          "retention_class": "STANDARD"
+        },
+        "simulated": true,
+        "case_metric": {
+          "ref": {
+            "id": "2f0a0853-e3b7-4058-88f0-a117865aa1df",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "started_at": "2026-01-01T00:00:00Z",
+          "finished_at": "2026-01-01T00:01:00.000Z",
+          "classification": "COMPLETED"
+        }
+      },
+      {
+        "event": {
+          "id": "de4ba409-0a40-4c38-ac5c-31f4d290cf39",
+          "type": "openresolve.case.history.v1",
+          "schema_id": "openresolve.case-history.v1",
+          "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+          "occurred_at": "2026-01-02T00:00:00Z",
+          "payload_ref": {
+            "id": "0306f61b-bae1-43e7-bcd2-8d620b275245",
+            "type": "case-snapshot",
+            "pack_id": "openresolve"
+          },
+          "subject_ref": {
+            "id": "3b0fd3fe-fd81-480d-9c31-57cd01d692df",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "correlation_id": "c6e666c6-6f02-4c89-902d-90ca9d356e69"
+        },
+        "evidence": [
+          {
+            "ref": {
+              "id": "e19e39ff-6152-4d8d-8d77-62a190d7dc50",
+              "type": "evidence",
+              "pack_id": "platform"
+            },
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "version": "synthetic-reference-1"
+          }
+        ],
+        "sequence": "8",
+        "snapshot": {
+          "ref": {
+            "id": "3b0fd3fe-fd81-480d-9c31-57cd01d692df",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "sha256": "78f925d9caa961edaceeea279d347802bf4ccdcfbb3d094880ea8ec75b0cb4d9",
+          "payload": {
+            "id": "3b0fd3fe-fd81-480d-9c31-57cd01d692df",
+            "fixture": "fictional-case-history-v1",
+            "invoice_total": "550000.0000",
+            "classification": "COMPLETED",
+            "source_version": "1"
+          },
+          "version": "1"
+        },
+        "retention": {
+          "legal_hold": false,
+          "retain_until": "2099-01-01T00:00:00Z",
+          "policy_version": "fixture-retention-1",
+          "retention_class": "STANDARD"
+        },
+        "simulated": true,
+        "case_metric": {
+          "ref": {
+            "id": "3b0fd3fe-fd81-480d-9c31-57cd01d692df",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "started_at": "2026-01-01T00:00:00Z",
+          "finished_at": "2026-01-01T00:01:00.000Z",
+          "classification": "COMPLETED"
+        }
+      }
+    ],
+    "coldSnapshots": [
+      {
+        "capture_sequence": "1",
+        "data": {
+          "id": "53aa70f9-c93d-498f-af84-fe954be03990",
+          "entry": {
+            "event": {
+              "id": "50af0bfc-b65d-4936-b2f7-111a4cbcc73f",
+              "type": "openresolve.case.history.v1",
+              "schema_id": "openresolve.case-history.v1",
+              "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+              "occurred_at": "2026-01-02T00:00:00Z",
+              "payload_ref": {
+                "id": "ff736d77-05c8-4220-88d1-cc52d86e2f4c",
+                "type": "case-snapshot",
+                "pack_id": "openresolve"
+              },
+              "subject_ref": {
+                "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "correlation_id": "80bae37a-43d2-4117-b5eb-47e3fb690b4a"
+            },
+            "evidence": [
+              {
+                "ref": {
+                  "id": "9d7b78a3-21a1-4542-9887-01b48f8ca7d6",
+                  "type": "evidence",
+                  "pack_id": "platform"
+                },
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "version": "synthetic-reference-1"
+              }
+            ],
+            "sequence": "1",
+            "snapshot": {
+              "ref": {
+                "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "sha256": "817fc55beee04474569ece9d08f5e601ed8a950b7de4995ccbf3e85b85034dc9",
+              "payload": {
+                "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+                "fixture": "fictional-case-history-v1",
+                "invoice_total": "550000.0000",
+                "classification": "ACTIVE",
+                "source_version": "1"
+              },
+              "version": "1"
+            },
+            "retention": {
+              "legal_hold": false,
+              "retain_until": "2099-01-01T00:00:00Z",
+              "policy_version": "fixture-retention-1",
+              "retention_class": "STANDARD"
+            },
+            "simulated": true,
+            "case_metric": {
+              "ref": {
+                "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "started_at": "2026-01-01T00:00:00Z",
+              "classification": "ACTIVE"
+            }
+          },
+          "epoch": "183517b7-0352-47de-940f-7f47e584f47e",
+          "stream": "case.history",
+          "tenantId": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+          "capturedAt": "2026-10-15T17:33:38.783Z",
+          "nativeHash": "a325adac609317d118471dc9a8a2d40cba78e7b7a782944202fe920c9dcfb7e3"
+        }
+      },
+      {
+        "capture_sequence": "2",
+        "data": {
+          "id": "4fbb3482-186b-4303-a4f9-8bc3b17dcd21",
+          "entry": {
+            "event": {
+              "id": "0ce48605-6e23-49c8-92f3-ece2be980997",
+              "type": "openresolve.case.history.v1",
+              "schema_id": "openresolve.case-history.v1",
+              "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+              "occurred_at": "2026-01-02T00:00:00Z",
+              "payload_ref": {
+                "id": "4d3eb5e3-6e65-41e4-a1d7-3dc7abf111ff",
+                "type": "case-snapshot",
+                "pack_id": "openresolve"
+              },
+              "subject_ref": {
+                "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "correlation_id": "a3a6c2a1-39e3-4c0b-b25c-465a7ec22391"
+            },
+            "evidence": [
+              {
+                "ref": {
+                  "id": "46baef6c-c6c1-4e70-ac0e-8ae1da38b274",
+                  "type": "evidence",
+                  "pack_id": "platform"
+                },
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "version": "synthetic-reference-1"
+              }
+            ],
+            "sequence": "2",
+            "snapshot": {
+              "ref": {
+                "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "sha256": "cd13c143c8e4e7ed3c7f8bf6d17e7c3abcf3d2d5d47677d86ad4e4bd65f211f1",
+              "payload": {
+                "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+                "fixture": "fictional-case-history-v1",
+                "invoice_total": "550000.0000",
+                "classification": "COMPLETED",
+                "source_version": "2"
+              },
+              "version": "2"
+            },
+            "retention": {
+              "legal_hold": false,
+              "retain_until": "2099-01-01T00:00:00Z",
+              "policy_version": "fixture-retention-1",
+              "retention_class": "STANDARD"
+            },
+            "simulated": true,
+            "case_metric": {
+              "ref": {
+                "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "started_at": "2026-01-01T00:00:00Z",
+              "finished_at": "2026-01-01T00:01:00.000Z",
+              "classification": "COMPLETED"
+            }
+          },
+          "epoch": "183517b7-0352-47de-940f-7f47e584f47e",
+          "stream": "case.history",
+          "tenantId": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+          "capturedAt": "2026-10-15T17:33:38.783Z",
+          "nativeHash": "4c13b50868fbdf83cd0706a87f809188ebffe2b8f0311097ce356ba0f2e6615b"
+        }
+      },
+      {
+        "capture_sequence": "3",
+        "data": {
+          "id": "abe52f33-95dd-433e-bb08-d02d3b4d678b",
+          "entry": {
+            "event": {
+              "id": "6602ac84-abda-4a22-b587-1bce784e2b34",
+              "type": "openresolve.case.history.v1",
+              "schema_id": "openresolve.case-history.v1",
+              "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+              "occurred_at": "2026-01-02T00:00:00Z",
+              "payload_ref": {
+                "id": "d9a26de1-16b4-4117-a223-1913703840b4",
+                "type": "case-snapshot",
+                "pack_id": "openresolve"
+              },
+              "subject_ref": {
+                "id": "ca31b1c5-fdc4-4b53-8948-b5f036d1f206",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "correlation_id": "48e24ab2-2cda-4d93-b6d4-6c8065e88996"
+            },
+            "evidence": [
+              {
+                "ref": {
+                  "id": "acb5d2db-d67b-4d8d-91a9-4f631242789a",
+                  "type": "evidence",
+                  "pack_id": "platform"
+                },
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "version": "synthetic-reference-1"
+              }
+            ],
+            "sequence": "3",
+            "snapshot": {
+              "ref": {
+                "id": "ca31b1c5-fdc4-4b53-8948-b5f036d1f206",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "sha256": "e18b13e2ea3c3b8496313e96dee06297f33754212dc129fecda86e90ac946db3",
+              "payload": {
+                "id": "ca31b1c5-fdc4-4b53-8948-b5f036d1f206",
+                "fixture": "fictional-case-history-v1",
+                "invoice_total": "550000.0000",
+                "classification": "ERROR",
+                "source_version": "1"
+              },
+              "version": "1"
+            },
+            "retention": {
+              "legal_hold": false,
+              "retain_until": "2099-01-01T00:00:00Z",
+              "policy_version": "fixture-retention-1",
+              "retention_class": "STANDARD"
+            },
+            "simulated": true,
+            "case_metric": {
+              "ref": {
+                "id": "ca31b1c5-fdc4-4b53-8948-b5f036d1f206",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "error_code": "UPSTREAM_TIMEOUT",
+              "started_at": "2026-01-01T00:00:00Z",
+              "finished_at": "2026-01-01T00:02:00.000Z",
+              "classification": "ERROR"
+            }
+          },
+          "epoch": "183517b7-0352-47de-940f-7f47e584f47e",
+          "stream": "case.history",
+          "tenantId": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+          "capturedAt": "2026-10-15T17:33:38.783Z",
+          "nativeHash": "cd83912cd14fafd8db133423bd13090f73a4f89673c0349f2ff89a0b1e74699b"
+        }
+      },
+      {
+        "capture_sequence": "4",
+        "data": {
+          "id": "6c806a19-afd0-4d77-bddc-1b2535d1d4d4",
+          "entry": {
+            "event": {
+              "id": "078bca67-af30-448c-8a30-c4a06c3d22ce",
+              "type": "openresolve.case.history.v1",
+              "schema_id": "openresolve.case-history.v1",
+              "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+              "occurred_at": "2026-01-02T00:00:00Z",
+              "payload_ref": {
+                "id": "c21cde70-9243-4281-a372-40b403185a6a",
+                "type": "case-snapshot",
+                "pack_id": "openresolve"
+              },
+              "subject_ref": {
+                "id": "1c19c9b4-5c7b-4956-b47b-3541a0458c33",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "correlation_id": "25f483c0-e16c-4cf8-8de5-2f2743bf4712"
+            },
+            "evidence": [
+              {
+                "ref": {
+                  "id": "b0be7670-a329-410e-9672-562710205fba",
+                  "type": "evidence",
+                  "pack_id": "platform"
+                },
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "version": "synthetic-reference-1"
+              }
+            ],
+            "sequence": "4",
+            "snapshot": {
+              "ref": {
+                "id": "1c19c9b4-5c7b-4956-b47b-3541a0458c33",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "sha256": "2555766dabbf32e5e73ff2389642f43f8edd1584fd865dffd0e21a490baf8277",
+              "payload": {
+                "id": "1c19c9b4-5c7b-4956-b47b-3541a0458c33",
+                "fixture": "fictional-case-history-v1",
+                "invoice_total": "550000.0000",
+                "classification": "ACTIVE",
+                "source_version": "1"
+              },
+              "version": "1"
+            },
+            "retention": {
+              "legal_hold": false,
+              "retain_until": "2099-01-01T00:00:00Z",
+              "policy_version": "fixture-retention-1",
+              "retention_class": "STANDARD"
+            },
+            "simulated": true,
+            "case_metric": {
+              "ref": {
+                "id": "1c19c9b4-5c7b-4956-b47b-3541a0458c33",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "started_at": "2026-01-01T00:00:00Z",
+              "classification": "ACTIVE"
+            }
+          },
+          "epoch": "183517b7-0352-47de-940f-7f47e584f47e",
+          "stream": "case.history",
+          "tenantId": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+          "capturedAt": "2026-10-15T17:33:38.783Z",
+          "nativeHash": "17b67bfdb7d9b352d719998c560e10cd4774baba4c5e1d105f96b998eed0529d"
+        }
+      },
+      {
+        "capture_sequence": "9",
+        "data": {
+          "id": "df778f80-6834-40fa-95e5-2eb7ef3490a4",
+          "entry": {
+            "event": {
+              "id": "be985da8-d99d-4c26-b59d-dbcac67b4dfe",
+              "type": "openresolve.case.history.v1",
+              "schema_id": "openresolve.case-history.v1",
+              "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+              "occurred_at": "2026-01-02T00:00:00Z",
+              "payload_ref": {
+                "id": "e96cf14a-71ea-498c-9c2f-567844a6d163",
+                "type": "case-snapshot",
+                "pack_id": "openresolve"
+              },
+              "subject_ref": {
+                "id": "7444de49-c3c1-4bc9-b43d-f48d8e4c9f3b",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "correlation_id": "9c288caa-940b-40eb-8e9d-ce0a0a250280"
+            },
+            "evidence": [
+              {
+                "ref": {
+                  "id": "66c96aac-8916-48c4-b176-8640fda1e83f",
+                  "type": "evidence",
+                  "pack_id": "platform"
+                },
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "version": "synthetic-reference-1"
+              }
+            ],
+            "sequence": "6",
+            "snapshot": {
+              "ref": {
+                "id": "7444de49-c3c1-4bc9-b43d-f48d8e4c9f3b",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "sha256": "d8fe08c25f715e61a2dc84f4f41998eedfbaef73b817933e48516c34be996e51",
+              "payload": {
+                "id": "7444de49-c3c1-4bc9-b43d-f48d8e4c9f3b",
+                "fixture": "fictional-case-history-v1",
+                "invoice_total": "550000.0000",
+                "classification": "COMPLETED",
+                "source_version": "1"
+              },
+              "version": "1"
+            },
+            "retention": {
+              "legal_hold": false,
+              "retain_until": "2099-01-01T00:00:00Z",
+              "policy_version": "fixture-retention-1",
+              "retention_class": "STANDARD"
+            },
+            "simulated": true,
+            "case_metric": {
+              "ref": {
+                "id": "7444de49-c3c1-4bc9-b43d-f48d8e4c9f3b",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "started_at": "2026-01-01T00:00:00Z",
+              "finished_at": "2026-01-01T00:00:30.000Z",
+              "classification": "COMPLETED"
+            }
+          },
+          "epoch": "183517b7-0352-47de-940f-7f47e584f47e",
+          "stream": "case.history",
+          "tenantId": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+          "capturedAt": "2026-10-15T17:33:38.990Z",
+          "nativeHash": "17fe0ebdd194c0d62a3c41cd5edefeae96922e18344faa656e805d755899bc58"
+        }
+      },
+      {
+        "capture_sequence": "11",
+        "data": {
+          "id": "2926823c-d3cb-4a62-955e-a26614007834",
+          "entry": {
+            "event": {
+              "id": "6c8e5412-8af9-450f-be9c-16d77357a505",
+              "type": "openresolve.case.history.v1",
+              "schema_id": "openresolve.case-history.v1",
+              "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+              "occurred_at": "2026-01-02T00:00:00Z",
+              "payload_ref": {
+                "id": "144b980c-0590-4260-8e3d-8cd5d365a8db",
+                "type": "case-snapshot",
+                "pack_id": "openresolve"
+              },
+              "subject_ref": {
+                "id": "2f0a0853-e3b7-4058-88f0-a117865aa1df",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "correlation_id": "b742c9dd-0cdb-48a9-81f3-897cfe68b506"
+            },
+            "evidence": [
+              {
+                "ref": {
+                  "id": "ada47a35-1f2d-4afb-90a7-b8b060cb97de",
+                  "type": "evidence",
+                  "pack_id": "platform"
+                },
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "version": "synthetic-reference-1"
+              }
+            ],
+            "sequence": "7",
+            "snapshot": {
+              "ref": {
+                "id": "2f0a0853-e3b7-4058-88f0-a117865aa1df",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "sha256": "314466305fd08327d766d0e8ff69e801f964037ecb95bd3a1c13fdc4a6cfac18",
+              "payload": {
+                "id": "2f0a0853-e3b7-4058-88f0-a117865aa1df",
+                "fixture": "fictional-case-history-v1",
+                "invoice_total": "550000.0000",
+                "classification": "COMPLETED",
+                "source_version": "1"
+              },
+              "version": "1"
+            },
+            "retention": {
+              "legal_hold": false,
+              "retain_until": "2099-01-01T00:00:00Z",
+              "policy_version": "fixture-retention-1",
+              "retention_class": "STANDARD"
+            },
+            "simulated": true,
+            "case_metric": {
+              "ref": {
+                "id": "2f0a0853-e3b7-4058-88f0-a117865aa1df",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "started_at": "2026-01-01T00:00:00Z",
+              "finished_at": "2026-01-01T00:01:00.000Z",
+              "classification": "COMPLETED"
+            }
+          },
+          "epoch": "183517b7-0352-47de-940f-7f47e584f47e",
+          "stream": "case.history",
+          "tenantId": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+          "capturedAt": "2026-10-15T17:33:39.064Z",
+          "nativeHash": "805acfe6a97912a45319441d8c12bde690eaedd12f1343e91f4e9b06249bb290"
+        }
+      },
+      {
+        "capture_sequence": "12",
+        "data": {
+          "id": "a8805c96-552e-431a-8edb-a4a07a117bc6",
+          "entry": {
+            "event": {
+              "id": "de4ba409-0a40-4c38-ac5c-31f4d290cf39",
+              "type": "openresolve.case.history.v1",
+              "schema_id": "openresolve.case-history.v1",
+              "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+              "occurred_at": "2026-01-02T00:00:00Z",
+              "payload_ref": {
+                "id": "0306f61b-bae1-43e7-bcd2-8d620b275245",
+                "type": "case-snapshot",
+                "pack_id": "openresolve"
+              },
+              "subject_ref": {
+                "id": "3b0fd3fe-fd81-480d-9c31-57cd01d692df",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "correlation_id": "c6e666c6-6f02-4c89-902d-90ca9d356e69"
+            },
+            "evidence": [
+              {
+                "ref": {
+                  "id": "e19e39ff-6152-4d8d-8d77-62a190d7dc50",
+                  "type": "evidence",
+                  "pack_id": "platform"
+                },
+                "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                "version": "synthetic-reference-1"
+              }
+            ],
+            "sequence": "8",
+            "snapshot": {
+              "ref": {
+                "id": "3b0fd3fe-fd81-480d-9c31-57cd01d692df",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "sha256": "78f925d9caa961edaceeea279d347802bf4ccdcfbb3d094880ea8ec75b0cb4d9",
+              "payload": {
+                "id": "3b0fd3fe-fd81-480d-9c31-57cd01d692df",
+                "fixture": "fictional-case-history-v1",
+                "invoice_total": "550000.0000",
+                "classification": "COMPLETED",
+                "source_version": "1"
+              },
+              "version": "1"
+            },
+            "retention": {
+              "legal_hold": false,
+              "retain_until": "2099-01-01T00:00:00Z",
+              "policy_version": "fixture-retention-1",
+              "retention_class": "STANDARD"
+            },
+            "simulated": true,
+            "case_metric": {
+              "ref": {
+                "id": "3b0fd3fe-fd81-480d-9c31-57cd01d692df",
+                "type": "case",
+                "pack_id": "openresolve"
+              },
+              "started_at": "2026-01-01T00:00:00Z",
+              "finished_at": "2026-01-01T00:01:00.000Z",
+              "classification": "COMPLETED"
+            }
+          },
+          "epoch": "183517b7-0352-47de-940f-7f47e584f47e",
+          "stream": "case.history",
+          "tenantId": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+          "capturedAt": "2026-10-15T17:33:39.085Z",
+          "nativeHash": "d9d5900b2bbef6a3a842fe709c7f2290be6121767422b103b4801f53173d5931"
+        }
+      }
+    ],
+    "lineage": [
+      {
+        "snapshot_id": "2926823c-d3cb-4a62-955e-a26614007834",
+        "ordinal": 0,
+        "edge": {
+          "to": {
+            "ref": {
+              "id": "2f0a0853-e3b7-4058-88f0-a117865aa1df",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "sha256": "314466305fd08327d766d0e8ff69e801f964037ecb95bd3a1c13fdc4a6cfac18",
+            "version": "1"
+          },
+          "from": {
+            "ref": {
+              "id": "2926823c-d3cb-4a62-955e-a26614007834",
+              "type": "history-snapshot",
+              "pack_id": "platform"
+            },
+            "sha256": "805acfe6a97912a45319441d8c12bde690eaedd12f1343e91f4e9b06249bb290",
+            "version": "cold-1"
+          },
+          "relation": "DERIVED_FROM",
+          "created_at": "2026-10-15T17:33:39.064Z"
+        }
+      },
+      {
+        "snapshot_id": "2926823c-d3cb-4a62-955e-a26614007834",
+        "ordinal": 1,
+        "edge": {
+          "to": {
+            "ref": {
+              "id": "ada47a35-1f2d-4afb-90a7-b8b060cb97de",
+              "type": "evidence",
+              "pack_id": "platform"
+            },
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "version": "synthetic-reference-1"
+          },
+          "from": {
+            "ref": {
+              "id": "2926823c-d3cb-4a62-955e-a26614007834",
+              "type": "history-snapshot",
+              "pack_id": "platform"
+            },
+            "sha256": "805acfe6a97912a45319441d8c12bde690eaedd12f1343e91f4e9b06249bb290",
+            "version": "cold-1"
+          },
+          "relation": "DERIVED_FROM",
+          "created_at": "2026-10-15T17:33:39.064Z"
+        }
+      },
+      {
+        "snapshot_id": "4fbb3482-186b-4303-a4f9-8bc3b17dcd21",
+        "ordinal": 0,
+        "edge": {
+          "to": {
+            "ref": {
+              "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "sha256": "cd13c143c8e4e7ed3c7f8bf6d17e7c3abcf3d2d5d47677d86ad4e4bd65f211f1",
+            "version": "2"
+          },
+          "from": {
+            "ref": {
+              "id": "4fbb3482-186b-4303-a4f9-8bc3b17dcd21",
+              "type": "history-snapshot",
+              "pack_id": "platform"
+            },
+            "sha256": "4c13b50868fbdf83cd0706a87f809188ebffe2b8f0311097ce356ba0f2e6615b",
+            "version": "cold-1"
+          },
+          "relation": "DERIVED_FROM",
+          "created_at": "2026-10-15T17:33:38.783Z"
+        }
+      },
+      {
+        "snapshot_id": "4fbb3482-186b-4303-a4f9-8bc3b17dcd21",
+        "ordinal": 1,
+        "edge": {
+          "to": {
+            "ref": {
+              "id": "46baef6c-c6c1-4e70-ac0e-8ae1da38b274",
+              "type": "evidence",
+              "pack_id": "platform"
+            },
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "version": "synthetic-reference-1"
+          },
+          "from": {
+            "ref": {
+              "id": "4fbb3482-186b-4303-a4f9-8bc3b17dcd21",
+              "type": "history-snapshot",
+              "pack_id": "platform"
+            },
+            "sha256": "4c13b50868fbdf83cd0706a87f809188ebffe2b8f0311097ce356ba0f2e6615b",
+            "version": "cold-1"
+          },
+          "relation": "DERIVED_FROM",
+          "created_at": "2026-10-15T17:33:38.783Z"
+        }
+      },
+      {
+        "snapshot_id": "53aa70f9-c93d-498f-af84-fe954be03990",
+        "ordinal": 0,
+        "edge": {
+          "to": {
+            "ref": {
+              "id": "0cf5a95b-d07a-425b-8eb1-92cf66bcfe8c",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "sha256": "817fc55beee04474569ece9d08f5e601ed8a950b7de4995ccbf3e85b85034dc9",
+            "version": "1"
+          },
+          "from": {
+            "ref": {
+              "id": "53aa70f9-c93d-498f-af84-fe954be03990",
+              "type": "history-snapshot",
+              "pack_id": "platform"
+            },
+            "sha256": "a325adac609317d118471dc9a8a2d40cba78e7b7a782944202fe920c9dcfb7e3",
+            "version": "cold-1"
+          },
+          "relation": "DERIVED_FROM",
+          "created_at": "2026-10-15T17:33:38.783Z"
+        }
+      },
+      {
+        "snapshot_id": "53aa70f9-c93d-498f-af84-fe954be03990",
+        "ordinal": 1,
+        "edge": {
+          "to": {
+            "ref": {
+              "id": "9d7b78a3-21a1-4542-9887-01b48f8ca7d6",
+              "type": "evidence",
+              "pack_id": "platform"
+            },
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "version": "synthetic-reference-1"
+          },
+          "from": {
+            "ref": {
+              "id": "53aa70f9-c93d-498f-af84-fe954be03990",
+              "type": "history-snapshot",
+              "pack_id": "platform"
+            },
+            "sha256": "a325adac609317d118471dc9a8a2d40cba78e7b7a782944202fe920c9dcfb7e3",
+            "version": "cold-1"
+          },
+          "relation": "DERIVED_FROM",
+          "created_at": "2026-10-15T17:33:38.783Z"
+        }
+      },
+      {
+        "snapshot_id": "6c806a19-afd0-4d77-bddc-1b2535d1d4d4",
+        "ordinal": 0,
+        "edge": {
+          "to": {
+            "ref": {
+              "id": "1c19c9b4-5c7b-4956-b47b-3541a0458c33",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "sha256": "2555766dabbf32e5e73ff2389642f43f8edd1584fd865dffd0e21a490baf8277",
+            "version": "1"
+          },
+          "from": {
+            "ref": {
+              "id": "6c806a19-afd0-4d77-bddc-1b2535d1d4d4",
+              "type": "history-snapshot",
+              "pack_id": "platform"
+            },
+            "sha256": "17b67bfdb7d9b352d719998c560e10cd4774baba4c5e1d105f96b998eed0529d",
+            "version": "cold-1"
+          },
+          "relation": "DERIVED_FROM",
+          "created_at": "2026-10-15T17:33:38.783Z"
+        }
+      },
+      {
+        "snapshot_id": "6c806a19-afd0-4d77-bddc-1b2535d1d4d4",
+        "ordinal": 1,
+        "edge": {
+          "to": {
+            "ref": {
+              "id": "b0be7670-a329-410e-9672-562710205fba",
+              "type": "evidence",
+              "pack_id": "platform"
+            },
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "version": "synthetic-reference-1"
+          },
+          "from": {
+            "ref": {
+              "id": "6c806a19-afd0-4d77-bddc-1b2535d1d4d4",
+              "type": "history-snapshot",
+              "pack_id": "platform"
+            },
+            "sha256": "17b67bfdb7d9b352d719998c560e10cd4774baba4c5e1d105f96b998eed0529d",
+            "version": "cold-1"
+          },
+          "relation": "DERIVED_FROM",
+          "created_at": "2026-10-15T17:33:38.783Z"
+        }
+      },
+      {
+        "snapshot_id": "a8805c96-552e-431a-8edb-a4a07a117bc6",
+        "ordinal": 0,
+        "edge": {
+          "to": {
+            "ref": {
+              "id": "3b0fd3fe-fd81-480d-9c31-57cd01d692df",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "sha256": "78f925d9caa961edaceeea279d347802bf4ccdcfbb3d094880ea8ec75b0cb4d9",
+            "version": "1"
+          },
+          "from": {
+            "ref": {
+              "id": "a8805c96-552e-431a-8edb-a4a07a117bc6",
+              "type": "history-snapshot",
+              "pack_id": "platform"
+            },
+            "sha256": "d9d5900b2bbef6a3a842fe709c7f2290be6121767422b103b4801f53173d5931",
+            "version": "cold-1"
+          },
+          "relation": "DERIVED_FROM",
+          "created_at": "2026-10-15T17:33:39.085Z"
+        }
+      },
+      {
+        "snapshot_id": "a8805c96-552e-431a-8edb-a4a07a117bc6",
+        "ordinal": 1,
+        "edge": {
+          "to": {
+            "ref": {
+              "id": "e19e39ff-6152-4d8d-8d77-62a190d7dc50",
+              "type": "evidence",
+              "pack_id": "platform"
+            },
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "version": "synthetic-reference-1"
+          },
+          "from": {
+            "ref": {
+              "id": "a8805c96-552e-431a-8edb-a4a07a117bc6",
+              "type": "history-snapshot",
+              "pack_id": "platform"
+            },
+            "sha256": "d9d5900b2bbef6a3a842fe709c7f2290be6121767422b103b4801f53173d5931",
+            "version": "cold-1"
+          },
+          "relation": "DERIVED_FROM",
+          "created_at": "2026-10-15T17:33:39.085Z"
+        }
+      },
+      {
+        "snapshot_id": "abe52f33-95dd-433e-bb08-d02d3b4d678b",
+        "ordinal": 0,
+        "edge": {
+          "to": {
+            "ref": {
+              "id": "ca31b1c5-fdc4-4b53-8948-b5f036d1f206",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "sha256": "e18b13e2ea3c3b8496313e96dee06297f33754212dc129fecda86e90ac946db3",
+            "version": "1"
+          },
+          "from": {
+            "ref": {
+              "id": "abe52f33-95dd-433e-bb08-d02d3b4d678b",
+              "type": "history-snapshot",
+              "pack_id": "platform"
+            },
+            "sha256": "cd83912cd14fafd8db133423bd13090f73a4f89673c0349f2ff89a0b1e74699b",
+            "version": "cold-1"
+          },
+          "relation": "DERIVED_FROM",
+          "created_at": "2026-10-15T17:33:38.783Z"
+        }
+      },
+      {
+        "snapshot_id": "abe52f33-95dd-433e-bb08-d02d3b4d678b",
+        "ordinal": 1,
+        "edge": {
+          "to": {
+            "ref": {
+              "id": "acb5d2db-d67b-4d8d-91a9-4f631242789a",
+              "type": "evidence",
+              "pack_id": "platform"
+            },
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "version": "synthetic-reference-1"
+          },
+          "from": {
+            "ref": {
+              "id": "abe52f33-95dd-433e-bb08-d02d3b4d678b",
+              "type": "history-snapshot",
+              "pack_id": "platform"
+            },
+            "sha256": "cd83912cd14fafd8db133423bd13090f73a4f89673c0349f2ff89a0b1e74699b",
+            "version": "cold-1"
+          },
+          "relation": "DERIVED_FROM",
+          "created_at": "2026-10-15T17:33:38.783Z"
+        }
+      },
+      {
+        "snapshot_id": "df778f80-6834-40fa-95e5-2eb7ef3490a4",
+        "ordinal": 0,
+        "edge": {
+          "to": {
+            "ref": {
+              "id": "7444de49-c3c1-4bc9-b43d-f48d8e4c9f3b",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "sha256": "d8fe08c25f715e61a2dc84f4f41998eedfbaef73b817933e48516c34be996e51",
+            "version": "1"
+          },
+          "from": {
+            "ref": {
+              "id": "df778f80-6834-40fa-95e5-2eb7ef3490a4",
+              "type": "history-snapshot",
+              "pack_id": "platform"
+            },
+            "sha256": "17fe0ebdd194c0d62a3c41cd5edefeae96922e18344faa656e805d755899bc58",
+            "version": "cold-1"
+          },
+          "relation": "DERIVED_FROM",
+          "created_at": "2026-10-15T17:33:38.990Z"
+        }
+      },
+      {
+        "snapshot_id": "df778f80-6834-40fa-95e5-2eb7ef3490a4",
+        "ordinal": 1,
+        "edge": {
+          "to": {
+            "ref": {
+              "id": "66c96aac-8916-48c4-b176-8640fda1e83f",
+              "type": "evidence",
+              "pack_id": "platform"
+            },
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "version": "synthetic-reference-1"
+          },
+          "from": {
+            "ref": {
+              "id": "df778f80-6834-40fa-95e5-2eb7ef3490a4",
+              "type": "history-snapshot",
+              "pack_id": "platform"
+            },
+            "sha256": "17fe0ebdd194c0d62a3c41cd5edefeae96922e18344faa656e805d755899bc58",
+            "version": "cold-1"
+          },
+          "relation": "DERIVED_FROM",
+          "created_at": "2026-10-15T17:33:38.990Z"
+        }
+      }
+    ],
+    "checkpoints": [
+      {
+        "mode": "LIVE",
+        "after": "8",
+        "epoch": "183517b7-0352-47de-940f-7f47e584f47e",
+        "jobId": "live",
+        "state": "SUCCEEDED",
+        "stream": "case.history",
+        "through": "8",
+        "tenantId": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+        "updatedAt": "2026-10-15T17:33:39.104Z"
+      },
+      {
+        "mode": "BACKFILL",
+        "after": "4",
+        "epoch": "183517b7-0352-47de-940f-7f47e584f47e",
+        "jobId": "e9c40fca-ddcd-4550-b139-a2224549e4ef",
+        "state": "SUCCEEDED",
+        "stream": "case.history",
+        "through": "4",
+        "tenantId": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+        "updatedAt": "2026-10-15T17:33:38.972Z"
+      }
+    ],
+    "runs": [
+      {
+        "id": "1",
+        "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+        "stream": "case.history",
+        "job_id": "live",
+        "previous_cursor": "0",
+        "scanned_through": "4",
+        "source_through": "4",
+        "inserted": 4,
+        "replayed": 0,
+        "captured_at": "2026-10-15T17:33:38.783Z",
+        "epoch": "183517b7-0352-47de-940f-7f47e584f47e"
+      },
+      {
+        "id": "2",
+        "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+        "stream": "case.history",
+        "job_id": "live",
+        "previous_cursor": "4",
+        "scanned_through": "4",
+        "source_through": "4",
+        "inserted": 0,
+        "replayed": 0,
+        "captured_at": "2026-10-15T17:33:38.810Z",
+        "epoch": "183517b7-0352-47de-940f-7f47e584f47e"
+      },
+      {
+        "id": "3",
+        "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+        "stream": "case.history",
+        "job_id": "e9c40fca-ddcd-4550-b139-a2224549e4ef",
+        "previous_cursor": "0",
+        "scanned_through": "2",
+        "source_through": "4",
+        "inserted": 0,
+        "replayed": 2,
+        "captured_at": "2026-10-15T17:33:38.912Z",
+        "epoch": "183517b7-0352-47de-940f-7f47e584f47e"
+      },
+      {
+        "id": "4",
+        "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+        "stream": "case.history",
+        "job_id": "e9c40fca-ddcd-4550-b139-a2224549e4ef",
+        "previous_cursor": "2",
+        "scanned_through": "4",
+        "source_through": "4",
+        "inserted": 0,
+        "replayed": 2,
+        "captured_at": "2026-10-15T17:33:38.972Z",
+        "epoch": "183517b7-0352-47de-940f-7f47e584f47e"
+      },
+      {
+        "id": "5",
+        "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+        "stream": "case.history",
+        "job_id": "live",
+        "previous_cursor": "4",
+        "scanned_through": "6",
+        "source_through": "6",
+        "inserted": 1,
+        "replayed": 0,
+        "captured_at": "2026-10-15T17:33:38.990Z",
+        "epoch": "183517b7-0352-47de-940f-7f47e584f47e"
+      },
+      {
+        "id": "7",
+        "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+        "stream": "case.history",
+        "job_id": "live",
+        "previous_cursor": "6",
+        "scanned_through": "7",
+        "source_through": "7",
+        "inserted": 1,
+        "replayed": 0,
+        "captured_at": "2026-10-15T17:33:39.064Z",
+        "epoch": "183517b7-0352-47de-940f-7f47e584f47e"
+      },
+      {
+        "id": "8",
+        "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+        "stream": "case.history",
+        "job_id": "live",
+        "previous_cursor": "7",
+        "scanned_through": "8",
+        "source_through": "8",
+        "inserted": 1,
+        "replayed": 0,
+        "captured_at": "2026-10-15T17:33:39.085Z",
+        "epoch": "183517b7-0352-47de-940f-7f47e584f47e"
+      },
+      {
+        "id": "9",
+        "tenant_id": "4d39baf7-4626-4b88-a389-8f83b09f506a",
+        "stream": "case.history",
+        "job_id": "live",
+        "previous_cursor": "8",
+        "scanned_through": "8",
+        "source_through": "8",
+        "inserted": 0,
+        "replayed": 0,
+        "captured_at": "2026-10-15T17:33:39.104Z",
+        "epoch": "183517b7-0352-47de-940f-7f47e584f47e"
+      }
+    ]
+  },
+  "projectionDurationsMs": [
+    36,
+    13,
+    25,
+    15,
+    15
+  ],
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "linux",
+    "services": "actual PostgreSQL separate hot/cold databases, SELECT-only reporting role, Nest HTTP",
+    "source": "explicit SQL-backed synthetic Case/Event/evidence-reference and identity/ACL/retention fixtures; production #43/#50 owning source absent",
+    "fault": "injected exception after actual cold snapshot/cursor/run SQL, not process-kill recovery"
+  },
+  "actualProviderRequests": 0,
+  "limitations": [
+    "No original evidence byte/AV/model or production SSO/Case/Decision/ledger integration claim",
+    "No hot deletion/cold purge or retention-administration API",
+    "No production load, process-kill or coordinated restore claim"
+  ]
+}
