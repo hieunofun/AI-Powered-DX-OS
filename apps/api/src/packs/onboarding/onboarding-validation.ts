@@ -45,7 +45,8 @@ export function binding(ctx: EvidenceContext, permission: string, value: Onboard
   if (value.manifest_sha256 !== fingerprint(ONBOARDING_MANIFEST) || typeof value.core_version !== 'string' || !/^1\.[0-9]+\.[0-9]+$/.test(value.core_version) ||
     !object(value.workflow) || !keys(value.workflow, ['ref', 'definition_id', 'process_key', 'reviewer_group']) || !version(value.workflow.ref) ||
     fingerprint(value.workflow.ref) !== fingerprint(ONBOARDING_MANIFEST.workflow_refs[0]) || value.workflow.process_key !== 'onboarding_access_review_v1' ||
-    typeof value.workflow.definition_id !== 'string' || !/^onboarding_access_review_v1:[1-9][0-9]*:[A-Za-z0-9-]{1,100}$/.test(value.workflow.definition_id) ||
+    // Flowable's 64-character definition-ID limit can yield a UUID without the process-key prefix.
+    typeof value.workflow.definition_id !== 'string' || !(UUID.test(value.workflow.definition_id) || /^onboarding_access_review_v1:[1-9][0-9]*:[A-Za-z0-9-]{1,100}$/.test(value.workflow.definition_id)) ||
     typeof value.workflow.reviewer_group !== 'string' || value.workflow.reviewer_group !== 'onboarding-reviewer-' + ctx.tenantId || !version(value.policy_ref)) fail('REVISION_CONFLICT', 409);
   return structuredClone(value);
 }

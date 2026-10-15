@@ -34,7 +34,7 @@ async function main() {
     const bpmn = fs.readFileSync(path.join(__dirname, 'access-review.bpmn')); assert.equal(checksum(bpmn), ONBOARDING_MANIFEST.workflow_refs[0].sha256);
     assert.doesNotMatch(bpmn.toString(), /serviceTask|scriptTask|sendTask|http:.*task/i);
   });
-  f = await createFixture(); const { db, tenant, contexts: ctx } = f, base = '/packs/onboarding/v1/cases/';
+  f = await createFixture(); resources.deployedDefinition = f.definition; const { db, tenant, contexts: ctx } = f, base = '/packs/onboarding/v1/cases/';
   const read = id => f.store.read(ctx.requester, id);
   const counts = async () => { const value = {}; for (const table of ['onboarding_cases', 'onboarding_history', 'onboarding_commands', 'onboarding_snapshots', 'onboarding_event_outbox', 'platform_lineage_snapshots', 'platform_lineage_links']) value[table] = (await db.query('SELECT count(*)::text AS n FROM ' + table + ' WHERE tenant_id=$1', [tenant])).rows[0].n; return value; };
   let source, completedId;

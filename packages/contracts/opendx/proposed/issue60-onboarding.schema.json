@@ -441,7 +441,7 @@
       "properties": {
         "definition_id": {
           "type": "string",
-          "pattern": "^onboarding_access_review_v1:[1-9][0-9]*:[A-Za-z0-9-]{1,100}$"
+          "pattern": "^(?:onboarding_access_review_v1:[1-9][0-9]*:[A-Za-z0-9-]{1,100}|[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12})$"
         },
         "process_id": {
           "type": "string",

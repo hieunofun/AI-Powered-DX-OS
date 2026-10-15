@@ -16,7 +16,7 @@ const definitions = {
     checklist: { type: 'array', minItems: 2, maxItems: 2, items: ref('ChecklistEvidence') }, manifest_sha256: sha, policy_ref: ref('VersionRef'), created_at: at, created_by: subject }),
   Decision: closed({ decision_ref: ref('ResourceRef'), action: { enum: ['APPROVE', 'REJECT'] }, approver: subject, subject_ref: ref('ResourceRef'), subject_sha256: sha,
     policy_ref: ref('VersionRef'), decision_version: { type: 'string', minLength: 1, maxLength: 120 }, approved_at: at }),
-  Workflow: { ...closed({ definition_id: { type: 'string', pattern: '^onboarding_access_review_v1:[1-9][0-9]*:[A-Za-z0-9-]{1,100}$' }, process_id: { type: 'string', minLength: 1, maxLength: 200 }, task_id: { type: 'string', minLength: 1, maxLength: 200 }, ended_at: at }), required: ['definition_id'] },
+  Workflow: { ...closed({ definition_id: { type: 'string', pattern: '^(?:onboarding_access_review_v1:[1-9][0-9]*:[A-Za-z0-9-]{1,100}|[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12})$' }, process_id: { type: 'string', minLength: 1, maxLength: 200 }, task_id: { type: 'string', minLength: 1, maxLength: 200 }, ended_at: at }), required: ['definition_id'] },
 };
 definitions.Case = { ...closed({ id: uuid, tenant_id: uuid, requester_subject: subject, display_label: definitions.Create.properties.display_label, created_at: at, updated_at: at,
   state: { enum: ['COLLECTING', 'SUBMITTING', 'AWAITING_APPROVAL', 'APPLYING_DECISION', 'COMPLETED', 'REJECTED', 'RECONCILIATION_REQUIRED'] }, manifest_sha256: sha,

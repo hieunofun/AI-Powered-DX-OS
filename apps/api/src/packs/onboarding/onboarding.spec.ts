@@ -22,6 +22,16 @@ describe('Onboarding state/recovery invariants (labelled SQL/engine/owner double
     f.denied.add('onboarding.case.read'); await expect(f.service.create(requester, { display_label: 'Fixture' }, key)).rejects.toMatchObject({ code: 'FORBIDDEN' });
     expect(f.store.records.size).toBe(1);
   });
+  test('opaque native Flowable UUID definition is pinned through a complete approved case', async () => {
+    const f = onboardingFixture(); f.current.workflow.definition_id = randomUUID(); const id = await f.deciding();
+    expect(await f.worker().processNext(processor)).toMatchObject({ state: 'SUCCEEDED' });
+    expect((await f.store.read(requester, id)).workflow.definitionId).toBe(f.current.workflow.definition_id);
+  });
+  test('another native UUID cannot replace the pinned process definition during reconciliation', async () => {
+    const f = onboardingFixture(); f.current.workflow.definition_id = randomUUID(); const id = await f.ready(); f.engine.fault = 'start-after'; await f.worker().processNext(processor);
+    f.engine.rows[0].processDefinitionId = randomUUID(); await f.worker().reconcile(processor, id);
+    expect((await f.store.read(requester, id)).state).toBe('RECONCILIATION_REQUIRED'); expect(f.engine.starts).toBe(1);
+  });
   test('save/lineage failure rolls back record, history and idempotency', async () => {
     const f = onboardingFixture(); f.store.failSave = true; await expect(f.create()).rejects.toThrow('Injected');
     expect(f.store.records.size).toBe(0); expect(f.store.commands.size).toBe(0); expect(f.store.history).toHaveLength(0);
