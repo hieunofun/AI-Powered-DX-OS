@@ -9,6 +9,8 @@ on:
       - 'database/proposed/issue60-onboarding-pack.sql'
       - 'packages/contracts/opendx/proposed/issue60-onboarding.schema.json'
       - 'infra/onboarding/**'
+      - 'docs/data/ONBOARDING_PACK.md'
+      - 'docs/ai/evidence/issue60-onboarding-runtime-*.json'
       - '.github/workflows/onboarding-acceptance.yml'
   workflow_dispatch:
 permissions:

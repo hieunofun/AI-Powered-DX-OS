@@ -29,6 +29,8 @@ Case history, idempotency responses, receipt/source snapshots and PENDING pack e
 
 ## Verification and timing
 
+Actual acceptance at source `b184ab5` passed all 16 groups in [run 38789310591](https://github.com/hieunofun/AI-Powered-DX-OS/actions/runs/38789310591/job/116609428165). Retained `issue60-onboarding-runtime-20261015185633783.json` records the CI merge `4336978`, nine cases, 106 immutable history records, 41 PENDING events/snapshots and 54 shared lineage links. There were seven actual starts, five claims and five completes; timeout/reconciliation checks prove no duplicate write. Exact source hashes match the published implementation, every case remains NOT_PROVISIONED and the 42-file core diff is zero. The first completed fixture case took 4,112 ms and fixture integration 5,235 ms; recorded pack wall time was 3,456,170 ms including preparation/build/CI waits. These are tiny synthetic-fixture timings. Actual owning SDK integration time is still `null`, because #59/#43/#50 production ports and independent peer acceptance remain gates. The three failed runs remain beside this successful report.
+
 ```sh
 npm ci
 npm run build:api
