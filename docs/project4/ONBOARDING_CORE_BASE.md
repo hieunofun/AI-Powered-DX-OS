@@ -1,0 +1,9 @@
+# Onboarding core preparation
+
+The #60 candidate composes pending #40/PR71 at `a4df50a` and evidence/lineage #46 at `93db77c`. These are explicit unmerged dependencies; production tenancy #43, decision #50 and Capability Pack SDK #59 remain gates.
+
+The unchanged #40 boundary checker found legacy infrastructure/type imports and business-oriented test imports in the B-owned evidence/extraction/lineage modules. This preparation uses the public DataPort, introduces a neutral object-storage port, moves the neutral extraction contract into platform with a compatible old-path re-export, and relocates eight business-loaded unit suites outside platform. Existing provider injection symbols/error constructor identities are preserved and checked. No checker rule or A-owned identity/data/workflow implementation is changed. No Onboarding business rule is added to core.
+
+Verification before the pack implementation: 41 platform files with zero business imports/vocabulary, four boundary checker fixtures, five headless/transport cases, 234 HTTP tests, API build/lint and accepted contract validation passed. The initial concurrent API run passed 636/640 cases and hit four five-second PDF test timeouts under host memory pressure; an isolated rerun passed all 33 cases in the two affected suites without changing production/parser/test deadlines. Thus all 640 API cases are covered by passing results across those runs; a fresh exact-head CI run remains required. This history is not represented as an initially green full run.
+
+The generic preparation is committed before pack business code. The pack acceptance runner will pin that commit and verify no subsequent platform source diff, while also running the unchanged boundary checker. This separates existing core preparation from the required zero HR-specific core changes and records the actual baseline for integration timing. A speculative SDK binding is not completed #59 integration.

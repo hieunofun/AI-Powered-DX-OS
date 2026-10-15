@@ -1,0 +1,149 @@
+{
+  "issue": 60,
+  "startedAt": "2026-10-15T18:37:04.627Z",
+  "finishedAt": "2026-10-15T18:37:22.414Z",
+  "commit": "9b4e2df4daf0eb5acd6449e45325ab84180e30d3",
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "linux",
+    "postgres": "16-alpine isolated",
+    "minio": "existing source-built pinned MinIO",
+    "clamav": "1.4.6 pinned/fresh <=24h",
+    "flowable": "8.0.0 pinned official image/history full",
+    "identity": "actual generic AuthService RS256/JWKS, ephemeral local issuer"
+  },
+  "fixtures": [
+    "SQL-backed current tenant membership/roles and resource denials (#43)",
+    "SQL-backed registered compatible manifest/declared permissions (#59)",
+    "SQL-backed independent owner decision (#50); scripted distinct actors, no human peer review"
+  ],
+  "limitations": [
+    "Production owner #43/#50/#59 adapters and integration time remain unverified",
+    "Pending events have no owning SDK dispatcher proof",
+    "No external accounts/grants/tokens provisioned",
+    "Tiny synthetic fixture timings are not production performance"
+  ],
+  "timings": {
+    "packImplementationWallElapsedMs": 2304804,
+    "actualOwningSdkIntegrationElapsedMs": null
+  },
+  "checks": [
+    {
+      "name": "pinned generic core/checker unchanged; declared manifest and BPMN match",
+      "status": "PASS",
+      "elapsedMs": 462
+    },
+    {
+      "name": "real private MinIO bytes, exact fresh ClamAV scan and immutable registered source",
+      "status": "PASS",
+      "elapsedMs": 230
+    },
+    {
+      "name": "actual RS256/JWKS rejects expired/forged token and current membership revocation",
+      "status": "PASS",
+      "elapsedMs": 84
+    },
+    {
+      "name": "HTTP rejects client identity/provisioning/scopes and unknown mutation routes",
+      "status": "FAIL",
+      "code": "ERR_ASSERTION",
+      "message": "[{\"keyword\":\"additionalProperties\",\"dataPath\":\"\",\"schemaPath\":\"#/additionalProperties\",\"params\":{\"additionalProperty\":\"error\"},\"message\":\"should NOT have additional properties\"},{\"keyword\":\"additionalProperties\",\"dataPath\":\"\",\"schemaPath\":\"#/additionalProperties\",\"params\":{\"additionalProperty\":\"statusCode\"},\"message\":\"should NOT have additional properties\"},{\"keyword\":\"required\",\"dataPath\":\"\",\"schemaPath\":\"#/required\",\"params\":{\"missingProperty\":\"code\"},\"message\":\"should have required property 'code'\"},{\"keyword\":\"required\",\"dataPath\":\"\",\"schemaPath\":\"#/required\",\"params\":{\"missingProperty\":\"correlation_id\"},\"message\":\"should have required property 'correlation_id'\"},{\"keyword\":\"required\",\"dataPath\":\"\",\"schemaPath\":\"#/required\",\"params\":{\"missingProperty\":\"retryable\"},\"message\":\"should have required property 'retryable'\"}]\n\nfalse !== true\n"
+    }
+  ],
+  "resources": {
+    "coreProof": {
+      "coreBaseline": "14e6e89530e390b2ee6882f1ec1843855a4f8583",
+      "coreFiles": 42,
+      "coreDiffFiles": 0,
+      "checkerUnchanged": true
+    },
+    "evidence": {
+      "id": "6cb9dd23-ca37-465a-a9d7-3a41feec43e1",
+      "sha256": "a9cd43a9ba0aaad2303fb84d575691368d5664a948bc9eadc7a2b743bcb24f73"
+    },
+    "scannerHistory": [
+      {
+        "at": "2026-10-15T18:37:22.250Z",
+        "state": "CLEAN",
+        "engine": "1.4.6",
+        "policy": "evidence-intake-v1",
+        "sha256": "a9cd43a9ba0aaad2303fb84d575691368d5664a948bc9eadc7a2b743bcb24f73",
+        "attempt": 1,
+        "revision": 4,
+        "objectKey": "tenant/f1ab6582-ab02-4c39-b891-ec33d25d325e/evidence/6cb9dd23-ca37-465a-a9d7-3a41feec43e1/revision/1/content/7c2427d8-08e0-4bd8-8460-80b51800ee59",
+        "retryable": false,
+        "leaseToken": "10d2d145-3aef-40c3-bb71-3dc299e2a7f3",
+        "definitions": "28154",
+        "definitionsAt": "2026-10-15T06:24:22.000Z"
+      }
+    ]
+  },
+  "sourceHashes": {
+    "apps/api/src/packs/onboarding/onboarding-lineage.writer.ts": "39c5342b4128fa923cc6f96131bb8e9e578d55319c922529ee3f4599b773e95e",
+    "apps/api/src/packs/onboarding/onboarding-validation.ts": "44c90de4d1b981652952561a3efef8e2e487b4c64909eb81fe2cf42b9302e642",
+    "apps/api/src/packs/onboarding/onboarding.controller.ts": "6f2b32ff15569212dbc8bfa40cb74ab327f78c50e5c4874f4d88b6c71ea99511",
+    "apps/api/src/packs/onboarding/onboarding.manifest.ts": "becb4f8bf7d2aa3711962a7bbc58118321d0e726965845209e3ff6829f9ad50f",
+    "apps/api/src/packs/onboarding/onboarding.module.ts": "2f8bfee558032c94b18f963cc91cce76d3e777ff4e02dc5c9ea41a17f14eb27c",
+    "apps/api/src/packs/onboarding/onboarding.repository.ts": "b215780de49e2a0959ea5a0ec230c45acdff90140083b5c91e78d6364eef7e63",
+    "apps/api/src/packs/onboarding/onboarding.service.ts": "e75cda9191ef50d75e8f4674af4c08c64f37577e9aab71aadcd2b37703e46d9a",
+    "apps/api/src/packs/onboarding/onboarding.spec.ts": "8a8374bd7dda41577c29023992e504571b4ee67764368a5212608e18a01ac735",
+    "apps/api/src/packs/onboarding/onboarding.types.ts": "da1b7bac3b47368dcf8b007d96d9e7c7cd7811a07608ea8d568d646683bc127d",
+    "apps/api/src/packs/onboarding/onboarding.worker.ts": "00a973edb86b8ceeb9b216bd14f5213b251c263f884275872a9fd91513cba22d",
+    "apps/api/src/platform/README.md": "f1d6cc2f747a8fc76bb95f6fd738bb1ac17121eb0d195ab89537649e7bc8d850",
+    "apps/api/src/platform/data/data.port.ts": "414064a39d0ff04f87c0270f895e2410c950a6909e9f3c60165603544715b141",
+    "apps/api/src/platform/data/database.module.ts": "ec729b7258e50263e0d30cfeeb8f4b235120e5901045b4170061e9590ed56c88",
+    "apps/api/src/platform/data/database.service.ts": "98993f23127155f772e417e91691495fa06cec541f79117dbf9da85efc82199e",
+    "apps/api/src/platform/evidence/clamav.scanner.ts": "bc129856f08e0143317ec13fe0dae625ec4186d012b1bae61d6cea2396dec524",
+    "apps/api/src/platform/evidence/evidence-context.ts": "41409188b369396514ee58d4790e7521c5c318822f5e452aea212c3d3e1b734f",
+    "apps/api/src/platform/evidence/evidence-storage.ts": "b3e05e93064b2fbb9417d6a613e13d98e660c6401d3a9d20930f5ed5b495a5a8",
+    "apps/api/src/platform/evidence/evidence.controller.ts": "10d4728efbf5d39149aa1c53609ec733a60124ae854eecadb4b8ad7ad4bb8163",
+    "apps/api/src/platform/evidence/evidence.module.ts": "581de09b460f0f9239dcb5199d709dab51e47dc9f2dec3f08b8498faca6a16ff",
+    "apps/api/src/platform/evidence/evidence.repository.ts": "aa14455a26b5583e915d02b720fa3a641b5c3c98d679db315984411edd433a78",
+    "apps/api/src/platform/evidence/evidence.service.ts": "0b82ba9273346c71ad9b574de250781963606ff3fb7d5bc048463da8222a2eff",
+    "apps/api/src/platform/evidence/evidence.types.ts": "ed6f37a0526e74ef9ad96151cd28f1bf3366f0b07d83424f459554c8b1cce83c",
+    "apps/api/src/platform/evidence/file-safety.ts": "0a0f1c6e957da3cef0377203792c302c5bc41ab08eeb88fc96591a0a67baf4f4",
+    "apps/api/src/platform/extraction/draft.module.ts": "bf02690ffc4d6a4bc2002a8df8e07223c5fb46ae0e6bf3c57a78cebf62ac4141",
+    "apps/api/src/platform/extraction/draft.repository.ts": "f4866ee0f83cb2590e44ab7e0f0df31eb34073e018dbd4e717ce53bd4d5a97a6",
+    "apps/api/src/platform/extraction/draft.service.ts": "cbc562bdc5151d37a9da8f9b27073081a7572362015f356afdf70aa668a9f4bd",
+    "apps/api/src/platform/extraction/draft.types.ts": "2c0de4991c8984af632a08088d6d62ead1cb8cf74956365c9db4a45a314d10f6",
+    "apps/api/src/platform/extraction/media-inspection.ts": "5a3b98865c3340fb0af4cc79124794fd2a03b7db49bad303ab99a02c7760c3ca",
+    "apps/api/src/platform/extraction/provider.port.ts": "c94d4074261816c28c2229f7e5c615c1517bc668cccc2a43138b460b87ec2610",
+    "apps/api/src/platform/identity/auth.service.ts": "697beebd81c23b6fc420148609909c8380868d71ad5403887d2c73d896f6e1e0",
+    "apps/api/src/platform/identity/decorators/current-user.decorator.ts": "091f49ec685d3ad2a94b63147a836630904c8d206792689875fa70a005f6d850",
+    "apps/api/src/platform/identity/decorators/public.decorator.ts": "bb149c7568f240afbabb885243d83abe7ec86fe6a27777ba4d028b7fb3b463dc",
+    "apps/api/src/platform/identity/decorators/roles.decorator.ts": "8080391fc73ab433dcea7bfa51c3ab08e5bb1cab10572fcbc16481ed755d9fac",
+    "apps/api/src/platform/identity/guards/jwt-auth.guard.ts": "3eb2530e329f93dc803e43ebc71e6c69059f5c7301989c4024a03e05a29b648c",
+    "apps/api/src/platform/identity/guards/roles.guard.ts": "460bf1f46c7f58c6d3ec3289a4f05c4d8ad01fb9a92f9be313105e4ef219d99f",
+    "apps/api/src/platform/identity/identity.module.ts": "16a15fbf007ed99d12e275c8f1808264f79f751560fe6f10ae86917c9cd7df8e",
+    "apps/api/src/platform/identity/identity.port.ts": "25335be281c65e13723a6c4720d194d3ec4b49124b9e483d317d10a38190f086",
+    "apps/api/src/platform/identity/interfaces/authenticated-user.interface.ts": "cd02e12dd4258f134975d4995f137fbf417a74600b974107784f01b3b829edab",
+    "apps/api/src/platform/identity/interfaces/keycloak-jwt-payload.interface.ts": "9b6d55cd9741e8094e6e2e3a8ca97fc6a2fe5982d7d70b598dac5f23847a2879",
+    "apps/api/src/platform/index.ts": "6460e23c3c5e56c4d5645e72ef6089ae9e7bc6a1cdbfb55a63ca3f38a027308f",
+    "apps/api/src/platform/lineage/draft-lineage.writer.ts": "f27348a0d0c73925c6a8b58b7848cbd88a26a3212852e6b378105bfd1d85f991",
+    "apps/api/src/platform/lineage/evaluation-lineage.writer.ts": "8ec18dad023fc12981aaf591179b73369b31a538810ea63176460584872ca425",
+    "apps/api/src/platform/lineage/lineage.module.ts": "abcea20b5ee018dba6f8dbae499f710151760136879f1cc04e685f0a282a129b",
+    "apps/api/src/platform/lineage/lineage.repository.ts": "760136e2110ae56922b3f98726195dddc349f0ceb3a41ccd5aa48edaab573039",
+    "apps/api/src/platform/lineage/lineage.service.ts": "98e09512b3b1bcfce894bbe6ed1bded91021ebd872eecfa8d1d76c134fba6f90",
+    "apps/api/src/platform/lineage/lineage.types.ts": "526e7ba7274ab378fc486b836f78c3936e3542ff17dfaa95167d317ca0289f0e",
+    "apps/api/src/platform/lineage/verified-evidence-access.ts": "dda8e76b906afa586fa7fc7558645fa01780fd4ae9f1cfb9dc306ccea961aa7f",
+    "apps/api/src/platform/platform.module.ts": "6146ea33e3604bf12486013a11608a3cffeef1dc503ced493ce8087d4ad32375",
+    "apps/api/src/platform/workflow/flowable.transport.ts": "00201ac0ff3149be283a717e0bc7c80132d328fe78837da1783a0f188613a76f",
+    "apps/api/src/platform/workflow/workflow-engine.module.ts": "38b3452ee85d348f8a8c0cafc67a9e46c4bdcd1b4c7aa0169dd37306c4c9ea40",
+    "apps/api/src/platform/workflow/workflow-engine.port.ts": "c3a765829d8b08b089ced53a9f0da6ca92669da4b2a491b41b2d654a87cef965",
+    "apps/api/src/platform/workflow/workflow-error.ts": "34482a6ad698143a051876a340d1a23b68ff837f938eb9fbe3c75647ef76b951",
+    "database/proposed/issue60-onboarding-pack.sql": "2eff43a2a4b256ca2c4704b18ce3907b9e017c5c2f98c1f9df8962b74d308b34",
+    "infra/onboarding/access-review.bpmn": "30784d9d3a551d6bb5355a8f2dd4da9dcf9ca6495c8a6c68ee41c3c2650148c6",
+    "infra/onboarding/compose.yaml": "5f630078f90bbe138c7f8cf19e91f2d1919bda563f84af8b98fea48f53e6a6f8",
+    "infra/onboarding/core-baseline.json": "ff0f0c1a0136aa150e6d8f8e2b478cb2d496d1ed6c5696fb86b6b00640e8b8d6",
+    "infra/onboarding/manifest.json": "c7b1f96c3edafe44a29ceb0ca370e2712a65f9251a875dabc2889e52f1229102",
+    "infra/onboarding/prepare-pack.cjs": "36912493ebcccd6c2008d30adaa1a43b48f6987202e843d01a8f9e83a813acbf",
+    "infra/onboarding/prepare-schema.cjs": "5ff0f010265e9798886f520cf8b046ea37c2a88f305afc395b3aa857dab8514f",
+    "infra/onboarding/runtime-fixture.cjs": "eb8491d1fb933560891818dee33e521199a506d916888ffbbdf986902b1a190e",
+    "infra/onboarding/validate-runtime.cjs": "0c927ef3f07b86470644c78f58d9acb08a1a03cfb7e1355e5ac8a8df2796956f",
+    "infra/onboarding/verify-core.cjs": "b4f86273d73c2f16563eef0155fe2d2b9cdc7e8dae2613cfdfbb3c8e3943ac1a"
+  },
+  "failure": {
+    "code": "ERR_ASSERTION",
+    "message": "[{\"keyword\":\"additionalProperties\",\"dataPath\":\"\",\"schemaPath\":\"#/additionalProperties\",\"params\":{\"additionalProperty\":\"error\"},\"message\":\"should NOT have additional properties\"},{\"keyword\":\"additionalProperties\",\"dataPath\":\"\",\"schemaPath\":\"#/additionalProperties\",\"params\":{\"additionalProperty\":\"statusCode\"},\"message\":\"should NOT have additional properties\"},{\"keyword\":\"required\",\"dataPath\":\"\",\"schemaPath\":\"#/required\",\"params\":{\"missingProperty\":\"code\"},\"message\":\"should have required property 'code'\"},{\"keyword\":\"required\",\"dataPath\":\"\",\"schemaPath\":\"#/required\",\"params\":{\"missingProperty\":\"correlation_id\"},\"message\":\"should have required property 'correlation_id'\"},{\"keyword\":\"required\",\"dataPath\":\"\",\"schemaPath\":\"#/required\",\"params\":{\"missingProperty\":\"retryable\"},\"message\":\"should have required property 'retryable'\"}]\n\nfalse !== true\n"
+  }
+}

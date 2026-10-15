@@ -1,0 +1,58 @@
+# Onboarding pack candidate (#60)
+
+The separate `onboarding` pack records two evidenced acknowledgements and a fixed access request, then reuses generic identity, data, private evidence, lineage and Flowable APIs for an independent approval or rejection. Completion records a reviewed request; `provisioning_state` is always `NOT_PROVISIONED`. There is no account, permission, payment or token provisioning adapter.
+
+This is an integration candidate. Pending PR71/#40 and #46 are composed explicitly. Production tenant authority #43, owner decision #50 and registered Capability Pack SDK #59 remain unresolved dependencies. The acceptance runtime provides **SQL-backed fixtures** for those three contracts and scripted distinct requester/reviewer/worker principals. These are not production adapters, independent human review, completed #59 integration or grounds to close the issue. No permissive registry/decision adapter is exported by the pack.
+
+## HTTP contract
+
+The host explicitly composes `OnboardingModule.register(service, verifiedContextResolver)`. It must supply the required current SDK, evidence and independent decision ports, transactional lineage and generic workflow engine. This module is not activated by the legacy main application. Tenant selection is checked against current membership; request bodies cannot set tenant, requester, roles, workflow, scopes or outcomes. All successful views use `Cache-Control: private, no-store` and existing error/correlation conventions.
+
+| Method /packs/onboarding/v1 | Body | Result |
+| --- | --- | --- |
+| POST /cases | `display_label`, 1–160 characters | 201 case |
+| GET /cases/{id} | none | 200 authorized case |
+| POST /cases/{id}/checklist/{code} | `evidence_id`, `acknowledged: true`, `expected_revision` 0–9 | 200 case |
+| POST /cases/{id}/access-requests | `access_profile` | 202 durable common operation |
+| POST /cases/{id}/decisions | `decision_ref` pointing to an actual owner decision | 202 durable common operation |
+| GET /operations/{id} | none | 200 operation after current case authorization |
+
+POST requires `Idempotency-Key`. Unknown body/query fields are rejected. Checklist codes are `WELCOME_ACK` and `ACCESS_POLICY_ACK`; both require accepted CLEAN bytes with matching hashes and current requester/resource authority. Receipt revisions append, stop at ten and freeze on submission. Profiles are `DOCS_READ_ONLY` (`INTERNAL_DOCS_READ`) and `TEAM_WORKSPACE` (also `TEAM_WORKSPACE_VIEW`); these scopes describe the reviewed request only. The server freezes request/checklist/manifest/policy hashes. Decision input cannot claim an action or approval: the mandatory owner port supplies and revalidates the actual independent decision, version, subject/policy hashes and immutable snapshot.
+
+## Workflow, recovery and history
+
+The versioned manifest declares seven permissions, five published events and the exact workflow hash. A mandatory SDK binding checks registration, compatible core, enabled state, declared permissions and current tenant/resource grants in each SQL transaction. Versioned workflow and policy bindings cannot drift for an existing case. The tenant reviewer group and actual deployed definition ID are pinned server side.
+
+The pack-owned PostgreSQL intent commits before each engine write. Two local worker slots, two-minute durable leases, three bounded safe attempts and read-only manual reconciliation prevent blind redispatch after ambiguous writes. Core `FlowableTransport` starts `onboarding_access_review_v1`; its single `access_review` user task has no service/provisioning tasks. The worker checks business key, definition, task/process binding and tenant candidate group. Actual current owner approval is checked before claiming/completing for its approver. Finalization requires actual ended process/task history, that approver and the matching **task-local** `applicationOperationId`. A timeout after successful start/claim/complete must be reconciled against native engine history before further writes. Current requester/worker/file/decision revocation withholds finalization even if the engine already ended.
+
+Case history, idempotency responses, receipt/source snapshots and PENDING pack events commit in the same transaction as shared lineage. PostgreSQL guards immutable original identity, submitted facts, decision/process/task bindings and terminal records. Pending events have no owning #59 dispatcher consumption proof. Run the proposed SQL only against the explicitly named isolated fixture or after coordinated production migration review. Stop keeps volumes/history; do not remove them during recovery. Recover through `OnboardingWorker.reconcile()` under the separate current reconciliation permission; there is no public worker/reconcile endpoint and no unconditional retry/reset command.
+
+## Verification and timing
+
+Actual acceptance at source `b184ab5` passed all 16 groups in [run 38789310591](https://github.com/hieunofun/AI-Powered-DX-OS/actions/runs/38789310591/job/116609428165). Retained `issue60-onboarding-runtime-20261015185633783.json` records the CI merge `4336978`, nine cases, 106 immutable history records, 41 PENDING events/snapshots and 54 shared lineage links. There were seven actual starts, five claims and five completes; timeout/reconciliation checks prove no duplicate write. Exact source hashes match the published implementation, every case remains NOT_PROVISIONED and the 42-file core diff is zero. The first completed fixture case took 4,112 ms and fixture integration 5,235 ms; recorded pack wall time was 3,456,170 ms including preparation/build/CI waits. These are tiny synthetic-fixture timings. Actual owning SDK integration time is still `null`, because #59/#43/#50 production ports and independent peer acceptance remain gates. The three failed runs remain beside this successful report.
+
+```sh
+npm ci
+npm run build:api
+npm run test:api
+npm run test:e2e --workspace=apps/api -- --runInBand
+npm run test:contracts
+npm run test:boundaries
+npm run test:platform --workspace=apps/api
+node infra/onboarding/verify-core.cjs
+docker compose -f infra/onboarding/compose.yaml up -d --build
+node infra/onboarding/validate-runtime.cjs --wait-ready
+docker compose -f infra/onboarding/compose.yaml stop
+```
+
+The generic pre-pack compatibility preparation is separately recorded in [ONBOARDING_CORE_BASE.md](../project4/ONBOARDING_CORE_BASE.md). Baseline `14e6e89530e390b2ee6882f1ec1843855a4f8583` pins all 42 platform files. Acceptance checks zero subsequent core diff/untracked additions, exact hashes and the unchanged owning boundary checker. `core-baseline.json` preserves the original preparation/pack start times; generation refuses to reset them. A reviewed manifest revision uses `prepare-pack.cjs --manifest-only`.
+
+The full root CI at `2336281` [passed](https://github.com/hieunofun/AI-Powered-DX-OS/actions/runs/38790173937/job/116612386904): API/web build and lint, 681 unit cases, 241 HTTP cases (seven new), four web cases, accepted contracts, boundary/headless checks and the inherited actual SQL/SSO/gateway/storage/matching/Flowable/ledger validators, including all eleven real business browser scenarios. The separate sixteen-group native Onboarding run also passed on that head. Proposed DTOs are in `packages/contracts/opendx/proposed/issue60-onboarding.schema.json`, separately from the accepted API; HTTP tests validate case/operation outputs against them. Unit/HTTP doubles and legacy browser regression do not replace the separately labelled pack runtime or production owner integrations. The runtime workflow retains successful and failed reports under `docs/ai/evidence/issue60-onboarding-runtime-*.json`, including actual commit, source hashes, native engine IDs, SQL counts and fixture labels. Its measured fixture integration time ends at the first actually completed case, starts before fixture binding/deployment and is separate from total pack implementation wall time. Actual owning #59 SDK integration time remains `null` until that dependency exists. Tiny synthetic timings do not establish production latency.
+
+## Reuse and licenses
+
+The first actual runtime run at `f4ae60c` passed the core/manifest, private bytes/fresh scanner and real RS256/JWKS groups, then failed an unknown-route error-envelope assertion: the fixture host had no global error filter for unmatched Nest routes. Its failed report `issue60-onboarding-runtime-20261015183722417.json` is retained. The fixture host now installs the existing generic error filter; the HTTP unmatched-route test checks the shared error schema. A second retained run `issue60-onboarding-runtime-20261015184336497.json` passed those four groups, then exposed an incorrect pack assumption about native definition IDs. Flowable 8's [definition ID generator](https://github.com/flowable/flowable-engine/blob/flowable-8.0.0/modules/flowable-engine/src/main/java/org/flowable/engine/impl/bpmn/deployer/BpmnDeployer.java) omits the key/version prefix when it would exceed 64 characters. Pack validation/proposed DTOs now also accept the opaque UUID supplied by the required verified SDK binding. Exact native definition equality, actual deployed BPMN hash/process key and tenant/policy binding checks remain required; two tests cover UUID success and substitution denial. No core source or validation deadline was changed. The successful sixteen-group runtime recorded above followed these preserved failures.
+
+The third retained run `issue60-onboarding-runtime-20261015184944425.json` reached the native worker and returned reconciliation instead of success. The new worker/double incorrectly expected `groupId`; the actual runtime identity-link shape uses `group`/`user`, as already checked by the inherited workflow integration. The pack now requires exactly one tenant candidate group and no candidate user, using those native fields. All 41 pack cases pass, including the two native ID cases and three foreign/additional group/user rejection cases. Future failed runtime reports also retain bounded durable phases and read-only native process/task/link diagnostics for reproducible investigation.
+
+No new npm dependency is added. New pack TypeScript, SQL, BPMN, manifest and acceptance scripts are team-authored MIT. Existing Flowable OSS 8.0.0 is reused through the unchanged generic transport, with official Docker manifest pinned at `sha256:708dfa32f27b93180bb6e7a30684d881d995fe257f5b8413e14b20a55c25672d`; [upstream](https://github.com/flowable/flowable-engine/tree/flowable-8.0.0), Apache-2.0, existing dependency ledger/notices retained. Historic task-local variable behavior is documented by the [upstream REST API](https://www.flowable.com/open-source/docs/bpmn/ch14-REST). No Flowable source is copied or modified. Existing PostgreSQL 16, source-built pinned MinIO, ClamAV 1.4.6 and npm dependencies retain their existing revisions/licenses/notices; this pack changes no vendor implementation or eligibility conclusion in #22. ClamAV must load definitions no older than 24 hours; stale/unavailable scanning fails closed.

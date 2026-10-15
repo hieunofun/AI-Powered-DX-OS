@@ -19,7 +19,8 @@
     "lint:web": "npm run lint --workspace=apps/web",
     "lint:api": "npm run lint --workspace=apps/api",
     "lint": "npm run lint:api && npm run lint:web",
-    "test:contracts": "node packages/contracts/opendx/validate.cjs"
+    "test:contracts": "node packages/contracts/opendx/validate.cjs",
+    "test:boundaries": "node infra/platform/check-boundaries.cjs && node --test infra/platform/check-boundaries.test.cjs"
   },
   "devDependencies": {
     "@apidevtools/swagger-parser": "10.1.0",
@@ -39,7 +40,7 @@
     "@rollup/rollup-linux-x64-musl": "4.63.6"
   },
   "engines": {
-    "node": ">=20.0.0",
+    "node": ">=24.14.0",
     "npm": ">=10.0.0"
   },
   "keywords": [

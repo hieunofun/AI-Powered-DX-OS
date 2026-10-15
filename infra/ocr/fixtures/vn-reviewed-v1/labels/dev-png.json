@@ -1,0 +1,21 @@
+{
+  "values": {
+    "/purchase_order_id": "00000000-0000-4000-8000-000000000226",
+    "/seller_tax_code": "SYNTH-MST-002",
+    "/buyer_tax_code": "SYNTH-MST-102",
+    "/invoice_number": "OCR-DEV-002",
+    "/invoice_date": "2026-10-02",
+    "/currency": "USD",
+    "/subtotal": "50.00",
+    "/tax_amount": "0.00",
+    "/total_amount": "50.00",
+    "/lines/0/description": "Bút mẫu",
+    "/lines/0/sku": "PEN-SYN",
+    "/lines/0/quantity": "4",
+    "/lines/0/unit_price": "12.50",
+    "/lines/0/tax_rate": "0",
+    "/lines/0/line_subtotal": "50.00",
+    "/lines/0/tax_amount": "0.00",
+    "/lines/0/line_total": "50.00"
+  }
+}

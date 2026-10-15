@@ -12,6 +12,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:platform": "jest --runInBand --config ./test/jest-platform.json",
     "lint": "eslint src test --ext .ts"
   },
   "dependencies": {
@@ -26,6 +27,7 @@
     "jsonwebtoken": "^9.0.3",
     "jwks-rsa": "^3.2.2",
     "minio": "8.0.7",
+    "pdfjs-dist": "6.4.299",
     "pdfkit": "0.20.2",
     "pg": "^8.23.1",
     "reflect-metadata": "^0.2.2",

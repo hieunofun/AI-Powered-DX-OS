@@ -1717,7 +1717,12 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/EvidenceLink"
-          }
+          },
+          "maxItems": 100
+        },
+        "next_cursor": {
+          "type": "string",
+          "maxLength": 1024
         }
       },
       "required": [

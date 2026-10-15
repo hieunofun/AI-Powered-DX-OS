@@ -1,0 +1,39 @@
+{
+  "pack_id": "onboarding",
+  "version": "1.0.0",
+  "publisher": "OpenDX contributors",
+  "license": "MIT",
+  "compatible_core": "^1.0.0",
+  "permissions": [
+    "onboarding.case.create",
+    "onboarding.case.read",
+    "onboarding.checklist.record",
+    "onboarding.access.request",
+    "onboarding.access.decide",
+    "onboarding.workflow.process",
+    "onboarding.workflow.reconcile"
+  ],
+  "entity_schema_ids": [
+    "onboarding.case.v1",
+    "onboarding.access-request.v1"
+  ],
+  "workflow_refs": [
+    {
+      "id": "b88c1f34-5bd9-4db4-8551-9c15432e1801",
+      "version": "1.0.0",
+      "sha256": "30784d9d3a551d6bb5355a8f2dd4da9dcf9ca6495c8a6c68ee41c3c2650148c6"
+    }
+  ],
+  "published_events": [
+    "onboarding.case.created.v1",
+    "onboarding.checklist.recorded.v1",
+    "onboarding.access.requested.v1",
+    "onboarding.access.decided.v1",
+    "onboarding.case.completed.v1"
+  ],
+  "consumed_events": [],
+  "evidence_schema_ids": [
+    "onboarding.checklist-evidence.v1"
+  ],
+  "migration_policy": "FORWARD_ONLY"
+}

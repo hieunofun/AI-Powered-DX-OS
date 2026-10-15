@@ -1,0 +1,49 @@
+name: Onboarding pack acceptance
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'apps/api/src/packs/onboarding/**'
+      - 'apps/api/src/platform/**'
+      - 'apps/api/test/onboarding*'
+      - 'database/proposed/issue60-onboarding-pack.sql'
+      - 'packages/contracts/opendx/proposed/issue60-onboarding.schema.json'
+      - 'infra/onboarding/**'
+      - 'docs/data/ONBOARDING_PACK.md'
+      - 'docs/ai/evidence/issue60-onboarding-runtime-*.json'
+      - '.github/workflows/onboarding-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  onboarding-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build:api
+      - run: node infra/onboarding/verify-core.cjs
+      - name: Start isolated data/evidence/scanner/workflow engines
+        run: docker compose -f infra/onboarding/compose.yaml up -d --build
+      - name: Verify actual Flowable approval/recovery, tenant/source authority and core diff
+        run: node infra/onboarding/validate-runtime.cjs --wait-ready
+      - name: Retain successful and failed runtime reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: onboarding-pack-runtime
+          path: docs/ai/evidence/issue60-onboarding-runtime-*.json
+          if-no-files-found: warn
+      - name: Print isolated fixture status on failure
+        if: failure()
+        run: docker compose -f infra/onboarding/compose.yaml ps
+      - name: Stop isolated fixture without deleting history
+        if: always()
+        run: docker compose -f infra/onboarding/compose.yaml stop

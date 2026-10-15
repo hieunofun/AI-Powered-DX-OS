@@ -8,7 +8,7 @@ All contracts are **proposed** in #37 until peer review and merge. First-wave me
 | Tenant/principal | Verified active tenant, service/user kind, resource permission checks, 404 isolation | #43 Keycloak mapper/switching/backfill/RLS and grant administration, A |
 | Evidence intake | Registration/upload/download, file limits/state/quarantine/hash/idempotency/failure | #41 AV engine/license/worker limits/decompression and cleanup, B |
 | OCR review | SourceRef known/unknown, draft/correction/revision/confirmation, domain decimal payload | #38 provider/model/terms/budget and evaluation; #26 persistence/provider/supplier validation, B |
-| Evidence lineage | Generic typed links/event refs/tenant ACL | #46 concrete links/search/retention permissions and pagination, B |
+| Evidence lineage | Generic typed links/event refs/tenant ACL; #46 proposes encrypted watermark pagination and filename/retention filters | #46 implementation candidate in docs/ai/EVIDENCE_LINEAGE.md; A/C review of optional parameters/page shape, #43 authority and owning evaluation adapters remain gates |
 | Workflow/tasks | Versioned start/input refs, candidate permissions, task actions/durable operation | #45 definition registration/migration, complete/claim guards/delegation/reconciliation details, A |
 | Policy | Version/effective/hash/schema refs and immutable snapshots | #48 rule DSL/parameters, publish/revoke/SoD/running-workflow policy, A |
 | Decision | Frozen facts/evidence/policy/workflow/actor/result refs | #50 create/authorize/execute persistence and risk-tier audit policy; revision/hash/export threat model, A |

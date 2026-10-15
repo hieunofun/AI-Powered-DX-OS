@@ -4,3 +4,8 @@
 *.pdf -text
 # Keep byte-sensitive XML fixture mutations and archival hashes identical across platforms.
 infra/invoice/fixtures/*.xml text eol=lf
+# Pin the second pack's BPMN/manifest/core proof hashes across checkouts.
+infra/onboarding/*.bpmn text eol=lf
+infra/onboarding/*.cjs text eol=lf
+infra/onboarding/*.json text eol=lf
+apps/api/src/packs/onboarding/*.ts text eol=lf
