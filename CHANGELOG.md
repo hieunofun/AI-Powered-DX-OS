@@ -6,6 +6,8 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
+- AI quality/security evaluation candidate (#63): fixed-denominator OCR/mapping/grounded-answer scorers, separately frozen synthetic document-injection corpus and source-bound citation metrics, malicious upload/tenant/worker/tool probes with retained failures and explicit owner integration gates.
+
 - Proposed AI mediation (#54): source-bound extractive Gemini explanations, server missing-evidence reporting, closed R0–R2 action registry with R3/transfer denial, current policy/independent decision/transactional execution ports, persisted leases/idempotency/history and tenant control epochs. Real synthetic model evaluation and labelled runtime fixtures are separate; production #43/#50 integration remains gated.
 
 - Proposed reviewed item mapping (#25): preserve exact deterministic identities, use a separate Gemini alias suggestion prompt for unresolved items, enforce tenant/PO candidate ownership and durable human decisions with transactional authorization/outbox. Add fictional dev/held-out evaluation, explicit fallback, immutable history and real SQL/storage/AV acceptance evidence; production domain integration remains pending.

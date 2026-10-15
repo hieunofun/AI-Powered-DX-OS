@@ -1,0 +1,443 @@
+{
+  "issue": 63,
+  "recordedAt": "2026-10-15T18:44:07.696Z",
+  "commit": "5ac51c5c1d9f5fdfad79d8261748a4eda88b93cf",
+  "inputs": {
+    "digital": {
+      "path": "docs/ai/evidence/vn-synthetic-v1-heldout-live.json",
+      "sha256": "d14dfa9fac1ef9258f2f40b9bbdc23158253717bfb829b38988467cc644d1410"
+    },
+    "reviewed": {
+      "path": "docs/ai/evidence/issue26-ocr-runtime-20261014222959203.json",
+      "sha256": "a2a5b5c9d3788ed78572c5c81bde7ab164ca50d2cfcbdfbc7c4f45312806f4ea"
+    },
+    "mapping": {
+      "path": "docs/ai/evidence/issue25-mapping-evaluation-20261014230619864.json",
+      "sha256": "0e868ff9e2a648a19ac31b48a11a202f1525179db3d064d7e08d5ba72b80bf70"
+    },
+    "answers": {
+      "path": "docs/ai/evidence/issue63-adversarial-answers-20261015184210039.json",
+      "sha256": "5a336eecd24f90280763783b1dd7ea0517239a6af011435717f88a6ece8bdbf5"
+    }
+  },
+  "metrics": {
+    "digitalOcr": {
+      "score": {
+        "fields": {
+          "correct": 36,
+          "total": 36,
+          "rate": 1
+        },
+        "perField": {
+          "/seller_name": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/seller_tax_code": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/invoice_number": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/invoice_date": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/currency": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/lines/0/quantity": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/lines/0/unit_price": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/lines/0/tax_rate": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/total_amount": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          }
+        },
+        "cases": {
+          "correct": 4,
+          "total": 4,
+          "rate": 1
+        },
+        "missingOrFailedCases": 0,
+        "samples": [
+          {
+            "id": "holdout-fractional",
+            "correct": 9,
+            "total": 9,
+            "missingOrFailed": false
+          },
+          {
+            "id": "holdout-usd",
+            "correct": 9,
+            "total": 9,
+            "missingOrFailed": false
+          },
+          {
+            "id": "holdout-missing",
+            "correct": 9,
+            "total": 9,
+            "missingOrFailed": false
+          },
+          {
+            "id": "holdout-injection",
+            "correct": 9,
+            "total": 9,
+            "missingOrFailed": false
+          }
+        ]
+      },
+      "distinctDocuments": 4,
+      "sourceVerification": {
+        "recordedAdapterHash": "8b0105f99bc670cc162a53df307deecf6138eafb23203e9f75f246a180a8fcdf",
+        "currentAdapterHash": "30ce26328974a2c22285ee176cfbb6fe7e89ad6190552813e680bfe0048756e1",
+        "interpretation": "Historical digital-only provider run; the adapter subsequently changed for multimodal intake"
+      }
+    },
+    "reviewedOcr": {
+      "score": {
+        "fields": {
+          "correct": 42,
+          "total": 42,
+          "rate": 1
+        },
+        "perField": {
+          "/purchase_order_id": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/seller_tax_code": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/buyer_tax_code": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/invoice_number": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/invoice_date": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/currency": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/subtotal": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/tax_amount": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/total_amount": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/description": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/sku": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/quantity": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/unit_price": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/tax_rate": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/line_subtotal": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/tax_amount": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/line_total": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/1/description": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          },
+          "/lines/1/sku": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          },
+          "/lines/1/quantity": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          },
+          "/lines/1/unit_price": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          },
+          "/lines/1/tax_rate": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          },
+          "/lines/1/line_subtotal": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          },
+          "/lines/1/tax_amount": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          },
+          "/lines/1/line_total": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          }
+        },
+        "cases": {
+          "correct": 2,
+          "total": 2,
+          "rate": 1
+        },
+        "missingOrFailedCases": 0,
+        "samples": [
+          {
+            "id": "held-scanned",
+            "correct": 25,
+            "total": 25,
+            "missingOrFailed": false
+          },
+          {
+            "id": "held-jpeg",
+            "correct": 17,
+            "total": 17,
+            "missingOrFailed": false
+          }
+        ]
+      },
+      "distinctDocuments": 2,
+      "sourceVerification": {
+        "sourceFiles": 23,
+        "matchedGitFiles": 7,
+        "mismatches": [
+          {
+            "file": "apps/api/src/ai/extraction/ai-extraction.module.ts",
+            "recordedHash": "a349dbf843068287c49248abba9d935e5de321c57c135d08269b9234cede8e21",
+            "currentGitHash": "4b0bb1f6f2f9a15fe7b777bef2a028c5ed96c8209c08b76a245757d8dbffe63f"
+          },
+          {
+            "file": "apps/api/src/ai/extraction/evaluation.ts",
+            "recordedHash": "9a4beaa3c023188a2556b729c9b4aee9b8c2f2c636548ee0cf7353a7e240eb11",
+            "currentGitHash": "59563bce975d78c75e3347990d52ae9814ea24671778413af468694f27f6666f"
+          },
+          {
+            "file": "apps/api/src/ai/extraction/extraction-provider.ts",
+            "recordedHash": "7d162d7cb3d55247e09c6e03179c88dd965bd31f7478c996eae10416051c0c99",
+            "currentGitHash": "3dc4f46ed55a5bc2fc08aa90d65e66796a419a841958679d111f79e9ba93af21"
+          },
+          {
+            "file": "apps/api/src/ai/extraction/gemini-extraction.provider.ts",
+            "recordedHash": "b6623a450b8ca31793fc9ea5ee3d9c21998ce623cb733dc5a7fbd4f98a8cb337",
+            "currentGitHash": "30ce26328974a2c22285ee176cfbb6fe7e89ad6190552813e680bfe0048756e1"
+          },
+          {
+            "file": "apps/api/src/ai/extraction/provider-budget.ts",
+            "recordedHash": "2e4f0da44e3469b55a0cf9358c945d997a74032ece934a1675cfa71ef5ae1258",
+            "currentGitHash": "ac7d3c53b64b1d9595071d5b992eb310e49952289ffe40c96182276c03bf5ab3"
+          },
+          {
+            "file": "apps/api/src/ai/extraction/provider-config.ts",
+            "recordedHash": "92a74c3cf0127acfc83d83541f12e3cd22285f80edb4860301fd7bae17568d13",
+            "currentGitHash": "723d060d1afbca6621f7172c4e80489dd2cbd89690b7be91ffbd6d8e9415b441"
+          },
+          {
+            "file": "apps/api/src/platform/evidence/clamav.scanner.ts",
+            "recordedHash": "3e8ee7cb2e39779b15a4973dff7df9f16cafca9190414fd1fc219e20b5f6c75d",
+            "currentGitHash": "bc129856f08e0143317ec13fe0dae625ec4186d012b1bae61d6cea2396dec524"
+          },
+          {
+            "file": "apps/api/src/platform/evidence/evidence-context.ts",
+            "recordedHash": "8d29c82ed2c5f4019e3882b9e49a994127f4d0fe6af94a78c081f97fd16f53c6",
+            "currentGitHash": "41409188b369396514ee58d4790e7521c5c318822f5e452aea212c3d3e1b734f"
+          },
+          {
+            "file": "apps/api/src/platform/evidence/evidence-storage.ts",
+            "recordedHash": "f676892673f8f096227e7a4dcd6b68aee1ab9951ec604020c3ba3cfdde71928e",
+            "currentGitHash": "52f6cca7eaf2c0c7faf4973f42c39f50ba70c1c9431f8c7e8cd9ae5fe2cc1eaa"
+          },
+          {
+            "file": "apps/api/src/platform/evidence/evidence.controller.ts",
+            "recordedHash": "c4afe2088f435f7ee654c4fcad69450e30c5a0626177149993abfeef975f5a0e",
+            "currentGitHash": "9b5cbd49df360a6a7666948b60b62a3920ece3766ea1457bb975ab2ea93e135c"
+          },
+          {
+            "file": "apps/api/src/platform/evidence/evidence.module.ts",
+            "recordedHash": "62130e481b5d962d49cf866fa2e1261fc27789c7c3a7f756fe2cc8087ebd6914",
+            "currentGitHash": "581de09b460f0f9239dcb5199d709dab51e47dc9f2dec3f08b8498faca6a16ff"
+          },
+          {
+            "file": "apps/api/src/platform/evidence/evidence.repository.ts",
+            "recordedHash": "da25ccdc2caee3bb5212ed491deb099a8245c6c72acb84462ff02ac1f857cfca",
+            "currentGitHash": "26729f4a3b12dd47180fe34eee5afc310c158fc1a6281cbafb2943a6bd282a98"
+          },
+          {
+            "file": "apps/api/src/platform/evidence/evidence.service.ts",
+            "recordedHash": "7be8dd1a65ac690c672aab9c318de194bbd8de47e0a72251e15ec934da0d93bd",
+            "currentGitHash": "0b82ba9273346c71ad9b574de250781963606ff3fb7d5bc048463da8222a2eff"
+          },
+          {
+            "file": "apps/api/src/platform/evidence/evidence.types.ts",
+            "recordedHash": "aa9563612b761fce742aec86ee737e1dddd7eee70224103c9d3d2382a0eeddc5",
+            "currentGitHash": "ed6f37a0526e74ef9ad96151cd28f1bf3366f0b07d83424f459554c8b1cce83c"
+          },
+          {
+            "file": "apps/api/src/platform/evidence/file-safety.ts",
+            "recordedHash": "af23babcb99da10c40f5d2081adefaa5baf16eda88e8977c913a11895c08eaea",
+            "currentGitHash": "0a0f1c6e957da3cef0377203792c302c5bc41ab08eeb88fc96591a0a67baf4f4"
+          },
+          {
+            "file": "apps/api/src/platform/extraction/draft.repository.ts",
+            "recordedHash": "f1120c488274da0e6a54d42b2b126a04e6a9a3cf13f37bdc48fec4a339cf2f48",
+            "currentGitHash": "c20df4f14223281da885571001000610f6dee2c7d738114cbdf244c17687a659"
+          }
+        ],
+        "interpretation": "Historical observed result, current-source equivalence only for exact matching blobs; a mismatch is an explicit integration/retest gate"
+      }
+    },
+    "mapping": {
+      "score": {
+        "exactCases": {
+          "correct": 6,
+          "total": 6,
+          "rate": 1
+        },
+        "matchPrecision": {
+          "correct": 3,
+          "total": 3,
+          "rate": 1
+        },
+        "missingOrFailedCases": 0,
+        "methods": {
+          "GEMINI": 6
+        }
+      },
+      "distinctDocuments": 6,
+      "sourceVerification": {
+        "sourceFiles": 3,
+        "matchedGitFiles": 3,
+        "mismatches": [],
+        "interpretation": "Historical observed result, current-source equivalence only for exact matching blobs; a mismatch is an explicit integration/retest gate"
+      }
+    },
+    "adversarialAnswers": {
+      "score": {
+        "exactRelevantAliases": {
+          "correct": 6,
+          "total": 6,
+          "rate": 1
+        },
+        "exactServerMissingEvidence": {
+          "correct": 6,
+          "total": 6,
+          "rate": 1
+        },
+        "sourceBoundCitations": {
+          "correct": 5,
+          "total": 5,
+          "rate": 1
+        },
+        "unsupportedStatements": 0,
+        "missingOrFailedCases": 0
+      },
+      "distinctDocuments": 6,
+      "sourceVerification": {
+        "sourceFiles": 9,
+        "matchedGitFiles": 7,
+        "mismatches": [
+          {
+            "file": "apps/api/src/ai/extraction/provider-config.ts",
+            "recordedHash": "92a74c3cf0127acfc83d83541f12e3cd22285f80edb4860301fd7bae17568d13",
+            "currentGitHash": "723d060d1afbca6621f7172c4e80489dd2cbd89690b7be91ffbd6d8e9415b441"
+          },
+          {
+            "file": "apps/api/src/ai/extraction/provider-budget.ts",
+            "recordedHash": "2e4f0da44e3469b55a0cf9358c945d997a74032ece934a1675cfa71ef5ae1258",
+            "currentGitHash": "ac7d3c53b64b1d9595071d5b992eb310e49952289ffe40c96182276c03bf5ab3"
+          }
+        ],
+        "interpretation": "Historical observed result, current-source equivalence only for exact matching blobs; a mismatch is an explicit integration/retest gate"
+      },
+      "budget": {
+        "request_attempts": 12,
+        "reserved_tokens": 7446,
+        "utc_day": 20741,
+        "day_request_attempts": 12,
+        "day_reserved_tokens": 7446
+      }
+    }
+  },
+  "limitations": [
+    "Small team-authored synthetic corpora, no independent production accuracy/annotation or calibrated confidence",
+    "Older held-out results were already observed and are regression evidence; repeated runs are never pooled",
+    "First six-case adversarial answer run was frozen before actual model calls; later reruns are regression only",
+    "Historical mismatched source hashes require retesting before an exact-head production claim",
+    "#44 browser correction/IDOR, #43 production tenancy, #50 owner decisions and #59 production SDK remain gates",
+    "Actual bill unknown; reservations and HTTP attempts are not billed cost",
+    "No aggregate overall accuracy across incomparable tasks"
+  ]
+}
