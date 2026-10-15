@@ -5,6 +5,7 @@ services:
     extends:
       file: ../history/compose.yaml
       service: postgres
+    ports: !override ["127.0.0.1:15457:5432"]
     volumes: !override ["source:/var/lib/postgresql/data"]
   restore:
     image: postgres:16-alpine

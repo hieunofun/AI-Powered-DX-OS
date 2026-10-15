@@ -7,6 +7,11 @@ const integrated = () => plan.map(item => ({ id: item.id, candidateSha: head, sc
   author: 'author-fixture', independentApproval: { reviewer: 'independent-fixture', commit: head } }));
 test('BRS defines all twelve distinct acceptance cases', () => assert.equal(plan.length, 12));
 test('absence of integrated results cannot be promoted by closed issues', () => assert.equal(assess(plan, snapshot, head).passed, 0));
+test('an empty plan cannot exploit vacuous every() to qualify zero acceptance cases', () => assert.throws(() => assess([], snapshot, head)));
+test('duplicate or unknown scenario IDs cannot replace a required acceptance case', () => {
+  const duplicated = structuredClone(plan); duplicated[11] = duplicated[0]; assert.throws(() => assess(duplicated, snapshot, head));
+  const unknown = structuredClone(plan); unknown[11].id = 'AT-99'; assert.throws(() => assess(unknown, snapshot, head));
+});
 test('open or absent owner dependency blocks an otherwise qualifying result', () => {
   const state = structuredClone(snapshot); state.issues = []; assert.equal(assess(plan, state, head, integrated()).passed, 0);
 });

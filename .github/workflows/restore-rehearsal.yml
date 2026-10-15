@@ -9,6 +9,8 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  issues: read
+  pull-requests: read
 jobs:
   native-history-restore:
     runs-on: ubuntu-latest
@@ -30,7 +32,9 @@ jobs:
           ACCEPTANCE_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: node infra/acceptance/collect-github.cjs
       - name: Start isolated source and separate restore target
-        run: docker compose -f infra/acceptance/compose.yaml up -d
+        run: |
+          node infra/acceptance/verify-compose.cjs
+          docker compose -f infra/acceptance/compose.yaml up -d
       - name: Rehearse native hot/cold restore with exact IDs, hashes and real SQL roles
         run: node infra/acceptance/restore-rehearsal.cjs --isolated-rehearsal --wait-ready
       - name: Retain component reports and native synthetic database dumps

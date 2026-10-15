@@ -9,6 +9,9 @@ function parsePlan(markdown) {
   assert.equal(rows.length, 12); assert.equal(new Set(rows.map(row => row.id)).size, 12); return rows;
 }
 function assess(plan, snapshot, candidateSha, integratedResults = []) {
+  assert.equal(plan.length, 12, 'All twelve integrated cases are required');
+  assert.equal(new Set(plan.map(row => row.id)).size, 12, 'Repeated scenarios cannot qualify');
+  assert.ok(plan.every(row => /^AT-(?:0[1-9]|1[0-2])$/.test(row.id)));
   assert.match(candidateSha, /^[a-f0-9]{40}$/); assert.equal(snapshot.repository, 'hieunofun/AI-Powered-DX-OS');
   const cases = plan.map(item => {
     const blockedDependencies = item.dependencies.filter(id => snapshot.issues.find(issue => issue.number === id)?.state !== 'closed');
