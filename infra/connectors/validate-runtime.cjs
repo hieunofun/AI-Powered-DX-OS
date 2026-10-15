@@ -142,6 +142,42 @@ async function main() {
     assert.equal(recovered.operation.state, 'SUCCEEDED'); assert.equal(recovered.evidence_id, pending.evidence_id); assert.equal(await count('openresolve_connector_case_outbox'), before + 1);
     assert.equal((await fixture.store.read(fixture.contexts.worker, operation.resource_ref.id)).failures.length, 1);
   });
+  await check('revoked original-source membership prevents worker substitution and any witness I/O', async () => {
+    const operation = await http('POST', route('external-orders', fixture.sources.order), native(order()), 202, 'order');
+    const before = await count('platform_evidence_records');
+    await fixture.db.query('UPDATE connector_fixture_memberships SET active=false WHERE tenant_id=$1 AND subject=$2', [fixture.contexts.order.tenantId, fixture.contexts.order.subject]);
+    try { await assert.rejects(fixture.ingress.processNext(fixture.contexts.worker), error => error.code === 'FORBIDDEN'); }
+    finally { await fixture.db.query('UPDATE connector_fixture_memberships SET active=true WHERE tenant_id=$1 AND subject=$2', [fixture.contexts.order.tenantId, fixture.contexts.order.subject]); }
+    assert.equal(await count('platform_evidence_records'), before);
+    assert.equal((await fixture.store.read(fixture.contexts.worker, operation.resource_ref.id)).attempts, 0);
+    assert.equal((await processOne(operation.resource_ref.id)).operation.state, 'SUCCEEDED');
+  });
+  await check('current per-source processor grant is mandatory even when another source remains granted', async () => {
+    const operation = await http('POST', route('external-orders', fixture.sources.order), native(order()), 202, 'order');
+    const before = await count('platform_evidence_records');
+    await fixture.db.query('DELETE FROM connector_fixture_processor_grants WHERE tenant_id=$1 AND subject=$2 AND source_id=$3', [fixture.contexts.worker.tenantId, fixture.contexts.worker.subject, fixture.sources.order]);
+    try { await assert.rejects(fixture.ingress.processNext(fixture.contexts.worker), error => error.code === 'FORBIDDEN'); }
+    finally { await fixture.db.query('INSERT INTO connector_fixture_processor_grants VALUES($1,$2,$3)', [fixture.contexts.worker.tenantId, fixture.contexts.worker.subject, fixture.sources.order]); }
+    assert.equal(await count('platform_evidence_records'), before);
+    assert.equal((await processOne(operation.resource_ref.id)).operation.state, 'SUCCEEDED');
+  });
+  await check('actual unavailable scanner retains quarantine and bytes, blocks handoff, and recovers the same witness', async () => {
+    const packet = reading(4, '2'); packet.data.quality = 'DAMAGED';
+    const operation = await http('POST', route('receiving-sensors', fixture.sources.sensor), native(packet), 202, 'sensor');
+    const before = await count('openresolve_connector_case_outbox'); fixture.flags.unavailableScanner = true;
+    let pending;
+    try { pending = await processOne(operation.resource_ref.id); }
+    finally { fixture.flags.unavailableScanner = false; }
+    assert.equal(pending.operation.state, 'PENDING'); assert.equal(pending.outcome, undefined); assert.equal(await count('openresolve_connector_case_outbox'), before);
+    await http('GET', '/platform/v1/evidence/' + pending.evidence_id + '/content', undefined, 409);
+    const stored = (await fixture.db.query('SELECT data FROM platform_evidence_records WHERE tenant_id=$1 AND id=$2', [fixture.contexts.worker.tenantId, pending.evidence_id])).rows[0].data;
+    assert.notEqual(stored.evidence.quarantine_state, 'CLEAN'); assert.equal(stored.history.at(-1).state, 'SCAN_FAILED');
+    await makeDue(operation.resource_ref.id);
+    const scannerWait = Math.max(0, Date.parse(stored.nextAttemptAt || '') - Date.now()) + 50;
+    if (Number.isFinite(scannerWait) && scannerWait > 0) await new Promise(resolve => setTimeout(resolve, scannerWait));
+    const recovered = await processOne(operation.resource_ref.id, fixture.createWorker());
+    assert.equal(recovered.operation.state, 'SUCCEEDED'); assert.equal(recovered.evidence_id, pending.evidence_id); assert.equal(await count('openresolve_connector_case_outbox'), before + 1);
+  });
   await check('native receipts, original payload metadata and anchors cannot be overwritten/deleted', async () => {
     const tenant = fixture.contexts.worker.tenantId;
     await assert.rejects(fixture.db.query('DELETE FROM openresolve_source_receipts WHERE tenant_id=$1', [tenant]), /append-only/);
