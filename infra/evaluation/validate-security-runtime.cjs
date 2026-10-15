@@ -3,6 +3,7 @@
 const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict'), { createHash, randomUUID } = require('node:crypto'), { execFileSync } = require('node:child_process');
 const root = path.resolve(__dirname, '../..'), load = file => require(path.join(root, 'apps/api/dist', file)), { createFixture } = require('../mediation/runtime-fixture.cjs');
 const { checksum } = load('platform/evidence/file-safety.js'), { ClamavScanner } = load('platform/evidence/clamav.scanner.js'), { Pool } = require('pg');
+const PDFDocument = require('pdfkit');
 const startedAt = new Date().toISOString(), checks = [], resources = {}; let f, failure;
 const prefix = '/apps/openresolve/v1/ai';
 async function check(name, work) { try { await work(); checks.push({ name, status: 'PASS' }); console.log('PASS ' + name); } catch (error) { checks.push({ name, status: 'FAIL', code: error.code || error.name, message: error.message }); throw error; } }
@@ -38,8 +39,16 @@ async function main() {
   });
   await check('actual AV blocks harmless embedded test signature and never serves infected bytes', async () => {
     const pattern = Buffer.from('WDVPIVAlQEFQWzRcUFpYNTQoUF4pN0NDKTd9JEVJQ0FSLVNUQU5EQVJELUFOVElWSVJVUy1URVNULUZJTEUhJEgrSCo=', 'base64');
-    const bytes = Buffer.concat([Buffer.from('<?xml version="1.0"?><fixture>'), pattern, Buffer.from('</fixture>')]), item = await register(bytes);
-    await http('PUT', item.upload.href, bytes, 202, 'worker', { 'Content-Type': 'application/xml' });
+    assert.equal(pattern.length, 68); const direct = await f.scanner.scan(pattern); resources.canonicalAvControl = direct; assert.equal(direct.state, 'INFECTED');
+    // Retain the earlier XML-wrapper observation; it is not the canonical 68-byte control.
+    const wrapper = Buffer.concat([Buffer.from('<?xml version="1.0"?><fixture>'), pattern, Buffer.from('</fixture>')]);
+    resources.nonCanonicalXmlControl = { result: await f.scanner.scan(wrapper), limitation: 'No claim that arbitrary XML-wrapped/encoded signatures are detected' };
+    const bytes = await new Promise((resolve, reject) => {
+      const document = new PDFDocument(), chunks = []; document.on('data', part => chunks.push(part)); document.on('error', reject); document.on('end', () => resolve(Buffer.concat(chunks)));
+      document.text('FICTIONAL AV acceptance, no user document'); document.file(pattern, { name: 'harmless-av-control.txt' }); document.end();
+    });
+    const item = await register(bytes, 'misleading.jpg', 'application/pdf');
+    await http('PUT', item.upload.href, bytes, 202, 'worker', { 'Content-Type': 'application/pdf' });
     // The existing prepared source also has one explicitly unscanned item; drain bounded eligible scans.
     for (let index = 0; index < 4 && (await f.evidence.detail(ctx.worker, item.evidence.id)).quarantine_state === 'PENDING_SCAN'; index++) await f.evidence.processNextScan(ctx.worker);
     assert.equal((await f.evidence.detail(ctx.worker, item.evidence.id)).quarantine_state, 'INFECTED'); await http('GET', item.upload.href, undefined, 409); resources.infectedId = item.evidence.id;
