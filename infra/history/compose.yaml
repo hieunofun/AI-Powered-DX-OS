@@ -1,0 +1,17 @@
+name: opendx-issue57
+# Separate hot/cold databases, one isolated fixture server; no production credentials or volume deletion.
+services:
+  postgres:
+    extends:
+      file: ../lineage/compose.yaml
+      service: postgres
+    environment:
+      POSTGRES_DB: history_hot_issue57
+      POSTGRES_USER: history_fixture
+      POSTGRES_PASSWORD: history_fixture_local_only
+    ports: !override ["127.0.0.1:15457:5432"]
+    volumes: !override ["postgres:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U history_fixture -d history_hot_issue57"]
+volumes:
+  postgres:

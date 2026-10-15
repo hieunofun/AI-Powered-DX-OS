@@ -1,0 +1,37 @@
+{
+  "issue": 66,
+  "profile": "COMPONENT_RESTORE_REHEARSAL",
+  "acceptanceStatus": "PARTIAL",
+  "startedAt": "2026-10-15T19:11:55.633Z",
+  "finishedAt": "2026-10-15T19:13:56.276Z",
+  "commit": "f3909d19c8aa6cc038256ea55789b0f5c785fedc",
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "linux",
+    "architecture": "x64",
+    "cpuThreads": 4,
+    "hostMemoryBytes": 16765378560,
+    "kernel": "6.17.0-1022-azure"
+  },
+  "checks": [],
+  "resources": {},
+  "times": {},
+  "sourceHashes": {
+    "infra/acceptance/compose.yaml": "33ca779fdac138aa09df9f3c2aeec744482fc92b61450a56fd65bcd42b52c26d",
+    "infra/acceptance/restore-rehearsal.cjs": "63ca629fc62ce2ba0143618be6c77052495dfc671a3907bf5240d33bf8b5c12d",
+    "infra/history/runtime-fixture.cjs": "d49c81181d671a7f0f55e9deb08302ea60e808e81c8dad65f265ccfe1698abe6",
+    "database/proposed/issue57-cold-history.sql": "3137d136a7b3fc6fc3f259fc607210f5acea7b5b9bcea7aad1dded1479e03aba"
+  },
+  "actualAiCalls": 0,
+  "limitations": [
+    "Synthetic owning source/identity/evidence-reference ports, not production #43/#50 authority",
+    "No original object bytes, native Flowable/ImmuDB/trust backup or verification; complete AT-12 blocked on #65",
+    "New empty target databases only; no production restore, volume deletion, live-worker quiescence or destructive rollback",
+    "Fresh source fixture plus forward schema initialization is not a legacy upgrade proof",
+    "No full AT-01..12 or release qualification claim"
+  ],
+  "failure": {
+    "code": "Error",
+    "message": "Isolated source/restore PostgreSQL readiness timed out"
+  }
+}

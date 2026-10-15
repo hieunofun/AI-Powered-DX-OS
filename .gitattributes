@@ -1,6 +1,29 @@
 # Shell acceptance scripts must run identically in Linux CI and Windows/WSL.
 *.sh text eol=lf
+infra/acceptance/*.cjs text eol=lf
+infra/acceptance/*.yaml text eol=lf
+infra/evaluation/*.cjs text eol=lf
+infra/evaluation/fixtures/*.json text eol=lf
+apps/api/src/ai/extraction/adversarial-boundaries.spec.ts text eol=lf
 # Preserve PDF fixture byte offsets and hashes across checkouts.
 *.pdf -text
 # Keep byte-sensitive XML fixture mutations and archival hashes identical across platforms.
 infra/invoice/fixtures/*.xml text eol=lf
+# Preserve AI mediation source, support and synthetic corpus hashes across checkouts.
+apps/api/src/packs/openresolve/mediation/*.ts text eol=lf
+infra/mediation/*.cjs text eol=lf
+infra/mediation/fixtures/*.json text eol=lf
+database/proposed/issue54-ai-mediation.sql text eol=lf
+packages/contracts/opendx/proposed/issue54-mediation.schema.json text eol=lf
+# Keep connector acceptance source/support hashes reproducible in Windows and Linux CI.
+apps/api/src/packs/openresolve/connectors/*.ts text eol=lf
+apps/api/src/platform/evidence/*.ts text eol=lf
+apps/api/src/platform/lineage/*.ts text eol=lf
+infra/connectors/*.cjs text eol=lf
+database/proposed/issue51-external-itot-ingress.sql text eol=lf
+packages/contracts/opendx/proposed/issue51-connectors.schema.json text eol=lf
+# Cold history acceptance uses exact source/support hashes across Windows and Linux.
+apps/api/src/platform/history/*.ts text eol=lf
+infra/history/*.cjs text eol=lf
+database/proposed/issue57-cold-history.sql text eol=lf
+packages/contracts/opendx/proposed/issue57-history.schema.json text eol=lf

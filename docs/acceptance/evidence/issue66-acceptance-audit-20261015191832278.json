@@ -1,0 +1,854 @@
+{
+  "issue": 66,
+  "testedGitCommit": "20050a1ffb57d22489d55b6f0361769a4a50c7de",
+  "snapshot": {
+    "repository": "hieunofun/AI-Powered-DX-OS",
+    "inspectedAt": "2026-10-15T19:18:32.269Z",
+    "issues": [
+      {
+        "number": 66,
+        "title": "[P4-34] Run system acceptance and measure operating behavior",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/66"
+      },
+      {
+        "number": 65,
+        "title": "[P4-33] Demonstrate configuration reconciliation and backup restore",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/65"
+      },
+      {
+        "number": 64,
+        "title": "[P4-32] Document source provenance and pack development",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/64"
+      },
+      {
+        "number": 63,
+        "title": "[P4-31] Evaluate AI quality and adversarial tenant/upload security",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/63"
+      },
+      {
+        "number": 62,
+        "title": "[P4-30] Integrate data migrations and transaction recovery",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/62"
+      },
+      {
+        "number": 61,
+        "title": "[P4-29] Build Onboarding screens on shared workspaces",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/61"
+      },
+      {
+        "number": 60,
+        "title": "[P4-28] Implement an Onboarding pack that reuses the core",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/60"
+      },
+      {
+        "number": 59,
+        "title": "[P4-27] Define the minimum Capability Pack contract and SDK",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/59"
+      },
+      {
+        "number": 58,
+        "title": "[P4-26] Build the decision comparison screen",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/58"
+      },
+      {
+        "number": 57,
+        "title": "[P4-25] Separate hot transactions from cold history and reporting",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/57"
+      },
+      {
+        "number": 56,
+        "title": "[P4-24] Simulate historical decisions with a different policy",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/56"
+      },
+      {
+        "number": 55,
+        "title": "[P4-23] Build process and policy inspection screens",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/55"
+      },
+      {
+        "number": 54,
+        "title": "[P4-22] Mediate AI explanations and action proposals",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/54"
+      },
+      {
+        "number": 53,
+        "title": "[P4-21] Implement exception cases and missing business invariants",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/53"
+      },
+      {
+        "number": 52,
+        "title": "[P4-20] Build the OpenResolve exception workspace",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/52"
+      },
+      {
+        "number": 51,
+        "title": "[P4-19] Connect external systems and demonstrate one IT/OT flow",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/51"
+      },
+      {
+        "number": 50,
+        "title": "[P4-18] Implement the shared Evidence-to-Decision record",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/50"
+      },
+      {
+        "number": 49,
+        "title": "[P4-17] Build the evidence workspace",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/49"
+      },
+      {
+        "number": 48,
+        "title": "[P4-15] Version policies and enforce approval controls",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/48"
+      },
+      {
+        "number": 47,
+        "title": "[P4-14] Build the shared work inbox",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/47"
+      },
+      {
+        "number": 46,
+        "title": "[P4-13] Add tenant-scoped evidence and data lineage",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/46"
+      },
+      {
+        "number": 45,
+        "title": "[P4-12] Provide generic workflow runtime and task APIs",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/45"
+      },
+      {
+        "number": 44,
+        "title": "[P4-11] Build the OCR review and correction screen",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/44"
+      },
+      {
+        "number": 43,
+        "title": "[P4-09] Enforce backend tenant isolation and resource authorization",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/43"
+      },
+      {
+        "number": 42,
+        "title": "[P4-08] Add a typed API client and authorization context",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/42"
+      },
+      {
+        "number": 41,
+        "title": "[P4-07] Implement secure document intake and file quarantine",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/41"
+      },
+      {
+        "number": 40,
+        "title": "[P4-06] Extract a headless platform core from PR3",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/40"
+      },
+      {
+        "number": 39,
+        "title": "[P4-04] Build the Vietnamese application shell",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/39"
+      },
+      {
+        "number": 38,
+        "title": "[P4-03] Implement the AI provider adapter and evaluation dataset",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/38"
+      },
+      {
+        "number": 37,
+        "title": "[P4-02] Define the BRS, core boundaries and first-wave API contracts",
+        "state": "closed",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/37"
+      },
+      {
+        "number": 36,
+        "title": "[P4-01] Preserve the PR3 baseline and define the contribution workflow",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/36"
+      },
+      {
+        "number": 34,
+        "title": "[BUG] Prevent invoice approvals from reusing received quantities",
+        "state": "closed",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/34"
+      },
+      {
+        "number": 30,
+        "title": "[P4-36] Publish a reviewed reproducible contest release",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/30"
+      },
+      {
+        "number": 29,
+        "title": "[P4-35] Prepare reproducible demos and collect user feedback",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/29"
+      },
+      {
+        "number": 28,
+        "title": "[TAX] Track supplier tax-risk checks with source provenance",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/28"
+      },
+      {
+        "number": 27,
+        "title": "[SECURITY] Verify invoice XML signatures and certificate trust",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/27"
+      },
+      {
+        "number": 26,
+        "title": "[P4-10] Persist reviewed OCR drafts from PDF and image documents",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/26"
+      },
+      {
+        "number": 25,
+        "title": "[P4-16] Add reviewed AI suggestions for line-item mapping",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/25"
+      },
+      {
+        "number": 24,
+        "title": "[UI] Build invoice reconciliation approval and audit workspaces",
+        "state": "closed",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/24"
+      },
+      {
+        "number": 23,
+        "title": "[UI] Build purchase order and goods receipt workspaces",
+        "state": "closed",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/23"
+      },
+      {
+        "number": 22,
+        "title": "[P4-05] Resolve ledger licensing and migrate the adapter if required",
+        "state": "open",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/22"
+      },
+      {
+        "number": 21,
+        "title": "[DOCS] Align MVP documentation and next delivery backlog",
+        "state": "closed",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/21"
+      },
+      {
+        "number": 10,
+        "title": "[AUDIT] Implement immutable audit sealing",
+        "state": "closed",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/10"
+      },
+      {
+        "number": 9,
+        "title": "[WORKFLOW] Implement invoice approval & exception workflow",
+        "state": "closed",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/9"
+      },
+      {
+        "number": 8,
+        "title": "[MATCHING] Implement 3-Way Matching Engine",
+        "state": "closed",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/8"
+      },
+      {
+        "number": 7,
+        "title": "[INVOICE] Implement invoice ingestion pipeline",
+        "state": "closed",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/7"
+      },
+      {
+        "number": 6,
+        "title": "[WAREHOUSE] Implement Goods Receipt module",
+        "state": "closed",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/6"
+      },
+      {
+        "number": 5,
+        "title": "[PROCUREMENT] Implement Purchase Order module",
+        "state": "closed",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/5"
+      },
+      {
+        "number": 4,
+        "title": "[GATEWAY] Integrate Apache APISIX API Gateway",
+        "state": "closed",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/4"
+      },
+      {
+        "number": 3,
+        "title": "[IDENTITY] Integrate Keycloak SSO & RBAC",
+        "state": "closed",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/3"
+      },
+      {
+        "number": 2,
+        "title": "[DATA] Design PostgreSQL domain schema",
+        "state": "closed",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/2"
+      },
+      {
+        "number": 1,
+        "title": "[BOOTSTRAP] Project bootstrap & Docker foundation",
+        "state": "closed",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/issues/1"
+      }
+    ],
+    "pullRequests": [
+      {
+        "number": 80,
+        "author": "huybitvvt",
+        "state": "open",
+        "mergedAt": null,
+        "draft": true,
+        "head": "a2f5f256d9b0f2f69342589bd9a53425213db5d3",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/80"
+      },
+      {
+        "number": 79,
+        "author": "huybitvvt",
+        "state": "open",
+        "mergedAt": null,
+        "draft": true,
+        "head": "976eed7fff9b6b4c7a3db4a0e8f73b42ed3ca4fb",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/79"
+      },
+      {
+        "number": 78,
+        "author": "huybitvvt",
+        "state": "open",
+        "mergedAt": null,
+        "draft": true,
+        "head": "2336281172ee1929486a7c3c32ed761cda5bc4a5",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/78"
+      },
+      {
+        "number": 77,
+        "author": "huybitvvt",
+        "state": "open",
+        "mergedAt": null,
+        "draft": true,
+        "head": "59fd491cf9530e82348bb8664fb2e86e7ac12328",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/77"
+      },
+      {
+        "number": 76,
+        "author": "huybitvvt",
+        "state": "open",
+        "mergedAt": null,
+        "draft": true,
+        "head": "b9e78b01023f0f8a500b957171bffbe31778e5d4",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/76"
+      },
+      {
+        "number": 75,
+        "author": "huybitvvt",
+        "state": "open",
+        "mergedAt": null,
+        "draft": true,
+        "head": "bef021e7fc963573cfa4811bcc031c85ef6349dc",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/75"
+      },
+      {
+        "number": 74,
+        "author": "huybitvvt",
+        "state": "open",
+        "mergedAt": null,
+        "draft": true,
+        "head": "a789cd9b1fff1de11ee7e21fcc6d4bb6e2148f1c",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/74"
+      },
+      {
+        "number": 73,
+        "author": "huybitvvt",
+        "state": "open",
+        "mergedAt": null,
+        "draft": true,
+        "head": "93db77c0d0fc22a37a200d0415bf93a1bb3f98dc",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/73"
+      },
+      {
+        "number": 72,
+        "author": "huybitvvt",
+        "state": "open",
+        "mergedAt": null,
+        "draft": true,
+        "head": "601e8f9ae666a983dff9f38cecb2ab5e72c99a02",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/72"
+      },
+      {
+        "number": 71,
+        "author": "hieunofun",
+        "state": "open",
+        "mergedAt": null,
+        "draft": false,
+        "head": "a4df50a7d9dd6d7093bc2df90e364222b6d319e6",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/71"
+      },
+      {
+        "number": 70,
+        "author": "huybitvvt",
+        "state": "open",
+        "mergedAt": null,
+        "draft": true,
+        "head": "34ca3db02a5d14f41ff437de83866e9976eaa15b",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/70"
+      },
+      {
+        "number": 69,
+        "author": "hieunofun",
+        "state": "open",
+        "mergedAt": null,
+        "draft": false,
+        "head": "955b31c09cd90c9aa6679828f6f5d642a1a43c66",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/69"
+      },
+      {
+        "number": 68,
+        "author": "huybitvvt",
+        "state": "open",
+        "mergedAt": null,
+        "draft": false,
+        "head": "70013f56055f9bb5eeeffe340a089e1770b53613",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/68"
+      },
+      {
+        "number": 67,
+        "author": "hieunofun",
+        "state": "closed",
+        "mergedAt": "2026-10-14T13:56:16Z",
+        "draft": false,
+        "head": "55dec1672d51153c37d56818480751cce898d505",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/67"
+      },
+      {
+        "number": 35,
+        "author": "huybitvvt",
+        "state": "closed",
+        "mergedAt": "2026-10-08T17:55:24Z",
+        "draft": false,
+        "head": "33fda7f533c2c42130ae2ec5aef16736fc14359f",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/35"
+      },
+      {
+        "number": 33,
+        "author": "huybitvvt",
+        "state": "closed",
+        "mergedAt": "2026-10-08T17:34:58Z",
+        "draft": false,
+        "head": "a2a838e5dbc0a0fa01a7836ceec584b8dd38b6be",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/33"
+      },
+      {
+        "number": 32,
+        "author": "huybitvvt",
+        "state": "closed",
+        "mergedAt": "2026-10-08T17:14:03Z",
+        "draft": false,
+        "head": "811570c34615d0ad3de42c8d3e3c414aa0a2022c",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/32"
+      },
+      {
+        "number": 31,
+        "author": "huybitvvt",
+        "state": "closed",
+        "mergedAt": "2026-10-08T16:21:44Z",
+        "draft": false,
+        "head": "a20ac7db7d40770303b0a00972dfe838389c7fc2",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/31"
+      },
+      {
+        "number": 20,
+        "author": "hieunofun",
+        "state": "closed",
+        "mergedAt": "2026-10-07T08:08:54Z",
+        "draft": false,
+        "head": "239b6b689c160707d0aba20e1069049a0197fe55",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/20"
+      },
+      {
+        "number": 19,
+        "author": "hieunofun",
+        "state": "closed",
+        "mergedAt": "2026-10-06T07:57:49Z",
+        "draft": false,
+        "head": "215398572e5bb294f705b31f93994442ae99a719",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/19"
+      },
+      {
+        "number": 18,
+        "author": "hieunofun",
+        "state": "closed",
+        "mergedAt": "2026-10-05T12:49:49Z",
+        "draft": false,
+        "head": "4178d22d8d414a47f603e40673a65904b680e57b",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/18"
+      },
+      {
+        "number": 17,
+        "author": "hieunofun",
+        "state": "closed",
+        "mergedAt": "2026-10-05T11:27:12Z",
+        "draft": false,
+        "head": "d3abc3dfca1020d68253e367248ca905a0a54b33",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/17"
+      },
+      {
+        "number": 16,
+        "author": "hieunofun",
+        "state": "closed",
+        "mergedAt": "2026-10-04T16:59:32Z",
+        "draft": false,
+        "head": "4043ed4aaf172d2541b0f2f5055cfe820ffc783f",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/16"
+      },
+      {
+        "number": 15,
+        "author": "hieunofun",
+        "state": "closed",
+        "mergedAt": "2026-10-04T11:02:18Z",
+        "draft": false,
+        "head": "e4aaedc28fd30e22d710bd865b6946962ead76fe",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/15"
+      },
+      {
+        "number": 14,
+        "author": "hieunofun",
+        "state": "closed",
+        "mergedAt": "2026-10-04T07:29:09Z",
+        "draft": false,
+        "head": "35ca3a54676419504b82483cee86e69dab260830",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/14"
+      },
+      {
+        "number": 13,
+        "author": "hieunofun",
+        "state": "closed",
+        "mergedAt": "2026-10-04T05:41:56Z",
+        "draft": false,
+        "head": "ec5547767eea32cb0ad802c7770c2a50913813f4",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/13"
+      },
+      {
+        "number": 12,
+        "author": "hieunofun",
+        "state": "closed",
+        "mergedAt": "2026-10-03T18:16:42Z",
+        "draft": false,
+        "head": "1dad64f77bb0f330e7b386938c2843982295eb01",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/12"
+      },
+      {
+        "number": 11,
+        "author": "hieunofun",
+        "state": "closed",
+        "mergedAt": "2026-10-03T16:43:11Z",
+        "draft": false,
+        "head": "973a3aec2eb35ffc1f84f027b63cce3c12620088",
+        "base": "develop",
+        "url": "https://github.com/hieunofun/AI-Powered-DX-OS/pull/11"
+      }
+    ]
+  },
+  "assessment": {
+    "candidateSha": "a2f5f256d9b0f2f69342589bd9a53425213db5d3",
+    "cases": [
+      {
+        "id": "AT-01",
+        "scenario": "A cannot read/update B's resource/file/search/worker data",
+        "scenarioHash": "a30960869683ba76f226bf06eb6072c9e9e362642bbb9ea46d42437b24946930",
+        "dependencies": [
+          43,
+          46,
+          63
+        ],
+        "trace": "#43, #46, #63",
+        "status": "BLOCKED",
+        "blockedDependencies": [
+          43,
+          46,
+          63
+        ],
+        "reasons": [
+          "Dependencies are open or their state is unverified",
+          "Exact-candidate integrated runtime/native proof and independent review are required; component/legacy/fixture checks do not qualify"
+        ]
+      },
+      {
+        "id": "AT-02",
+        "scenario": "Concurrent invoice capacity only commits permitted claims",
+        "scenarioHash": "b09afd4c6942ab5a91c51f78526826f979487867cf07d3d1d4b9a9b6d4d9918b",
+        "dependencies": [
+          53,
+          62,
+          34
+        ],
+        "trace": "#53, #62, PR3 #34 regression",
+        "status": "BLOCKED",
+        "blockedDependencies": [
+          53,
+          62
+        ],
+        "reasons": [
+          "Dependencies are open or their state is unverified",
+          "Exact-candidate integrated runtime/native proof and independent review are required; component/legacy/fixture checks do not qualify"
+        ]
+      },
+      {
+        "id": "AT-03",
+        "scenario": "Counted 95/missing 5 from 100 items and 10 packages",
+        "scenarioHash": "82c55e8746ad41c30e7375489d3848769f59c925741850d75f8955e8c12fa74a",
+        "dependencies": [
+          53
+        ],
+        "trace": "#53; ReceiptQuantities fixture",
+        "status": "BLOCKED",
+        "blockedDependencies": [
+          53
+        ],
+        "reasons": [
+          "Dependencies are open or their state is unverified",
+          "Exact-candidate integrated runtime/native proof and independent review are required; component/legacy/fixture checks do not qualify"
+        ]
+      },
+      {
+        "id": "AT-04",
+        "scenario": "Four post-handover failures create incident, no GRN rewrite",
+        "scenarioHash": "4776a708be64301a0664a128fae6df6b62c9c0fc5964f428cfab4bb2709afc72",
+        "dependencies": [
+          53
+        ],
+        "trace": "#53",
+        "status": "BLOCKED",
+        "blockedDependencies": [
+          53
+        ],
+        "reasons": [
+          "Dependencies are open or their state is unverified",
+          "Exact-candidate integrated runtime/native proof and independent review are required; component/legacy/fixture checks do not qualify"
+        ]
+      },
+      {
+        "id": "AT-05",
+        "scenario": "+10% price versus 5% tolerance becomes exception",
+        "scenarioHash": "9d65d0557ef43a7e7cdf3ec565a804b71a15f021e4a1974f3351a99202e3d4fa",
+        "dependencies": [
+          48,
+          53
+        ],
+        "trace": "#48, #53",
+        "status": "BLOCKED",
+        "blockedDependencies": [
+          48,
+          53
+        ],
+        "reasons": [
+          "Dependencies are open or their state is unverified",
+          "Exact-candidate integrated runtime/native proof and independent review are required; component/legacy/fixture checks do not qualify"
+        ]
+      },
+      {
+        "id": "AT-06",
+        "scenario": "OCR total correction retains raw/extraction/actor and rematches",
+        "scenarioHash": "dafeebb13506e7b42fe5a22f9d9af8fcd7551b5f6ec172684f41ae3087059a10",
+        "dependencies": [
+          26,
+          44,
+          46
+        ],
+        "trace": "#26, #44, #46",
+        "status": "BLOCKED",
+        "blockedDependencies": [
+          26,
+          44,
+          46
+        ],
+        "reasons": [
+          "Dependencies are open or their state is unverified",
+          "Exact-candidate integrated runtime/native proof and independent review are required; component/legacy/fixture checks do not qualify"
+        ]
+      },
+      {
+        "id": "AT-07",
+        "scenario": "Policy replay shows A/B with no business/tool side effects",
+        "scenarioHash": "1a325138b7f2e41b8d390593a319ff2035faa82142f7f97501ca3d7c37a3bb29",
+        "dependencies": [
+          56,
+          58
+        ],
+        "trace": "#56, #58",
+        "status": "BLOCKED",
+        "blockedDependencies": [
+          56,
+          58
+        ],
+        "reasons": [
+          "Dependencies are open or their state is unverified",
+          "Exact-candidate integrated runtime/native proof and independent review are required; component/legacy/fixture checks do not qualify"
+        ]
+      },
+      {
+        "id": "AT-08",
+        "scenario": "Injection cannot approve/export outside rights",
+        "scenarioHash": "1469040a19c90ee00e48794cca92c1ff909009d3cae886a62dafe060ec5f132d",
+        "dependencies": [
+          54,
+          63
+        ],
+        "trace": "#54, #63",
+        "status": "BLOCKED",
+        "blockedDependencies": [
+          54,
+          63
+        ],
+        "reasons": [
+          "Dependencies are open or their state is unverified",
+          "Exact-candidate integrated runtime/native proof and independent review are required; component/legacy/fixture checks do not qualify"
+        ]
+      },
+      {
+        "id": "AT-09",
+        "scenario": "Dependency outage gives pending/reconcile, no false completion",
+        "scenarioHash": "2eec24ee9d9e90c1d1700689448de9f720f56ac111b440fe1abe407219a8494b",
+        "dependencies": [
+          45,
+          62,
+          65
+        ],
+        "trace": "#45, #62, #65",
+        "status": "BLOCKED",
+        "blockedDependencies": [
+          45,
+          62,
+          65
+        ],
+        "reasons": [
+          "Dependencies are open or their state is unverified",
+          "Exact-candidate integrated runtime/native proof and independent review are required; component/legacy/fixture checks do not qualify"
+        ]
+      },
+      {
+        "id": "AT-10",
+        "scenario": "Onboarding reuses identity/workflow/evidence, zero domain core diff",
+        "scenarioHash": "f84ed2a3830d03bbbe34e629131a88749107479d62abbfc4791da5525a022f04",
+        "dependencies": [
+          59,
+          60,
+          61
+        ],
+        "trace": "#59, #60, #61",
+        "status": "BLOCKED",
+        "blockedDependencies": [
+          59,
+          60,
+          61
+        ],
+        "reasons": [
+          "Dependencies are open or their state is unverified",
+          "Exact-candidate integrated runtime/native proof and independent review are required; component/legacy/fixture checks do not qualify"
+        ]
+      },
+      {
+        "id": "AT-11",
+        "scenario": "Fresh release clone builds/migrates/seeds/runs",
+        "scenarioHash": "44273a2a93714770642e13597c5e5ff7efd8fc3931333f6af5594080f6bf8d2e",
+        "dependencies": [
+          64,
+          66,
+          30
+        ],
+        "trace": "#64, #66, #30",
+        "status": "BLOCKED",
+        "blockedDependencies": [
+          64,
+          66,
+          30
+        ],
+        "reasons": [
+          "Dependencies are open or their state is unverified",
+          "Exact-candidate integrated runtime/native proof and independent review are required; component/legacy/fixture checks do not qualify"
+        ]
+      },
+      {
+        "id": "AT-12",
+        "scenario": "Isolated restore preserves data and verifiable trust state",
+        "scenarioHash": "74ff465c6a6820ca2abc833a3ccaaa3709f8aa573f17f195c3cd085f530e40f4",
+        "dependencies": [
+          65,
+          66
+        ],
+        "trace": "#65, #66",
+        "status": "BLOCKED",
+        "blockedDependencies": [
+          65,
+          66
+        ],
+        "reasons": [
+          "Dependencies are open or their state is unverified",
+          "Exact-candidate integrated runtime/native proof and independent review are required; component/legacy/fixture checks do not qualify"
+        ]
+      }
+    ],
+    "passed": 0,
+    "required": 12,
+    "status": "BLOCKED"
+  },
+  "integratedRuntimeResults": [],
+  "limitations": [
+    "Read-only GitHub state snapshot is not review/behavior/native proof",
+    "No integrated AT runtime adapter is provided by the missing owning #43/#48/#50/#53/#56/#58/#59/#62/#64/#65/#44/#61 contracts",
+    "Component restore and legacy real-stack CI are separate evidence, never automatic AT acceptance",
+    "Release qualification fails closed until exact-candidate integrated evidence and independent review exist"
+  ]
+}

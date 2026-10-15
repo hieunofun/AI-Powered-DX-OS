@@ -1,0 +1,215 @@
+{
+  "issue": 66,
+  "profile": "COMPONENT_RESTORE_REHEARSAL",
+  "acceptanceStatus": "PARTIAL",
+  "startedAt": "2026-10-15T19:18:43.467Z",
+  "finishedAt": "2026-10-15T19:18:47.235Z",
+  "commit": "20050a1ffb57d22489d55b6f0361769a4a50c7de",
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "linux",
+    "architecture": "x64",
+    "cpuThreads": 4,
+    "hostMemoryBytes": 16765378560,
+    "kernel": "6.17.0-1022-azure"
+  },
+  "checks": [
+    {
+      "name": "source/target are explicitly named isolated databases and different containers",
+      "status": "PASS"
+    },
+    {
+      "name": "actual source append and cold projector retain IDs/sequences/lineage beyond JS safe integers",
+      "status": "PASS"
+    },
+    {
+      "name": "native pg_dump/pg_restore into new empty databases preserve every hot/cold row hash",
+      "status": "PASS"
+    },
+    {
+      "name": "restored native source sequence, snapshots and append-only guards remain valid",
+      "status": "PASS"
+    },
+    {
+      "name": "restored fixture reports use an actual SELECT-only role, not read-only transaction flags",
+      "status": "PASS"
+    },
+    {
+      "name": "record actual tiny-fixture read latency and memory with workload denominators",
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "containers": {
+      "source": "ba4b9af7a4c5f444f7396048677ba68021dee5c875e11a629d4916fb6a1a9d48",
+      "restore": "a8a7c675ccb10f116b98f06ece623072457782aec3641cf64f78c36497ab1c82"
+    },
+    "postgresVersion": {
+      "source": "PostgreSQL 16.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+      "restore": "PostgreSQL 16.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit"
+    },
+    "projected": {
+      "checkpoint": {
+        "tenantId": "855748b5-1258-49f2-91f0-289ba78f93ed",
+        "stream": "case.history",
+        "jobId": "live",
+        "mode": "LIVE",
+        "epoch": "5e99b291-cac3-4140-a690-f840dd3eac88",
+        "after": "9007199254740995",
+        "through": "9007199254740995",
+        "updatedAt": "2026-10-15T19:18:45.919Z",
+        "state": "SUCCEEDED"
+      },
+      "inserted": 3,
+      "replayed": 0
+    },
+    "tenant": "855748b5-1258-49f2-91f0-289ba78f93ed",
+    "quiescence": "Isolated single-writer fixture stopped after awaited projection; no production quiescence claim",
+    "dumps": [
+      {
+        "kind": "hot",
+        "sourceDatabase": "history_hot_issue57",
+        "targetDatabase": "restore_hot_issue66_de8f8650120a",
+        "path": "tmp/issue66-de8f8650120a/hot.dump",
+        "bytes": 17294,
+        "sha256": "97dca7163f39e5de9b432512cc1ae5211e8dbde0e41181423d38d03acc7e5fa5",
+        "inventory": {
+          "tables": {
+            "history_fixture_case_grants": {
+              "rows": 6,
+              "sha256": "675adb0e724a0ef49ebca665977f7d87c548b1097c4b3742de4d0b625b86519c"
+            },
+            "history_fixture_cases": {
+              "rows": 2,
+              "sha256": "9325de93f5b07967f6909185a779def86d4991bc8c7f0ca1c5b5411661394f6d"
+            },
+            "history_fixture_events": {
+              "rows": 3,
+              "sha256": "bb3da9dbeb73f57f7519e129569c50cd8a8f5961f50486103e48ae2c7c465cd7"
+            },
+            "history_fixture_members": {
+              "rows": 5,
+              "sha256": "bbf6189bf3acb816da4379a74462a49c58d0d04375685500ca4286928b128dcc"
+            },
+            "history_fixture_stream_grants": {
+              "rows": 5,
+              "sha256": "a168eecd514bf31d2334b89f5a8e08552937513755e53d4e75cf94acdcf5736d"
+            },
+            "history_fixture_streams": {
+              "rows": 2,
+              "sha256": "58ec48c653af2a81b95f65d24afbe0b44ea6ea98667968ec59ccfebf80fc3832"
+            }
+          },
+          "sequences": {
+            "history_fixture_events_sequence_seq": {
+              "last_value": "9007199254740995",
+              "is_called": true
+            }
+          }
+        }
+      },
+      {
+        "kind": "cold",
+        "sourceDatabase": "history_cold_issue57",
+        "targetDatabase": "restore_cold_issue66_de8f8650120a",
+        "path": "tmp/issue66-de8f8650120a/cold.dump",
+        "bytes": 20467,
+        "sha256": "04296ce2cd7a9aa26db3dd55d0a0fa7df524aac519573a0d51dfe596b882641a",
+        "inventory": {
+          "tables": {
+            "platform_history_lineage": {
+              "rows": 6,
+              "sha256": "cd8cbc7ef9cd24883246d5e2539cc7ae05773746669317ae27b32be48a0db863"
+            },
+            "platform_history_projection_jobs": {
+              "rows": 1,
+              "sha256": "b4f82f7cc05e25ce0a86fba721034c3bfb8e58a5de79edc45d9541aa03f9b615"
+            },
+            "platform_history_projection_runs": {
+              "rows": 1,
+              "sha256": "17d80ba324cf1ad18ff3b5e7474253c3d0d47fbed8283fde549ac88526c70eb7"
+            },
+            "platform_history_snapshots": {
+              "rows": 3,
+              "sha256": "2f6fac12c34d7ba166c153ac4dd04215a5096b99fbecbb9ded0bb7340f931962"
+            }
+          },
+          "sequences": {
+            "platform_history_projection_runs_id_seq": {
+              "last_value": "1",
+              "is_called": true
+            },
+            "platform_history_snapshots_capture_sequence_seq": {
+              "last_value": "3",
+              "is_called": true
+            }
+          }
+        }
+      }
+    ],
+    "restoredSequences": [
+      "9007199254740993",
+      "9007199254740994",
+      "9007199254740995"
+    ],
+    "roleRestoration": "Fixture SELECT-only role explicitly reconstructed after --no-acl; not a complete original-role/ACL restore claim",
+    "workload": {
+      "samples": 20,
+      "concurrency": 1,
+      "snapshots": 3,
+      "query": "Full source-sequence/hash scan on restored cold DB",
+      "unit": "ms",
+      "p95NearestRankMs": 0.5026050000001305,
+      "samplesMs": [
+        2.8488000000002103,
+        0.5026050000001305,
+        0.4142930000002707,
+        0.3710340000002361,
+        0.39388099999996484,
+        0.30350899999984904,
+        0.2958819999998923,
+        0.2649139999998624,
+        0.2605119999998351,
+        0.27844999999979336,
+        0.38174000000026354,
+        0.3698229999999967,
+        0.3313499999999294,
+        0.43324799999982133,
+        0.36583599999994476,
+        0.47044599999981074,
+        0.387065999999777,
+        0.41543700000011086,
+        0.37152800000012576,
+        0.3290780000002087
+      ],
+      "nodeMemory": {
+        "rss": 98283520,
+        "heapTotal": 35168256,
+        "heapUsed": 18884680,
+        "external": 3296815,
+        "arrayBuffers": 430029
+      },
+      "limitations": "Tiny synthetic hot/cold fixture; not application HTTP p95 or production sizing"
+    }
+  },
+  "times": {
+    "hotDumpMs": 203,
+    "hotRestoreMs": 151,
+    "coldDumpMs": 189,
+    "coldRestoreMs": 157
+  },
+  "sourceHashes": {
+    "infra/acceptance/compose.yaml": "3b4361515e9bd09898c7c0aad038461ed7924bcd95dacabbc167d9187e765231",
+    "infra/acceptance/restore-rehearsal.cjs": "63ca629fc62ce2ba0143618be6c77052495dfc671a3907bf5240d33bf8b5c12d",
+    "infra/history/runtime-fixture.cjs": "d49c81181d671a7f0f55e9deb08302ea60e808e81c8dad65f265ccfe1698abe6",
+    "database/proposed/issue57-cold-history.sql": "3137d136a7b3fc6fc3f259fc607210f5acea7b5b9bcea7aad1dded1479e03aba"
+  },
+  "actualAiCalls": 0,
+  "limitations": [
+    "Synthetic owning source/identity/evidence-reference ports, not production #43/#50 authority",
+    "No original object bytes, native Flowable/ImmuDB/trust backup or verification; complete AT-12 blocked on #65",
+    "New empty target databases only; no production restore, volume deletion, live-worker quiescence or destructive rollback",
+    "Fresh source fixture plus forward schema initialization is not a legacy upgrade proof",
+    "No full AT-01..12 or release qualification claim"
+  ]
+}

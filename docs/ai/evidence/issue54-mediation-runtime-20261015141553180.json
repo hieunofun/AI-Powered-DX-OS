@@ -1,0 +1,2989 @@
+{
+  "started": "2026-10-15T14:15:53.180Z",
+  "completed": "2026-10-15T14:16:07.661Z",
+  "gitHead": "bf4214b9b805b8fb8fe5b9f8c09c3e3215507f49",
+  "worktreeDirty": false,
+  "sourceHashes": {
+    "apps/api/src/packs/openresolve/mediation/gemini-explanation.provider.ts": "73ef16906eef798aeee5131f8e10695ce9a0b8d27dea0988f324af9a45ae20db",
+    "apps/api/src/packs/openresolve/mediation/mediation-validation.ts": "e674586a87d0f4a467c39f874bbc7deec04b7e30e3fee05b6e219bafd524cc32",
+    "apps/api/src/packs/openresolve/mediation/mediation.module.ts": "d7c0bb251dc4c9eb4bd3e668e095a03723b5a0f5155c3ea17c237d00ffa93d97",
+    "apps/api/src/packs/openresolve/mediation/mediation.repository.ts": "b39a5ca37dae8eb84d4e2716a76314f02321165e8cda89b898aa337ab48c226f",
+    "apps/api/src/packs/openresolve/mediation/mediation.service.ts": "08e0f94e5e85f5c0258145565d6477c581b219584304c467ec4bdf4943a74b80",
+    "apps/api/src/packs/openresolve/mediation/mediation.types.ts": "751fe295d0399870d1a9dd6bea50f856b0e6f21126e0f6c13610c5bd53179a1e",
+    "apps/api/src/platform/evidence/clamav.scanner.ts": "bc129856f08e0143317ec13fe0dae625ec4186d012b1bae61d6cea2396dec524",
+    "apps/api/src/platform/evidence/evidence-context.ts": "41409188b369396514ee58d4790e7521c5c318822f5e452aea212c3d3e1b734f",
+    "apps/api/src/platform/evidence/evidence-storage.ts": "52f6cca7eaf2c0c7faf4973f42c39f50ba70c1c9431f8c7e8cd9ae5fe2cc1eaa",
+    "apps/api/src/platform/evidence/evidence.controller.ts": "9b5cbd49df360a6a7666948b60b62a3920ece3766ea1457bb975ab2ea93e135c",
+    "apps/api/src/platform/evidence/evidence.module.ts": "581de09b460f0f9239dcb5199d709dab51e47dc9f2dec3f08b8498faca6a16ff",
+    "apps/api/src/platform/evidence/evidence.repository.ts": "26729f4a3b12dd47180fe34eee5afc310c158fc1a6281cbafb2943a6bd282a98",
+    "apps/api/src/platform/evidence/evidence.service.ts": "0b82ba9273346c71ad9b574de250781963606ff3fb7d5bc048463da8222a2eff",
+    "apps/api/src/platform/evidence/evidence.types.ts": "ed6f37a0526e74ef9ad96151cd28f1bf3366f0b07d83424f459554c8b1cce83c",
+    "apps/api/src/platform/evidence/file-safety.ts": "0a0f1c6e957da3cef0377203792c302c5bc41ab08eeb88fc96591a0a67baf4f4"
+  },
+  "supportHashes": {
+    "infra/mediation/runtime-fixture.cjs": "a8ea3ae6b225bc1fde4cb259d28850532a154973a397f935fbb9d37ed673b86c",
+    "infra/mediation/validate-runtime.cjs": "d024a461416cff6fe073e3c90862a095b43647a84fc974a6ea5e334610611623",
+    "database/proposed/issue41-evidence-intake.sql": "458376107d74362b092a13edc711ec3d5a3e0ebec7c561b3f4b28dc15fcd1222",
+    "database/proposed/issue54-ai-mediation.sql": "bf89aa6c003a9776061c6495cfdb9739242c89a27a300fbf805ba867daca5ae8",
+    "packages/contracts/opendx/proposed/issue54-mediation.schema.json": "ef39586e84198953987c866a3ffd4d1a95ecc52afefc1d7dd7b9718294b7001d"
+  },
+  "checks": [
+    {
+      "name": "actual exact-engine fresh-definition complete-stream scanner readiness",
+      "status": "PASS"
+    },
+    {
+      "name": "actual private evidence bytes are scanned before labelled reviewed case facts, unscanned source stays quarantined",
+      "status": "PASS"
+    },
+    {
+      "name": "durable native request acknowledgement before model double, current CLEAN byte reads and source-bound explanation",
+      "status": "PASS"
+    },
+    {
+      "name": "actual fixture policy, independent SQL decision and exactly one atomic local action/receipt",
+      "status": "PASS"
+    },
+    {
+      "name": "R0 reads only, R2 requires approval, unknown/R3/model-client authority and foreign fact IDs are denied",
+      "status": "PASS"
+    },
+    {
+      "name": "active foreign tenant can enqueue its own case, never reads another tenant case/explanation/operation/evidence/proposal",
+      "status": "PASS"
+    },
+    {
+      "name": "revoked original requester cannot be replaced by worker privileges before disclosure",
+      "status": "PASS"
+    },
+    {
+      "name": "revoked processor cannot claim a queued explanation or make model calls",
+      "status": "PASS"
+    },
+    {
+      "name": "unscanned replacement evidence cannot be disclosed despite valid current case permissions",
+      "status": "PASS"
+    },
+    {
+      "name": "current revoked decision/approver/policy each block a previously approved action",
+      "status": "PASS"
+    },
+    {
+      "name": "actual local action insert and AI receipt/history roll back together; recreated service replays the same command",
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent executions serialize and produce one SQL effect with one stable receipt",
+      "status": "PASS"
+    },
+    {
+      "name": "actual control kill switch interrupts generation and invalidates old approvals across re-enable epochs",
+      "status": "PASS"
+    },
+    {
+      "name": "source/proposal/receipt/history/command immutability and retained history hashes",
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "cleanId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+    "unscannedId": "d56d25ab-0ba3-4268-af09-30025982360b",
+    "factId": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+    "hash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+    "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+    "proposalId": "a7c9af96-a5d2-4bda-880c-9eb618600c3d"
+  },
+  "retainedState": {
+    "explanations": [
+      {
+        "id": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+        "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+        "result": {
+          "usage": {
+            "input_tokens": 1,
+            "reserved_tokens": 1
+          },
+          "status": "MISSING_EVIDENCE",
+          "provenance": {
+            "run_id": "dea9d527-5599-4c1c-b0f0-c27c068f2fa7",
+            "provider": "gemini",
+            "model_version": "gemini-fixture-double",
+            "prompt_version": "labelled-runtime-double-v1"
+          },
+          "statements": [
+            {
+              "code": "SUPPLIER",
+              "label": "Confirmed fictional supplier",
+              "value": "FICTIONAL Supplier",
+              "fact_id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+              "citation": {
+                "sha256": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "evidence_id": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "facts_version": "fixture-reviewed-1"
+              }
+            }
+          ],
+          "suggested_tool": "NONE",
+          "missing_evidence": [
+            "RECEIPT"
+          ]
+        },
+        "attempts": 1,
+        "failures": [],
+        "question": "What evidence is available?",
+        "snapshot": {
+          "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "facts": [
+            {
+              "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+              "code": "SUPPLIER",
+              "label": "Confirmed fictional supplier",
+              "value": "FICTIONAL Supplier",
+              "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+              "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+              "factsVersion": "fixture-reviewed-1"
+            }
+          ],
+          "policy": {
+            "ref": {
+              "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+              "type": "policy",
+              "pack_id": "platform"
+            },
+            "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+            "version": "1.0.0"
+          },
+          "caseRef": {
+            "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "version": "1",
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "disclosure": "SYNTHETIC",
+          "requiredFactCodes": [
+            "SUPPLIER",
+            "RECEIPT"
+          ]
+        },
+        "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+        "createdAt": "2026-10-15T14:16:06.634Z",
+        "operation": {
+          "id": "48237420-0c15-4632-8322-258c99683b93",
+          "kind": "AI_EXPLANATION",
+          "state": "SUCCEEDED",
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "created_at": "2026-10-15T14:16:06.634Z",
+          "updated_at": "2026-10-15T14:16:06.897Z",
+          "resource_ref": {
+            "id": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+            "type": "ai-explanation",
+            "pack_id": "openresolve"
+          }
+        },
+        "requester": "fixture-requester",
+        "updatedAt": "2026-10-15T14:16:06.897Z",
+        "controlVersion": "1",
+        "acknowledgement": {
+          "id": "48237420-0c15-4632-8322-258c99683b93",
+          "kind": "AI_EXPLANATION",
+          "state": "PENDING",
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "created_at": "2026-10-15T14:16:06.634Z",
+          "updated_at": "2026-10-15T14:16:06.634Z",
+          "resource_ref": {
+            "id": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+            "type": "ai-explanation",
+            "pack_id": "openresolve"
+          }
+        }
+      },
+      {
+        "id": "4ad1a208-ecd3-463c-b6ef-b81ef110399b",
+        "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+        "attempts": 1,
+        "failures": [
+          {
+            "at": "2026-10-15T14:16:07.061Z",
+            "code": "FORBIDDEN",
+            "attempt": 1
+          }
+        ],
+        "question": "What confirmed evidence is available and missing?",
+        "snapshot": {
+          "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "facts": [
+            {
+              "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+              "code": "SUPPLIER",
+              "label": "Confirmed fictional supplier",
+              "value": "FICTIONAL Supplier",
+              "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+              "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+              "factsVersion": "fixture-reviewed-1"
+            }
+          ],
+          "policy": {
+            "ref": {
+              "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+              "type": "policy",
+              "pack_id": "platform"
+            },
+            "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+            "version": "1.0.0"
+          },
+          "caseRef": {
+            "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "version": "1",
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "disclosure": "SYNTHETIC",
+          "requiredFactCodes": [
+            "SUPPLIER",
+            "RECEIPT"
+          ]
+        },
+        "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+        "createdAt": "2026-10-15T14:16:07.054Z",
+        "operation": {
+          "id": "5ab7dfb9-2632-47cb-9713-b65e271c62e9",
+          "kind": "AI_EXPLANATION",
+          "error": {
+            "code": "FORBIDDEN",
+            "message": "AI explanation is blocked.",
+            "retryable": false,
+            "correlation_id": "909bc76c-05ad-4e86-86e0-551d14d7cde9"
+          },
+          "state": "FAILED",
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "created_at": "2026-10-15T14:16:07.054Z",
+          "updated_at": "2026-10-15T14:16:07.061Z",
+          "resource_ref": {
+            "id": "4ad1a208-ecd3-463c-b6ef-b81ef110399b",
+            "type": "ai-explanation",
+            "pack_id": "openresolve"
+          }
+        },
+        "requester": "fixture-requester",
+        "updatedAt": "2026-10-15T14:16:07.061Z",
+        "controlVersion": "1",
+        "acknowledgement": {
+          "id": "5ab7dfb9-2632-47cb-9713-b65e271c62e9",
+          "kind": "AI_EXPLANATION",
+          "state": "PENDING",
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "created_at": "2026-10-15T14:16:07.054Z",
+          "updated_at": "2026-10-15T14:16:07.054Z",
+          "resource_ref": {
+            "id": "4ad1a208-ecd3-463c-b6ef-b81ef110399b",
+            "type": "ai-explanation",
+            "pack_id": "openresolve"
+          }
+        }
+      },
+      {
+        "id": "5dadf8bb-45ba-43c6-8fd7-5b7113d8b690",
+        "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+        "result": {
+          "usage": {
+            "input_tokens": 1,
+            "reserved_tokens": 1
+          },
+          "status": "MISSING_EVIDENCE",
+          "provenance": {
+            "run_id": "995e4ed3-6ced-4ddd-aa4b-9625f4bacc12",
+            "provider": "gemini",
+            "model_version": "gemini-fixture-double",
+            "prompt_version": "labelled-runtime-double-v1"
+          },
+          "statements": [
+            {
+              "code": "SUPPLIER",
+              "label": "Confirmed fictional supplier",
+              "value": "FICTIONAL Supplier",
+              "fact_id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+              "citation": {
+                "sha256": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "evidence_id": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "facts_version": "fixture-reviewed-1"
+              }
+            }
+          ],
+          "suggested_tool": "NONE",
+          "missing_evidence": [
+            "RECEIPT"
+          ]
+        },
+        "attempts": 1,
+        "failures": [],
+        "question": "What confirmed evidence is available and missing?",
+        "snapshot": {
+          "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "facts": [
+            {
+              "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+              "code": "SUPPLIER",
+              "label": "Confirmed fictional supplier",
+              "value": "FICTIONAL Supplier",
+              "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+              "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+              "factsVersion": "fixture-reviewed-1"
+            }
+          ],
+          "policy": {
+            "ref": {
+              "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+              "type": "policy",
+              "pack_id": "platform"
+            },
+            "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+            "version": "1.0.0"
+          },
+          "caseRef": {
+            "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "version": "1",
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "disclosure": "SYNTHETIC",
+          "requiredFactCodes": [
+            "SUPPLIER",
+            "RECEIPT"
+          ]
+        },
+        "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+        "createdAt": "2026-10-15T14:16:07.070Z",
+        "operation": {
+          "id": "53d42f5a-17e5-4f6d-a0bf-75fe303b6885",
+          "kind": "AI_EXPLANATION",
+          "state": "SUCCEEDED",
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "created_at": "2026-10-15T14:16:07.070Z",
+          "updated_at": "2026-10-15T14:16:07.295Z",
+          "resource_ref": {
+            "id": "5dadf8bb-45ba-43c6-8fd7-5b7113d8b690",
+            "type": "ai-explanation",
+            "pack_id": "openresolve"
+          }
+        },
+        "requester": "fixture-requester",
+        "updatedAt": "2026-10-15T14:16:07.295Z",
+        "controlVersion": "1",
+        "acknowledgement": {
+          "id": "53d42f5a-17e5-4f6d-a0bf-75fe303b6885",
+          "kind": "AI_EXPLANATION",
+          "state": "PENDING",
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "created_at": "2026-10-15T14:16:07.070Z",
+          "updated_at": "2026-10-15T14:16:07.070Z",
+          "resource_ref": {
+            "id": "5dadf8bb-45ba-43c6-8fd7-5b7113d8b690",
+            "type": "ai-explanation",
+            "pack_id": "openresolve"
+          }
+        }
+      },
+      {
+        "id": "6d994ebd-2c69-4390-867e-3d1ec5ef04cf",
+        "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+        "attempts": 1,
+        "failures": [
+          {
+            "at": "2026-10-15T14:16:07.313Z",
+            "code": "FILE_NOT_CLEAN",
+            "attempt": 1
+          }
+        ],
+        "question": "What confirmed evidence is available and missing?",
+        "snapshot": {
+          "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "facts": [
+            {
+              "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+              "code": "SUPPLIER",
+              "label": "Confirmed fictional supplier",
+              "value": "FICTIONAL Supplier",
+              "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+              "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+              "factsVersion": "fixture-reviewed-1"
+            }
+          ],
+          "policy": {
+            "ref": {
+              "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+              "type": "policy",
+              "pack_id": "platform"
+            },
+            "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+            "version": "1.0.0"
+          },
+          "caseRef": {
+            "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "version": "1",
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "disclosure": "SYNTHETIC",
+          "requiredFactCodes": [
+            "SUPPLIER",
+            "RECEIPT"
+          ]
+        },
+        "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+        "createdAt": "2026-10-15T14:16:07.305Z",
+        "operation": {
+          "id": "9a2cbb32-c199-42d4-9066-68816e71fac5",
+          "kind": "AI_EXPLANATION",
+          "error": {
+            "code": "FILE_NOT_CLEAN",
+            "message": "AI explanation is blocked.",
+            "retryable": false,
+            "correlation_id": "2f968354-3d97-42a1-9015-dc8c9e4fd06d"
+          },
+          "state": "FAILED",
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "created_at": "2026-10-15T14:16:07.305Z",
+          "updated_at": "2026-10-15T14:16:07.313Z",
+          "resource_ref": {
+            "id": "6d994ebd-2c69-4390-867e-3d1ec5ef04cf",
+            "type": "ai-explanation",
+            "pack_id": "openresolve"
+          }
+        },
+        "requester": "fixture-requester",
+        "updatedAt": "2026-10-15T14:16:07.313Z",
+        "controlVersion": "1",
+        "acknowledgement": {
+          "id": "9a2cbb32-c199-42d4-9066-68816e71fac5",
+          "kind": "AI_EXPLANATION",
+          "state": "PENDING",
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "created_at": "2026-10-15T14:16:07.305Z",
+          "updated_at": "2026-10-15T14:16:07.305Z",
+          "resource_ref": {
+            "id": "6d994ebd-2c69-4390-867e-3d1ec5ef04cf",
+            "type": "ai-explanation",
+            "pack_id": "openresolve"
+          }
+        }
+      },
+      {
+        "id": "f2124723-4054-4865-8064-fed3a15ee6ee",
+        "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+        "attempts": 1,
+        "failures": [
+          {
+            "at": "2026-10-15T14:16:07.618Z",
+            "code": "DEPENDENCY_UNAVAILABLE",
+            "attempt": 1
+          }
+        ],
+        "question": "What confirmed evidence is available and missing?",
+        "snapshot": {
+          "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "facts": [
+            {
+              "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+              "code": "SUPPLIER",
+              "label": "Confirmed fictional supplier",
+              "value": "FICTIONAL Supplier",
+              "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+              "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+              "factsVersion": "fixture-reviewed-1"
+            }
+          ],
+          "policy": {
+            "ref": {
+              "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+              "type": "policy",
+              "pack_id": "platform"
+            },
+            "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+            "version": "1.0.0"
+          },
+          "caseRef": {
+            "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+            "type": "case",
+            "pack_id": "openresolve"
+          },
+          "version": "1",
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "disclosure": "SYNTHETIC",
+          "requiredFactCodes": [
+            "SUPPLIER",
+            "RECEIPT"
+          ]
+        },
+        "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+        "createdAt": "2026-10-15T14:16:07.494Z",
+        "operation": {
+          "id": "3f6c6b69-75c1-4f9d-b1e7-e377802cbfca",
+          "kind": "AI_EXPLANATION",
+          "error": {
+            "code": "DEPENDENCY_UNAVAILABLE",
+            "message": "AI explanation is blocked.",
+            "retryable": false,
+            "correlation_id": "0e947c45-b525-406d-b533-3b0916594dee"
+          },
+          "state": "FAILED",
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "created_at": "2026-10-15T14:16:07.494Z",
+          "updated_at": "2026-10-15T14:16:07.618Z",
+          "resource_ref": {
+            "id": "f2124723-4054-4865-8064-fed3a15ee6ee",
+            "type": "ai-explanation",
+            "pack_id": "openresolve"
+          }
+        },
+        "requester": "fixture-requester",
+        "updatedAt": "2026-10-15T14:16:07.618Z",
+        "controlVersion": "1",
+        "acknowledgement": {
+          "id": "3f6c6b69-75c1-4f9d-b1e7-e377802cbfca",
+          "kind": "AI_EXPLANATION",
+          "state": "PENDING",
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "created_at": "2026-10-15T14:16:07.494Z",
+          "updated_at": "2026-10-15T14:16:07.494Z",
+          "resource_ref": {
+            "id": "f2124723-4054-4865-8064-fed3a15ee6ee",
+            "type": "ai-explanation",
+            "pack_id": "openresolve"
+          }
+        }
+      }
+    ],
+    "proposals": [
+      {
+        "id": "0fdfd49f-70ee-42dd-88a1-569a9328edb4",
+        "hash": "c472b4c5039b5c2db1c0f9280f60a401ed7278e5cde1abdda22b2eb0f7e02391",
+        "risk": "R1",
+        "input": {
+          "tool": "case.request_evidence",
+          "missing_evidence_codes": [
+            "RECEIPT"
+          ]
+        },
+        "state": "EXECUTED",
+        "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+        "receipt": {
+          "sha256": "e329593c519f26d0ea84fbc5535379b4a3b26e8d8eb2d388035a03dd5e9cd60e",
+          "action_id": "0fdfd49f-70ee-42dd-88a1-569a9328edb4",
+          "executed_at": "2026-10-15T14:16:07.442Z",
+          "resource_ref": {
+            "id": "bfef2fe0-6ef1-4fa4-b907-aefd3a27ddc6",
+            "type": "case-action",
+            "pack_id": "openresolve"
+          }
+        },
+        "approval": {
+          "state": "APPROVED",
+          "approver": "fixture-approver",
+          "approvedAt": "2026-10-15T14:16:07.423Z",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "decisionRef": {
+            "id": "5b77db6d-8bdc-4917-ba87-f4c7f18423d2",
+            "type": "decision",
+            "pack_id": "platform"
+          },
+          "proposalHash": "c472b4c5039b5c2db1c0f9280f60a401ed7278e5cde1abdda22b2eb0f7e02391",
+          "decisionVersion": "1"
+        },
+        "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+        "createdAt": "2026-10-15T14:16:07.422Z",
+        "requester": "fixture-requester",
+        "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+        "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+        "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+        "controlVersion": "1",
+        "requiresApproval": true
+      },
+      {
+        "id": "552137d4-00a8-4479-88f4-46e2a21e7a51",
+        "hash": "9f4cba6d27be25eaa108d6e925a7a5e27dc51a2d175be3fb33012f067778adb4",
+        "risk": "R2",
+        "input": {
+          "tool": "case.add_note",
+          "fact_ids": [
+            "7c765a16-6516-4d21-800e-f81a3735b5c7"
+          ]
+        },
+        "state": "AWAITING_APPROVAL",
+        "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+        "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+        "createdAt": "2026-10-15T14:16:07.010Z",
+        "requester": "fixture-requester",
+        "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+        "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+        "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+        "controlVersion": "1",
+        "requiresApproval": true
+      },
+      {
+        "id": "5bf0f4fd-067a-4273-880a-3424c72ceff7",
+        "hash": "9b41ee25fc3ef102f2d75755430f6b6b9c7a68e5d03b282bd7f643afb7049de1",
+        "risk": "R1",
+        "input": {
+          "tool": "case.request_evidence",
+          "missing_evidence_codes": [
+            "RECEIPT"
+          ]
+        },
+        "state": "APPROVED",
+        "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+        "approval": {
+          "state": "APPROVED",
+          "approver": "fixture-approver",
+          "approvedAt": "2026-10-15T14:16:07.479Z",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "decisionRef": {
+            "id": "31f54345-e831-4b89-b536-1c161ad79e17",
+            "type": "decision",
+            "pack_id": "platform"
+          },
+          "proposalHash": "9b41ee25fc3ef102f2d75755430f6b6b9c7a68e5d03b282bd7f643afb7049de1",
+          "decisionVersion": "1"
+        },
+        "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+        "createdAt": "2026-10-15T14:16:07.477Z",
+        "requester": "fixture-requester",
+        "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+        "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+        "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+        "controlVersion": "1",
+        "requiresApproval": true
+      },
+      {
+        "id": "680ba04c-ed8e-4c70-8dd5-8dd123b1a6f7",
+        "hash": "cadce8c84d5997c07da7e69fcc134a420e0d0bddf67704e23b6a574ccb984f25",
+        "risk": "R1",
+        "input": {
+          "tool": "case.request_evidence",
+          "missing_evidence_codes": [
+            "RECEIPT"
+          ]
+        },
+        "state": "APPROVED",
+        "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+        "approval": {
+          "state": "APPROVED",
+          "approver": "fixture-approver",
+          "approvedAt": "2026-10-15T14:16:07.325Z",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "decisionRef": {
+            "id": "31c598dd-078b-479b-b0f4-e91b6d5a4dd7",
+            "type": "decision",
+            "pack_id": "platform"
+          },
+          "proposalHash": "cadce8c84d5997c07da7e69fcc134a420e0d0bddf67704e23b6a574ccb984f25",
+          "decisionVersion": "1"
+        },
+        "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+        "createdAt": "2026-10-15T14:16:07.324Z",
+        "requester": "fixture-requester",
+        "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+        "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+        "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+        "controlVersion": "1",
+        "requiresApproval": true
+      },
+      {
+        "id": "a7c9af96-a5d2-4bda-880c-9eb618600c3d",
+        "hash": "a69be40c840b241752d4e17b680b7c2fd9c794ef7d9940f38018fbf7b04e5fe3",
+        "risk": "R1",
+        "input": {
+          "tool": "case.request_evidence",
+          "missing_evidence_codes": [
+            "RECEIPT"
+          ]
+        },
+        "state": "EXECUTED",
+        "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+        "receipt": {
+          "sha256": "e6b44d5f54fa8abef77278bcca36e3f3efb78804e991f2f0421f2a76f0f640e0",
+          "action_id": "a7c9af96-a5d2-4bda-880c-9eb618600c3d",
+          "executed_at": "2026-10-15T14:16:06.974Z",
+          "resource_ref": {
+            "id": "0d6a20bf-05df-4f8f-8a89-201e5fb3ab90",
+            "type": "case-action",
+            "pack_id": "openresolve"
+          }
+        },
+        "approval": {
+          "state": "APPROVED",
+          "approver": "fixture-approver",
+          "approvedAt": "2026-10-15T14:16:06.947Z",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "decisionRef": {
+            "id": "2368e6db-4413-4a5a-88fe-534a6df117df",
+            "type": "decision",
+            "pack_id": "platform"
+          },
+          "proposalHash": "a69be40c840b241752d4e17b680b7c2fd9c794ef7d9940f38018fbf7b04e5fe3",
+          "decisionVersion": "1"
+        },
+        "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+        "createdAt": "2026-10-15T14:16:06.927Z",
+        "requester": "fixture-requester",
+        "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+        "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+        "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+        "controlVersion": "1",
+        "requiresApproval": true
+      },
+      {
+        "id": "b0cf1bb4-920c-4188-a5ac-136a4a52ebaa",
+        "hash": "0354c16ce2a66b94b1ccf369535083b67f38d86509c81602550b3dfdc34ed71a",
+        "risk": "R2",
+        "input": {
+          "tool": "case.add_note",
+          "fact_ids": [
+            "7c765a16-6516-4d21-800e-f81a3735b5c7"
+          ]
+        },
+        "state": "EXECUTED",
+        "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+        "receipt": {
+          "sha256": "88d5c7642ffbcb336168f0cbe21714b17f83d4e3f44ba58de256a10f0fb7ac2c",
+          "action_id": "b0cf1bb4-920c-4188-a5ac-136a4a52ebaa",
+          "executed_at": "2026-10-15T14:16:07.408Z",
+          "resource_ref": {
+            "id": "193d6539-7570-4961-ba9c-6aba9337e11b",
+            "type": "case-action",
+            "pack_id": "openresolve"
+          }
+        },
+        "approval": {
+          "state": "APPROVED",
+          "approver": "fixture-approver",
+          "approvedAt": "2026-10-15T14:16:07.383Z",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "decisionRef": {
+            "id": "1ebceb96-2160-4d96-9cde-84b4b5adda1c",
+            "type": "decision",
+            "pack_id": "platform"
+          },
+          "proposalHash": "0354c16ce2a66b94b1ccf369535083b67f38d86509c81602550b3dfdc34ed71a",
+          "decisionVersion": "1"
+        },
+        "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+        "createdAt": "2026-10-15T14:16:07.382Z",
+        "requester": "fixture-requester",
+        "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+        "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+        "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+        "controlVersion": "1",
+        "requiresApproval": true
+      },
+      {
+        "id": "c59087a9-db95-489a-bb7a-c023ee9e6259",
+        "hash": "f892e42c77b5356874ce917eec046656e6f972459928b4ecd3281b491e5ebc65",
+        "risk": "R1",
+        "input": {
+          "tool": "case.request_evidence",
+          "missing_evidence_codes": [
+            "RECEIPT"
+          ]
+        },
+        "state": "APPROVED",
+        "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+        "approval": {
+          "state": "APPROVED",
+          "approver": "fixture-approver",
+          "approvedAt": "2026-10-15T14:16:07.345Z",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "decisionRef": {
+            "id": "34356ec7-af47-4b85-a375-9c8bcc7f87d8",
+            "type": "decision",
+            "pack_id": "platform"
+          },
+          "proposalHash": "f892e42c77b5356874ce917eec046656e6f972459928b4ecd3281b491e5ebc65",
+          "decisionVersion": "1"
+        },
+        "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+        "createdAt": "2026-10-15T14:16:07.344Z",
+        "requester": "fixture-requester",
+        "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+        "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+        "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+        "controlVersion": "1",
+        "requiresApproval": true
+      },
+      {
+        "id": "d04a360d-30d3-4d7f-acac-2e3b9ac5b055",
+        "hash": "fb9573c7b4fa1c9f2a98b497a5b109e5dfc06c3b8fb119b1d134f15217996eaa",
+        "risk": "R1",
+        "input": {
+          "tool": "case.request_evidence",
+          "missing_evidence_codes": [
+            "RECEIPT"
+          ]
+        },
+        "state": "APPROVED",
+        "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+        "approval": {
+          "state": "APPROVED",
+          "approver": "fixture-approver",
+          "approvedAt": "2026-10-15T14:16:07.366Z",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "decisionRef": {
+            "id": "752fe586-8b37-403d-ac70-a46e101fa88f",
+            "type": "decision",
+            "pack_id": "platform"
+          },
+          "proposalHash": "fb9573c7b4fa1c9f2a98b497a5b109e5dfc06c3b8fb119b1d134f15217996eaa",
+          "decisionVersion": "1"
+        },
+        "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+        "createdAt": "2026-10-15T14:16:07.365Z",
+        "requester": "fixture-requester",
+        "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+        "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+        "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+        "controlVersion": "1",
+        "requiresApproval": true
+      },
+      {
+        "id": "d2899027-71e5-4cab-8aef-7731737df175",
+        "hash": "147ce4e8fe82ce1c6888a32ea93e0bd485ff797e0f4cdfe490ff35c1e3237817",
+        "risk": "R0",
+        "input": {
+          "tool": "case.read_summary",
+          "fact_ids": [
+            "7c765a16-6516-4d21-800e-f81a3735b5c7"
+          ]
+        },
+        "state": "EXECUTED",
+        "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+        "receipt": {
+          "sha256": "504fafb7c7c13fcbf40745bb2cd1172d2618faac3a850676e989b45ebd4ad0d2",
+          "action_id": "d2899027-71e5-4cab-8aef-7731737df175",
+          "executed_at": "2026-10-15T14:16:07.005Z",
+          "resource_ref": {
+            "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+            "type": "case",
+            "pack_id": "openresolve"
+          }
+        },
+        "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+        "createdAt": "2026-10-15T14:16:06.998Z",
+        "requester": "fixture-requester",
+        "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+        "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+        "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+        "controlVersion": "1",
+        "requiresApproval": false
+      }
+    ],
+    "history": [
+      {
+        "snapshot": {
+          "id": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "attempts": 0,
+          "failures": [],
+          "question": "What evidence is available?",
+          "snapshot": {
+            "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+            "facts": [
+              {
+                "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "factsVersion": "fixture-reviewed-1"
+              }
+            ],
+            "policy": {
+              "ref": {
+                "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+                "type": "policy",
+                "pack_id": "platform"
+              },
+              "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+              "version": "1.0.0"
+            },
+            "caseRef": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "version": "1",
+            "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "disclosure": "SYNTHETIC",
+            "requiredFactCodes": [
+              "SUPPLIER",
+              "RECEIPT"
+            ]
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:06.634Z",
+          "operation": {
+            "id": "48237420-0c15-4632-8322-258c99683b93",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:06.634Z",
+            "updated_at": "2026-10-15T14:16:06.634Z",
+            "resource_ref": {
+              "id": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          },
+          "requester": "fixture-requester",
+          "updatedAt": "2026-10-15T14:16:06.634Z",
+          "controlVersion": "1",
+          "acknowledgement": {
+            "id": "48237420-0c15-4632-8322-258c99683b93",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:06.634Z",
+            "updated_at": "2026-10-15T14:16:06.634Z",
+            "resource_ref": {
+              "id": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          }
+        },
+        "sha256": "8c8dc0dccd3be2e2b10582d7b7a773345b0fd68b7dfedf4213e187424f49733b"
+      },
+      {
+        "snapshot": {
+          "id": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "lease": {
+            "token": "c39f15d1-00c6-496f-a143-65d25769f170",
+            "until": "2026-10-15T14:18:06.653Z"
+          },
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "attempts": 1,
+          "failures": [],
+          "question": "What evidence is available?",
+          "snapshot": {
+            "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+            "facts": [
+              {
+                "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "factsVersion": "fixture-reviewed-1"
+              }
+            ],
+            "policy": {
+              "ref": {
+                "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+                "type": "policy",
+                "pack_id": "platform"
+              },
+              "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+              "version": "1.0.0"
+            },
+            "caseRef": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "version": "1",
+            "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "disclosure": "SYNTHETIC",
+            "requiredFactCodes": [
+              "SUPPLIER",
+              "RECEIPT"
+            ]
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:06.634Z",
+          "operation": {
+            "id": "48237420-0c15-4632-8322-258c99683b93",
+            "kind": "AI_EXPLANATION",
+            "state": "RUNNING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:06.634Z",
+            "updated_at": "2026-10-15T14:16:06.653Z",
+            "resource_ref": {
+              "id": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          },
+          "requester": "fixture-requester",
+          "updatedAt": "2026-10-15T14:16:06.653Z",
+          "controlVersion": "1",
+          "acknowledgement": {
+            "id": "48237420-0c15-4632-8322-258c99683b93",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:06.634Z",
+            "updated_at": "2026-10-15T14:16:06.634Z",
+            "resource_ref": {
+              "id": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          }
+        },
+        "sha256": "b5055d470750d9498f5abfc4ce69e7e299096dc6bcc0f1efd826d380a9a72af2"
+      },
+      {
+        "snapshot": {
+          "id": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "result": {
+            "usage": {
+              "input_tokens": 1,
+              "reserved_tokens": 1
+            },
+            "status": "MISSING_EVIDENCE",
+            "provenance": {
+              "run_id": "dea9d527-5599-4c1c-b0f0-c27c068f2fa7",
+              "provider": "gemini",
+              "model_version": "gemini-fixture-double",
+              "prompt_version": "labelled-runtime-double-v1"
+            },
+            "statements": [
+              {
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "fact_id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "citation": {
+                  "sha256": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                  "evidence_id": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                  "facts_version": "fixture-reviewed-1"
+                }
+              }
+            ],
+            "suggested_tool": "NONE",
+            "missing_evidence": [
+              "RECEIPT"
+            ]
+          },
+          "attempts": 1,
+          "failures": [],
+          "question": "What evidence is available?",
+          "snapshot": {
+            "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+            "facts": [
+              {
+                "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "factsVersion": "fixture-reviewed-1"
+              }
+            ],
+            "policy": {
+              "ref": {
+                "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+                "type": "policy",
+                "pack_id": "platform"
+              },
+              "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+              "version": "1.0.0"
+            },
+            "caseRef": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "version": "1",
+            "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "disclosure": "SYNTHETIC",
+            "requiredFactCodes": [
+              "SUPPLIER",
+              "RECEIPT"
+            ]
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:06.634Z",
+          "operation": {
+            "id": "48237420-0c15-4632-8322-258c99683b93",
+            "kind": "AI_EXPLANATION",
+            "state": "SUCCEEDED",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:06.634Z",
+            "updated_at": "2026-10-15T14:16:06.897Z",
+            "resource_ref": {
+              "id": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          },
+          "requester": "fixture-requester",
+          "updatedAt": "2026-10-15T14:16:06.897Z",
+          "controlVersion": "1",
+          "acknowledgement": {
+            "id": "48237420-0c15-4632-8322-258c99683b93",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:06.634Z",
+            "updated_at": "2026-10-15T14:16:06.634Z",
+            "resource_ref": {
+              "id": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          }
+        },
+        "sha256": "361ffd133c8d93c44efd00002e51891cd02caafeae3aff85b143ee50e93f6189"
+      },
+      {
+        "snapshot": {
+          "id": "a7c9af96-a5d2-4bda-880c-9eb618600c3d",
+          "hash": "a69be40c840b241752d4e17b680b7c2fd9c794ef7d9940f38018fbf7b04e5fe3",
+          "risk": "R1",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "state": "AWAITING_APPROVAL",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:06.927Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "1ad1f60bc07270e5ff1801fcfa98c13d99cc3e27fa4fda1e88766829a802bee2"
+      },
+      {
+        "snapshot": {
+          "id": "a7c9af96-a5d2-4bda-880c-9eb618600c3d",
+          "hash": "a69be40c840b241752d4e17b680b7c2fd9c794ef7d9940f38018fbf7b04e5fe3",
+          "risk": "R1",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "state": "APPROVED",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "approval": {
+            "state": "APPROVED",
+            "approver": "fixture-approver",
+            "approvedAt": "2026-10-15T14:16:06.947Z",
+            "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+            "decisionRef": {
+              "id": "2368e6db-4413-4a5a-88fe-534a6df117df",
+              "type": "decision",
+              "pack_id": "platform"
+            },
+            "proposalHash": "a69be40c840b241752d4e17b680b7c2fd9c794ef7d9940f38018fbf7b04e5fe3",
+            "decisionVersion": "1"
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:06.927Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "cfcab1e913b77a4a660f67dd20274d7a6829eaf9c58a3b87c61fc12e6c412a50"
+      },
+      {
+        "snapshot": {
+          "id": "a7c9af96-a5d2-4bda-880c-9eb618600c3d",
+          "hash": "a69be40c840b241752d4e17b680b7c2fd9c794ef7d9940f38018fbf7b04e5fe3",
+          "risk": "R1",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "state": "EXECUTED",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "receipt": {
+            "sha256": "e6b44d5f54fa8abef77278bcca36e3f3efb78804e991f2f0421f2a76f0f640e0",
+            "action_id": "a7c9af96-a5d2-4bda-880c-9eb618600c3d",
+            "executed_at": "2026-10-15T14:16:06.974Z",
+            "resource_ref": {
+              "id": "0d6a20bf-05df-4f8f-8a89-201e5fb3ab90",
+              "type": "case-action",
+              "pack_id": "openresolve"
+            }
+          },
+          "approval": {
+            "state": "APPROVED",
+            "approver": "fixture-approver",
+            "approvedAt": "2026-10-15T14:16:06.947Z",
+            "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+            "decisionRef": {
+              "id": "2368e6db-4413-4a5a-88fe-534a6df117df",
+              "type": "decision",
+              "pack_id": "platform"
+            },
+            "proposalHash": "a69be40c840b241752d4e17b680b7c2fd9c794ef7d9940f38018fbf7b04e5fe3",
+            "decisionVersion": "1"
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:06.927Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "48f2f7f92567ab8fa9f4035875bfdd8c95e79e05374acdecaf79ff68752b1e44"
+      },
+      {
+        "snapshot": {
+          "id": "d2899027-71e5-4cab-8aef-7731737df175",
+          "hash": "147ce4e8fe82ce1c6888a32ea93e0bd485ff797e0f4cdfe490ff35c1e3237817",
+          "risk": "R0",
+          "input": {
+            "tool": "case.read_summary",
+            "fact_ids": [
+              "7c765a16-6516-4d21-800e-f81a3735b5c7"
+            ]
+          },
+          "state": "READY",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:06.998Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": false
+        },
+        "sha256": "756ce8f70b10258297e5c7ae0b78eafcf23173a676546b2024fbee6e3db5f9e3"
+      },
+      {
+        "snapshot": {
+          "id": "d2899027-71e5-4cab-8aef-7731737df175",
+          "hash": "147ce4e8fe82ce1c6888a32ea93e0bd485ff797e0f4cdfe490ff35c1e3237817",
+          "risk": "R0",
+          "input": {
+            "tool": "case.read_summary",
+            "fact_ids": [
+              "7c765a16-6516-4d21-800e-f81a3735b5c7"
+            ]
+          },
+          "state": "EXECUTED",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "receipt": {
+            "sha256": "504fafb7c7c13fcbf40745bb2cd1172d2618faac3a850676e989b45ebd4ad0d2",
+            "action_id": "d2899027-71e5-4cab-8aef-7731737df175",
+            "executed_at": "2026-10-15T14:16:07.005Z",
+            "resource_ref": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            }
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:06.998Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": false
+        },
+        "sha256": "c9349f6477aa156ed4dcfe42ef21e5429f36382868505d019edd9f1ade865abb"
+      },
+      {
+        "snapshot": {
+          "id": "552137d4-00a8-4479-88f4-46e2a21e7a51",
+          "hash": "9f4cba6d27be25eaa108d6e925a7a5e27dc51a2d175be3fb33012f067778adb4",
+          "risk": "R2",
+          "input": {
+            "tool": "case.add_note",
+            "fact_ids": [
+              "7c765a16-6516-4d21-800e-f81a3735b5c7"
+            ]
+          },
+          "state": "AWAITING_APPROVAL",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.010Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "035d31be5696ba93bc44bfb3e13aa6487cd189b7a6b5c4ad287126ffb258976c"
+      },
+      {
+        "snapshot": {
+          "id": "4ad1a208-ecd3-463c-b6ef-b81ef110399b",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "attempts": 0,
+          "failures": [],
+          "question": "What confirmed evidence is available and missing?",
+          "snapshot": {
+            "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+            "facts": [
+              {
+                "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "factsVersion": "fixture-reviewed-1"
+              }
+            ],
+            "policy": {
+              "ref": {
+                "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+                "type": "policy",
+                "pack_id": "platform"
+              },
+              "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+              "version": "1.0.0"
+            },
+            "caseRef": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "version": "1",
+            "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "disclosure": "SYNTHETIC",
+            "requiredFactCodes": [
+              "SUPPLIER",
+              "RECEIPT"
+            ]
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.054Z",
+          "operation": {
+            "id": "5ab7dfb9-2632-47cb-9713-b65e271c62e9",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.054Z",
+            "updated_at": "2026-10-15T14:16:07.054Z",
+            "resource_ref": {
+              "id": "4ad1a208-ecd3-463c-b6ef-b81ef110399b",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          },
+          "requester": "fixture-requester",
+          "updatedAt": "2026-10-15T14:16:07.054Z",
+          "controlVersion": "1",
+          "acknowledgement": {
+            "id": "5ab7dfb9-2632-47cb-9713-b65e271c62e9",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.054Z",
+            "updated_at": "2026-10-15T14:16:07.054Z",
+            "resource_ref": {
+              "id": "4ad1a208-ecd3-463c-b6ef-b81ef110399b",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          }
+        },
+        "sha256": "380102f9598f9a922e259aa5b9e6b979e3e51ab7b280fd1e0c583e04f7bc7c92"
+      },
+      {
+        "snapshot": {
+          "id": "4ad1a208-ecd3-463c-b6ef-b81ef110399b",
+          "lease": {
+            "token": "be9be376-df79-4332-bb27-033bcab40be2",
+            "until": "2026-10-15T14:18:07.058Z"
+          },
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "attempts": 1,
+          "failures": [],
+          "question": "What confirmed evidence is available and missing?",
+          "snapshot": {
+            "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+            "facts": [
+              {
+                "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "factsVersion": "fixture-reviewed-1"
+              }
+            ],
+            "policy": {
+              "ref": {
+                "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+                "type": "policy",
+                "pack_id": "platform"
+              },
+              "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+              "version": "1.0.0"
+            },
+            "caseRef": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "version": "1",
+            "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "disclosure": "SYNTHETIC",
+            "requiredFactCodes": [
+              "SUPPLIER",
+              "RECEIPT"
+            ]
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.054Z",
+          "operation": {
+            "id": "5ab7dfb9-2632-47cb-9713-b65e271c62e9",
+            "kind": "AI_EXPLANATION",
+            "state": "RUNNING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.054Z",
+            "updated_at": "2026-10-15T14:16:07.058Z",
+            "resource_ref": {
+              "id": "4ad1a208-ecd3-463c-b6ef-b81ef110399b",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          },
+          "requester": "fixture-requester",
+          "updatedAt": "2026-10-15T14:16:07.058Z",
+          "controlVersion": "1",
+          "acknowledgement": {
+            "id": "5ab7dfb9-2632-47cb-9713-b65e271c62e9",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.054Z",
+            "updated_at": "2026-10-15T14:16:07.054Z",
+            "resource_ref": {
+              "id": "4ad1a208-ecd3-463c-b6ef-b81ef110399b",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          }
+        },
+        "sha256": "e08de14c1488a7c278a853eedf9ba55a6b0e0038f29f64591654b89fa3202b96"
+      },
+      {
+        "snapshot": {
+          "id": "4ad1a208-ecd3-463c-b6ef-b81ef110399b",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "attempts": 1,
+          "failures": [
+            {
+              "at": "2026-10-15T14:16:07.061Z",
+              "code": "FORBIDDEN",
+              "attempt": 1
+            }
+          ],
+          "question": "What confirmed evidence is available and missing?",
+          "snapshot": {
+            "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+            "facts": [
+              {
+                "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "factsVersion": "fixture-reviewed-1"
+              }
+            ],
+            "policy": {
+              "ref": {
+                "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+                "type": "policy",
+                "pack_id": "platform"
+              },
+              "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+              "version": "1.0.0"
+            },
+            "caseRef": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "version": "1",
+            "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "disclosure": "SYNTHETIC",
+            "requiredFactCodes": [
+              "SUPPLIER",
+              "RECEIPT"
+            ]
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.054Z",
+          "operation": {
+            "id": "5ab7dfb9-2632-47cb-9713-b65e271c62e9",
+            "kind": "AI_EXPLANATION",
+            "error": {
+              "code": "FORBIDDEN",
+              "message": "AI explanation is blocked.",
+              "retryable": false,
+              "correlation_id": "909bc76c-05ad-4e86-86e0-551d14d7cde9"
+            },
+            "state": "FAILED",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.054Z",
+            "updated_at": "2026-10-15T14:16:07.061Z",
+            "resource_ref": {
+              "id": "4ad1a208-ecd3-463c-b6ef-b81ef110399b",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          },
+          "requester": "fixture-requester",
+          "updatedAt": "2026-10-15T14:16:07.061Z",
+          "controlVersion": "1",
+          "acknowledgement": {
+            "id": "5ab7dfb9-2632-47cb-9713-b65e271c62e9",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.054Z",
+            "updated_at": "2026-10-15T14:16:07.054Z",
+            "resource_ref": {
+              "id": "4ad1a208-ecd3-463c-b6ef-b81ef110399b",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          }
+        },
+        "sha256": "9a6754367eb0d3aa460e4f7a694673c953abd6b417856bfee1dc9ff0ed4e6dd5"
+      },
+      {
+        "snapshot": {
+          "id": "5dadf8bb-45ba-43c6-8fd7-5b7113d8b690",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "attempts": 0,
+          "failures": [],
+          "question": "What confirmed evidence is available and missing?",
+          "snapshot": {
+            "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+            "facts": [
+              {
+                "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "factsVersion": "fixture-reviewed-1"
+              }
+            ],
+            "policy": {
+              "ref": {
+                "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+                "type": "policy",
+                "pack_id": "platform"
+              },
+              "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+              "version": "1.0.0"
+            },
+            "caseRef": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "version": "1",
+            "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "disclosure": "SYNTHETIC",
+            "requiredFactCodes": [
+              "SUPPLIER",
+              "RECEIPT"
+            ]
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.070Z",
+          "operation": {
+            "id": "53d42f5a-17e5-4f6d-a0bf-75fe303b6885",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.070Z",
+            "updated_at": "2026-10-15T14:16:07.070Z",
+            "resource_ref": {
+              "id": "5dadf8bb-45ba-43c6-8fd7-5b7113d8b690",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          },
+          "requester": "fixture-requester",
+          "updatedAt": "2026-10-15T14:16:07.070Z",
+          "controlVersion": "1",
+          "acknowledgement": {
+            "id": "53d42f5a-17e5-4f6d-a0bf-75fe303b6885",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.070Z",
+            "updated_at": "2026-10-15T14:16:07.070Z",
+            "resource_ref": {
+              "id": "5dadf8bb-45ba-43c6-8fd7-5b7113d8b690",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          }
+        },
+        "sha256": "1400921b9e43b8d9244e80441d0c59c8279e28fd7e0fc6fdce620460fbaee8c3"
+      },
+      {
+        "snapshot": {
+          "id": "5dadf8bb-45ba-43c6-8fd7-5b7113d8b690",
+          "lease": {
+            "token": "433a65f7-1c54-402d-aefb-3680cb20fd4c",
+            "until": "2026-10-15T14:18:07.076Z"
+          },
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "attempts": 1,
+          "failures": [],
+          "question": "What confirmed evidence is available and missing?",
+          "snapshot": {
+            "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+            "facts": [
+              {
+                "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "factsVersion": "fixture-reviewed-1"
+              }
+            ],
+            "policy": {
+              "ref": {
+                "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+                "type": "policy",
+                "pack_id": "platform"
+              },
+              "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+              "version": "1.0.0"
+            },
+            "caseRef": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "version": "1",
+            "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "disclosure": "SYNTHETIC",
+            "requiredFactCodes": [
+              "SUPPLIER",
+              "RECEIPT"
+            ]
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.070Z",
+          "operation": {
+            "id": "53d42f5a-17e5-4f6d-a0bf-75fe303b6885",
+            "kind": "AI_EXPLANATION",
+            "state": "RUNNING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.070Z",
+            "updated_at": "2026-10-15T14:16:07.076Z",
+            "resource_ref": {
+              "id": "5dadf8bb-45ba-43c6-8fd7-5b7113d8b690",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          },
+          "requester": "fixture-requester",
+          "updatedAt": "2026-10-15T14:16:07.076Z",
+          "controlVersion": "1",
+          "acknowledgement": {
+            "id": "53d42f5a-17e5-4f6d-a0bf-75fe303b6885",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.070Z",
+            "updated_at": "2026-10-15T14:16:07.070Z",
+            "resource_ref": {
+              "id": "5dadf8bb-45ba-43c6-8fd7-5b7113d8b690",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          }
+        },
+        "sha256": "c18064bfbeb8074b17f1ca4cd732d794287158388480710eeb0b09fd5816870f"
+      },
+      {
+        "snapshot": {
+          "id": "5dadf8bb-45ba-43c6-8fd7-5b7113d8b690",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "result": {
+            "usage": {
+              "input_tokens": 1,
+              "reserved_tokens": 1
+            },
+            "status": "MISSING_EVIDENCE",
+            "provenance": {
+              "run_id": "995e4ed3-6ced-4ddd-aa4b-9625f4bacc12",
+              "provider": "gemini",
+              "model_version": "gemini-fixture-double",
+              "prompt_version": "labelled-runtime-double-v1"
+            },
+            "statements": [
+              {
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "fact_id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "citation": {
+                  "sha256": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                  "evidence_id": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                  "facts_version": "fixture-reviewed-1"
+                }
+              }
+            ],
+            "suggested_tool": "NONE",
+            "missing_evidence": [
+              "RECEIPT"
+            ]
+          },
+          "attempts": 1,
+          "failures": [],
+          "question": "What confirmed evidence is available and missing?",
+          "snapshot": {
+            "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+            "facts": [
+              {
+                "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "factsVersion": "fixture-reviewed-1"
+              }
+            ],
+            "policy": {
+              "ref": {
+                "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+                "type": "policy",
+                "pack_id": "platform"
+              },
+              "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+              "version": "1.0.0"
+            },
+            "caseRef": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "version": "1",
+            "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "disclosure": "SYNTHETIC",
+            "requiredFactCodes": [
+              "SUPPLIER",
+              "RECEIPT"
+            ]
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.070Z",
+          "operation": {
+            "id": "53d42f5a-17e5-4f6d-a0bf-75fe303b6885",
+            "kind": "AI_EXPLANATION",
+            "state": "SUCCEEDED",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.070Z",
+            "updated_at": "2026-10-15T14:16:07.295Z",
+            "resource_ref": {
+              "id": "5dadf8bb-45ba-43c6-8fd7-5b7113d8b690",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          },
+          "requester": "fixture-requester",
+          "updatedAt": "2026-10-15T14:16:07.295Z",
+          "controlVersion": "1",
+          "acknowledgement": {
+            "id": "53d42f5a-17e5-4f6d-a0bf-75fe303b6885",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.070Z",
+            "updated_at": "2026-10-15T14:16:07.070Z",
+            "resource_ref": {
+              "id": "5dadf8bb-45ba-43c6-8fd7-5b7113d8b690",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          }
+        },
+        "sha256": "66948bb185f276dd493d1ebe627e7e56e4dda93c9259f40bb8b58d76e630caef"
+      },
+      {
+        "snapshot": {
+          "id": "6d994ebd-2c69-4390-867e-3d1ec5ef04cf",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "attempts": 0,
+          "failures": [],
+          "question": "What confirmed evidence is available and missing?",
+          "snapshot": {
+            "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+            "facts": [
+              {
+                "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "factsVersion": "fixture-reviewed-1"
+              }
+            ],
+            "policy": {
+              "ref": {
+                "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+                "type": "policy",
+                "pack_id": "platform"
+              },
+              "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+              "version": "1.0.0"
+            },
+            "caseRef": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "version": "1",
+            "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "disclosure": "SYNTHETIC",
+            "requiredFactCodes": [
+              "SUPPLIER",
+              "RECEIPT"
+            ]
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.305Z",
+          "operation": {
+            "id": "9a2cbb32-c199-42d4-9066-68816e71fac5",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.305Z",
+            "updated_at": "2026-10-15T14:16:07.305Z",
+            "resource_ref": {
+              "id": "6d994ebd-2c69-4390-867e-3d1ec5ef04cf",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          },
+          "requester": "fixture-requester",
+          "updatedAt": "2026-10-15T14:16:07.305Z",
+          "controlVersion": "1",
+          "acknowledgement": {
+            "id": "9a2cbb32-c199-42d4-9066-68816e71fac5",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.305Z",
+            "updated_at": "2026-10-15T14:16:07.305Z",
+            "resource_ref": {
+              "id": "6d994ebd-2c69-4390-867e-3d1ec5ef04cf",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          }
+        },
+        "sha256": "a7e35dd2e585bcf15ac1ec53a6f93cc0c755ba8341248bc11180d4594032d78d"
+      },
+      {
+        "snapshot": {
+          "id": "6d994ebd-2c69-4390-867e-3d1ec5ef04cf",
+          "lease": {
+            "token": "d1fff89b-4022-4c3b-a37f-a3d5e65bb9b7",
+            "until": "2026-10-15T14:18:07.309Z"
+          },
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "attempts": 1,
+          "failures": [],
+          "question": "What confirmed evidence is available and missing?",
+          "snapshot": {
+            "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+            "facts": [
+              {
+                "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "factsVersion": "fixture-reviewed-1"
+              }
+            ],
+            "policy": {
+              "ref": {
+                "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+                "type": "policy",
+                "pack_id": "platform"
+              },
+              "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+              "version": "1.0.0"
+            },
+            "caseRef": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "version": "1",
+            "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "disclosure": "SYNTHETIC",
+            "requiredFactCodes": [
+              "SUPPLIER",
+              "RECEIPT"
+            ]
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.305Z",
+          "operation": {
+            "id": "9a2cbb32-c199-42d4-9066-68816e71fac5",
+            "kind": "AI_EXPLANATION",
+            "state": "RUNNING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.305Z",
+            "updated_at": "2026-10-15T14:16:07.309Z",
+            "resource_ref": {
+              "id": "6d994ebd-2c69-4390-867e-3d1ec5ef04cf",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          },
+          "requester": "fixture-requester",
+          "updatedAt": "2026-10-15T14:16:07.309Z",
+          "controlVersion": "1",
+          "acknowledgement": {
+            "id": "9a2cbb32-c199-42d4-9066-68816e71fac5",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.305Z",
+            "updated_at": "2026-10-15T14:16:07.305Z",
+            "resource_ref": {
+              "id": "6d994ebd-2c69-4390-867e-3d1ec5ef04cf",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          }
+        },
+        "sha256": "ec8366a0df73c3f9c5df25e80aff6601f646c876e11fee3d2d4c99fe875b9ff6"
+      },
+      {
+        "snapshot": {
+          "id": "6d994ebd-2c69-4390-867e-3d1ec5ef04cf",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "attempts": 1,
+          "failures": [
+            {
+              "at": "2026-10-15T14:16:07.313Z",
+              "code": "FILE_NOT_CLEAN",
+              "attempt": 1
+            }
+          ],
+          "question": "What confirmed evidence is available and missing?",
+          "snapshot": {
+            "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+            "facts": [
+              {
+                "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "factsVersion": "fixture-reviewed-1"
+              }
+            ],
+            "policy": {
+              "ref": {
+                "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+                "type": "policy",
+                "pack_id": "platform"
+              },
+              "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+              "version": "1.0.0"
+            },
+            "caseRef": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "version": "1",
+            "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "disclosure": "SYNTHETIC",
+            "requiredFactCodes": [
+              "SUPPLIER",
+              "RECEIPT"
+            ]
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.305Z",
+          "operation": {
+            "id": "9a2cbb32-c199-42d4-9066-68816e71fac5",
+            "kind": "AI_EXPLANATION",
+            "error": {
+              "code": "FILE_NOT_CLEAN",
+              "message": "AI explanation is blocked.",
+              "retryable": false,
+              "correlation_id": "2f968354-3d97-42a1-9015-dc8c9e4fd06d"
+            },
+            "state": "FAILED",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.305Z",
+            "updated_at": "2026-10-15T14:16:07.313Z",
+            "resource_ref": {
+              "id": "6d994ebd-2c69-4390-867e-3d1ec5ef04cf",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          },
+          "requester": "fixture-requester",
+          "updatedAt": "2026-10-15T14:16:07.313Z",
+          "controlVersion": "1",
+          "acknowledgement": {
+            "id": "9a2cbb32-c199-42d4-9066-68816e71fac5",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.305Z",
+            "updated_at": "2026-10-15T14:16:07.305Z",
+            "resource_ref": {
+              "id": "6d994ebd-2c69-4390-867e-3d1ec5ef04cf",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          }
+        },
+        "sha256": "947155a7ff8fc4c29c4b537dc0348f86cbc2f7d91fb4b19960f52ea82cf4989a"
+      },
+      {
+        "snapshot": {
+          "id": "680ba04c-ed8e-4c70-8dd5-8dd123b1a6f7",
+          "hash": "cadce8c84d5997c07da7e69fcc134a420e0d0bddf67704e23b6a574ccb984f25",
+          "risk": "R1",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "state": "AWAITING_APPROVAL",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.324Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "7e2361cb1d9daf6db8a8843dbb91b4074614df97f61feae765eadb704cda47d9"
+      },
+      {
+        "snapshot": {
+          "id": "680ba04c-ed8e-4c70-8dd5-8dd123b1a6f7",
+          "hash": "cadce8c84d5997c07da7e69fcc134a420e0d0bddf67704e23b6a574ccb984f25",
+          "risk": "R1",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "state": "APPROVED",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "approval": {
+            "state": "APPROVED",
+            "approver": "fixture-approver",
+            "approvedAt": "2026-10-15T14:16:07.325Z",
+            "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+            "decisionRef": {
+              "id": "31c598dd-078b-479b-b0f4-e91b6d5a4dd7",
+              "type": "decision",
+              "pack_id": "platform"
+            },
+            "proposalHash": "cadce8c84d5997c07da7e69fcc134a420e0d0bddf67704e23b6a574ccb984f25",
+            "decisionVersion": "1"
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.324Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "8ace8dc488f969d369626f204a3080a4e36753a3cc4e6fc50fabdd8ed5fa5595"
+      },
+      {
+        "snapshot": {
+          "id": "c59087a9-db95-489a-bb7a-c023ee9e6259",
+          "hash": "f892e42c77b5356874ce917eec046656e6f972459928b4ecd3281b491e5ebc65",
+          "risk": "R1",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "state": "AWAITING_APPROVAL",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.344Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "22b4725c079967fcbcfa9199bfc619d7085e4c5276e037dca46cf671a80ca9a1"
+      },
+      {
+        "snapshot": {
+          "id": "c59087a9-db95-489a-bb7a-c023ee9e6259",
+          "hash": "f892e42c77b5356874ce917eec046656e6f972459928b4ecd3281b491e5ebc65",
+          "risk": "R1",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "state": "APPROVED",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "approval": {
+            "state": "APPROVED",
+            "approver": "fixture-approver",
+            "approvedAt": "2026-10-15T14:16:07.345Z",
+            "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+            "decisionRef": {
+              "id": "34356ec7-af47-4b85-a375-9c8bcc7f87d8",
+              "type": "decision",
+              "pack_id": "platform"
+            },
+            "proposalHash": "f892e42c77b5356874ce917eec046656e6f972459928b4ecd3281b491e5ebc65",
+            "decisionVersion": "1"
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.344Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "746e31d572b2ddb54896736532a7df3c318d33141eb7dcb3a00dea75cfc04f65"
+      },
+      {
+        "snapshot": {
+          "id": "d04a360d-30d3-4d7f-acac-2e3b9ac5b055",
+          "hash": "fb9573c7b4fa1c9f2a98b497a5b109e5dfc06c3b8fb119b1d134f15217996eaa",
+          "risk": "R1",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "state": "AWAITING_APPROVAL",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.365Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "23781d0f222cdc127bd940b314d9fef95178bfa17f105510f60ae217377933e6"
+      },
+      {
+        "snapshot": {
+          "id": "d04a360d-30d3-4d7f-acac-2e3b9ac5b055",
+          "hash": "fb9573c7b4fa1c9f2a98b497a5b109e5dfc06c3b8fb119b1d134f15217996eaa",
+          "risk": "R1",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "state": "APPROVED",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "approval": {
+            "state": "APPROVED",
+            "approver": "fixture-approver",
+            "approvedAt": "2026-10-15T14:16:07.366Z",
+            "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+            "decisionRef": {
+              "id": "752fe586-8b37-403d-ac70-a46e101fa88f",
+              "type": "decision",
+              "pack_id": "platform"
+            },
+            "proposalHash": "fb9573c7b4fa1c9f2a98b497a5b109e5dfc06c3b8fb119b1d134f15217996eaa",
+            "decisionVersion": "1"
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.365Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "ac497c435dc6c70ac4c1957114128c7ae71904fff65b240642f36021cb831ac3"
+      },
+      {
+        "snapshot": {
+          "id": "b0cf1bb4-920c-4188-a5ac-136a4a52ebaa",
+          "hash": "0354c16ce2a66b94b1ccf369535083b67f38d86509c81602550b3dfdc34ed71a",
+          "risk": "R2",
+          "input": {
+            "tool": "case.add_note",
+            "fact_ids": [
+              "7c765a16-6516-4d21-800e-f81a3735b5c7"
+            ]
+          },
+          "state": "AWAITING_APPROVAL",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.382Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "40c3680222e7cc95ad49dbc8d2d0bc2d92ec06f6853ac31fd5ec571c0ae891cf"
+      },
+      {
+        "snapshot": {
+          "id": "b0cf1bb4-920c-4188-a5ac-136a4a52ebaa",
+          "hash": "0354c16ce2a66b94b1ccf369535083b67f38d86509c81602550b3dfdc34ed71a",
+          "risk": "R2",
+          "input": {
+            "tool": "case.add_note",
+            "fact_ids": [
+              "7c765a16-6516-4d21-800e-f81a3735b5c7"
+            ]
+          },
+          "state": "APPROVED",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "approval": {
+            "state": "APPROVED",
+            "approver": "fixture-approver",
+            "approvedAt": "2026-10-15T14:16:07.383Z",
+            "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+            "decisionRef": {
+              "id": "1ebceb96-2160-4d96-9cde-84b4b5adda1c",
+              "type": "decision",
+              "pack_id": "platform"
+            },
+            "proposalHash": "0354c16ce2a66b94b1ccf369535083b67f38d86509c81602550b3dfdc34ed71a",
+            "decisionVersion": "1"
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.382Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "d33317b5772daefed42edf49e6eededbeeea487e59d9fe44f3eb82dfd1a8e9a5"
+      },
+      {
+        "snapshot": {
+          "id": "b0cf1bb4-920c-4188-a5ac-136a4a52ebaa",
+          "hash": "0354c16ce2a66b94b1ccf369535083b67f38d86509c81602550b3dfdc34ed71a",
+          "risk": "R2",
+          "input": {
+            "tool": "case.add_note",
+            "fact_ids": [
+              "7c765a16-6516-4d21-800e-f81a3735b5c7"
+            ]
+          },
+          "state": "EXECUTED",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "receipt": {
+            "sha256": "88d5c7642ffbcb336168f0cbe21714b17f83d4e3f44ba58de256a10f0fb7ac2c",
+            "action_id": "b0cf1bb4-920c-4188-a5ac-136a4a52ebaa",
+            "executed_at": "2026-10-15T14:16:07.408Z",
+            "resource_ref": {
+              "id": "193d6539-7570-4961-ba9c-6aba9337e11b",
+              "type": "case-action",
+              "pack_id": "openresolve"
+            }
+          },
+          "approval": {
+            "state": "APPROVED",
+            "approver": "fixture-approver",
+            "approvedAt": "2026-10-15T14:16:07.383Z",
+            "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+            "decisionRef": {
+              "id": "1ebceb96-2160-4d96-9cde-84b4b5adda1c",
+              "type": "decision",
+              "pack_id": "platform"
+            },
+            "proposalHash": "0354c16ce2a66b94b1ccf369535083b67f38d86509c81602550b3dfdc34ed71a",
+            "decisionVersion": "1"
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.382Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "592135e364808aaa6ed363521d4d04d17e27a8b5c59dff6bb03f8ff68e1c95d8"
+      },
+      {
+        "snapshot": {
+          "id": "0fdfd49f-70ee-42dd-88a1-569a9328edb4",
+          "hash": "c472b4c5039b5c2db1c0f9280f60a401ed7278e5cde1abdda22b2eb0f7e02391",
+          "risk": "R1",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "state": "AWAITING_APPROVAL",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.422Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "b4ef1c4baf38f604b0817dba83c1214213cf65870c4ebc05f54f31ac96cc1306"
+      },
+      {
+        "snapshot": {
+          "id": "0fdfd49f-70ee-42dd-88a1-569a9328edb4",
+          "hash": "c472b4c5039b5c2db1c0f9280f60a401ed7278e5cde1abdda22b2eb0f7e02391",
+          "risk": "R1",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "state": "APPROVED",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "approval": {
+            "state": "APPROVED",
+            "approver": "fixture-approver",
+            "approvedAt": "2026-10-15T14:16:07.423Z",
+            "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+            "decisionRef": {
+              "id": "5b77db6d-8bdc-4917-ba87-f4c7f18423d2",
+              "type": "decision",
+              "pack_id": "platform"
+            },
+            "proposalHash": "c472b4c5039b5c2db1c0f9280f60a401ed7278e5cde1abdda22b2eb0f7e02391",
+            "decisionVersion": "1"
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.422Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "95ce82ca318b983d04253d8af6260fbe5e376f091f75dd8569fd4de85b7a98da"
+      },
+      {
+        "snapshot": {
+          "id": "0fdfd49f-70ee-42dd-88a1-569a9328edb4",
+          "hash": "c472b4c5039b5c2db1c0f9280f60a401ed7278e5cde1abdda22b2eb0f7e02391",
+          "risk": "R1",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "state": "EXECUTED",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "receipt": {
+            "sha256": "e329593c519f26d0ea84fbc5535379b4a3b26e8d8eb2d388035a03dd5e9cd60e",
+            "action_id": "0fdfd49f-70ee-42dd-88a1-569a9328edb4",
+            "executed_at": "2026-10-15T14:16:07.442Z",
+            "resource_ref": {
+              "id": "bfef2fe0-6ef1-4fa4-b907-aefd3a27ddc6",
+              "type": "case-action",
+              "pack_id": "openresolve"
+            }
+          },
+          "approval": {
+            "state": "APPROVED",
+            "approver": "fixture-approver",
+            "approvedAt": "2026-10-15T14:16:07.423Z",
+            "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+            "decisionRef": {
+              "id": "5b77db6d-8bdc-4917-ba87-f4c7f18423d2",
+              "type": "decision",
+              "pack_id": "platform"
+            },
+            "proposalHash": "c472b4c5039b5c2db1c0f9280f60a401ed7278e5cde1abdda22b2eb0f7e02391",
+            "decisionVersion": "1"
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.422Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "ef52984c8a26977653dbcc79dcf30b7de33b9d7c5711714d7c0df48b3607125d"
+      },
+      {
+        "snapshot": {
+          "id": "5bf0f4fd-067a-4273-880a-3424c72ceff7",
+          "hash": "9b41ee25fc3ef102f2d75755430f6b6b9c7a68e5d03b282bd7f643afb7049de1",
+          "risk": "R1",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "state": "AWAITING_APPROVAL",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.477Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "ff82677c48ceeff61d9bbb1812efba35c968bea600acbd5ba9a226539031e253"
+      },
+      {
+        "snapshot": {
+          "id": "5bf0f4fd-067a-4273-880a-3424c72ceff7",
+          "hash": "9b41ee25fc3ef102f2d75755430f6b6b9c7a68e5d03b282bd7f643afb7049de1",
+          "risk": "R1",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "state": "APPROVED",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "approval": {
+            "state": "APPROVED",
+            "approver": "fixture-approver",
+            "approvedAt": "2026-10-15T14:16:07.479Z",
+            "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+            "decisionRef": {
+              "id": "31f54345-e831-4b89-b536-1c161ad79e17",
+              "type": "decision",
+              "pack_id": "platform"
+            },
+            "proposalHash": "9b41ee25fc3ef102f2d75755430f6b6b9c7a68e5d03b282bd7f643afb7049de1",
+            "decisionVersion": "1"
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.477Z",
+          "requester": "fixture-requester",
+          "policyHash": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+          "snapshotHash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+          "explanationId": "251a58a8-5c92-45e8-87de-13db664ae4e3",
+          "controlVersion": "1",
+          "requiresApproval": true
+        },
+        "sha256": "1b8db612f4dc58db755f6094ece882d35ef9945c92820c3b437c868897b8dc98"
+      },
+      {
+        "snapshot": {
+          "id": "f2124723-4054-4865-8064-fed3a15ee6ee",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "attempts": 0,
+          "failures": [],
+          "question": "What confirmed evidence is available and missing?",
+          "snapshot": {
+            "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+            "facts": [
+              {
+                "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "factsVersion": "fixture-reviewed-1"
+              }
+            ],
+            "policy": {
+              "ref": {
+                "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+                "type": "policy",
+                "pack_id": "platform"
+              },
+              "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+              "version": "1.0.0"
+            },
+            "caseRef": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "version": "1",
+            "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "disclosure": "SYNTHETIC",
+            "requiredFactCodes": [
+              "SUPPLIER",
+              "RECEIPT"
+            ]
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.494Z",
+          "operation": {
+            "id": "3f6c6b69-75c1-4f9d-b1e7-e377802cbfca",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.494Z",
+            "updated_at": "2026-10-15T14:16:07.494Z",
+            "resource_ref": {
+              "id": "f2124723-4054-4865-8064-fed3a15ee6ee",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          },
+          "requester": "fixture-requester",
+          "updatedAt": "2026-10-15T14:16:07.494Z",
+          "controlVersion": "1",
+          "acknowledgement": {
+            "id": "3f6c6b69-75c1-4f9d-b1e7-e377802cbfca",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.494Z",
+            "updated_at": "2026-10-15T14:16:07.494Z",
+            "resource_ref": {
+              "id": "f2124723-4054-4865-8064-fed3a15ee6ee",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          }
+        },
+        "sha256": "82395f8d5a6ff53d4047b4d7c4bb26a8ff4ce92e3021c048cdd5b7997dc0a2bd"
+      },
+      {
+        "snapshot": {
+          "id": "f2124723-4054-4865-8064-fed3a15ee6ee",
+          "lease": {
+            "token": "7599d488-654e-4a55-8565-bd8485b8b9ac",
+            "until": "2026-10-15T14:18:07.499Z"
+          },
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "attempts": 1,
+          "failures": [],
+          "question": "What confirmed evidence is available and missing?",
+          "snapshot": {
+            "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+            "facts": [
+              {
+                "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "factsVersion": "fixture-reviewed-1"
+              }
+            ],
+            "policy": {
+              "ref": {
+                "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+                "type": "policy",
+                "pack_id": "platform"
+              },
+              "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+              "version": "1.0.0"
+            },
+            "caseRef": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "version": "1",
+            "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "disclosure": "SYNTHETIC",
+            "requiredFactCodes": [
+              "SUPPLIER",
+              "RECEIPT"
+            ]
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.494Z",
+          "operation": {
+            "id": "3f6c6b69-75c1-4f9d-b1e7-e377802cbfca",
+            "kind": "AI_EXPLANATION",
+            "state": "RUNNING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.494Z",
+            "updated_at": "2026-10-15T14:16:07.499Z",
+            "resource_ref": {
+              "id": "f2124723-4054-4865-8064-fed3a15ee6ee",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          },
+          "requester": "fixture-requester",
+          "updatedAt": "2026-10-15T14:16:07.499Z",
+          "controlVersion": "1",
+          "acknowledgement": {
+            "id": "3f6c6b69-75c1-4f9d-b1e7-e377802cbfca",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.494Z",
+            "updated_at": "2026-10-15T14:16:07.494Z",
+            "resource_ref": {
+              "id": "f2124723-4054-4865-8064-fed3a15ee6ee",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          }
+        },
+        "sha256": "a623f7c872ce180d26219466ef5e9e901f914bb21d6cd77991703b086410b2a4"
+      },
+      {
+        "snapshot": {
+          "id": "f2124723-4054-4865-8064-fed3a15ee6ee",
+          "caseId": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "attempts": 1,
+          "failures": [
+            {
+              "at": "2026-10-15T14:16:07.618Z",
+              "code": "DEPENDENCY_UNAVAILABLE",
+              "attempt": 1
+            }
+          ],
+          "question": "What confirmed evidence is available and missing?",
+          "snapshot": {
+            "hash": "d1259624d146ce31a5027a7b55fe48aae59371cae11dfcef40bda4b3d9233bc3",
+            "facts": [
+              {
+                "id": "7c765a16-6516-4d21-800e-f81a3735b5c7",
+                "code": "SUPPLIER",
+                "label": "Confirmed fictional supplier",
+                "value": "FICTIONAL Supplier",
+                "evidenceId": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+                "evidenceHash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+                "factsVersion": "fixture-reviewed-1"
+              }
+            ],
+            "policy": {
+              "ref": {
+                "id": "7bf1a527-9cf5-4ebd-9137-d3daee949794",
+                "type": "policy",
+                "pack_id": "platform"
+              },
+              "sha256": "819b6cf509b6ece9e0485165246963c22d41b4705159a01b48b5a9c619c5f044",
+              "version": "1.0.0"
+            },
+            "caseRef": {
+              "id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+              "type": "case",
+              "pack_id": "openresolve"
+            },
+            "version": "1",
+            "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "disclosure": "SYNTHETIC",
+            "requiredFactCodes": [
+              "SUPPLIER",
+              "RECEIPT"
+            ]
+          },
+          "tenantId": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "createdAt": "2026-10-15T14:16:07.494Z",
+          "operation": {
+            "id": "3f6c6b69-75c1-4f9d-b1e7-e377802cbfca",
+            "kind": "AI_EXPLANATION",
+            "error": {
+              "code": "DEPENDENCY_UNAVAILABLE",
+              "message": "AI explanation is blocked.",
+              "retryable": false,
+              "correlation_id": "0e947c45-b525-406d-b533-3b0916594dee"
+            },
+            "state": "FAILED",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.494Z",
+            "updated_at": "2026-10-15T14:16:07.618Z",
+            "resource_ref": {
+              "id": "f2124723-4054-4865-8064-fed3a15ee6ee",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          },
+          "requester": "fixture-requester",
+          "updatedAt": "2026-10-15T14:16:07.618Z",
+          "controlVersion": "1",
+          "acknowledgement": {
+            "id": "3f6c6b69-75c1-4f9d-b1e7-e377802cbfca",
+            "kind": "AI_EXPLANATION",
+            "state": "PENDING",
+            "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+            "created_at": "2026-10-15T14:16:07.494Z",
+            "updated_at": "2026-10-15T14:16:07.494Z",
+            "resource_ref": {
+              "id": "f2124723-4054-4865-8064-fed3a15ee6ee",
+              "type": "ai-explanation",
+              "pack_id": "openresolve"
+            }
+          }
+        },
+        "sha256": "094b5fba53afcd6b021483d40f4d5de1cf9767c54bebede97018fb5702d92312"
+      }
+    ],
+    "actualFixtureActions": [
+      {
+        "data": {
+          "at": "2026-10-15T14:16:07.442Z",
+          "actor": "fixture-requester",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "case_id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "decision_ref": {
+            "id": "5b77db6d-8bdc-4917-ba87-f4c7f18423d2",
+            "type": "decision",
+            "pack_id": "platform"
+          },
+          "proposal_sha256": "c472b4c5039b5c2db1c0f9280f60a401ed7278e5cde1abdda22b2eb0f7e02391"
+        },
+        "sha256": "e329593c519f26d0ea84fbc5535379b4a3b26e8d8eb2d388035a03dd5e9cd60e"
+      },
+      {
+        "data": {
+          "at": "2026-10-15T14:16:06.974Z",
+          "actor": "fixture-requester",
+          "input": {
+            "tool": "case.request_evidence",
+            "missing_evidence_codes": [
+              "RECEIPT"
+            ]
+          },
+          "case_id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "decision_ref": {
+            "id": "2368e6db-4413-4a5a-88fe-534a6df117df",
+            "type": "decision",
+            "pack_id": "platform"
+          },
+          "proposal_sha256": "a69be40c840b241752d4e17b680b7c2fd9c794ef7d9940f38018fbf7b04e5fe3"
+        },
+        "sha256": "e6b44d5f54fa8abef77278bcca36e3f3efb78804e991f2f0421f2a76f0f640e0"
+      },
+      {
+        "data": {
+          "at": "2026-10-15T14:16:07.408Z",
+          "actor": "fixture-requester",
+          "input": {
+            "tool": "case.add_note",
+            "fact_ids": [
+              "7c765a16-6516-4d21-800e-f81a3735b5c7"
+            ]
+          },
+          "case_id": "087613ae-9d42-4888-86b3-ad24f061e4c3",
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "decision_ref": {
+            "id": "1ebceb96-2160-4d96-9cde-84b4b5adda1c",
+            "type": "decision",
+            "pack_id": "platform"
+          },
+          "proposal_sha256": "0354c16ce2a66b94b1ccf369535083b67f38d86509c81602550b3dfdc34ed71a"
+        },
+        "sha256": "88d5c7642ffbcb336168f0cbe21714b17f83d4e3f44ba58de256a10f0fb7ac2c"
+      }
+    ],
+    "evidence": [
+      {
+        "history": [
+          {
+            "at": "2026-10-15T14:16:06.533Z",
+            "state": "CLEAN",
+            "engine": "1.4.6",
+            "policy": "evidence-intake-v1",
+            "sha256": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+            "attempt": 1,
+            "revision": 4,
+            "objectKey": "tenant/5c09d9d1-1d2b-406e-9c02-aa74b4991100/evidence/c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27/revision/1/content/a826675f-402c-4f95-aebb-1f5c20cf99a8",
+            "retryable": false,
+            "leaseToken": "9ec70070-8337-4f7b-9c9f-11150ffc88a0",
+            "definitions": "28154",
+            "definitionsAt": "2026-10-15T06:24:22.000Z"
+          }
+        ],
+        "accepted": true,
+        "evidence": {
+          "id": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+          "sha256": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45",
+          "source": {
+            "kind": "USER_UPLOAD"
+          },
+          "filename": "FICTIONAL-case-evidence.xml",
+          "revision": 5,
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "created_at": "2026-10-15T14:16:06.414Z",
+          "created_by": "fixture-worker",
+          "legal_hold": false,
+          "media_type": "application/xml",
+          "size_bytes": 79,
+          "updated_at": "2026-10-15T14:16:06.533Z",
+          "retention_class": "STANDARD",
+          "processing_state": "NOT_STARTED",
+          "quarantine_state": "CLEAN"
+        },
+        "expiresAt": "2026-10-15T14:31:06.414Z",
+        "objectKey": "tenant/5c09d9d1-1d2b-406e-9c02-aa74b4991100/evidence/c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27/revision/1/content/a826675f-402c-4f95-aebb-1f5c20cf99a8",
+        "operation": {
+          "id": "65c6006d-3f82-4c8a-ab88-d29c0a08f887",
+          "kind": "EVIDENCE_UPLOAD",
+          "state": "SUCCEEDED",
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "created_at": "2026-10-15T14:16:06.447Z",
+          "updated_at": "2026-10-15T14:16:06.533Z",
+          "resource_ref": {
+            "id": "c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27",
+            "type": "evidence",
+            "pack_id": "platform"
+          }
+        },
+        "scanAttempts": 1,
+        "uploadHistory": [
+          {
+            "at": "2026-10-15T14:16:06.447Z",
+            "attempt": 1,
+            "objectKey": "tenant/5c09d9d1-1d2b-406e-9c02-aa74b4991100/evidence/c4b30cc5-b6d2-4bc8-b3fc-e9e9112bbe27/revision/1/content/a826675f-402c-4f95-aebb-1f5c20cf99a8",
+            "leaseToken": "a826675f-402c-4f95-aebb-1f5c20cf99a8"
+          }
+        ],
+        "uploadAttempts": 1
+      },
+      {
+        "history": [],
+        "accepted": true,
+        "evidence": {
+          "id": "d56d25ab-0ba3-4268-af09-30025982360b",
+          "sha256": "b15d4d3d7a3bcd5ddb2633aefe53f4f3bbf8a77cc9eba14c5dcd4a3dbb1bb6c6",
+          "source": {
+            "kind": "USER_UPLOAD"
+          },
+          "filename": "FICTIONAL-unscanned.xml",
+          "revision": 3,
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "created_at": "2026-10-15T14:16:06.538Z",
+          "created_by": "fixture-worker",
+          "legal_hold": false,
+          "media_type": "application/xml",
+          "size_bytes": 66,
+          "updated_at": "2026-10-15T14:16:06.596Z",
+          "retention_class": "STANDARD",
+          "processing_state": "NOT_STARTED",
+          "quarantine_state": "PENDING_SCAN"
+        },
+        "expiresAt": "2026-10-15T14:31:06.538Z",
+        "objectKey": "tenant/5c09d9d1-1d2b-406e-9c02-aa74b4991100/evidence/d56d25ab-0ba3-4268-af09-30025982360b/revision/1/content/84852f58-be43-4bb0-8e53-8403844fda00",
+        "operation": {
+          "id": "a4fb6e68-ceec-44d8-8e24-1081d68dd4db",
+          "kind": "EVIDENCE_UPLOAD",
+          "state": "PENDING",
+          "tenant_id": "5c09d9d1-1d2b-406e-9c02-aa74b4991100",
+          "created_at": "2026-10-15T14:16:06.563Z",
+          "updated_at": "2026-10-15T14:16:06.596Z",
+          "resource_ref": {
+            "id": "d56d25ab-0ba3-4268-af09-30025982360b",
+            "type": "evidence",
+            "pack_id": "platform"
+          }
+        },
+        "scanAttempts": 0,
+        "uploadHistory": [
+          {
+            "at": "2026-10-15T14:16:06.563Z",
+            "attempt": 1,
+            "objectKey": "tenant/5c09d9d1-1d2b-406e-9c02-aa74b4991100/evidence/d56d25ab-0ba3-4268-af09-30025982360b/revision/1/content/84852f58-be43-4bb0-8e53-8403844fda00",
+            "leaseToken": "84852f58-be43-4bb0-8e53-8403844fda00"
+          }
+        ],
+        "uploadAttempts": 1
+      }
+    ]
+  },
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "linux",
+    "services": "actual isolated PostgreSQL/MinIO/pinned fresh ClamAV/Nest HTTP",
+    "identity": "static server identities and actual SQL membership/case/evidence grants, not production SSO",
+    "model": "explicit deterministic selection double; actual Gemini evaluation is a separate report",
+    "policyDecisionExecution": "actual SQL-backed fixture ports and append-only local case-action rows, not owning #50 production integration",
+    "fault": "injected exception after actual SQL, not process-kill recovery"
+  },
+  "workerDurationsMs": [
+    252,
+    223
+  ],
+  "providerDoubleCalls": 3,
+  "actualProviderRequests": 0,
+  "limitations": [
+    "No production #43/#50 Case/policy/decision adapter, ledger receipt or workflow integration",
+    "No bank/HTTP/arbitrary code or R3 executor",
+    "No production load, process-kill or coordinated restore claim"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "version": "source-bound-adversarial-v1",
+  "disclosure": "SYNTHETIC",
+  "license": "MIT",
+  "split": "held-out",
+  "cases": 6,
+  "inputs": {
+    "path": "adversarial-inputs.json",
+    "sha256": "a28a708092ba3a7afdeff067f1962363bf53caa5d982dfdb44368ac8a1190103"
+  },
+  "labels": {
+    "path": "adversarial-labels.json",
+    "sha256": "47274ce3b413ecee38ea5ea3fa6e742e170f38d49a19a42851080bbba3eb9ebc"
+  },
+  "limitations": [
+    "Six small team-authored synthetic cases; no production generalization or independent annotation",
+    "Frozen before the first actual call; later reruns are regression evidence, never new independent held-out samples",
+    "Model selection and actual source-bound output are scored separately; no tool execution"
+  ]
+}

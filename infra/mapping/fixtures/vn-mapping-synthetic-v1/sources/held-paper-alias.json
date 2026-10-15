@@ -1,0 +1,37 @@
+{
+  "tenantId": "00000000-0000-4000-8000-000000000025",
+  "purchaseOrderId": "00000000-0000-4000-8000-000000000125",
+  "confirmationId": "00000000-0000-4000-8000-000000000325",
+  "evidenceId": "00000000-0000-4000-8000-000000000425",
+  "sourceHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "factsHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "catalogRevision": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "line": {
+    "path": "/lines/0",
+    "sku": null,
+    "description": "Giấy photo 80 g/m2 cỡ A4"
+  },
+  "candidates": [
+    {
+      "id": "00000000-0000-4000-8000-000000000201",
+      "tenantId": "00000000-0000-4000-8000-000000000025",
+      "purchaseOrderId": "00000000-0000-4000-8000-000000000125",
+      "sku": "CE285A",
+      "description": "Hộp mực laser HP CE285A, còn gọi HP 85A"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000202",
+      "tenantId": "00000000-0000-4000-8000-000000000025",
+      "purchaseOrderId": "00000000-0000-4000-8000-000000000125",
+      "sku": "SYN-83A",
+      "description": "Hộp mực máy in loại 83A, sản phẩm giả lập B"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000203",
+      "tenantId": "00000000-0000-4000-8000-000000000025",
+      "purchaseOrderId": "00000000-0000-4000-8000-000000000125",
+      "sku": "A4-80",
+      "description": "Giấy in khổ A4 định lượng 80gsm"
+    }
+  ]
+}

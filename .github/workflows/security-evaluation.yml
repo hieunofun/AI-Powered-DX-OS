@@ -1,0 +1,45 @@
+name: AI quality and adversarial security
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'infra/evaluation/**'
+      - 'apps/api/src/ai/extraction/adversarial-boundaries.spec.ts'
+      - 'docs/ai/evidence/issue63-*.json'
+      - '.github/workflows/security-evaluation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  security-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build:api
+      - run: node --test infra/evaluation/metrics.test.cjs
+      - run: npm run test --workspace=apps/api -- --runInBand --runTestsByPath src/ai/extraction/adversarial-boundaries.spec.ts
+      - name: Recompute retained model scores with planned denominators
+        run: node infra/evaluation/summarize-quality.cjs
+      - name: Start isolated existing evidence and mediation fixture
+        run: docker compose -f infra/mediation/compose.yaml up -d --build
+      - name: Exercise real upload/AV/IDOR and current worker/tool guards
+        run: node infra/evaluation/validate-security-runtime.cjs --wait-ready
+      - name: Retain successful and failed evaluations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: adversarial-ai-security
+          path: docs/ai/evidence/issue63-*.json
+          if-no-files-found: warn
+      - name: Print fixture status on failure
+        if: failure()
+        run: docker compose -f infra/mediation/compose.yaml ps
+      - name: Stop without deleting histories, objects or definitions
+        if: always()
+        run: docker compose -f infra/mediation/compose.yaml stop

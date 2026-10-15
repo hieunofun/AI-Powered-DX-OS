@@ -1,0 +1,53 @@
+{
+  "version": "vn-reviewed-v1",
+  "synthetic": true,
+  "license": "MIT",
+  "sources": "Team-authored fictional fixtures; PDFKit and Chromium rendering, Noto Sans OFL; no production data.",
+  "renderer": {
+    "playwright": "1.63.0",
+    "browser": "154.0.8037.100",
+    "channel": "chrome"
+  },
+  "cases": [
+    {
+      "id": "dev-digital",
+      "split": "dev",
+      "kind": "text-pdf",
+      "source": "sources/dev-digital.pdf",
+      "label": "labels/dev-digital.json",
+      "sha256": "db5714f66f8d14ad9a3e411b3b688a0cd12ea0bcfa0597ba126931640486527f",
+      "size_bytes": 8439,
+      "media_type": "application/pdf"
+    },
+    {
+      "id": "dev-png",
+      "split": "dev",
+      "kind": "png",
+      "source": "sources/dev-png.png",
+      "label": "labels/dev-png.json",
+      "sha256": "cca773aa6ca380eb6717532d1f6aaf4d64206bc7257b94db1a763548e0e3e5d4",
+      "size_bytes": 80970,
+      "media_type": "image/png"
+    },
+    {
+      "id": "held-scanned",
+      "split": "held-out",
+      "kind": "scanned-pdf",
+      "source": "sources/held-scanned.pdf",
+      "label": "labels/held-scanned.json",
+      "sha256": "6232ad3f9761866fdd0f8f4e3db305814f6402a1872551497269b14732e4a7b7",
+      "size_bytes": 108196,
+      "media_type": "application/pdf"
+    },
+    {
+      "id": "held-jpeg",
+      "split": "held-out",
+      "kind": "jpeg",
+      "source": "sources/held-jpeg.jpg",
+      "label": "labels/held-jpeg.json",
+      "sha256": "f5640164951870ced2427768d96e36b9e49b85c12f52ab552f639bdabbbf5bf1",
+      "size_bytes": 91797,
+      "media_type": "image/jpeg"
+    }
+  ]
+}

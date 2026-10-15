@@ -1,0 +1,26 @@
+name: opendx-issue66
+# Component restore rehearsal only. Volumes/dumps are retained; no production target.
+services:
+  postgres:
+    extends:
+      file: ../history/compose.yaml
+      service: postgres
+    ports: !override ["127.0.0.1:15457:5432"]
+    volumes: !override ["source:/var/lib/postgresql/data"]
+  restore:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: restore_control_issue66
+      POSTGRES_USER: history_fixture
+      POSTGRES_PASSWORD: history_fixture_local_only
+    ports: ["127.0.0.1:15466:5432"]
+    volumes: ["restore:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U history_fixture -d restore_control_issue66"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    mem_limit: 512m
+volumes:
+  source:
+  restore:

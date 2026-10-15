@@ -1,0 +1,1861 @@
+{
+  "started": "2026-10-15T13:35:58.242Z",
+  "completed": "2026-10-15T13:36:15.525Z",
+  "gitHead": "b2d484d5d0b69bae934ad041ccdee4ed06a04369",
+  "worktreeDirty": false,
+  "sourceHashes": {
+    "apps/api/src/packs/openresolve/connectors/connector-case.target.ts": "83599d7b959687a4e9a6a6a8c6fe01746fe6b013ae866d8f663697240e96c23e",
+    "apps/api/src/packs/openresolve/connectors/connector-lineage.writer.ts": "346328f0ea0619fad9e6848747002a9563f4cf75bfc5b262da97b712324a9b39",
+    "apps/api/src/packs/openresolve/connectors/ingress-reconciliation.ts": "38f3162982e69eea17c763675546387f80e08d6fed0cd2a31db24b1bb249c22a",
+    "apps/api/src/packs/openresolve/connectors/ingress-validation.ts": "4965634a67185f42a121b3601a289e801917215119bff92df9148d82affcedef",
+    "apps/api/src/packs/openresolve/connectors/ingress.module.ts": "9666bfe8767e35a5adbd28a3847e92baa1341fdba04c58c512b1f5678e8d89c1",
+    "apps/api/src/packs/openresolve/connectors/ingress.repository.ts": "1c3469c6a7c5fbfdecf072d1499ed0ccc361d0b416673b25a30a11822f95594e",
+    "apps/api/src/packs/openresolve/connectors/ingress.service.ts": "5fac5059bbf50268dc7062992b10a27e443d67a92d236aff5b31bc6825ee73df",
+    "apps/api/src/packs/openresolve/connectors/ingress.types.ts": "e054ed4bf3767f5c1663268835a6269a32271579a395ff503dd00926c3827011",
+    "apps/api/src/packs/openresolve/connectors/source-registry.ts": "42deb7400c79d78209913ff5740907f6710452746806e80197dd4ab354c99522",
+    "apps/api/src/platform/evidence/clamav.scanner.ts": "bc129856f08e0143317ec13fe0dae625ec4186d012b1bae61d6cea2396dec524",
+    "apps/api/src/platform/evidence/evidence-context.ts": "41409188b369396514ee58d4790e7521c5c318822f5e452aea212c3d3e1b734f",
+    "apps/api/src/platform/evidence/evidence-storage.ts": "52f6cca7eaf2c0c7faf4973f42c39f50ba70c1c9431f8c7e8cd9ae5fe2cc1eaa",
+    "apps/api/src/platform/evidence/evidence.controller.ts": "9b5cbd49df360a6a7666948b60b62a3920ece3766ea1457bb975ab2ea93e135c",
+    "apps/api/src/platform/evidence/evidence.module.ts": "581de09b460f0f9239dcb5199d709dab51e47dc9f2dec3f08b8498faca6a16ff",
+    "apps/api/src/platform/evidence/evidence.repository.ts": "26729f4a3b12dd47180fe34eee5afc310c158fc1a6281cbafb2943a6bd282a98",
+    "apps/api/src/platform/evidence/evidence.service.ts": "4399288f6c56c05416d1976e2547b5760abf5cb3395a09a7ffee71b248fc412b",
+    "apps/api/src/platform/evidence/evidence.types.ts": "ed6f37a0526e74ef9ad96151cd28f1bf3366f0b07d83424f459554c8b1cce83c",
+    "apps/api/src/platform/evidence/file-safety.ts": "0a0f1c6e957da3cef0377203792c302c5bc41ab08eeb88fc96591a0a67baf4f4",
+    "apps/api/src/platform/lineage/draft-lineage.writer.ts": "c910285fbe0ca1b21839749c0c317314354b4600b13d1e490142b328323e6e0e",
+    "apps/api/src/platform/lineage/evaluation-lineage.writer.ts": "8ec18dad023fc12981aaf591179b73369b31a538810ea63176460584872ca425",
+    "apps/api/src/platform/lineage/lineage.module.ts": "abcea20b5ee018dba6f8dbae499f710151760136879f1cc04e685f0a282a129b",
+    "apps/api/src/platform/lineage/lineage.repository.ts": "e1f9d670980283edaf74f78e393eb5c02cf3a344dbdf6611e97a01b33e409fab",
+    "apps/api/src/platform/lineage/lineage.service.ts": "98e09512b3b1bcfce894bbe6ed1bded91021ebd872eecfa8d1d76c134fba6f90",
+    "apps/api/src/platform/lineage/lineage.types.ts": "526e7ba7274ab378fc486b836f78c3936e3542ff17dfaa95167d317ca0289f0e",
+    "apps/api/src/platform/lineage/raw-evidence.snapshot.ts": "ef211216d9943274855ee558bcf818d2f5eaf9ed1ffcb3a40acab0f642372b5c",
+    "apps/api/src/platform/lineage/verified-evidence-access.ts": "dda8e76b906afa586fa7fc7558645fa01780fd4ae9f1cfb9dc306ccea961aa7f"
+  },
+  "supportHashes": {
+    "database/proposed/issue41-evidence-intake.sql": "458376107d74362b092a13edc711ec3d5a3e0ebec7c561b3f4b28dc15fcd1222",
+    "database/proposed/issue46-evidence-lineage.sql": "cfb137de477fbc54a3f9ae2e5107b261253e0017bebc8eccdfac357ab4ec577f",
+    "database/proposed/issue51-external-itot-ingress.sql": "5a1537a7d511e7bf0d412fd1248c2b5733573c05c7ff136991db0d358ab34687",
+    "infra/connectors/runtime-fixture.cjs": "b661c4bf890178d15a9bbdbbd5821d8ac6e20d7c112439ffc5f2344f25c7a83b",
+    "infra/connectors/validate-runtime.cjs": "b532a55bf0e21d34ae2b998d9a1ef0de8e9b1f5142f92d76eac32037d9b41100",
+    "infra/connectors/simulator-client.cjs": "ddf408fb6dff3d9914696b89b3564874d7c5d1723facbcb35e26c1512f34e7d3",
+    "infra/connectors/simulate-external-orders.cjs": "06ead14dc5fd5dd5725ddcafab8c42208a0ec5d0afff7aa19866a8e43e68fa79",
+    "infra/connectors/simulate-receiving-sensors.cjs": "2623580f6d9a22f4e158796291d2592db2299f0b1c5fab7e3b75497b98d484a6",
+    "packages/contracts/opendx/proposed/issue51-connectors.schema.json": "2716cee2b230a5f12632589988047420cfbcc384c294666c17d899b3acdaf4a6"
+  },
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "linux",
+    "services": "actual isolated PostgreSQL/MinIO/ClamAV and two independent loopback HTTP simulator clients",
+    "identity": "static server identity resolver; real SQL memberships/processor/source/PO grants, not production SSO",
+    "caseIntegration": "actual transactional PENDING case-intent outbox; owning #53 Case processor absent",
+    "fault": "injected exception after real SQL lineage writes, not process-kill recovery"
+  },
+  "checks": [
+    {
+      "name": "actual exact-engine/fresh-definition complete ClamAV stream readiness",
+      "status": "PASS"
+    },
+    {
+      "name": "independent order-system HTTP simulator durably stores native raw bytes before 202",
+      "status": "PASS"
+    },
+    {
+      "name": "same command and reencoded canonical event retain original acknowledgement and every raw receipt",
+      "status": "PASS"
+    },
+    {
+      "name": "order witness is actually scanned and authorized lineage freezes native/master hashes",
+      "status": "PASS"
+    },
+    {
+      "name": "independent receiving/counter HTTP simulator creates a durable observation without inventory writes",
+      "status": "PASS"
+    },
+    {
+      "name": "short cumulative count produces an authorized shared CaseRequest and EventEnvelope, only PENDING intent",
+      "status": "PASS"
+    },
+    {
+      "name": "different payload under the same source event ID preserves both originals and proposes SOURCE_CONFLICT",
+      "status": "PASS"
+    },
+    {
+      "name": "new cumulative count is not added twice; prior inventory/PO facts remain unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "wrong source principal, source family, client tenant and malformed source payload cannot bypass admission",
+      "status": "PASS"
+    },
+    {
+      "name": "a valid foreign tenant source can enqueue its own event, but cannot read our source/operations/witness/lineage",
+      "status": "PASS"
+    },
+    {
+      "name": "actual case-intent/lineage SQL rollback after an injected finalization error, recreated worker retries without duplicates",
+      "status": "PASS"
+    },
+    {
+      "name": "revoked original-source membership prevents worker substitution and any witness I/O",
+      "status": "PASS"
+    },
+    {
+      "name": "current per-source processor grant is mandatory even when another source remains granted",
+      "status": "PASS"
+    },
+    {
+      "name": "actual unavailable scanner retains quarantine and bytes, blocks handoff, and recovers the same witness",
+      "status": "PASS"
+    },
+    {
+      "name": "native receipts, original payload metadata and anchors cannot be overwritten/deleted",
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "orderObservationId": "313e794b-5aff-4f5c-9801-13c372821ea7",
+    "orderEvidenceId": "3772c3b0-0e68-45fc-8504-ea4987f15aeb",
+    "sensorObservationId": "038168d6-4300-4744-a4e7-0de9d71772cf",
+    "pendingCaseRequest": {
+      "reason": "SHORT_DELIVERY",
+      "severity": "MEDIUM",
+      "subject_ref": {
+        "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+        "type": "purchase-order",
+        "pack_id": "openresolve"
+      },
+      "evidence_ids": [
+        "b07451ed-4edd-4665-b764-77125b1b8641"
+      ]
+    },
+    "conflictObservationId": "5419b8d4-5360-4574-8d94-dd38640b2624"
+  },
+  "retainedState": {
+    "receipts": [
+      {
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "source_id": "942d6227-7845-4a69-84a4-4db2c0410730",
+        "source_event_id": "a87e0601-cc5c-484e-8840-e005a75d3601",
+        "raw_hash": "1c6f13bc3ca2c42220ddf8efbc79c753886260a39c42dbfa43b1781a0bf18123",
+        "observation_id": "313e794b-5aff-4f5c-9801-13c372821ea7",
+        "received_at": "2026-10-15T13:36:11.521Z",
+        "raw_base64": "eyJzb3VyY2VfZXZlbnRfaWQiOiJhODdlMDYwMS1jYzVjLTQ4NGUtODg0MC1lMDA1YTc1ZDM2MDEi\nLCJzY2hlbWFfaWQiOiJvcGVucmVzb2x2ZS5leHRlcm5hbC1vcmRlci52MSIsIm9ic2VydmVkX2F0\nIjoiMjAyNi0xMC0xNVQxMzozNjoxMS41MDBaIiwiZGF0YSI6eyJleHRlcm5hbF9vcmRlcl9pZCI6\nIkVSUC1ERU1PLTEiLCJzb3VyY2VfcmV2aXNpb24iOjEsInN1cHBsaWVyX3JlZiI6IkZJQ1RJT05B\nTC1TVVBQTElFUiIsImN1cnJlbmN5IjoiVk5EIiwibGluZXMiOlt7ImV4dGVybmFsX2l0ZW1faWQi\nOiJFUlAtTElORS0xIiwic2t1IjoiQ0UyODVBIiwiZGVzY3JpcHRpb24iOiJTSU1VTEFURUQgY2Fy\ndHJpZGdlIG9yZGVyIiwib3JkZXJlZF9xdWFudGl0eSI6IjIiLCJ1bml0X3ByaWNlIjoiNTAwMDAw\nIiwidGF4X3JhdGUiOiIwLjEifV19fQ=="
+      },
+      {
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "source_id": "942d6227-7845-4a69-84a4-4db2c0410730",
+        "source_event_id": "a87e0601-cc5c-484e-8840-e005a75d3601",
+        "raw_hash": "656f14a1e16f9e799428171d8a2e3d33f02d7d64c9d4f9598ede48ec793991f4",
+        "observation_id": "313e794b-5aff-4f5c-9801-13c372821ea7",
+        "received_at": "2026-10-15T13:36:11.558Z",
+        "raw_base64": "ewogICJzb3VyY2VfZXZlbnRfaWQiOiAiYTg3ZTA2MDEtY2M1Yy00ODRlLTg4NDAtZTAwNWE3NWQz\nNjAxIiwKICAic2NoZW1hX2lkIjogIm9wZW5yZXNvbHZlLmV4dGVybmFsLW9yZGVyLnYxIiwKICAi\nb2JzZXJ2ZWRfYXQiOiAiMjAyNi0xMC0xNVQxMzozNjoxMS41MDBaIiwKICAiZGF0YSI6IHsKICAg\nICJleHRlcm5hbF9vcmRlcl9pZCI6ICJFUlAtREVNTy0xIiwKICAgICJzb3VyY2VfcmV2aXNpb24i\nOiAxLAogICAgInN1cHBsaWVyX3JlZiI6ICJGSUNUSU9OQUwtU1VQUExJRVIiLAogICAgImN1cnJl\nbmN5IjogIlZORCIsCiAgICAibGluZXMiOiBbCiAgICAgIHsKICAgICAgICAiZXh0ZXJuYWxfaXRl\nbV9pZCI6ICJFUlAtTElORS0xIiwKICAgICAgICAic2t1IjogIkNFMjg1QSIsCiAgICAgICAgImRl\nc2NyaXB0aW9uIjogIlNJTVVMQVRFRCBjYXJ0cmlkZ2Ugb3JkZXIiLAogICAgICAgICJvcmRlcmVk\nX3F1YW50aXR5IjogIjIiLAogICAgICAgICJ1bml0X3ByaWNlIjogIjUwMDAwMCIsCiAgICAgICAg\nInRheF9yYXRlIjogIjAuMSIKICAgICAgfQogICAgXQogIH0KfQ=="
+      },
+      {
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "source_id": "97f61afd-3e5a-4e68-8512-bcb7d3043860",
+        "source_event_id": "3b8092b0-1924-4d3b-a254-843a177bdb7e",
+        "raw_hash": "f73bcd6932e33f5b17ded331414272d8b14b46e8dff628e8db83c48a26a76257",
+        "observation_id": "038168d6-4300-4744-a4e7-0de9d71772cf",
+        "received_at": "2026-10-15T13:36:11.831Z",
+        "raw_base64": "eyJzb3VyY2VfZXZlbnRfaWQiOiIzYjgwOTJiMC0xOTI0LTRkM2ItYTI1NC04NDNhMTc3YmRiN2Ui\nLCJzY2hlbWFfaWQiOiJvcGVucmVzb2x2ZS5yZWNlaXZpbmctc2Vuc29yLnYxIiwib2JzZXJ2ZWRf\nYXQiOiIyMDI2LTEwLTE1VDEzOjM2OjExLjgyN1oiLCJkYXRhIjp7ImV4dGVybmFsX29yZGVyX2lk\nIjoiRVJQLURFTU8tMSIsImV4dGVybmFsX2l0ZW1faWQiOiJFUlAtTElORS0xIiwiZGV2aWNlX2lk\nIjoiU0lNVUxBVEVELWNvdW50ZXItMSIsInNlcXVlbmNlIjoxLCJyZWNlaXZlZF9xdWFudGl0eSI6\nIjEiLCJxdWFsaXR5IjoiQUNDRVBURUQiLCJpc19maW5hbCI6dHJ1ZX19"
+      },
+      {
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "source_id": "942d6227-7845-4a69-84a4-4db2c0410730",
+        "source_event_id": "a87e0601-cc5c-484e-8840-e005a75d3601",
+        "raw_hash": "bfd3480c152d6beaa0d44c35a41c8abbda5bbae36b21041b964bdeff2507ecee",
+        "observation_id": "5419b8d4-5360-4574-8d94-dd38640b2624",
+        "received_at": "2026-10-15T13:36:12.009Z",
+        "raw_base64": "eyJzb3VyY2VfZXZlbnRfaWQiOiJhODdlMDYwMS1jYzVjLTQ4NGUtODg0MC1lMDA1YTc1ZDM2MDEi\nLCJzY2hlbWFfaWQiOiJvcGVucmVzb2x2ZS5leHRlcm5hbC1vcmRlci52MSIsIm9ic2VydmVkX2F0\nIjoiMjAyNi0xMC0xNVQxMzozNjoxMS41MDBaIiwiZGF0YSI6eyJleHRlcm5hbF9vcmRlcl9pZCI6\nIkVSUC1ERU1PLTEiLCJzb3VyY2VfcmV2aXNpb24iOjEsInN1cHBsaWVyX3JlZiI6IkZJQ1RJT05B\nTC1TVVBQTElFUiIsImN1cnJlbmN5IjoiVk5EIiwibGluZXMiOlt7ImV4dGVybmFsX2l0ZW1faWQi\nOiJFUlAtTElORS0xIiwic2t1IjoiQ0UyODVBIiwiZGVzY3JpcHRpb24iOiJTSU1VTEFURUQgY2Fy\ndHJpZGdlIG9yZGVyIiwib3JkZXJlZF9xdWFudGl0eSI6IjIiLCJ1bml0X3ByaWNlIjoiNTAwMDAx\nIiwidGF4X3JhdGUiOiIwLjEifV19fQ=="
+      },
+      {
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "source_id": "97f61afd-3e5a-4e68-8512-bcb7d3043860",
+        "source_event_id": "e318c33a-7181-422d-ba58-f8b0792284b6",
+        "raw_hash": "59b9843f6435abfa3ef6f0f933235ca3e6465d59e06e0d4dea58d9b5b704eab1",
+        "observation_id": "959b88fd-39c3-4049-a5e9-5dbfdc364fc8",
+        "received_at": "2026-10-15T13:36:12.177Z",
+        "raw_base64": "eyJzb3VyY2VfZXZlbnRfaWQiOiJlMzE4YzMzYS03MTgxLTQyMmQtYmE1OC1mOGIwNzkyMjg0YjYi\nLCJzY2hlbWFfaWQiOiJvcGVucmVzb2x2ZS5yZWNlaXZpbmctc2Vuc29yLnYxIiwib2JzZXJ2ZWRf\nYXQiOiIyMDI2LTEwLTE1VDEzOjM2OjEyLjE3NVoiLCJkYXRhIjp7ImV4dGVybmFsX29yZGVyX2lk\nIjoiRVJQLURFTU8tMSIsImV4dGVybmFsX2l0ZW1faWQiOiJFUlAtTElORS0xIiwiZGV2aWNlX2lk\nIjoiU0lNVUxBVEVELWNvdW50ZXItMSIsInNlcXVlbmNlIjoyLCJyZWNlaXZlZF9xdWFudGl0eSI6\nIjIiLCJxdWFsaXR5IjoiQUNDRVBURUQiLCJpc19maW5hbCI6dHJ1ZX19"
+      },
+      {
+        "tenant_id": "0e775ed5-e7a8-4874-9cee-b4e3df58428e",
+        "source_id": "055bca15-ca1f-45ef-95ed-275db1bcb478",
+        "source_event_id": "fd944bdd-d144-4111-bbb8-3ee7668a327d",
+        "raw_hash": "eeff7c46bebff7054b85658c48f15e04cad0548641e1ef15aadfcfa228fe1914",
+        "observation_id": "bd70adab-886d-403f-8445-465006ee7f71",
+        "received_at": "2026-10-15T13:36:12.348Z",
+        "raw_base64": "eyJzb3VyY2VfZXZlbnRfaWQiOiJmZDk0NGJkZC1kMTQ0LTQxMTEtYmJiOC0zZWU3NjY4YTMyN2Qi\nLCJzY2hlbWFfaWQiOiJvcGVucmVzb2x2ZS5leHRlcm5hbC1vcmRlci52MSIsIm9ic2VydmVkX2F0\nIjoiMjAyNi0xMC0xNVQxMzozNjoxMi4zNDZaIiwiZGF0YSI6eyJleHRlcm5hbF9vcmRlcl9pZCI6\nIkZPUkVJR04tREVNTy0xIiwic291cmNlX3JldmlzaW9uIjoxLCJzdXBwbGllcl9yZWYiOiJGSUNU\nSU9OQUwtU1VQUExJRVIiLCJjdXJyZW5jeSI6IlZORCIsImxpbmVzIjpbeyJleHRlcm5hbF9pdGVt\nX2lkIjoiRVJQLUxJTkUtMSIsInNrdSI6IkNFMjg1QSIsImRlc2NyaXB0aW9uIjoiU0lNVUxBVEVE\nIGNhcnRyaWRnZSBvcmRlciIsIm9yZGVyZWRfcXVhbnRpdHkiOiIyIiwidW5pdF9wcmljZSI6IjUw\nMDAwMCIsInRheF9yYXRlIjoiMC4xIn1dfX0="
+      },
+      {
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "source_id": "97f61afd-3e5a-4e68-8512-bcb7d3043860",
+        "source_event_id": "f98625c3-9cc3-49d9-80c2-cd678f72fa23",
+        "raw_hash": "0c3df5c58f097fa0178680d0bba4fac06ac7c76bda404f678bc6572e99dc3818",
+        "observation_id": "c354a13c-f0c5-4f34-84a1-c09a3260cc14",
+        "received_at": "2026-10-15T13:36:12.361Z",
+        "raw_base64": "eyJzb3VyY2VfZXZlbnRfaWQiOiJmOTg2MjVjMy05Y2MzLTQ5ZDktODBjMi1jZDY3OGY3MmZhMjMi\nLCJzY2hlbWFfaWQiOiJvcGVucmVzb2x2ZS5yZWNlaXZpbmctc2Vuc29yLnYxIiwib2JzZXJ2ZWRf\nYXQiOiIyMDI2LTEwLTE1VDEzOjM2OjEyLjM1OVoiLCJkYXRhIjp7ImV4dGVybmFsX29yZGVyX2lk\nIjoiRVJQLURFTU8tMSIsImV4dGVybmFsX2l0ZW1faWQiOiJFUlAtTElORS0xIiwiZGV2aWNlX2lk\nIjoiU0lNVUxBVEVELWNvdW50ZXItMSIsInNlcXVlbmNlIjozLCJyZWNlaXZlZF9xdWFudGl0eSI6\nIjIiLCJxdWFsaXR5IjoiREFNQUdFRCIsImlzX2ZpbmFsIjp0cnVlfX0="
+      },
+      {
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "source_id": "942d6227-7845-4a69-84a4-4db2c0410730",
+        "source_event_id": "5cd59f9f-6126-4598-896b-313dc9a503d6",
+        "raw_hash": "0f48201fb120ef4796a112a80a0a576149ebf4d16272983a4efdbf8cc4b8be04",
+        "observation_id": "fd65c7b8-3ed8-4af5-a6bb-e0b07b10073a",
+        "received_at": "2026-10-15T13:36:13.779Z",
+        "raw_base64": "eyJzb3VyY2VfZXZlbnRfaWQiOiI1Y2Q1OWY5Zi02MTI2LTQ1OTgtODk2Yi0zMTNkYzlhNTAzZDYi\nLCJzY2hlbWFfaWQiOiJvcGVucmVzb2x2ZS5leHRlcm5hbC1vcmRlci52MSIsIm9ic2VydmVkX2F0\nIjoiMjAyNi0xMC0xNVQxMzozNjoxMy43NzdaIiwiZGF0YSI6eyJleHRlcm5hbF9vcmRlcl9pZCI6\nIkVSUC1ERU1PLTEiLCJzb3VyY2VfcmV2aXNpb24iOjEsInN1cHBsaWVyX3JlZiI6IkZJQ1RJT05B\nTC1TVVBQTElFUiIsImN1cnJlbmN5IjoiVk5EIiwibGluZXMiOlt7ImV4dGVybmFsX2l0ZW1faWQi\nOiJFUlAtTElORS0xIiwic2t1IjoiQ0UyODVBIiwiZGVzY3JpcHRpb24iOiJTSU1VTEFURUQgY2Fy\ndHJpZGdlIG9yZGVyIiwib3JkZXJlZF9xdWFudGl0eSI6IjIiLCJ1bml0X3ByaWNlIjoiNTAwMDAw\nIiwidGF4X3JhdGUiOiIwLjEifV19fQ=="
+      },
+      {
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "source_id": "942d6227-7845-4a69-84a4-4db2c0410730",
+        "source_event_id": "772b0946-16ee-410c-a661-c43b0946bf2c",
+        "raw_hash": "ecc5ded111adca570f9522e72efdcaf8f262730ebe1fcf4e2e280c374d6bf037",
+        "observation_id": "af9135aa-eafd-470c-be6c-c180817d7c2b",
+        "received_at": "2026-10-15T13:36:13.937Z",
+        "raw_base64": "eyJzb3VyY2VfZXZlbnRfaWQiOiI3NzJiMDk0Ni0xNmVlLTQxMGMtYTY2MS1jNDNiMDk0NmJmMmMi\nLCJzY2hlbWFfaWQiOiJvcGVucmVzb2x2ZS5leHRlcm5hbC1vcmRlci52MSIsIm9ic2VydmVkX2F0\nIjoiMjAyNi0xMC0xNVQxMzozNjoxMy45MzVaIiwiZGF0YSI6eyJleHRlcm5hbF9vcmRlcl9pZCI6\nIkVSUC1ERU1PLTEiLCJzb3VyY2VfcmV2aXNpb24iOjEsInN1cHBsaWVyX3JlZiI6IkZJQ1RJT05B\nTC1TVVBQTElFUiIsImN1cnJlbmN5IjoiVk5EIiwibGluZXMiOlt7ImV4dGVybmFsX2l0ZW1faWQi\nOiJFUlAtTElORS0xIiwic2t1IjoiQ0UyODVBIiwiZGVzY3JpcHRpb24iOiJTSU1VTEFURUQgY2Fy\ndHJpZGdlIG9yZGVyIiwib3JkZXJlZF9xdWFudGl0eSI6IjIiLCJ1bml0X3ByaWNlIjoiNTAwMDAw\nIiwidGF4X3JhdGUiOiIwLjEifV19fQ=="
+      },
+      {
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "source_id": "97f61afd-3e5a-4e68-8512-bcb7d3043860",
+        "source_event_id": "e0da2b9a-9514-4446-948e-fa1fe799a9c1",
+        "raw_hash": "88bc2f167ce4767b215d0cea24bd330b5bb09bd186c67cdb84ad42740d649882",
+        "observation_id": "55c016e3-780e-4ab5-aa5d-fccd084522ff",
+        "received_at": "2026-10-15T13:36:14.102Z",
+        "raw_base64": "eyJzb3VyY2VfZXZlbnRfaWQiOiJlMGRhMmI5YS05NTE0LTQ0NDYtOTQ4ZS1mYTFmZTc5OWE5YzEi\nLCJzY2hlbWFfaWQiOiJvcGVucmVzb2x2ZS5yZWNlaXZpbmctc2Vuc29yLnYxIiwib2JzZXJ2ZWRf\nYXQiOiIyMDI2LTEwLTE1VDEzOjM2OjE0LjEwMFoiLCJkYXRhIjp7ImV4dGVybmFsX29yZGVyX2lk\nIjoiRVJQLURFTU8tMSIsImV4dGVybmFsX2l0ZW1faWQiOiJFUlAtTElORS0xIiwiZGV2aWNlX2lk\nIjoiU0lNVUxBVEVELWNvdW50ZXItMSIsInNlcXVlbmNlIjo0LCJyZWNlaXZlZF9xdWFudGl0eSI6\nIjIiLCJxdWFsaXR5IjoiREFNQUdFRCIsImlzX2ZpbmFsIjp0cnVlfX0="
+      }
+    ],
+    "observations": [
+      {
+        "id": "313e794b-5aff-4f5c-9801-13c372821ea7",
+        "kind": "EXTERNAL_ORDER",
+        "event": {
+          "data": {
+            "lines": [
+              {
+                "sku": "CE285A",
+                "tax_rate": "0.1000",
+                "unit_price": "500000.0000",
+                "description": "SIMULATED cartridge order",
+                "external_item_id": "ERP-LINE-1",
+                "ordered_quantity": "2.0000"
+              }
+            ],
+            "currency": "VND",
+            "supplier_ref": "FICTIONAL-SUPPLIER",
+            "source_revision": 1,
+            "external_order_id": "ERP-DEMO-1"
+          },
+          "schema_id": "openresolve.external-order.v1",
+          "observed_at": "2026-10-15T13:36:11.500Z",
+          "source_event_id": "a87e0601-cc5c-484e-8840-e005a75d3601"
+        },
+        "outcome": {
+          "caseDispatch": "NONE",
+          "sourceVersion": "b6ccde8c59b62c1a96e56eb46bd5f358fec915b4d57f57b65264393ddc4e7b3c",
+          "purchaseOrderId": "72034c37-1953-423d-8f06-5fcd893a3e52"
+        },
+        "rawHash": "1c6f13bc3ca2c42220ddf8efbc79c753886260a39c42dbfa43b1781a0bf18123",
+        "attempts": 1,
+        "sourceId": "942d6227-7845-4a69-84a4-4db2c0410730",
+        "tenantId": "11539967-3054-438c-b852-8a089057d368",
+        "operation": {
+          "id": "bc1cdb91-cf15-48e9-b164-73874ca44039",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:11.521Z",
+          "updated_at": "2026-10-15T13:36:11.768Z",
+          "resource_ref": {
+            "id": "313e794b-5aff-4f5c-9801-13c372821ea7",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        },
+        "simulated": true,
+        "evidenceId": "3772c3b0-0e68-45fc-8504-ea4987f15aeb",
+        "receivedAt": "2026-10-15T13:36:11.521Z",
+        "contentHash": "41dee135726d5c84c21790763c1717fb50d1b6945de9b6cc3cf81d3f0a943edb",
+        "requestedBy": "fixture-order",
+        "correlationId": "7754f426-9f44-4257-8278-5c55cded9f83",
+        "evidenceSha256": "bad760aa9f7a8b6083d97d70373192c2245dcafb90c70bb182305f1461b293f7",
+        "witnessVersion": "source-witness-xml-v1",
+        "acknowledgement": {
+          "id": "bc1cdb91-cf15-48e9-b164-73874ca44039",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "PENDING",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:11.521Z",
+          "updated_at": "2026-10-15T13:36:11.521Z",
+          "resource_ref": {
+            "id": "313e794b-5aff-4f5c-9801-13c372821ea7",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        }
+      },
+      {
+        "id": "038168d6-4300-4744-a4e7-0de9d71772cf",
+        "kind": "RECEIVING_SENSOR",
+        "event": {
+          "data": {
+            "quality": "ACCEPTED",
+            "is_final": true,
+            "sequence": 1,
+            "device_id": "SIMULATED-counter-1",
+            "external_item_id": "ERP-LINE-1",
+            "external_order_id": "ERP-DEMO-1",
+            "received_quantity": "1.0000"
+          },
+          "schema_id": "openresolve.receiving-sensor.v1",
+          "observed_at": "2026-10-15T13:36:11.827Z",
+          "source_event_id": "3b8092b0-1924-4d3b-a254-843a177bdb7e"
+        },
+        "outcome": {
+          "reason": "SHORT_DELIVERY",
+          "severity": "MEDIUM",
+          "caseDispatch": "PENDING",
+          "sourceVersion": "b6ccde8c59b62c1a96e56eb46bd5f358fec915b4d57f57b65264393ddc4e7b3c",
+          "purchaseOrderId": "72034c37-1953-423d-8f06-5fcd893a3e52"
+        },
+        "rawHash": "f73bcd6932e33f5b17ded331414272d8b14b46e8dff628e8db83c48a26a76257",
+        "attempts": 1,
+        "sourceId": "97f61afd-3e5a-4e68-8512-bcb7d3043860",
+        "tenantId": "11539967-3054-438c-b852-8a089057d368",
+        "operation": {
+          "id": "ea6c393b-fce2-4671-8717-af5ea97f4188",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:11.831Z",
+          "updated_at": "2026-10-15T13:36:11.998Z",
+          "resource_ref": {
+            "id": "038168d6-4300-4744-a4e7-0de9d71772cf",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        },
+        "simulated": true,
+        "evidenceId": "b07451ed-4edd-4665-b764-77125b1b8641",
+        "receivedAt": "2026-10-15T13:36:11.831Z",
+        "contentHash": "1cd5f95a6ee5fb69185bb7c43d59493f6eca03bfe5df3a917b171a2555cc4dd9",
+        "requestedBy": "fixture-sensor",
+        "correlationId": "ca51427a-dbdf-49f8-a147-ecae25113f9a",
+        "evidenceSha256": "d8b092ba0d8e70a6161e9e9d488010f5bc4fc2d2af20b77ff8c02a424b224561",
+        "witnessVersion": "source-witness-xml-v1",
+        "acknowledgement": {
+          "id": "ea6c393b-fce2-4671-8717-af5ea97f4188",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "PENDING",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:11.831Z",
+          "updated_at": "2026-10-15T13:36:11.831Z",
+          "resource_ref": {
+            "id": "038168d6-4300-4744-a4e7-0de9d71772cf",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        }
+      },
+      {
+        "id": "5419b8d4-5360-4574-8d94-dd38640b2624",
+        "kind": "EXTERNAL_ORDER",
+        "event": {
+          "data": {
+            "lines": [
+              {
+                "sku": "CE285A",
+                "tax_rate": "0.1000",
+                "unit_price": "500001.0000",
+                "description": "SIMULATED cartridge order",
+                "external_item_id": "ERP-LINE-1",
+                "ordered_quantity": "2.0000"
+              }
+            ],
+            "currency": "VND",
+            "supplier_ref": "FICTIONAL-SUPPLIER",
+            "source_revision": 1,
+            "external_order_id": "ERP-DEMO-1"
+          },
+          "schema_id": "openresolve.external-order.v1",
+          "observed_at": "2026-10-15T13:36:11.500Z",
+          "source_event_id": "a87e0601-cc5c-484e-8840-e005a75d3601"
+        },
+        "outcome": {
+          "reason": "SOURCE_CONFLICT",
+          "severity": "HIGH",
+          "caseDispatch": "PENDING",
+          "sourceVersion": "b6ccde8c59b62c1a96e56eb46bd5f358fec915b4d57f57b65264393ddc4e7b3c",
+          "purchaseOrderId": "72034c37-1953-423d-8f06-5fcd893a3e52"
+        },
+        "rawHash": "bfd3480c152d6beaa0d44c35a41c8abbda5bbae36b21041b964bdeff2507ecee",
+        "attempts": 1,
+        "sourceId": "942d6227-7845-4a69-84a4-4db2c0410730",
+        "tenantId": "11539967-3054-438c-b852-8a089057d368",
+        "operation": {
+          "id": "bea9ecf3-aa46-4c7a-a57b-47c1fe32a9fe",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:12.009Z",
+          "updated_at": "2026-10-15T13:36:12.171Z",
+          "resource_ref": {
+            "id": "5419b8d4-5360-4574-8d94-dd38640b2624",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        },
+        "simulated": true,
+        "evidenceId": "d794019b-e157-40d4-9510-f18174b2d103",
+        "receivedAt": "2026-10-15T13:36:12.009Z",
+        "contentHash": "80d49d5ec9302783c99ad5844d79869d12a35ab47d8ef57460cd2866be976194",
+        "requestedBy": "fixture-order",
+        "correlationId": "49bbfd18-c2f3-4b93-b5e9-6aa2b8664ca0",
+        "evidenceSha256": "515f6a3b5d93ffde9cb4c2c0a2d8b3618d99841c0a97ab09be6bc0417bc853c6",
+        "witnessVersion": "source-witness-xml-v1",
+        "acknowledgement": {
+          "id": "bea9ecf3-aa46-4c7a-a57b-47c1fe32a9fe",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "PENDING",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:12.009Z",
+          "updated_at": "2026-10-15T13:36:12.009Z",
+          "resource_ref": {
+            "id": "5419b8d4-5360-4574-8d94-dd38640b2624",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        },
+        "originalObservationId": "313e794b-5aff-4f5c-9801-13c372821ea7"
+      },
+      {
+        "id": "959b88fd-39c3-4049-a5e9-5dbfdc364fc8",
+        "kind": "RECEIVING_SENSOR",
+        "event": {
+          "data": {
+            "quality": "ACCEPTED",
+            "is_final": true,
+            "sequence": 2,
+            "device_id": "SIMULATED-counter-1",
+            "external_item_id": "ERP-LINE-1",
+            "external_order_id": "ERP-DEMO-1",
+            "received_quantity": "2.0000"
+          },
+          "schema_id": "openresolve.receiving-sensor.v1",
+          "observed_at": "2026-10-15T13:36:12.175Z",
+          "source_event_id": "e318c33a-7181-422d-ba58-f8b0792284b6"
+        },
+        "outcome": {
+          "caseDispatch": "NONE",
+          "sourceVersion": "b6ccde8c59b62c1a96e56eb46bd5f358fec915b4d57f57b65264393ddc4e7b3c",
+          "purchaseOrderId": "72034c37-1953-423d-8f06-5fcd893a3e52"
+        },
+        "rawHash": "59b9843f6435abfa3ef6f0f933235ca3e6465d59e06e0d4dea58d9b5b704eab1",
+        "attempts": 1,
+        "sourceId": "97f61afd-3e5a-4e68-8512-bcb7d3043860",
+        "tenantId": "11539967-3054-438c-b852-8a089057d368",
+        "operation": {
+          "id": "8b66c764-c983-47cc-8a57-753fbb594693",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:12.177Z",
+          "updated_at": "2026-10-15T13:36:12.331Z",
+          "resource_ref": {
+            "id": "959b88fd-39c3-4049-a5e9-5dbfdc364fc8",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        },
+        "simulated": true,
+        "evidenceId": "18b18e6c-0d94-43c3-ba4a-50af73b3ec10",
+        "receivedAt": "2026-10-15T13:36:12.177Z",
+        "contentHash": "34d1015edb1c5fcd6d97cd2d50f4e5f117e3dc8c7e97a33012527b2c6978a5d1",
+        "requestedBy": "fixture-sensor",
+        "correlationId": "a9e89abd-ed24-45be-9f72-3e1b0438ab08",
+        "evidenceSha256": "5dd8c23fcb9e34443d816702e900a888a41d6c6f12077840e7c8c600024f5774",
+        "witnessVersion": "source-witness-xml-v1",
+        "acknowledgement": {
+          "id": "8b66c764-c983-47cc-8a57-753fbb594693",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "PENDING",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:12.177Z",
+          "updated_at": "2026-10-15T13:36:12.177Z",
+          "resource_ref": {
+            "id": "959b88fd-39c3-4049-a5e9-5dbfdc364fc8",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        }
+      },
+      {
+        "id": "bd70adab-886d-403f-8445-465006ee7f71",
+        "kind": "EXTERNAL_ORDER",
+        "event": {
+          "data": {
+            "lines": [
+              {
+                "sku": "CE285A",
+                "tax_rate": "0.1000",
+                "unit_price": "500000.0000",
+                "description": "SIMULATED cartridge order",
+                "external_item_id": "ERP-LINE-1",
+                "ordered_quantity": "2.0000"
+              }
+            ],
+            "currency": "VND",
+            "supplier_ref": "FICTIONAL-SUPPLIER",
+            "source_revision": 1,
+            "external_order_id": "FOREIGN-DEMO-1"
+          },
+          "schema_id": "openresolve.external-order.v1",
+          "observed_at": "2026-10-15T13:36:12.346Z",
+          "source_event_id": "fd944bdd-d144-4111-bbb8-3ee7668a327d"
+        },
+        "rawHash": "eeff7c46bebff7054b85658c48f15e04cad0548641e1ef15aadfcfa228fe1914",
+        "attempts": 0,
+        "sourceId": "055bca15-ca1f-45ef-95ed-275db1bcb478",
+        "tenantId": "0e775ed5-e7a8-4874-9cee-b4e3df58428e",
+        "operation": {
+          "id": "101506b6-2de1-4c7a-81be-94109ab86dc2",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "PENDING",
+          "tenant_id": "0e775ed5-e7a8-4874-9cee-b4e3df58428e",
+          "created_at": "2026-10-15T13:36:12.348Z",
+          "updated_at": "2026-10-15T13:36:12.348Z",
+          "resource_ref": {
+            "id": "bd70adab-886d-403f-8445-465006ee7f71",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        },
+        "simulated": true,
+        "receivedAt": "2026-10-15T13:36:12.348Z",
+        "contentHash": "f8f67d39af141fcc910f800d2080a02b8e2c7d7d6ce8d7c829f2efacae8830f3",
+        "requestedBy": "fixture-worker",
+        "correlationId": "8b4ede3a-987b-45b8-9aa4-379c85c93aac",
+        "witnessVersion": "source-witness-xml-v1",
+        "acknowledgement": {
+          "id": "101506b6-2de1-4c7a-81be-94109ab86dc2",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "PENDING",
+          "tenant_id": "0e775ed5-e7a8-4874-9cee-b4e3df58428e",
+          "created_at": "2026-10-15T13:36:12.348Z",
+          "updated_at": "2026-10-15T13:36:12.348Z",
+          "resource_ref": {
+            "id": "bd70adab-886d-403f-8445-465006ee7f71",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        }
+      },
+      {
+        "id": "c354a13c-f0c5-4f34-84a1-c09a3260cc14",
+        "kind": "RECEIVING_SENSOR",
+        "event": {
+          "data": {
+            "quality": "DAMAGED",
+            "is_final": true,
+            "sequence": 3,
+            "device_id": "SIMULATED-counter-1",
+            "external_item_id": "ERP-LINE-1",
+            "external_order_id": "ERP-DEMO-1",
+            "received_quantity": "2.0000"
+          },
+          "schema_id": "openresolve.receiving-sensor.v1",
+          "observed_at": "2026-10-15T13:36:12.359Z",
+          "source_event_id": "f98625c3-9cc3-49d9-80c2-cd678f72fa23"
+        },
+        "outcome": {
+          "reason": "QUALITY",
+          "severity": "HIGH",
+          "caseDispatch": "PENDING",
+          "sourceVersion": "b6ccde8c59b62c1a96e56eb46bd5f358fec915b4d57f57b65264393ddc4e7b3c",
+          "purchaseOrderId": "72034c37-1953-423d-8f06-5fcd893a3e52"
+        },
+        "rawHash": "0c3df5c58f097fa0178680d0bba4fac06ac7c76bda404f678bc6572e99dc3818",
+        "attempts": 2,
+        "failures": [
+          {
+            "at": "2026-10-15T13:36:12.523Z",
+            "code": "DEPENDENCY_UNAVAILABLE",
+            "attempt": 1
+          }
+        ],
+        "sourceId": "97f61afd-3e5a-4e68-8512-bcb7d3043860",
+        "tenantId": "11539967-3054-438c-b852-8a089057d368",
+        "operation": {
+          "id": "ed123996-ed27-4bf3-ad8c-a8c9e132e209",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:12.361Z",
+          "updated_at": "2026-10-15T13:36:13.773Z",
+          "resource_ref": {
+            "id": "c354a13c-f0c5-4f34-84a1-c09a3260cc14",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        },
+        "simulated": true,
+        "evidenceId": "9b22473b-d46b-450c-bec5-88fc3798eec6",
+        "receivedAt": "2026-10-15T13:36:12.361Z",
+        "contentHash": "cdd35bc752b520a3a6a7b3225cc2fdbb0c9dc853617069e0d0331ef00736b5fa",
+        "requestedBy": "fixture-sensor",
+        "correlationId": "6c4987a6-23e0-4028-a248-08d8a3350ef3",
+        "evidenceSha256": "148d15f14759f7de55b1617602cb8727a54c0901932b2cb2672f2ccea24fbfdc",
+        "witnessVersion": "source-witness-xml-v1",
+        "acknowledgement": {
+          "id": "ed123996-ed27-4bf3-ad8c-a8c9e132e209",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "PENDING",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:12.361Z",
+          "updated_at": "2026-10-15T13:36:12.361Z",
+          "resource_ref": {
+            "id": "c354a13c-f0c5-4f34-84a1-c09a3260cc14",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        }
+      },
+      {
+        "id": "fd65c7b8-3ed8-4af5-a6bb-e0b07b10073a",
+        "kind": "EXTERNAL_ORDER",
+        "event": {
+          "data": {
+            "lines": [
+              {
+                "sku": "CE285A",
+                "tax_rate": "0.1000",
+                "unit_price": "500000.0000",
+                "description": "SIMULATED cartridge order",
+                "external_item_id": "ERP-LINE-1",
+                "ordered_quantity": "2.0000"
+              }
+            ],
+            "currency": "VND",
+            "supplier_ref": "FICTIONAL-SUPPLIER",
+            "source_revision": 1,
+            "external_order_id": "ERP-DEMO-1"
+          },
+          "schema_id": "openresolve.external-order.v1",
+          "observed_at": "2026-10-15T13:36:13.777Z",
+          "source_event_id": "5cd59f9f-6126-4598-896b-313dc9a503d6"
+        },
+        "outcome": {
+          "caseDispatch": "NONE",
+          "sourceVersion": "b6ccde8c59b62c1a96e56eb46bd5f358fec915b4d57f57b65264393ddc4e7b3c",
+          "purchaseOrderId": "72034c37-1953-423d-8f06-5fcd893a3e52"
+        },
+        "rawHash": "0f48201fb120ef4796a112a80a0a576149ebf4d16272983a4efdbf8cc4b8be04",
+        "attempts": 1,
+        "sourceId": "942d6227-7845-4a69-84a4-4db2c0410730",
+        "tenantId": "11539967-3054-438c-b852-8a089057d368",
+        "operation": {
+          "id": "16d9e9c5-da30-4cde-9344-de88ccb05bd3",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:13.779Z",
+          "updated_at": "2026-10-15T13:36:13.932Z",
+          "resource_ref": {
+            "id": "fd65c7b8-3ed8-4af5-a6bb-e0b07b10073a",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        },
+        "simulated": true,
+        "evidenceId": "f7d3eba0-2ce0-4d11-9108-403eda8e0f7b",
+        "receivedAt": "2026-10-15T13:36:13.779Z",
+        "contentHash": "828f5e9eba83c372da0a853ccd30a6937efa225bcf03aee7d8aae48a5a7820dc",
+        "requestedBy": "fixture-order",
+        "correlationId": "25887caf-3a0f-4cdd-b0c3-e145835cc476",
+        "evidenceSha256": "e8c73160e82528b1a2529f68d2d2f6c2b6acae2ea73073e5bc0f8944a34502ca",
+        "witnessVersion": "source-witness-xml-v1",
+        "acknowledgement": {
+          "id": "16d9e9c5-da30-4cde-9344-de88ccb05bd3",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "PENDING",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:13.779Z",
+          "updated_at": "2026-10-15T13:36:13.779Z",
+          "resource_ref": {
+            "id": "fd65c7b8-3ed8-4af5-a6bb-e0b07b10073a",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        }
+      },
+      {
+        "id": "af9135aa-eafd-470c-be6c-c180817d7c2b",
+        "kind": "EXTERNAL_ORDER",
+        "event": {
+          "data": {
+            "lines": [
+              {
+                "sku": "CE285A",
+                "tax_rate": "0.1000",
+                "unit_price": "500000.0000",
+                "description": "SIMULATED cartridge order",
+                "external_item_id": "ERP-LINE-1",
+                "ordered_quantity": "2.0000"
+              }
+            ],
+            "currency": "VND",
+            "supplier_ref": "FICTIONAL-SUPPLIER",
+            "source_revision": 1,
+            "external_order_id": "ERP-DEMO-1"
+          },
+          "schema_id": "openresolve.external-order.v1",
+          "observed_at": "2026-10-15T13:36:13.935Z",
+          "source_event_id": "772b0946-16ee-410c-a661-c43b0946bf2c"
+        },
+        "outcome": {
+          "caseDispatch": "NONE",
+          "sourceVersion": "b6ccde8c59b62c1a96e56eb46bd5f358fec915b4d57f57b65264393ddc4e7b3c",
+          "purchaseOrderId": "72034c37-1953-423d-8f06-5fcd893a3e52"
+        },
+        "rawHash": "ecc5ded111adca570f9522e72efdcaf8f262730ebe1fcf4e2e280c374d6bf037",
+        "attempts": 1,
+        "sourceId": "942d6227-7845-4a69-84a4-4db2c0410730",
+        "tenantId": "11539967-3054-438c-b852-8a089057d368",
+        "operation": {
+          "id": "c46094aa-81bb-4ac5-9d8a-3bf925688478",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:13.937Z",
+          "updated_at": "2026-10-15T13:36:14.096Z",
+          "resource_ref": {
+            "id": "af9135aa-eafd-470c-be6c-c180817d7c2b",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        },
+        "simulated": true,
+        "evidenceId": "b57d505b-f020-43ef-bd71-3f76787518a6",
+        "receivedAt": "2026-10-15T13:36:13.937Z",
+        "contentHash": "5aadd38d1b63eb16ae78b6473db51a3386a686e2965775af374c9f8cf3898ea7",
+        "requestedBy": "fixture-order",
+        "correlationId": "c6be8398-cb66-4a40-8068-a9ae96160ed6",
+        "evidenceSha256": "98c550478e3a42c15485b785add5d294828a64152b7f80a3461a8b1602e1b028",
+        "witnessVersion": "source-witness-xml-v1",
+        "acknowledgement": {
+          "id": "c46094aa-81bb-4ac5-9d8a-3bf925688478",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "PENDING",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:13.937Z",
+          "updated_at": "2026-10-15T13:36:13.937Z",
+          "resource_ref": {
+            "id": "af9135aa-eafd-470c-be6c-c180817d7c2b",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        }
+      },
+      {
+        "id": "55c016e3-780e-4ab5-aa5d-fccd084522ff",
+        "kind": "RECEIVING_SENSOR",
+        "event": {
+          "data": {
+            "quality": "DAMAGED",
+            "is_final": true,
+            "sequence": 4,
+            "device_id": "SIMULATED-counter-1",
+            "external_item_id": "ERP-LINE-1",
+            "external_order_id": "ERP-DEMO-1",
+            "received_quantity": "2.0000"
+          },
+          "schema_id": "openresolve.receiving-sensor.v1",
+          "observed_at": "2026-10-15T13:36:14.100Z",
+          "source_event_id": "e0da2b9a-9514-4446-948e-fa1fe799a9c1"
+        },
+        "outcome": {
+          "reason": "QUALITY",
+          "severity": "HIGH",
+          "caseDispatch": "PENDING",
+          "sourceVersion": "b6ccde8c59b62c1a96e56eb46bd5f358fec915b4d57f57b65264393ddc4e7b3c",
+          "purchaseOrderId": "72034c37-1953-423d-8f06-5fcd893a3e52"
+        },
+        "rawHash": "88bc2f167ce4767b215d0cea24bd330b5bb09bd186c67cdb84ad42740d649882",
+        "attempts": 2,
+        "failures": [
+          {
+            "at": "2026-10-15T13:36:14.216Z",
+            "code": "DEPENDENCY_UNAVAILABLE",
+            "attempt": 1
+          }
+        ],
+        "sourceId": "97f61afd-3e5a-4e68-8512-bcb7d3043860",
+        "tenantId": "11539967-3054-438c-b852-8a089057d368",
+        "operation": {
+          "id": "866fddc7-23c0-470b-8a7c-52ea2b6100ef",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:14.102Z",
+          "updated_at": "2026-10-15T13:36:15.497Z",
+          "resource_ref": {
+            "id": "55c016e3-780e-4ab5-aa5d-fccd084522ff",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        },
+        "simulated": true,
+        "evidenceId": "46742f85-0a74-4f87-98d1-fefc3ce36a49",
+        "receivedAt": "2026-10-15T13:36:14.102Z",
+        "contentHash": "38d273bc47a94c67dd695e1c7439d44aaf291d7a4b2536dc21d1d098ec704296",
+        "requestedBy": "fixture-sensor",
+        "correlationId": "e8c0008f-84a0-4925-b45c-b76cc534a2db",
+        "evidenceSha256": "43e8fd5a08100854992a7436f7da2c908ef57a466202521b82b809fbc23a9894",
+        "witnessVersion": "source-witness-xml-v1",
+        "acknowledgement": {
+          "id": "866fddc7-23c0-470b-8a7c-52ea2b6100ef",
+          "kind": "CONNECTOR_INGRESS",
+          "state": "PENDING",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:14.102Z",
+          "updated_at": "2026-10-15T13:36:14.102Z",
+          "resource_ref": {
+            "id": "55c016e3-780e-4ab5-aa5d-fccd084522ff",
+            "type": "source-observation",
+            "pack_id": "openresolve"
+          }
+        }
+      }
+    ],
+    "evidence": [
+      {
+        "history": [
+          {
+            "at": "2026-10-15T13:36:11.711Z",
+            "state": "CLEAN",
+            "engine": "1.4.6",
+            "policy": "evidence-intake-v1",
+            "sha256": "bad760aa9f7a8b6083d97d70373192c2245dcafb90c70bb182305f1461b293f7",
+            "attempt": 1,
+            "revision": 4,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/3772c3b0-0e68-45fc-8504-ea4987f15aeb/revision/1/content/9666fd83-1cdf-431b-80f7-f26d3d6e5d20",
+            "retryable": false,
+            "leaseToken": "7495c0b2-9fbe-49d8-b52f-4315029c017e",
+            "definitions": "28154",
+            "definitionsAt": "2026-10-15T06:24:22.000Z"
+          }
+        ],
+        "accepted": true,
+        "evidence": {
+          "id": "3772c3b0-0e68-45fc-8504-ea4987f15aeb",
+          "sha256": "bad760aa9f7a8b6083d97d70373192c2245dcafb90c70bb182305f1461b293f7",
+          "source": {
+            "kind": "CONNECTOR",
+            "source_id": "942d6227-7845-4a69-84a4-4db2c0410730",
+            "observed_at": "2026-10-15T13:36:11.500Z"
+          },
+          "filename": "SIMULATED-source-event-313e794b-5aff-4f5c-9801-13c372821ea7.xml",
+          "revision": 5,
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:11.585Z",
+          "created_by": "fixture-worker",
+          "legal_hold": false,
+          "media_type": "application/xml",
+          "size_bytes": 727,
+          "updated_at": "2026-10-15T13:36:11.712Z",
+          "retention_class": "STANDARD",
+          "processing_state": "NOT_STARTED",
+          "quarantine_state": "CLEAN"
+        },
+        "expiresAt": "2026-10-15T13:51:11.585Z",
+        "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/3772c3b0-0e68-45fc-8504-ea4987f15aeb/revision/1/content/9666fd83-1cdf-431b-80f7-f26d3d6e5d20",
+        "operation": {
+          "id": "d8716eea-a697-4494-b3f2-065d930f3d49",
+          "kind": "EVIDENCE_UPLOAD",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:11.620Z",
+          "updated_at": "2026-10-15T13:36:11.712Z",
+          "resource_ref": {
+            "id": "3772c3b0-0e68-45fc-8504-ea4987f15aeb",
+            "type": "evidence",
+            "pack_id": "platform"
+          }
+        },
+        "scanAttempts": 1,
+        "uploadHistory": [
+          {
+            "at": "2026-10-15T13:36:11.620Z",
+            "attempt": 1,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/3772c3b0-0e68-45fc-8504-ea4987f15aeb/revision/1/content/9666fd83-1cdf-431b-80f7-f26d3d6e5d20",
+            "leaseToken": "9666fd83-1cdf-431b-80f7-f26d3d6e5d20"
+          }
+        ],
+        "uploadAttempts": 1
+      },
+      {
+        "history": [
+          {
+            "at": "2026-10-15T13:36:11.947Z",
+            "state": "CLEAN",
+            "engine": "1.4.6",
+            "policy": "evidence-intake-v1",
+            "sha256": "d8b092ba0d8e70a6161e9e9d488010f5bc4fc2d2af20b77ff8c02a424b224561",
+            "attempt": 1,
+            "revision": 4,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/b07451ed-4edd-4665-b764-77125b1b8641/revision/1/content/b73e40af-2b4b-4f69-bd56-865e026f9850",
+            "retryable": false,
+            "leaseToken": "25441b36-c422-4e81-af2f-bd76ca5e4de7",
+            "definitions": "28154",
+            "definitionsAt": "2026-10-15T06:24:22.000Z"
+          }
+        ],
+        "accepted": true,
+        "evidence": {
+          "id": "b07451ed-4edd-4665-b764-77125b1b8641",
+          "sha256": "d8b092ba0d8e70a6161e9e9d488010f5bc4fc2d2af20b77ff8c02a424b224561",
+          "source": {
+            "kind": "CONNECTOR",
+            "source_id": "97f61afd-3e5a-4e68-8512-bcb7d3043860",
+            "observed_at": "2026-10-15T13:36:11.827Z"
+          },
+          "filename": "SIMULATED-source-event-038168d6-4300-4744-a4e7-0de9d71772cf.xml",
+          "revision": 5,
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:11.842Z",
+          "created_by": "fixture-worker",
+          "legal_hold": false,
+          "media_type": "application/xml",
+          "size_bytes": 599,
+          "updated_at": "2026-10-15T13:36:11.948Z",
+          "retention_class": "STANDARD",
+          "processing_state": "NOT_STARTED",
+          "quarantine_state": "CLEAN"
+        },
+        "expiresAt": "2026-10-15T13:51:11.842Z",
+        "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/b07451ed-4edd-4665-b764-77125b1b8641/revision/1/content/b73e40af-2b4b-4f69-bd56-865e026f9850",
+        "operation": {
+          "id": "3392ae42-7247-4feb-ab54-fb73f5b454eb",
+          "kind": "EVIDENCE_UPLOAD",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:11.870Z",
+          "updated_at": "2026-10-15T13:36:11.948Z",
+          "resource_ref": {
+            "id": "b07451ed-4edd-4665-b764-77125b1b8641",
+            "type": "evidence",
+            "pack_id": "platform"
+          }
+        },
+        "scanAttempts": 1,
+        "uploadHistory": [
+          {
+            "at": "2026-10-15T13:36:11.870Z",
+            "attempt": 1,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/b07451ed-4edd-4665-b764-77125b1b8641/revision/1/content/b73e40af-2b4b-4f69-bd56-865e026f9850",
+            "leaseToken": "b73e40af-2b4b-4f69-bd56-865e026f9850"
+          }
+        ],
+        "uploadAttempts": 1
+      },
+      {
+        "history": [
+          {
+            "at": "2026-10-15T13:36:12.123Z",
+            "state": "CLEAN",
+            "engine": "1.4.6",
+            "policy": "evidence-intake-v1",
+            "sha256": "515f6a3b5d93ffde9cb4c2c0a2d8b3618d99841c0a97ab09be6bc0417bc853c6",
+            "attempt": 1,
+            "revision": 4,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/d794019b-e157-40d4-9510-f18174b2d103/revision/1/content/122d687e-ece6-4b36-ac59-68cc58ca6e1d",
+            "retryable": false,
+            "leaseToken": "20dee965-7372-4c33-9aaf-916b98c70bac",
+            "definitions": "28154",
+            "definitionsAt": "2026-10-15T06:24:22.000Z"
+          }
+        ],
+        "accepted": true,
+        "evidence": {
+          "id": "d794019b-e157-40d4-9510-f18174b2d103",
+          "sha256": "515f6a3b5d93ffde9cb4c2c0a2d8b3618d99841c0a97ab09be6bc0417bc853c6",
+          "source": {
+            "kind": "CONNECTOR",
+            "source_id": "942d6227-7845-4a69-84a4-4db2c0410730",
+            "observed_at": "2026-10-15T13:36:11.500Z"
+          },
+          "filename": "SIMULATED-source-event-5419b8d4-5360-4574-8d94-dd38640b2624.xml",
+          "revision": 5,
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:12.020Z",
+          "created_by": "fixture-worker",
+          "legal_hold": false,
+          "media_type": "application/xml",
+          "size_bytes": 727,
+          "updated_at": "2026-10-15T13:36:12.123Z",
+          "retention_class": "STANDARD",
+          "processing_state": "NOT_STARTED",
+          "quarantine_state": "CLEAN"
+        },
+        "expiresAt": "2026-10-15T13:51:12.020Z",
+        "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/d794019b-e157-40d4-9510-f18174b2d103/revision/1/content/122d687e-ece6-4b36-ac59-68cc58ca6e1d",
+        "operation": {
+          "id": "cc37f968-67e6-44a8-a591-5c1083fbbeab",
+          "kind": "EVIDENCE_UPLOAD",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:12.046Z",
+          "updated_at": "2026-10-15T13:36:12.123Z",
+          "resource_ref": {
+            "id": "d794019b-e157-40d4-9510-f18174b2d103",
+            "type": "evidence",
+            "pack_id": "platform"
+          }
+        },
+        "scanAttempts": 1,
+        "uploadHistory": [
+          {
+            "at": "2026-10-15T13:36:12.046Z",
+            "attempt": 1,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/d794019b-e157-40d4-9510-f18174b2d103/revision/1/content/122d687e-ece6-4b36-ac59-68cc58ca6e1d",
+            "leaseToken": "122d687e-ece6-4b36-ac59-68cc58ca6e1d"
+          }
+        ],
+        "uploadAttempts": 1
+      },
+      {
+        "history": [
+          {
+            "at": "2026-10-15T13:36:12.292Z",
+            "state": "CLEAN",
+            "engine": "1.4.6",
+            "policy": "evidence-intake-v1",
+            "sha256": "5dd8c23fcb9e34443d816702e900a888a41d6c6f12077840e7c8c600024f5774",
+            "attempt": 1,
+            "revision": 4,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/18b18e6c-0d94-43c3-ba4a-50af73b3ec10/revision/1/content/ab24b2cf-3596-4968-af81-dfbda0008bc5",
+            "retryable": false,
+            "leaseToken": "d55281c0-e417-4a99-93a9-6c7337b54d1c",
+            "definitions": "28154",
+            "definitionsAt": "2026-10-15T06:24:22.000Z"
+          }
+        ],
+        "accepted": true,
+        "evidence": {
+          "id": "18b18e6c-0d94-43c3-ba4a-50af73b3ec10",
+          "sha256": "5dd8c23fcb9e34443d816702e900a888a41d6c6f12077840e7c8c600024f5774",
+          "source": {
+            "kind": "CONNECTOR",
+            "source_id": "97f61afd-3e5a-4e68-8512-bcb7d3043860",
+            "observed_at": "2026-10-15T13:36:12.175Z"
+          },
+          "filename": "SIMULATED-source-event-959b88fd-39c3-4049-a5e9-5dbfdc364fc8.xml",
+          "revision": 5,
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:12.189Z",
+          "created_by": "fixture-worker",
+          "legal_hold": false,
+          "media_type": "application/xml",
+          "size_bytes": 599,
+          "updated_at": "2026-10-15T13:36:12.292Z",
+          "retention_class": "STANDARD",
+          "processing_state": "NOT_STARTED",
+          "quarantine_state": "CLEAN"
+        },
+        "expiresAt": "2026-10-15T13:51:12.189Z",
+        "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/18b18e6c-0d94-43c3-ba4a-50af73b3ec10/revision/1/content/ab24b2cf-3596-4968-af81-dfbda0008bc5",
+        "operation": {
+          "id": "48205103-d554-4f4c-8748-9af7130898df",
+          "kind": "EVIDENCE_UPLOAD",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:12.216Z",
+          "updated_at": "2026-10-15T13:36:12.292Z",
+          "resource_ref": {
+            "id": "18b18e6c-0d94-43c3-ba4a-50af73b3ec10",
+            "type": "evidence",
+            "pack_id": "platform"
+          }
+        },
+        "scanAttempts": 1,
+        "uploadHistory": [
+          {
+            "at": "2026-10-15T13:36:12.216Z",
+            "attempt": 1,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/18b18e6c-0d94-43c3-ba4a-50af73b3ec10/revision/1/content/ab24b2cf-3596-4968-af81-dfbda0008bc5",
+            "leaseToken": "ab24b2cf-3596-4968-af81-dfbda0008bc5"
+          }
+        ],
+        "uploadAttempts": 1
+      },
+      {
+        "history": [
+          {
+            "at": "2026-10-15T13:36:12.474Z",
+            "state": "CLEAN",
+            "engine": "1.4.6",
+            "policy": "evidence-intake-v1",
+            "sha256": "148d15f14759f7de55b1617602cb8727a54c0901932b2cb2672f2ccea24fbfdc",
+            "attempt": 1,
+            "revision": 4,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/9b22473b-d46b-450c-bec5-88fc3798eec6/revision/1/content/084d0bd6-c68e-4571-b68d-e6f1e876700c",
+            "retryable": false,
+            "leaseToken": "700fe777-6790-41f0-b42f-a8fb67bdc19d",
+            "definitions": "28154",
+            "definitionsAt": "2026-10-15T06:24:22.000Z"
+          }
+        ],
+        "accepted": true,
+        "evidence": {
+          "id": "9b22473b-d46b-450c-bec5-88fc3798eec6",
+          "sha256": "148d15f14759f7de55b1617602cb8727a54c0901932b2cb2672f2ccea24fbfdc",
+          "source": {
+            "kind": "CONNECTOR",
+            "source_id": "97f61afd-3e5a-4e68-8512-bcb7d3043860",
+            "observed_at": "2026-10-15T13:36:12.359Z"
+          },
+          "filename": "SIMULATED-source-event-c354a13c-f0c5-4f34-84a1-c09a3260cc14.xml",
+          "revision": 5,
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:12.371Z",
+          "created_by": "fixture-worker",
+          "legal_hold": false,
+          "media_type": "application/xml",
+          "size_bytes": 599,
+          "updated_at": "2026-10-15T13:36:12.474Z",
+          "retention_class": "STANDARD",
+          "processing_state": "NOT_STARTED",
+          "quarantine_state": "CLEAN"
+        },
+        "expiresAt": "2026-10-15T13:51:12.371Z",
+        "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/9b22473b-d46b-450c-bec5-88fc3798eec6/revision/1/content/084d0bd6-c68e-4571-b68d-e6f1e876700c",
+        "operation": {
+          "id": "5112068e-22a8-4ba8-91d0-039a42267135",
+          "kind": "EVIDENCE_UPLOAD",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:12.398Z",
+          "updated_at": "2026-10-15T13:36:12.474Z",
+          "resource_ref": {
+            "id": "9b22473b-d46b-450c-bec5-88fc3798eec6",
+            "type": "evidence",
+            "pack_id": "platform"
+          }
+        },
+        "scanAttempts": 1,
+        "uploadHistory": [
+          {
+            "at": "2026-10-15T13:36:12.398Z",
+            "attempt": 1,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/9b22473b-d46b-450c-bec5-88fc3798eec6/revision/1/content/084d0bd6-c68e-4571-b68d-e6f1e876700c",
+            "leaseToken": "084d0bd6-c68e-4571-b68d-e6f1e876700c"
+          }
+        ],
+        "uploadAttempts": 1
+      },
+      {
+        "history": [
+          {
+            "at": "2026-10-15T13:36:13.892Z",
+            "state": "CLEAN",
+            "engine": "1.4.6",
+            "policy": "evidence-intake-v1",
+            "sha256": "e8c73160e82528b1a2529f68d2d2f6c2b6acae2ea73073e5bc0f8944a34502ca",
+            "attempt": 1,
+            "revision": 4,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/f7d3eba0-2ce0-4d11-9108-403eda8e0f7b/revision/1/content/2c90c942-6835-40b1-b886-f105b8ed7504",
+            "retryable": false,
+            "leaseToken": "e766eab7-ef96-408c-b66e-7a225b2966b2",
+            "definitions": "28154",
+            "definitionsAt": "2026-10-15T06:24:22.000Z"
+          }
+        ],
+        "accepted": true,
+        "evidence": {
+          "id": "f7d3eba0-2ce0-4d11-9108-403eda8e0f7b",
+          "sha256": "e8c73160e82528b1a2529f68d2d2f6c2b6acae2ea73073e5bc0f8944a34502ca",
+          "source": {
+            "kind": "CONNECTOR",
+            "source_id": "942d6227-7845-4a69-84a4-4db2c0410730",
+            "observed_at": "2026-10-15T13:36:13.777Z"
+          },
+          "filename": "SIMULATED-source-event-fd65c7b8-3ed8-4af5-a6bb-e0b07b10073a.xml",
+          "revision": 5,
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:13.790Z",
+          "created_by": "fixture-worker",
+          "legal_hold": false,
+          "media_type": "application/xml",
+          "size_bytes": 727,
+          "updated_at": "2026-10-15T13:36:13.892Z",
+          "retention_class": "STANDARD",
+          "processing_state": "NOT_STARTED",
+          "quarantine_state": "CLEAN"
+        },
+        "expiresAt": "2026-10-15T13:51:13.790Z",
+        "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/f7d3eba0-2ce0-4d11-9108-403eda8e0f7b/revision/1/content/2c90c942-6835-40b1-b886-f105b8ed7504",
+        "operation": {
+          "id": "0da12b3d-ae39-4964-92ed-295e4735b72c",
+          "kind": "EVIDENCE_UPLOAD",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:13.818Z",
+          "updated_at": "2026-10-15T13:36:13.892Z",
+          "resource_ref": {
+            "id": "f7d3eba0-2ce0-4d11-9108-403eda8e0f7b",
+            "type": "evidence",
+            "pack_id": "platform"
+          }
+        },
+        "scanAttempts": 1,
+        "uploadHistory": [
+          {
+            "at": "2026-10-15T13:36:13.818Z",
+            "attempt": 1,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/f7d3eba0-2ce0-4d11-9108-403eda8e0f7b/revision/1/content/2c90c942-6835-40b1-b886-f105b8ed7504",
+            "leaseToken": "2c90c942-6835-40b1-b886-f105b8ed7504"
+          }
+        ],
+        "uploadAttempts": 1
+      },
+      {
+        "history": [
+          {
+            "at": "2026-10-15T13:36:14.055Z",
+            "state": "CLEAN",
+            "engine": "1.4.6",
+            "policy": "evidence-intake-v1",
+            "sha256": "98c550478e3a42c15485b785add5d294828a64152b7f80a3461a8b1602e1b028",
+            "attempt": 1,
+            "revision": 4,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/b57d505b-f020-43ef-bd71-3f76787518a6/revision/1/content/74559056-260e-4382-addb-37fcfde6f19e",
+            "retryable": false,
+            "leaseToken": "184af0dc-2bb2-427a-a99d-98a0ffdac0ff",
+            "definitions": "28154",
+            "definitionsAt": "2026-10-15T06:24:22.000Z"
+          }
+        ],
+        "accepted": true,
+        "evidence": {
+          "id": "b57d505b-f020-43ef-bd71-3f76787518a6",
+          "sha256": "98c550478e3a42c15485b785add5d294828a64152b7f80a3461a8b1602e1b028",
+          "source": {
+            "kind": "CONNECTOR",
+            "source_id": "942d6227-7845-4a69-84a4-4db2c0410730",
+            "observed_at": "2026-10-15T13:36:13.935Z"
+          },
+          "filename": "SIMULATED-source-event-af9135aa-eafd-470c-be6c-c180817d7c2b.xml",
+          "revision": 5,
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:13.951Z",
+          "created_by": "fixture-worker",
+          "legal_hold": false,
+          "media_type": "application/xml",
+          "size_bytes": 727,
+          "updated_at": "2026-10-15T13:36:14.055Z",
+          "retention_class": "STANDARD",
+          "processing_state": "NOT_STARTED",
+          "quarantine_state": "CLEAN"
+        },
+        "expiresAt": "2026-10-15T13:51:13.951Z",
+        "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/b57d505b-f020-43ef-bd71-3f76787518a6/revision/1/content/74559056-260e-4382-addb-37fcfde6f19e",
+        "operation": {
+          "id": "6a748de4-9902-430f-8ac7-0a8560d32a15",
+          "kind": "EVIDENCE_UPLOAD",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:13.978Z",
+          "updated_at": "2026-10-15T13:36:14.055Z",
+          "resource_ref": {
+            "id": "b57d505b-f020-43ef-bd71-3f76787518a6",
+            "type": "evidence",
+            "pack_id": "platform"
+          }
+        },
+        "scanAttempts": 1,
+        "uploadHistory": [
+          {
+            "at": "2026-10-15T13:36:13.978Z",
+            "attempt": 1,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/b57d505b-f020-43ef-bd71-3f76787518a6/revision/1/content/74559056-260e-4382-addb-37fcfde6f19e",
+            "leaseToken": "74559056-260e-4382-addb-37fcfde6f19e"
+          }
+        ],
+        "uploadAttempts": 1
+      },
+      {
+        "history": [
+          {
+            "at": "2026-10-15T13:36:14.213Z",
+            "state": "SCAN_FAILED",
+            "reason": "SCANNER_UNAVAILABLE_OR_TIMEOUT",
+            "sha256": "43e8fd5a08100854992a7436f7da2c908ef57a466202521b82b809fbc23a9894",
+            "attempt": 1,
+            "revision": 4,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/46742f85-0a74-4f87-98d1-fefc3ce36a49/revision/1/content/0a955f06-f846-4cd0-bf13-58f4993b2912",
+            "retryable": true,
+            "leaseToken": "b418d320-4bfa-4457-95e7-887eabb427ad"
+          },
+          {
+            "at": "2026-10-15T13:36:15.452Z",
+            "state": "CLEAN",
+            "engine": "1.4.6",
+            "policy": "evidence-intake-v1",
+            "sha256": "43e8fd5a08100854992a7436f7da2c908ef57a466202521b82b809fbc23a9894",
+            "attempt": 2,
+            "revision": 6,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/46742f85-0a74-4f87-98d1-fefc3ce36a49/revision/1/content/0a955f06-f846-4cd0-bf13-58f4993b2912",
+            "retryable": false,
+            "leaseToken": "a95ed077-90a3-4a93-b1e4-c85a62d14058",
+            "definitions": "28154",
+            "definitionsAt": "2026-10-15T06:24:22.000Z"
+          }
+        ],
+        "accepted": true,
+        "evidence": {
+          "id": "46742f85-0a74-4f87-98d1-fefc3ce36a49",
+          "sha256": "43e8fd5a08100854992a7436f7da2c908ef57a466202521b82b809fbc23a9894",
+          "source": {
+            "kind": "CONNECTOR",
+            "source_id": "97f61afd-3e5a-4e68-8512-bcb7d3043860",
+            "observed_at": "2026-10-15T13:36:14.100Z"
+          },
+          "filename": "SIMULATED-source-event-55c016e3-780e-4ab5-aa5d-fccd084522ff.xml",
+          "revision": 7,
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:14.115Z",
+          "created_by": "fixture-worker",
+          "legal_hold": false,
+          "media_type": "application/xml",
+          "size_bytes": 599,
+          "updated_at": "2026-10-15T13:36:15.452Z",
+          "retention_class": "STANDARD",
+          "processing_state": "NOT_STARTED",
+          "quarantine_state": "CLEAN"
+        },
+        "expiresAt": "2026-10-15T13:51:14.115Z",
+        "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/46742f85-0a74-4f87-98d1-fefc3ce36a49/revision/1/content/0a955f06-f846-4cd0-bf13-58f4993b2912",
+        "operation": {
+          "id": "c13038f8-0267-45b0-830d-d2f32c676675",
+          "kind": "EVIDENCE_UPLOAD",
+          "state": "SUCCEEDED",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "created_at": "2026-10-15T13:36:14.144Z",
+          "updated_at": "2026-10-15T13:36:15.452Z",
+          "resource_ref": {
+            "id": "46742f85-0a74-4f87-98d1-fefc3ce36a49",
+            "type": "evidence",
+            "pack_id": "platform"
+          }
+        },
+        "scanAttempts": 2,
+        "uploadHistory": [
+          {
+            "at": "2026-10-15T13:36:14.144Z",
+            "attempt": 1,
+            "objectKey": "tenant/11539967-3054-438c-b852-8a089057d368/evidence/46742f85-0a74-4f87-98d1-fefc3ce36a49/revision/1/content/0a955f06-f846-4cd0-bf13-58f4993b2912",
+            "leaseToken": "0a955f06-f846-4cd0-bf13-58f4993b2912"
+          }
+        ],
+        "uploadAttempts": 1
+      }
+    ],
+    "intents": [
+      {
+        "observation_id": "038168d6-4300-4744-a4e7-0de9d71772cf",
+        "request_hash": "a49e3bdb1cf1866775c0413ee04c47f82369175b45e42e22f3fed06ddbcd507b",
+        "case_request": {
+          "reason": "SHORT_DELIVERY",
+          "severity": "MEDIUM",
+          "subject_ref": {
+            "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+            "type": "purchase-order",
+            "pack_id": "openresolve"
+          },
+          "evidence_ids": [
+            "b07451ed-4edd-4665-b764-77125b1b8641"
+          ]
+        },
+        "event_envelope": {
+          "id": "c356da31-3440-4ccf-87a1-f6a052c31de7",
+          "type": "openresolve.source.discrepancy.v1",
+          "schema_id": "openresolve.source-case-intent.v1",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "occurred_at": "2026-10-15T13:36:11.827Z",
+          "payload_ref": {
+            "id": "038168d6-4300-4744-a4e7-0de9d71772cf",
+            "type": "connector-case-intent",
+            "pack_id": "openresolve"
+          },
+          "subject_ref": {
+            "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+            "type": "purchase-order",
+            "pack_id": "openresolve"
+          },
+          "correlation_id": "ca51427a-dbdf-49f8-a147-ecae25113f9a"
+        },
+        "state": "PENDING"
+      },
+      {
+        "observation_id": "5419b8d4-5360-4574-8d94-dd38640b2624",
+        "request_hash": "beb818578d9f58de0db147ef8f8cd47fd687e606655ab20010e0e559444173a9",
+        "case_request": {
+          "reason": "SOURCE_CONFLICT",
+          "severity": "HIGH",
+          "subject_ref": {
+            "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+            "type": "purchase-order",
+            "pack_id": "openresolve"
+          },
+          "evidence_ids": [
+            "d794019b-e157-40d4-9510-f18174b2d103"
+          ]
+        },
+        "event_envelope": {
+          "id": "6049c02b-30dd-43b7-9c1c-8f919188477a",
+          "type": "openresolve.source.discrepancy.v1",
+          "schema_id": "openresolve.source-case-intent.v1",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "occurred_at": "2026-10-15T13:36:11.500Z",
+          "payload_ref": {
+            "id": "5419b8d4-5360-4574-8d94-dd38640b2624",
+            "type": "connector-case-intent",
+            "pack_id": "openresolve"
+          },
+          "subject_ref": {
+            "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+            "type": "purchase-order",
+            "pack_id": "openresolve"
+          },
+          "causation_id": "313e794b-5aff-4f5c-9801-13c372821ea7",
+          "correlation_id": "49bbfd18-c2f3-4b93-b5e9-6aa2b8664ca0"
+        },
+        "state": "PENDING"
+      },
+      {
+        "observation_id": "c354a13c-f0c5-4f34-84a1-c09a3260cc14",
+        "request_hash": "5ff89861236a2f249775847e194bdf8f3003e5eb0c2caae810c0bed6c65624f0",
+        "case_request": {
+          "reason": "QUALITY",
+          "severity": "HIGH",
+          "subject_ref": {
+            "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+            "type": "purchase-order",
+            "pack_id": "openresolve"
+          },
+          "evidence_ids": [
+            "9b22473b-d46b-450c-bec5-88fc3798eec6"
+          ]
+        },
+        "event_envelope": {
+          "id": "b97d350f-51d9-42bf-adbf-8b7f181ab1bb",
+          "type": "openresolve.source.discrepancy.v1",
+          "schema_id": "openresolve.source-case-intent.v1",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "occurred_at": "2026-10-15T13:36:12.359Z",
+          "payload_ref": {
+            "id": "c354a13c-f0c5-4f34-84a1-c09a3260cc14",
+            "type": "connector-case-intent",
+            "pack_id": "openresolve"
+          },
+          "subject_ref": {
+            "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+            "type": "purchase-order",
+            "pack_id": "openresolve"
+          },
+          "correlation_id": "6c4987a6-23e0-4028-a248-08d8a3350ef3"
+        },
+        "state": "PENDING"
+      },
+      {
+        "observation_id": "55c016e3-780e-4ab5-aa5d-fccd084522ff",
+        "request_hash": "0f9047735e3c608c503ea571aa21c847049efcb1b3339d456c26b0f5059031ba",
+        "case_request": {
+          "reason": "QUALITY",
+          "severity": "HIGH",
+          "subject_ref": {
+            "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+            "type": "purchase-order",
+            "pack_id": "openresolve"
+          },
+          "evidence_ids": [
+            "46742f85-0a74-4f87-98d1-fefc3ce36a49"
+          ]
+        },
+        "event_envelope": {
+          "id": "7cdf2d33-a310-445d-8e22-434f12703e54",
+          "type": "openresolve.source.discrepancy.v1",
+          "schema_id": "openresolve.source-case-intent.v1",
+          "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+          "occurred_at": "2026-10-15T13:36:14.100Z",
+          "payload_ref": {
+            "id": "55c016e3-780e-4ab5-aa5d-fccd084522ff",
+            "type": "connector-case-intent",
+            "pack_id": "openresolve"
+          },
+          "subject_ref": {
+            "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+            "type": "purchase-order",
+            "pack_id": "openresolve"
+          },
+          "correlation_id": "e8c0008f-84a0-4925-b45c-b76cc534a2db"
+        },
+        "state": "PENDING"
+      }
+    ],
+    "lineage": [
+      {
+        "id": "f279c4b2-d89d-47e0-a304-615436bf1846",
+        "to_ref": {
+          "id": "3772c3b0-0e68-45fc-8504-ea4987f15aeb",
+          "type": "evidence",
+          "pack_id": "platform"
+        },
+        "from_ref": {
+          "id": "313e794b-5aff-4f5c-9801-13c372821ea7",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "DERIVED_FROM",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:11.521Z"
+      },
+      {
+        "id": "a683774a-42e5-4957-89d3-ae5e48d324f9",
+        "to_ref": {
+          "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+          "type": "purchase-order",
+          "pack_id": "openresolve"
+        },
+        "from_ref": {
+          "id": "313e794b-5aff-4f5c-9801-13c372821ea7",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "EVALUATED_BY",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:11.521Z"
+      },
+      {
+        "id": "797d798c-ddbd-43df-bcf0-750d683ae914",
+        "to_ref": {
+          "id": "b07451ed-4edd-4665-b764-77125b1b8641",
+          "type": "evidence",
+          "pack_id": "platform"
+        },
+        "from_ref": {
+          "id": "038168d6-4300-4744-a4e7-0de9d71772cf",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "DERIVED_FROM",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:11.831Z"
+      },
+      {
+        "id": "ee2bef2d-8e44-4f8b-86ba-f035423777fa",
+        "to_ref": {
+          "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+          "type": "purchase-order",
+          "pack_id": "openresolve"
+        },
+        "from_ref": {
+          "id": "038168d6-4300-4744-a4e7-0de9d71772cf",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "EVALUATED_BY",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:11.831Z"
+      },
+      {
+        "id": "ed915e1b-3dc0-487f-9c4a-3475bc20b0f7",
+        "to_ref": {
+          "id": "038168d6-4300-4744-a4e7-0de9d71772cf",
+          "type": "connector-case-intent",
+          "pack_id": "openresolve"
+        },
+        "from_ref": {
+          "id": "038168d6-4300-4744-a4e7-0de9d71772cf",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "SUPPORTS",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:11.831Z"
+      },
+      {
+        "id": "4a7d22f7-d337-4ec3-8e66-d80204a94e8d",
+        "to_ref": {
+          "id": "d794019b-e157-40d4-9510-f18174b2d103",
+          "type": "evidence",
+          "pack_id": "platform"
+        },
+        "from_ref": {
+          "id": "5419b8d4-5360-4574-8d94-dd38640b2624",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "DERIVED_FROM",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:12.009Z"
+      },
+      {
+        "id": "6d6ee565-b098-46eb-a9c6-b23f8e957983",
+        "to_ref": {
+          "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+          "type": "purchase-order",
+          "pack_id": "openresolve"
+        },
+        "from_ref": {
+          "id": "5419b8d4-5360-4574-8d94-dd38640b2624",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "EVALUATED_BY",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:12.009Z"
+      },
+      {
+        "id": "9e03deab-7762-4067-8bac-9d6a8a072796",
+        "to_ref": {
+          "id": "5419b8d4-5360-4574-8d94-dd38640b2624",
+          "type": "connector-case-intent",
+          "pack_id": "openresolve"
+        },
+        "from_ref": {
+          "id": "5419b8d4-5360-4574-8d94-dd38640b2624",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "SUPPORTS",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:12.009Z"
+      },
+      {
+        "id": "6070afc8-62b3-49bf-8983-b8d385272a86",
+        "to_ref": {
+          "id": "5419b8d4-5360-4574-8d94-dd38640b2624",
+          "type": "connector-case-intent",
+          "pack_id": "openresolve"
+        },
+        "from_ref": {
+          "id": "313e794b-5aff-4f5c-9801-13c372821ea7",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "SUPPORTS",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:12.009Z"
+      },
+      {
+        "id": "3478c172-c1db-4a5b-a894-6906dc981d8d",
+        "to_ref": {
+          "id": "18b18e6c-0d94-43c3-ba4a-50af73b3ec10",
+          "type": "evidence",
+          "pack_id": "platform"
+        },
+        "from_ref": {
+          "id": "959b88fd-39c3-4049-a5e9-5dbfdc364fc8",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "DERIVED_FROM",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:12.177Z"
+      },
+      {
+        "id": "57da70f6-14b8-4181-bb35-286d68d89bb6",
+        "to_ref": {
+          "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+          "type": "purchase-order",
+          "pack_id": "openresolve"
+        },
+        "from_ref": {
+          "id": "959b88fd-39c3-4049-a5e9-5dbfdc364fc8",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "EVALUATED_BY",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:12.177Z"
+      },
+      {
+        "id": "a4f1e6fb-a058-486f-8379-a06929af68dd",
+        "to_ref": {
+          "id": "9b22473b-d46b-450c-bec5-88fc3798eec6",
+          "type": "evidence",
+          "pack_id": "platform"
+        },
+        "from_ref": {
+          "id": "c354a13c-f0c5-4f34-84a1-c09a3260cc14",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "DERIVED_FROM",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:12.361Z"
+      },
+      {
+        "id": "e2089321-aa7e-4c42-8742-f70874c8f055",
+        "to_ref": {
+          "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+          "type": "purchase-order",
+          "pack_id": "openresolve"
+        },
+        "from_ref": {
+          "id": "c354a13c-f0c5-4f34-84a1-c09a3260cc14",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "EVALUATED_BY",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:12.361Z"
+      },
+      {
+        "id": "4ada1c06-8159-47c0-ab30-2fca0bcba9a8",
+        "to_ref": {
+          "id": "c354a13c-f0c5-4f34-84a1-c09a3260cc14",
+          "type": "connector-case-intent",
+          "pack_id": "openresolve"
+        },
+        "from_ref": {
+          "id": "c354a13c-f0c5-4f34-84a1-c09a3260cc14",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "SUPPORTS",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:12.361Z"
+      },
+      {
+        "id": "56a76b92-5225-4346-a0f0-dc0369636c23",
+        "to_ref": {
+          "id": "f7d3eba0-2ce0-4d11-9108-403eda8e0f7b",
+          "type": "evidence",
+          "pack_id": "platform"
+        },
+        "from_ref": {
+          "id": "fd65c7b8-3ed8-4af5-a6bb-e0b07b10073a",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "DERIVED_FROM",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:13.779Z"
+      },
+      {
+        "id": "f8f9a160-d177-49b8-a0d0-c47122c69ab1",
+        "to_ref": {
+          "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+          "type": "purchase-order",
+          "pack_id": "openresolve"
+        },
+        "from_ref": {
+          "id": "fd65c7b8-3ed8-4af5-a6bb-e0b07b10073a",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "EVALUATED_BY",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:13.779Z"
+      },
+      {
+        "id": "d33cd25d-8776-436f-914b-520f14b44069",
+        "to_ref": {
+          "id": "b57d505b-f020-43ef-bd71-3f76787518a6",
+          "type": "evidence",
+          "pack_id": "platform"
+        },
+        "from_ref": {
+          "id": "af9135aa-eafd-470c-be6c-c180817d7c2b",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "DERIVED_FROM",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:13.937Z"
+      },
+      {
+        "id": "8dc61967-5a00-4ee5-899c-7288c81cc2a9",
+        "to_ref": {
+          "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+          "type": "purchase-order",
+          "pack_id": "openresolve"
+        },
+        "from_ref": {
+          "id": "af9135aa-eafd-470c-be6c-c180817d7c2b",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "EVALUATED_BY",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:13.937Z"
+      },
+      {
+        "id": "4e03dcc3-791e-4b6e-bc22-8758222ae0a2",
+        "to_ref": {
+          "id": "46742f85-0a74-4f87-98d1-fefc3ce36a49",
+          "type": "evidence",
+          "pack_id": "platform"
+        },
+        "from_ref": {
+          "id": "55c016e3-780e-4ab5-aa5d-fccd084522ff",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "DERIVED_FROM",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:14.102Z"
+      },
+      {
+        "id": "a99e85f2-7af5-4ecc-a63b-b767d09aab5b",
+        "to_ref": {
+          "id": "72034c37-1953-423d-8f06-5fcd893a3e52",
+          "type": "purchase-order",
+          "pack_id": "openresolve"
+        },
+        "from_ref": {
+          "id": "55c016e3-780e-4ab5-aa5d-fccd084522ff",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "EVALUATED_BY",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:14.102Z"
+      },
+      {
+        "id": "4a7b0cb9-b9d9-4876-a9b7-c1cbaf37f01e",
+        "to_ref": {
+          "id": "55c016e3-780e-4ab5-aa5d-fccd084522ff",
+          "type": "connector-case-intent",
+          "pack_id": "openresolve"
+        },
+        "from_ref": {
+          "id": "55c016e3-780e-4ab5-aa5d-fccd084522ff",
+          "type": "source-observation",
+          "pack_id": "openresolve"
+        },
+        "relation": "SUPPORTS",
+        "tenant_id": "11539967-3054-438c-b852-8a089057d368",
+        "created_at": "2026-10-15T13:36:14.102Z"
+      }
+    ]
+  },
+  "workerDurationsMs": [
+    199,
+    164,
+    159,
+    150,
+    160,
+    56,
+    148,
+    153,
+    110,
+    98
+  ],
+  "limitations": [
+    "Explicitly simulated external order and cumulative receiving counter; no production ERP/PLC/digital twin",
+    "No PO/GRN/payment mutations or autonomous approvals",
+    "No completed Case/Decision/Export or production #43 integration is asserted",
+    "No process-kill/restore or production latency claim"
+  ]
+}

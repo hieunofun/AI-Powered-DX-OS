@@ -1,0 +1,44 @@
+name: AI mediation acceptance
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'apps/api/src/packs/openresolve/mediation/**'
+      - 'apps/api/src/platform/evidence/**'
+      - 'apps/api/test/ai-mediation.e2e-spec.ts'
+      - 'database/proposed/issue54-ai-mediation.sql'
+      - 'packages/contracts/opendx/proposed/issue54-mediation.schema.json'
+      - 'infra/mediation/**'
+      - '.github/workflows/ai-mediation-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mediation-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build:api
+      - name: Start isolated PostgreSQL, MinIO and fresh pinned ClamAV
+        run: docker compose -f infra/mediation/compose.yaml up -d --build
+      - name: Exercise actual SQL/storage/AV and explicitly labelled owner/model fixtures
+        run: node infra/mediation/validate-runtime.cjs --wait-ready
+      - name: Retain successful and failed acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-mediation-runtime
+          path: docs/ai/evidence/issue54-*.json
+          if-no-files-found: warn
+      - name: Print fixture status on failure
+        if: failure()
+        run: docker compose -f infra/mediation/compose.yaml ps
+      - name: Stop isolated fixtures without deleting volumes
+        if: always()
+        run: docker compose -f infra/mediation/compose.yaml stop

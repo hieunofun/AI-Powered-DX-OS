@@ -1,0 +1,38 @@
+name: opendx-issue51
+# Explicit local simulation. Isolated state; stopping retains every original receipt/witness/attempt.
+services:
+  postgres:
+    extends:
+      file: ../lineage/compose.yaml
+      service: postgres
+    environment:
+      POSTGRES_DB: connector_issue51
+      POSTGRES_USER: connector_fixture
+      POSTGRES_PASSWORD: connector_fixture_local_only
+    ports: !override ["127.0.0.1:15451:5432"]
+    volumes: !override
+      - postgres:/var/lib/postgresql/data
+      - ../../database/proposed/issue41-evidence-intake.sql:/docker-entrypoint-initdb.d/001-evidence.sql:ro
+      - ../../database/proposed/issue46-evidence-lineage.sql:/docker-entrypoint-initdb.d/002-lineage.sql:ro
+      - ../../database/proposed/issue51-external-itot-ingress.sql:/docker-entrypoint-initdb.d/003-ingress.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U connector_fixture -d connector_issue51"]
+  minio:
+    extends:
+      file: ../lineage/compose.yaml
+      service: minio
+    environment:
+      MINIO_ROOT_USER: connector_fixture
+      MINIO_ROOT_PASSWORD: connector_fixture_local_only
+    ports: !override ["127.0.0.1:19451:9000"]
+    volumes: !override ["minio:/data"]
+  scanner:
+    extends:
+      file: ../evidence/compose.yaml
+      service: scanner
+    ports: !override ["127.0.0.1:33151:3310"]
+    volumes: !override ["definitions:/var/lib/clamav"]
+volumes:
+  postgres:
+  minio:
+  definitions:
