@@ -1,0 +1,113 @@
+{
+  "issue": 63,
+  "startedAt": "2026-10-15T18:58:31.258Z",
+  "finishedAt": "2026-10-15T18:58:44.310Z",
+  "commit": "f2f880759d2a59d69e7c2ccddd0e3aca538817dd",
+  "environment": {
+    "node": "v24.21.0",
+    "platform": "linux",
+    "persistence": "actual isolated PostgreSQL/private MinIO/fresh ClamAV1.4.6",
+    "provider": "selection double; actual Gemini scored separately",
+    "identity": "static server fixture aliases with actual SQL current membership/resource checks, not production #43 JWT"
+  },
+  "checks": [
+    {
+      "name": "actual XML parser blocks DTD/entity, malformed and excessive-depth uploads before scan",
+      "status": "PASS"
+    },
+    {
+      "name": "misleading file suffix cannot make non-PDF bytes acceptable",
+      "status": "PASS"
+    },
+    {
+      "name": "actual AV blocks harmless embedded test signature and never serves infected bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "document instruction/URL is inert source data; only actual original private attachment is returned",
+      "status": "PASS"
+    },
+    {
+      "name": "cross-tenant evidence/explanation/operation URLs never reveal source or result",
+      "status": "PASS"
+    },
+    {
+      "name": "unknown/R3/URL/prototype tool names and forged approval fields cannot invoke executor",
+      "status": "PASS"
+    },
+    {
+      "name": "requester cannot impersonate worker; actual current SQL revocation stops provider dispatch",
+      "status": "PASS"
+    },
+    {
+      "name": "file permission revoked during provider I/O prevents result persistence or tool effects",
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "source": {
+      "cleanId": "073799be-774d-461e-bce3-58e373315c83",
+      "unscannedId": "918ea995-45c3-4e71-ab8d-1c8e6e674ac0",
+      "factId": "836a2876-fe29-481b-b54c-095bc2130be8",
+      "hash": "c92edaf726b6b7fca22bf1e8c19ea409584dffc0164295e1dd33f9ebb58a7a45"
+    },
+    "fixture": {
+      "caseId": "8b5f81b1-54d8-4238-9083-57aea3667cb1",
+      "tenant": "7a5287e8-8f65-4939-ad4a-167f50b236b3"
+    },
+    "canonicalAvControl": {
+      "engine": "1.4.6",
+      "definitions": "28154",
+      "definitionsAt": "2026-10-15T06:24:22.000Z",
+      "policy": "evidence-intake-v1",
+      "state": "INFECTED",
+      "reason": "Eicar-Test-Signature",
+      "retryable": false
+    },
+    "nonCanonicalXmlControl": {
+      "result": {
+        "engine": "1.4.6",
+        "definitions": "28154",
+        "definitionsAt": "2026-10-15T06:24:22.000Z",
+        "policy": "evidence-intake-v1",
+        "state": "CLEAN",
+        "retryable": false
+      },
+      "limitation": "No claim that arbitrary XML-wrapped/encoded signatures are detected"
+    },
+    "infectedId": "3e176fff-acda-4696-aa11-615230e5ee3a",
+    "calls": {
+      "provider": 2,
+      "executor": 0
+    },
+    "actualToolEffects": "0"
+  },
+  "sourceHashes": {
+    "apps/api/src/platform/evidence/clamav.scanner.ts": "bc129856f08e0143317ec13fe0dae625ec4186d012b1bae61d6cea2396dec524",
+    "apps/api/src/platform/evidence/evidence-context.ts": "41409188b369396514ee58d4790e7521c5c318822f5e452aea212c3d3e1b734f",
+    "apps/api/src/platform/evidence/evidence-storage.ts": "52f6cca7eaf2c0c7faf4973f42c39f50ba70c1c9431f8c7e8cd9ae5fe2cc1eaa",
+    "apps/api/src/platform/evidence/evidence.controller.ts": "9b5cbd49df360a6a7666948b60b62a3920ece3766ea1457bb975ab2ea93e135c",
+    "apps/api/src/platform/evidence/evidence.module.ts": "581de09b460f0f9239dcb5199d709dab51e47dc9f2dec3f08b8498faca6a16ff",
+    "apps/api/src/platform/evidence/evidence.repository.ts": "26729f4a3b12dd47180fe34eee5afc310c158fc1a6281cbafb2943a6bd282a98",
+    "apps/api/src/platform/evidence/evidence.service.ts": "0b82ba9273346c71ad9b574de250781963606ff3fb7d5bc048463da8222a2eff",
+    "apps/api/src/platform/evidence/evidence.types.ts": "ed6f37a0526e74ef9ad96151cd28f1bf3366f0b07d83424f459554c8b1cce83c",
+    "apps/api/src/platform/evidence/file-safety.ts": "0a0f1c6e957da3cef0377203792c302c5bc41ab08eeb88fc96591a0a67baf4f4",
+    "apps/api/src/packs/openresolve/mediation/gemini-explanation.provider.ts": "73ef16906eef798aeee5131f8e10695ce9a0b8d27dea0988f324af9a45ae20db",
+    "apps/api/src/packs/openresolve/mediation/mediation-validation.ts": "e674586a87d0f4a467c39f874bbc7deec04b7e30e3fee05b6e219bafd524cc32",
+    "apps/api/src/packs/openresolve/mediation/mediation.module.ts": "d7c0bb251dc4c9eb4bd3e668e095a03723b5a0f5155c3ea17c237d00ffa93d97",
+    "apps/api/src/packs/openresolve/mediation/mediation.repository.ts": "b39a5ca37dae8eb84d4e2716a76314f02321165e8cda89b898aa337ab48c226f",
+    "apps/api/src/packs/openresolve/mediation/mediation.service.ts": "08e0f94e5e85f5c0258145565d6477c581b219584304c467ec4bdf4943a74b80",
+    "apps/api/src/packs/openresolve/mediation/mediation.types.ts": "751fe295d0399870d1a9dd6bea50f856b0e6f21126e0f6c13610c5bd53179a1e",
+    "infra/evaluation/create-adversarial-corpus.cjs": "4c183b2564eba44115cf674b304d4a2bc8ca59e5a32a1c9b104a2e0dadf46000",
+    "infra/evaluation/evaluate-answers.cjs": "bd05185a8e43480ecd1cb022f070b343dffdcbac8cf14178e700294818cb6088",
+    "infra/evaluation/metrics.cjs": "609901e4305a46218ac370d5687d3345addbd45852a2f40c1a650f78fccfd5b1",
+    "infra/evaluation/metrics.test.cjs": "b60adb488eadee0ea01173e65d08c6278819ae7f9dfa4b3d2fdd6e8dfbe7bfb2",
+    "infra/evaluation/summarize-quality.cjs": "ee05b92ca4f3158eb1a29d1ae4e31efa6ecea0cad2bdc5241262b9db76d3d8f0",
+    "infra/evaluation/validate-security-runtime.cjs": "4847f040d3bcb68fe3f37353d33aed98c3efe33e6ec97f9b69c10f67640b328f"
+  },
+  "limitations": [
+    "Production #43/#50 integration and #44 browser correction/IDOR remain unverified",
+    "Separate Onboarding #60 native runtime evidence is required",
+    "Scripted fixture actors are not human reviewers"
+  ]
+}
