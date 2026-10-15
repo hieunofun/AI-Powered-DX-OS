@@ -201,6 +201,18 @@
         "summary": "listEvidence",
         "parameters": [
           {
+            "name": "q",
+            "in": "query",
+            "schema": { "type": "string", "minLength": 1, "maxLength": 128 },
+            "description": "Case-insensitive literal filename substring within currently authorized tenant resources; no wildcard or cross-tenant search. Bound into pagination cursor."
+          },
+          {
+            "name": "retention_class",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["STANDARD", "RESTRICTED"] },
+            "description": "Filters registration retention metadata; does not grant restricted-resource access."
+          },
+          {
             "$ref": "#/components/parameters/CorrelationId"
           },
           {
@@ -1102,6 +1114,17 @@
         "summary": "getEvidenceLineage",
         "parameters": [
           {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 25 }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": { "type": "string", "maxLength": 1024 },
+            "description": "Opaque server cursor bound to tenant, principal, evidence and a committed-link watermark; expires after 15 minutes. Rechecks current permissions on every page."
+          },
+          {
             "$ref": "#/components/parameters/CorrelationId"
           },
           {
@@ -1165,7 +1188,7 @@
         },
         "x-required-permission": "evidence.read",
         "x-resource-authorization": "effective tenant + principal action grant + resource ACL + state + SoD as applicable",
-        "x-contract-stage": "skeleton-P4-13"
+        "x-contract-stage": "proposed-P4-13-pagination"
       }
     },
     "/platform/v1/workflows/instances": {
@@ -4028,7 +4051,12 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/EvidenceLink"
-            }
+            },
+            "maxItems": 100
+          },
+          "next_cursor": {
+            "type": "string",
+            "maxLength": 1024
           }
         },
         "required": [

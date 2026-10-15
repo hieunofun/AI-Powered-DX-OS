@@ -6,6 +6,20 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
+- AI quality/security evaluation candidate (#63): fixed-denominator OCR/mapping/grounded-answer scorers, separately frozen synthetic document-injection corpus and source-bound citation metrics, malicious upload/tenant/worker/tool probes with retained failures and explicit owner integration gates.
+
+- Proposed AI mediation (#54): source-bound extractive Gemini explanations, server missing-evidence reporting, closed R0–R2 action registry with R3/transfer denial, current policy/independent decision/transactional execution ports, persisted leases/idempotency/history and tenant control epochs. Real synthetic model evaluation and labelled runtime fixtures are separate; production #43/#50 integration remains gated.
+
+- Proposed reviewed item mapping (#25): preserve exact deterministic identities, use a separate Gemini alias suggestion prompt for unresolved items, enforce tenant/PO candidate ownership and durable human decisions with transactional authorization/outbox. Add fictional dev/held-out evaluation, explicit fallback, immutable history and real SQL/storage/AV acceptance evidence; production domain integration remains pending.
+
+- Proposed evidence lineage (#46): atomic raw/run/correction/confirmation snapshots and typed links, immutable history/deduplication, authorized graph pagination with encrypted cursors, literal filename/retention search and a verified identity/current membership boundary. Production #43 and match/decision integration remain pending.
+
+- Issue #26 (draft): durable PDF/image OCR suggestions, trusted PDF text spans, append-only corrections, exact invoice validation and atomic reviewed confirmation/outbox. The bounded PDF parser uses PDF.js 6.4.299 and proposes Node 24; real synthetic Gemini/PG/MinIO/AV acceptance is recorded, with tenant/domain integration gates explicit.
+
+- Issue #38 (local review candidate): replaceable backend Gemini extraction adapter with bounded HTTP/deadline/quota/token controls, untrusted field suggestions and provenance; versioned synthetic Vietnamese PDF dev/held-out corpus and exact-field evaluation tooling. Runtime OCR intake/persistence remains gated by #37/#41/#26.
+
+- Issue #41 (draft): tenant-scoped evidence registration/upload/read ports, private source hashes, durable scan leases/retries, ClamAV quarantine and guarded clean-byte delivery. An isolated PostgreSQL/MinIO/clamd fixture exercises the runtime; production tenant composition and migration integration await review.
+
 - Issue #24: Vietnamese XML/PDF intake status, saved three-way comparison, role-based task decisions and native audit verification/JSON/PDF export workspaces. Add direct invoice-case lookup and explicit export-status headers; CI runs 11 real browser scenarios.
 
 - Issue #23: Vietnamese PO/GRN lists, detail views and guarded draft/lifecycle actions; bounded supplier lookup and finalized receipt quantities. Real browser acceptance and exact-decimal tests run in CI.

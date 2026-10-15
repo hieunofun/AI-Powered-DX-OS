@@ -1,0 +1,86 @@
+{
+  "started": "2026-10-14T23:10:57.577Z",
+  "completed": "2026-10-14T23:11:00.284Z",
+  "gitHead": "a3077e8822f41a2815f323e7550f7e8192e4a758",
+  "worktreeDirty": true,
+  "sourceHashes": {
+    "apps/api/src/packs/openresolve/mapping/gemini-mapping.provider.ts": "7a5d43ddcd5f11ba65a32b2b820d7591a13278162dd1aa98640133844d98091e",
+    "apps/api/src/packs/openresolve/mapping/mapping-engine.ts": "88e267a95eb8a680cc08d0a9121a85d6ba0a9922a8461a4c5e1d0e4b02c41380",
+    "apps/api/src/packs/openresolve/mapping/mapping-outbox.target.ts": "c7875a11854ba2952b6fbcddcb2cb531474a2ab14d45570a364465895f427ec9",
+    "apps/api/src/packs/openresolve/mapping/mapping.module.ts": "dad0086581bb36ca1143358a479dde0ed121730387831ecd743a84fb5ba87ca8",
+    "apps/api/src/packs/openresolve/mapping/mapping.repository.ts": "5ad69c2542b77788ed026adf06557ee802a0f4ec115ff6b7752452df78ae4e09",
+    "apps/api/src/packs/openresolve/mapping/mapping.service.ts": "23ce2cbee3e54b11557d1167738733e6cd2771772fa385b49b6d8d3f4ee7e24e",
+    "apps/api/src/packs/openresolve/mapping/mapping.types.ts": "746ccb18def7bd2bac8a8f308a571f99b924fdc387030da04d40c0452439cbb4",
+    "apps/api/src/packs/openresolve/mapping/reviewed-mapping.source.ts": "3a4dc84787565d86c96cf9b5ced58ee2e3e5351eb7e6d3d48bafa3f971e5daf2"
+  },
+  "environment": {
+    "node": "v24.14.0",
+    "services": "real PostgreSQL/MinIO/ClamAV and actual mapping Gemini when deterministic path is unresolved",
+    "identity": "static server fixture resolver; actual SQL active membership/tenant/PO checks; not production SSO/#43",
+    "upstreamOCR": "labelled fixture bootstrap only; actual OCR is separately measured by #26",
+    "failure": "injected exception after actual SQL outbox insert",
+    "budget": {
+      "request_attempts": 0,
+      "reserved_tokens": 0,
+      "utc_day": -1,
+      "day_request_attempts": 0,
+      "day_reserved_tokens": 0
+    }
+  },
+  "checks": [
+    {
+      "name": "real scanner exact engine/fresh definitions/complete stream",
+      "status": "PASS"
+    },
+    {
+      "name": "actual confirmed immutable facts and tenant/PO-predicated catalog exclude foreign items",
+      "status": "PASS"
+    },
+    {
+      "name": "actual mapping provider/deterministic suggestion cannot dispatch until human review",
+      "status": "PASS"
+    },
+    {
+      "name": "foreign IDs and client actor cannot create a mapping decision",
+      "status": "PASS"
+    },
+    {
+      "name": "real decision/outbox insert followed by injected error rolls back all reviewed state",
+      "status": "PASS"
+    },
+    {
+      "name": "catalog version change blocks a stale human selection in the real database",
+      "status": "PASS"
+    },
+    {
+      "name": "recorded human mapping and replay preserve original suggestion and one PENDING outbox",
+      "status": "PASS"
+    }
+  ],
+  "resources": {
+    "selectedPoItemId": "dade4915-0f83-4065-ad7c-1202fd36ef43",
+    "evidenceId": "3b09d0d3-878b-4c6c-85ee-76feb8290805",
+    "confirmationId": "ad651177-6496-42ac-9df2-21217e87b48f",
+    "mappingId": "f7f19540-f369-4bfa-9354-f1f85cbeeb88",
+    "mappingMs": 211,
+    "suggestion": {
+      "state": "REVIEW_REQUIRED",
+      "method": "DETERMINISTIC",
+      "candidates": [
+        {
+          "reason": "Exact catalog identity by SKU",
+          "po_item_id": "dade4915-0f83-4065-ad7c-1202fd36ef43"
+        }
+      ],
+      "resolution": "MATCH",
+      "profile_version": "reviewed-item-mapping-v1"
+    },
+    "decisionId": "2d3d8db8-020d-4670-895f-7feca2a4417f"
+  },
+  "limitations": [
+    "One fictional reviewed source; not OCR or independent mapping quality evaluation",
+    "Actual provider quality is separately reported by evaluate.cjs",
+    "PENDING handoff is not executed domain matching or payment",
+    "Production authority/migration/catalog writer lock integration and peer review remain gates"
+  ]
+}
