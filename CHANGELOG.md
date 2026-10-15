@@ -6,6 +6,8 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
+- Proposed AI mediation (#54): source-bound extractive Gemini explanations, server missing-evidence reporting, closed R0–R2 action registry with R3/transfer denial, current policy/independent decision/transactional execution ports, persisted leases/idempotency/history and tenant control epochs. Real synthetic model evaluation and labelled runtime fixtures are separate; production #43/#50 integration remains gated.
+
 - Proposed evidence lineage (#46): atomic raw/run/correction/confirmation snapshots and typed links, immutable history/deduplication, authorized graph pagination with encrypted cursors, literal filename/retention search and a verified identity/current membership boundary. Production #43 and match/decision integration remain pending.
 
 - Issue #26 (draft): durable PDF/image OCR suggestions, trusted PDF text spans, append-only corrections, exact invoice validation and atomic reviewed confirmation/outbox. The bounded PDF parser uses PDF.js 6.4.299 and proposes Node 24; real synthetic Gemini/PG/MinIO/AV acceptance is recorded, with tenant/domain integration gates explicit.

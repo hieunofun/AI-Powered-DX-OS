@@ -31,8 +31,12 @@ export class EvidenceErrorFilter implements ExceptionFilter {
     const response = host.switchToHttp().getResponse<Response>();
     if (response.headersSent) { response.destroy(); return; }
     const correlation = request.correlationId || randomUUID();
-    const status = cause instanceof EvidenceError ? cause.getStatus() : cause instanceof HttpException && cause.getStatus() < 500 ? cause.getStatus() : 503;
-    const code = cause instanceof EvidenceError ? cause.code : status === 401 ? 'UNAUTHENTICATED' : status === 403 ? 'FORBIDDEN' : status === 404 ? 'NOT_FOUND' : status < 500 ? 'INVALID_REQUEST' : 'DEPENDENCY_UNAVAILABLE';
+    const parser = cause && typeof cause === 'object' ? cause as { type?: string; status?: number } : undefined;
+    const parserStatus = parser?.type === 'entity.too.large' && parser.status === 413 ? 413 :
+      ['charset.unsupported', 'encoding.unsupported'].includes(parser?.type) && parser.status === 415 ? 415 : undefined;
+    const status = cause instanceof EvidenceError ? cause.getStatus() : cause instanceof HttpException && cause.getStatus() < 500 ? cause.getStatus() : parserStatus || 503;
+    const code = cause instanceof EvidenceError ? cause.code : status === 413 ? 'FILE_TOO_LARGE' : status === 415 ? 'UNSUPPORTED_MEDIA_TYPE' :
+      status === 401 ? 'UNAUTHENTICATED' : status === 403 ? 'FORBIDDEN' : status === 404 ? 'NOT_FOUND' : status < 500 ? 'INVALID_REQUEST' : 'DEPENDENCY_UNAVAILABLE';
     response.setHeader('X-Correlation-ID', correlation);
     if (status === 429) response.setHeader('Retry-After', '1');
     response.status(status).json({ code, message: 'Evidence operation failed: ' + code + '.', correlation_id: correlation,

@@ -4,3 +4,9 @@
 *.pdf -text
 # Keep byte-sensitive XML fixture mutations and archival hashes identical across platforms.
 infra/invoice/fixtures/*.xml text eol=lf
+# Preserve AI mediation source, support and synthetic corpus hashes across checkouts.
+apps/api/src/packs/openresolve/mediation/*.ts text eol=lf
+infra/mediation/*.cjs text eol=lf
+infra/mediation/fixtures/*.json text eol=lf
+database/proposed/issue54-ai-mediation.sql text eol=lf
+packages/contracts/opendx/proposed/issue54-mediation.schema.json text eol=lf
