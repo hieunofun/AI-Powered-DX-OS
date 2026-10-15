@@ -2,6 +2,8 @@
 
 Issue #54 adds no upstream dependency or patch. Its orchestration reuses the exact existing Gemini REST integration, PostgreSQL/MinIO/ClamAV images, Node/Nest, decimal/hash primitives and Ajv versions already pinned and recorded below. Existing notices and licensing gates remain applicable; the model and persistence engines are not project-authored algorithms.
 
+Issue #25 adds no dependency. Its team-authored semantic mapping adapter reuses the recorded Gemini REST service, Node/Nest/PostgreSQL and existing deterministic resolver. Provider disclosure/terms, notices and the separation between upstream engines and original orchestration remain applicable; see `docs/ai/REVIEWED_ITEM_MAPPING.md`.
+
 This document tracks external software evaluated and integrated into **SmartProcure-Pay**, including open-source and explicitly identified source-available components.
 
 Issue #10 corrects the stale ImmuDB license entry: the selected release is BUSL-1.1 source-available software, not currently Apache-2.0 or OSI-approved open source. Version-specific provenance and limitations follow the registry.
