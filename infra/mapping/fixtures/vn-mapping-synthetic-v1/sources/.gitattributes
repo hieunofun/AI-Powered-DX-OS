@@ -1,0 +1,2 @@
+# Manifest SHA-256 values identify exact UTF-8 fixture bytes on every host.
+*.json -text

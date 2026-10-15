@@ -1,0 +1,10 @@
+HÓA ĐƠN MẪU — DỮ LIỆU TỔNG HỢP
+Tài liệu hoàn toàn hư cấu. Không dùng để thanh toán.
+
+Tên đơn vị bán: Đơn vị Mẫu Hồ Sen
+Mã số thuế bên bán: SYNTH-MST-003
+Ngày lập: 2026-09-03
+Mã tiền tệ ISO: VND
+Số lượng mặt hàng đầu tiên: 1
+Đơn giá mặt hàng đầu tiên: 25000.00
+Thuế suất dạng phân số: 0.08

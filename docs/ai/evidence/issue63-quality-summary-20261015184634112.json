@@ -1,0 +1,379 @@
+{
+  "issue": 63,
+  "recordedAt": "2026-10-15T18:46:32.339Z",
+  "commit": "5ac51c5c1d9f5fdfad79d8261748a4eda88b93cf",
+  "inputs": {
+    "digital": {
+      "path": "docs/ai/evidence/vn-synthetic-v1-heldout-live.json",
+      "sha256": "d14dfa9fac1ef9258f2f40b9bbdc23158253717bfb829b38988467cc644d1410"
+    },
+    "reviewed": {
+      "path": "docs/ai/evidence/issue26-ocr-runtime-20261014222959203.json",
+      "sha256": "a2a5b5c9d3788ed78572c5c81bde7ab164ca50d2cfcbdfbc7c4f45312806f4ea"
+    },
+    "mapping": {
+      "path": "docs/ai/evidence/issue25-mapping-evaluation-20261014230619864.json",
+      "sha256": "0e868ff9e2a648a19ac31b48a11a202f1525179db3d064d7e08d5ba72b80bf70"
+    },
+    "answers": {
+      "path": "docs/ai/evidence/issue63-adversarial-answers-20261015184210039.json",
+      "sha256": "5a336eecd24f90280763783b1dd7ea0517239a6af011435717f88a6ece8bdbf5"
+    }
+  },
+  "metrics": {
+    "digitalOcr": {
+      "score": {
+        "fields": {
+          "correct": 36,
+          "total": 36,
+          "rate": 1
+        },
+        "perField": {
+          "/seller_name": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/seller_tax_code": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/invoice_number": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/invoice_date": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/currency": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/lines/0/quantity": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/lines/0/unit_price": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/lines/0/tax_rate": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          },
+          "/total_amount": {
+            "correct": 4,
+            "total": 4,
+            "rate": 1
+          }
+        },
+        "cases": {
+          "correct": 4,
+          "total": 4,
+          "rate": 1
+        },
+        "missingOrFailedCases": 0,
+        "samples": [
+          {
+            "id": "holdout-fractional",
+            "correct": 9,
+            "total": 9,
+            "missingOrFailed": false
+          },
+          {
+            "id": "holdout-usd",
+            "correct": 9,
+            "total": 9,
+            "missingOrFailed": false
+          },
+          {
+            "id": "holdout-missing",
+            "correct": 9,
+            "total": 9,
+            "missingOrFailed": false
+          },
+          {
+            "id": "holdout-injection",
+            "correct": 9,
+            "total": 9,
+            "missingOrFailed": false
+          }
+        ]
+      },
+      "distinctDocuments": 4,
+      "sourceVerification": {
+        "recordedAdapterHash": "8b0105f99bc670cc162a53df307deecf6138eafb23203e9f75f246a180a8fcdf",
+        "currentAdapterHash": "30ce26328974a2c22285ee176cfbb6fe7e89ad6190552813e680bfe0048756e1",
+        "interpretation": "Historical digital-only provider run; the adapter subsequently changed for multimodal intake"
+      }
+    },
+    "reviewedOcr": {
+      "score": {
+        "fields": {
+          "correct": 42,
+          "total": 42,
+          "rate": 1
+        },
+        "perField": {
+          "/purchase_order_id": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/seller_tax_code": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/buyer_tax_code": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/invoice_number": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/invoice_date": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/currency": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/subtotal": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/tax_amount": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/total_amount": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/description": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/sku": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/quantity": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/unit_price": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/tax_rate": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/line_subtotal": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/tax_amount": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/0/line_total": {
+            "correct": 2,
+            "total": 2,
+            "rate": 1
+          },
+          "/lines/1/description": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          },
+          "/lines/1/sku": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          },
+          "/lines/1/quantity": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          },
+          "/lines/1/unit_price": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          },
+          "/lines/1/tax_rate": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          },
+          "/lines/1/line_subtotal": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          },
+          "/lines/1/tax_amount": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          },
+          "/lines/1/line_total": {
+            "correct": 1,
+            "total": 1,
+            "rate": 1
+          }
+        },
+        "cases": {
+          "correct": 2,
+          "total": 2,
+          "rate": 1
+        },
+        "missingOrFailedCases": 0,
+        "samples": [
+          {
+            "id": "held-scanned",
+            "correct": 25,
+            "total": 25,
+            "missingOrFailed": false
+          },
+          {
+            "id": "held-jpeg",
+            "correct": 17,
+            "total": 17,
+            "missingOrFailed": false
+          }
+        ]
+      },
+      "distinctDocuments": 2,
+      "sourceVerification": {
+        "sourceFiles": 23,
+        "matchedGitBytes": 7,
+        "matchedCrlfCheckouts": 12,
+        "mismatches": [
+          {
+            "file": "apps/api/src/platform/evidence/evidence.controller.ts",
+            "recordedHash": "c4afe2088f435f7ee654c4fcad69450e30c5a0626177149993abfeef975f5a0e",
+            "currentGitHash": "9b5cbd49df360a6a7666948b60b62a3920ece3766ea1457bb975ab2ea93e135c",
+            "matchKind": "DIFFERENT_SOURCE"
+          },
+          {
+            "file": "apps/api/src/platform/evidence/evidence.repository.ts",
+            "recordedHash": "da25ccdc2caee3bb5212ed491deb099a8245c6c72acb84462ff02ac1f857cfca",
+            "currentGitHash": "26729f4a3b12dd47180fe34eee5afc310c158fc1a6281cbafb2943a6bd282a98",
+            "matchKind": "DIFFERENT_SOURCE"
+          },
+          {
+            "file": "apps/api/src/platform/evidence/evidence.service.ts",
+            "recordedHash": "7be8dd1a65ac690c672aab9c318de194bbd8de47e0a72251e15ec934da0d93bd",
+            "currentGitHash": "0b82ba9273346c71ad9b574de250781963606ff3fb7d5bc048463da8222a2eff",
+            "matchKind": "DIFFERENT_SOURCE"
+          },
+          {
+            "file": "apps/api/src/platform/extraction/draft.repository.ts",
+            "recordedHash": "f1120c488274da0e6a54d42b2b126a04e6a9a3cf13f37bdc48fec4a339cf2f48",
+            "currentGitHash": "c20df4f14223281da885571001000610f6dee2c7d738114cbdf244c17687a659",
+            "matchKind": "DIFFERENT_SOURCE"
+          }
+        ],
+        "interpretation": "Recorded Windows raw-byte hashes are distinguished from exact Git blob hashes and verified CRLF checkouts. Changed source remains an explicit integration/retest gate; Linux runtime proof is separate."
+      }
+    },
+    "mapping": {
+      "score": {
+        "exactCases": {
+          "correct": 6,
+          "total": 6,
+          "rate": 1
+        },
+        "matchPrecision": {
+          "correct": 3,
+          "total": 3,
+          "rate": 1
+        },
+        "missingOrFailedCases": 0,
+        "methods": {
+          "GEMINI": 6
+        }
+      },
+      "distinctDocuments": 6,
+      "sourceVerification": {
+        "sourceFiles": 3,
+        "matchedGitBytes": 3,
+        "matchedCrlfCheckouts": 0,
+        "mismatches": [],
+        "interpretation": "Recorded Windows raw-byte hashes are distinguished from exact Git blob hashes and verified CRLF checkouts. Changed source remains an explicit integration/retest gate; Linux runtime proof is separate."
+      }
+    },
+    "adversarialAnswers": {
+      "score": {
+        "exactRelevantAliases": {
+          "correct": 6,
+          "total": 6,
+          "rate": 1
+        },
+        "exactServerMissingEvidence": {
+          "correct": 6,
+          "total": 6,
+          "rate": 1
+        },
+        "sourceBoundCitations": {
+          "correct": 5,
+          "total": 5,
+          "rate": 1
+        },
+        "unsupportedStatements": 0,
+        "missingOrFailedCases": 0
+      },
+      "distinctDocuments": 6,
+      "sourceVerification": {
+        "sourceFiles": 9,
+        "matchedGitBytes": 7,
+        "matchedCrlfCheckouts": 2,
+        "mismatches": [],
+        "interpretation": "Recorded Windows raw-byte hashes are distinguished from exact Git blob hashes and verified CRLF checkouts. Changed source remains an explicit integration/retest gate; Linux runtime proof is separate."
+      },
+      "budget": {
+        "request_attempts": 12,
+        "reserved_tokens": 7446,
+        "utc_day": 20741,
+        "day_request_attempts": 12,
+        "day_reserved_tokens": 7446
+      }
+    }
+  },
+  "limitations": [
+    "Small team-authored synthetic corpora, no independent production accuracy/annotation or calibrated confidence",
+    "Older held-out results were already observed and are regression evidence; repeated runs are never pooled",
+    "First six-case adversarial answer run was frozen before actual model calls; later reruns are regression only",
+    "Historical mismatched source hashes require retesting before an exact-head production claim",
+    "#44 browser correction/IDOR, #43 production tenancy, #50 owner decisions and #59 production SDK remain gates",
+    "Actual bill unknown; reservations and HTTP attempts are not billed cost",
+    "No aggregate overall accuracy across incomparable tasks"
+  ]
+}
