@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/bpmn" targetNamespace="https://opendx.invalid/onboarding">
+  <process id="onboarding_access_review_v1" name="Onboarding access request review" isExecutable="true">
+    <startEvent id="start" />
+    <sequenceFlow id="start_review" sourceRef="start" targetRef="access_review" />
+    <userTask id="access_review" name="Review completed checklist and access request" flowable:candidateGroups="${reviewerGroup}" />
+    <sequenceFlow id="review_route" sourceRef="access_review" targetRef="decision" />
+    <exclusiveGateway id="decision" default="rejected" />
+    <sequenceFlow id="approved" sourceRef="decision" targetRef="approved_end">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == 'APPROVE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="rejected" sourceRef="decision" targetRef="rejected_end" />
+    <endEvent id="approved_end" name="Request approved; no account provisioning" />
+    <endEvent id="rejected_end" name="Request rejected; no account provisioning" />
+  </process>
+</definitions>

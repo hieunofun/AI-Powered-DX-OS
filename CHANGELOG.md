@@ -6,6 +6,8 @@ Notable changes are recorded using [Keep a Changelog](https://keepachangelog.com
 
 ### Added
 
+- Proposed Onboarding pack (#60): evidenced acknowledgement checklist, fixed access request and independently verified decision with a pinned generic Flowable workflow; durable intent/reconciliation, immutable history/shared lineage and explicit NOT_PROVISIONED state. Zero subsequent core changes are checked against a separate compatibility baseline. Production tenant/decision/SDK integration remains gated.
+
 - Issue #40: extract reusable identity/data/Flowable transport ports into a headless platform module; preserve legacy provider/import identities and business definition/hash guards. Add static boundary checks, standalone composition and transport failure tests to CI while retaining PR3 regressions.
 
 - Proposed evidence lineage (#46): atomic raw/run/correction/confirmation snapshots and typed links, immutable history/deduplication, authorized graph pagination with encrypted cursors, literal filename/retention search and a verified identity/current membership boundary. Production #43 and match/decision integration remain pending.

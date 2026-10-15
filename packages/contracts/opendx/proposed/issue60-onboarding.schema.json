@@ -1,0 +1,560 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://opendx.invalid/proposed/issue60-onboarding.schema.json",
+  "description": "Proposed onboarding.case.v1, onboarding.access-request.v1 and onboarding.checklist-evidence.v1. Not registered owning #59 contracts.",
+  "definitions": {
+    "ResourceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pack_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "pack_id",
+        "type",
+        "id"
+      ]
+    },
+    "VersionRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "sha256"
+      ]
+    },
+    "Error": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "INVALID_REQUEST",
+            "UNAUTHENTICATED",
+            "FORBIDDEN",
+            "NOT_FOUND",
+            "TENANT_CONTEXT_REQUIRED",
+            "IDEMPOTENCY_CONFLICT",
+            "REVISION_CONFLICT",
+            "INVALID_STATE",
+            "FILE_NOT_CLEAN",
+            "FILE_TOO_LARGE",
+            "UNSUPPORTED_MEDIA_TYPE",
+            "CHECKSUM_MISMATCH",
+            "INVALID_DECIMAL",
+            "DRAFT_INVALID",
+            "QUOTA_EXCEEDED",
+            "DEPENDENCY_UNAVAILABLE",
+            "RECONCILIATION_REQUIRED",
+            "SOD_VIOLATION",
+            "PACK_DISABLED",
+            "SNAPSHOT_UNAVAILABLE"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "correlation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "operation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "code": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              }
+            },
+            "required": [
+              "path",
+              "code"
+            ]
+          },
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "correlation_id",
+        "retryable"
+      ]
+    },
+    "Operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "tenant_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "PENDING",
+            "RUNNING",
+            "SUCCEEDED",
+            "FAILED",
+            "RECONCILIATION_REQUIRED"
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "resource_ref": {
+          "$ref": "#/definitions/ResourceRef"
+        },
+        "result_ref": {
+          "$ref": "#/definitions/ResourceRef"
+        },
+        "error": {
+          "$ref": "#/definitions/Error"
+        }
+      },
+      "required": [
+        "id",
+        "tenant_id",
+        "kind",
+        "state",
+        "created_at",
+        "updated_at",
+        "resource_ref"
+      ]
+    },
+    "Create": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "display_label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "display_label"
+      ]
+    },
+    "ChecklistInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "acknowledged": {
+          "const": true
+        },
+        "expected_revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9
+        }
+      },
+      "required": [
+        "evidence_id",
+        "acknowledged",
+        "expected_revision"
+      ]
+    },
+    "AccessInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "access_profile": {
+          "enum": [
+            "DOCS_READ_ONLY",
+            "TEAM_WORKSPACE"
+          ]
+        }
+      },
+      "required": [
+        "access_profile"
+      ]
+    },
+    "DecisionInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "decision_ref": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ResourceRef"
+            },
+            {
+              "properties": {
+                "pack_id": {
+                  "const": "platform"
+                },
+                "type": {
+                  "const": "decision"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "decision_ref"
+      ]
+    },
+    "ChecklistEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "code": {
+          "enum": [
+            "WELCOME_ACK",
+            "ACCESS_POLICY_ACK"
+          ]
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "acknowledged": {
+          "const": true
+        },
+        "evidence_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "recorded_by": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "recorded_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        }
+      },
+      "required": [
+        "id",
+        "code",
+        "revision",
+        "acknowledged",
+        "evidence_id",
+        "sha256",
+        "recorded_by",
+        "recorded_at"
+      ]
+    },
+    "AccessRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "requested_for": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "profile": {
+          "enum": [
+            "DOCS_READ_ONLY",
+            "TEAM_WORKSPACE"
+          ]
+        },
+        "requested_scopes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "INTERNAL_DOCS_READ",
+              "TEAM_WORKSPACE_VIEW"
+            ]
+          }
+        },
+        "checklist": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/definitions/ChecklistEvidence"
+          }
+        },
+        "manifest_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "policy_ref": {
+          "$ref": "#/definitions/VersionRef"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "created_by": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      },
+      "required": [
+        "id",
+        "requested_for",
+        "profile",
+        "requested_scopes",
+        "checklist",
+        "manifest_sha256",
+        "policy_ref",
+        "created_at",
+        "created_by"
+      ]
+    },
+    "Decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "decision_ref": {
+          "$ref": "#/definitions/ResourceRef"
+        },
+        "action": {
+          "enum": [
+            "APPROVE",
+            "REJECT"
+          ]
+        },
+        "approver": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "subject_ref": {
+          "$ref": "#/definitions/ResourceRef"
+        },
+        "subject_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "policy_ref": {
+          "$ref": "#/definitions/VersionRef"
+        },
+        "decision_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "approved_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        }
+      },
+      "required": [
+        "decision_ref",
+        "action",
+        "approver",
+        "subject_ref",
+        "subject_sha256",
+        "policy_ref",
+        "decision_version",
+        "approved_at"
+      ]
+    },
+    "Workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "definition_id": {
+          "type": "string",
+          "pattern": "^onboarding_access_review_v1:[1-9][0-9]*:[A-Za-z0-9-]{1,100}$"
+        },
+        "process_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "ended_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        }
+      },
+      "required": [
+        "definition_id"
+      ]
+    },
+    "Case": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "tenant_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "requester_subject": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "display_label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "\\S"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "state": {
+          "enum": [
+            "COLLECTING",
+            "SUBMITTING",
+            "AWAITING_APPROVAL",
+            "APPLYING_DECISION",
+            "COMPLETED",
+            "REJECTED",
+            "RECONCILIATION_REQUIRED"
+          ]
+        },
+        "manifest_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "checklist": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/definitions/ChecklistEvidence"
+          }
+        },
+        "provisioning_state": {
+          "const": "NOT_PROVISIONED"
+        },
+        "operations": {
+          "type": "array",
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/definitions/Operation"
+          }
+        },
+        "access_request": {
+          "$ref": "#/definitions/AccessRequest"
+        },
+        "request_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "decision": {
+          "$ref": "#/definitions/Decision"
+        },
+        "workflow": {
+          "$ref": "#/definitions/Workflow"
+        }
+      },
+      "required": [
+        "id",
+        "tenant_id",
+        "requester_subject",
+        "display_label",
+        "created_at",
+        "updated_at",
+        "state",
+        "manifest_sha256",
+        "checklist",
+        "provisioning_state",
+        "operations"
+      ]
+    }
+  }
+}
