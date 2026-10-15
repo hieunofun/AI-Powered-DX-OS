@@ -1,0 +1,50 @@
+{
+  "case_id": "holdout-usd",
+  "fields": [
+    {
+      "path": "/seller_name",
+      "status": "EXTRACTED",
+      "value": "Nhà cung cấp Mẫu Sông Lam"
+    },
+    {
+      "path": "/seller_tax_code",
+      "status": "EXTRACTED",
+      "value": "SYNTH-MST-102"
+    },
+    {
+      "path": "/invoice_number",
+      "status": "EXTRACTED",
+      "value": "TEST-H102"
+    },
+    {
+      "path": "/invoice_date",
+      "status": "EXTRACTED",
+      "value": "2026-10-02"
+    },
+    {
+      "path": "/currency",
+      "status": "EXTRACTED",
+      "value": "USD"
+    },
+    {
+      "path": "/lines/0/quantity",
+      "status": "EXTRACTED",
+      "value": "4"
+    },
+    {
+      "path": "/lines/0/unit_price",
+      "status": "EXTRACTED",
+      "value": "12.50"
+    },
+    {
+      "path": "/lines/0/tax_rate",
+      "status": "EXTRACTED",
+      "value": "0"
+    },
+    {
+      "path": "/total_amount",
+      "status": "EXTRACTED",
+      "value": "50.00"
+    }
+  ]
+}

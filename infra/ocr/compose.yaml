@@ -1,0 +1,58 @@
+name: opendx-issue26
+# Public local fixture credentials; never production identity or API keys.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ocr_issue26
+      POSTGRES_USER: ocr_fixture
+      POSTGRES_PASSWORD: ocr_fixture_local_only
+    ports: ["127.0.0.1:15426:5432"]
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ../../database/proposed/issue41-evidence-intake.sql:/docker-entrypoint-initdb.d/001-evidence.sql:ro
+      - ../../database/proposed/issue26-reviewed-drafts.sql:/docker-entrypoint-initdb.d/002-drafts.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ocr_fixture -d ocr_issue26"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 512m
+  minio:
+    build: ../minio
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: ocr_fixture
+      MINIO_ROOT_PASSWORD: ocr_fixture_local_only
+    ports: ["127.0.0.1:19426:9000"]
+    volumes: ["minio:/data"]
+    mem_limit: 512m
+  scanner:
+    image: clamav/clamav:1.4.6@sha256:b5b910ce43d595bf8a2fe401e34db56434602b2c755b7c2b07f00c917d04d469
+    # Finish the initial update before daemon startup; otherwise VERSION can retain bundled stale definitions.
+    entrypoint: ["/bin/sh", "-ec", "freshclam --foreground --stdout; exec /init"]
+    environment:
+      TZ: UTC
+      FRESHCLAM_CHECKS: "12"
+      FRESHCLAM_CONF_NotifyClamd: /etc/clamav/clamd.conf
+      CLAMD_CONF_SelfCheck: "60"
+      CLAMD_CONF_StreamMaxLength: 20M
+      CLAMD_CONF_MaxFileSize: 20M
+      CLAMD_CONF_MaxScanSize: 100M
+      CLAMD_CONF_MaxRecursion: "10"
+      CLAMD_CONF_MaxFiles: "1000"
+      CLAMD_CONF_MaxScanTime: "25000"
+      CLAMD_CONF_MaxThreads: "2"
+      CLAMD_CONF_MaxQueue: "4"
+      CLAMD_CONF_AlertExceedsMax: "yes"
+      CLAMD_CONF_AlertEncryptedArchive: "yes"
+      CLAMD_CONF_AlertEncryptedDoc: "yes"
+    ports: ["127.0.0.1:33126:3310"]
+    volumes: ["definitions:/var/lib/clamav"]
+    restart: on-failure:3
+    mem_limit: 4g
+    cpus: 2
+volumes:
+  postgres:
+  minio:
+  definitions:

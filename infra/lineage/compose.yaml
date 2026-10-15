@@ -1,0 +1,40 @@
+name: opendx-issue46
+# Isolated fictional acceptance state. Keep volumes for inspection; never use production credentials.
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: lineage_issue46
+      POSTGRES_USER: lineage_fixture
+      POSTGRES_PASSWORD: lineage_fixture_local_only
+    ports: ["127.0.0.1:15446:5432"]
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ../../database/proposed/issue41-evidence-intake.sql:/docker-entrypoint-initdb.d/001-evidence.sql:ro
+      - ../../database/proposed/issue26-reviewed-drafts.sql:/docker-entrypoint-initdb.d/002-drafts.sql:ro
+      - ../../database/proposed/issue46-evidence-lineage.sql:/docker-entrypoint-initdb.d/003-lineage.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lineage_fixture -d lineage_issue46"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 512m
+  minio:
+    build: ../minio
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: lineage_fixture
+      MINIO_ROOT_PASSWORD: lineage_fixture_local_only
+    ports: ["127.0.0.1:19446:9000"]
+    volumes: ["minio:/data"]
+    mem_limit: 512m
+  scanner:
+    extends:
+      file: ../evidence/compose.yaml
+      service: scanner
+    ports: !override ["127.0.0.1:33146:3310"]
+    volumes: !override ["definitions:/var/lib/clamav"]
+volumes:
+  postgres:
+  minio:
+  definitions:
