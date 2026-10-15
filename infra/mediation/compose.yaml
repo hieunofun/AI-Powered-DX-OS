@@ -1,0 +1,37 @@
+name: opendx-issue54
+# Isolated acceptance only. Stop preserves evidence, SQL histories and scanner definitions.
+services:
+  postgres:
+    extends:
+      file: ../lineage/compose.yaml
+      service: postgres
+    environment:
+      POSTGRES_DB: mediation_issue54
+      POSTGRES_USER: mediation_fixture
+      POSTGRES_PASSWORD: mediation_fixture_local_only
+    ports: !override ["127.0.0.1:15454:5432"]
+    volumes: !override
+      - postgres:/var/lib/postgresql/data
+      - ../../database/proposed/issue41-evidence-intake.sql:/docker-entrypoint-initdb.d/001-evidence.sql:ro
+      - ../../database/proposed/issue54-ai-mediation.sql:/docker-entrypoint-initdb.d/002-mediation.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mediation_fixture -d mediation_issue54"]
+  minio:
+    extends:
+      file: ../lineage/compose.yaml
+      service: minio
+    environment:
+      MINIO_ROOT_USER: mediation_fixture
+      MINIO_ROOT_PASSWORD: mediation_fixture_local_only
+    ports: !override ["127.0.0.1:19454:9000"]
+    volumes: !override ["minio:/data"]
+  scanner:
+    extends:
+      file: ../evidence/compose.yaml
+      service: scanner
+    ports: !override ["127.0.0.1:33154:3310"]
+    volumes: !override ["definitions:/var/lib/clamav"]
+volumes:
+  postgres:
+  minio:
+  definitions:
