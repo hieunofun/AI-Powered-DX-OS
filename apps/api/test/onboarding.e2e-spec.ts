@@ -8,6 +8,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { OnboardingModule } from '../src/packs/onboarding/onboarding.module';
 import { fail } from '../src/platform/evidence/evidence.types';
+import { EvidenceErrorFilter } from '../src/platform/evidence/evidence.controller';
 import { onboardingFixture, requester, reviewer, foreign, processor } from './onboarding.fixtures';
 const schema = JSON.parse(readFileSync(resolve(__dirname, '../../../packages/contracts/opendx/proposed/issue60-onboarding.schema.json'), 'utf8'));
 const ajv = new Ajv({ allErrors: true }); ajv.addSchema(schema);
@@ -19,7 +20,7 @@ describe('Onboarding HTTP (server identity and owner/DB/engine doubles)', () => 
     const module = await Test.createTestingModule({ imports: [OnboardingModule.register(fixture.service, { resolve: async req => {
       const token = req.header('Authorization'), ctx = { 'Bearer requester': requester, 'Bearer reviewer': reviewer, 'Bearer foreign': foreign }[token];
       if (!ctx) fail('UNAUTHENTICATED', 401); return ctx;
-    } })] }).compile(); app = module.createNestApplication(); await app.init();
+    } })] }).compile(); app = module.createNestApplication(); app.useGlobalFilters(new EvidenceErrorFilter()); await app.init();
   });
   afterEach(async () => app.close());
   const route = '/packs/onboarding/v1';
@@ -67,6 +68,6 @@ describe('Onboarding HTTP (server identity and owner/DB/engine doubles)', () => 
     fixture.current.enabled = true; fixture.denied.add(requester.subject); await post('/cases', { display_label: 'Fixture' }).expect(403); expect(fixture.store.records.size).toBe(0);
   });
   test('no public worker/reconciliation/provisioning or mutating detail endpoint exists', async () => {
-    for (const path of ['/process', '/reconcile', '/provision', '/cases/' + randomUUID()]) await post(path, {}).expect(404);
+    for (const path of ['/process', '/reconcile', '/provision', '/cases/' + randomUUID()]) shape('Error', (await post(path, {}).expect(404)).body);
   });
 });

@@ -10,6 +10,7 @@ const root = path.resolve(__dirname, '../..'), load = file => require(path.join(
 const { DatabaseService } = load('platform/data/database.service.js'), { AuthService } = load('platform/identity/auth.service.js');
 const { FlowableTransport, EngineError } = load('platform/workflow/flowable.transport.js');
 const { EvidenceService } = load('platform/evidence/evidence.service.js'), { EvidenceModule } = load('platform/evidence/evidence.module.js');
+const { EvidenceErrorFilter } = load('platform/evidence/evidence.controller.js');
 const { PostgresEvidenceStore } = load('platform/evidence/evidence.repository.js'), { PrivateEvidenceStorage } = load('platform/evidence/evidence-storage.js');
 const { MinioStorageService } = load('storage/minio-storage.service.js'), { ClamavScanner } = load('platform/evidence/clamav.scanner.js');
 const { PostgresLineageStore } = load('platform/lineage/lineage.repository.js');
@@ -115,7 +116,7 @@ async function createFixture() {
     }, authorize: async (ctx, action) => { if (action !== 'context.read') fail('FORBIDDEN', 403); await db.transaction(client => member(client, ctx)); } };
     const resolver = new MembershipEvidenceResolver(new AuthService(), authority);
     class FixtureModule {} Module({ imports: [OnboardingModule.register(service, resolver), EvidenceModule.register(evidence, resolver)] })(FixtureModule);
-    app = await NestFactory.create(FixtureModule, { logger: false }); await app.listen(0, '127.0.0.1'); const origin = await app.getUrl();
+    app = await NestFactory.create(FixtureModule, { logger: false }); app.useGlobalFilters(new EvidenceErrorFilter()); await app.listen(0, '127.0.0.1'); const origin = await app.getUrl();
     const api = async (method, route, body, expected = 200, alias = 'requester', headers = {}, token = sign(alias)) => {
       const res = await fetch(origin + route, { method, headers: { Authorization: 'Bearer ' + token, ...(body ? { 'Content-Type': 'application/json' } : {}), ...headers }, ...(body ? { body: JSON.stringify(body) } : {}), signal: AbortSignal.timeout(60000) });
       const value = await res.json(); assert.equal(res.status, expected, method + ' ' + route + ' => ' + value.code);
