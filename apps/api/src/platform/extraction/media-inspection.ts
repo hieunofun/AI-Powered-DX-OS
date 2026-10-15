@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: MIT */
 import { Worker } from 'node:worker_threads';
 import { pathToFileURL } from 'node:url';
-import { ExtractionField } from '../../ai/extraction/extraction-provider';
+import { ExtractionField } from './provider.port';
 import { fail } from '../evidence/evidence.types';
 export interface DocumentText {
   parser: 'pdfjs-dist@6.4.299'; pages: { page: number; text: string }[];

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT */
 import { PoolClient } from 'pg';
-import { DatabaseService } from '../../database/database.service';
+import { DataPort } from '../data/data.port';
 import { EvidenceContext, EvidenceRecord, fail } from './evidence.types';
 export interface CommandIdentity { scope: string; hash: string; }
 export interface EvidenceSearch { q?: string; retentionClass?: 'STANDARD' | 'RESTRICTED'; }
@@ -14,7 +14,7 @@ export interface EvidenceStore {
     work: (record: EvidenceRecord | undefined, replay: boolean) => { record: EvidenceRecord; result: T }): Promise<T>;
 }
 export class PostgresEvidenceStore implements EvidenceStore {
-  constructor(private readonly db: Pick<DatabaseService, 'query' | 'transaction'>) {}
+  constructor(private readonly db: Pick<DataPort, 'query' | 'transaction'>) {}
   async commandHash(context: EvidenceContext, scope: string): Promise<string | undefined> {
     const result = await this.db.query('SELECT request_hash FROM platform_evidence_commands WHERE tenant_id=$1 AND scope_hash=$2', [context.tenantId, scope]);
     return result.rows[0]?.request_hash;

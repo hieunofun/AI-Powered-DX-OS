@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT */
 import { createServer, Socket } from 'node:net';
-import { ClamavScanner } from './clamav.scanner';
+import { ClamavScanner } from '../../platform/evidence/clamav.scanner';
 describe('ClamAV INSTREAM protocol (real TCP, scripted daemon)', () => {
   let close: () => Promise<void>;
   const now = Date.now();

@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: MIT */
 import { randomUUID } from 'node:crypto';
-import { LineageService } from './lineage.service';
-import { EvidenceLink, LineageStore } from './lineage.types';
+import { LineageService } from '../../platform/lineage/lineage.service';
+import { EvidenceLink, LineageStore } from '../../platform/lineage/lineage.types';
 import { context, foreign } from '../../../test/evidence.fixtures';
-import { fail } from '../evidence/evidence.types';
+import { fail } from '../../platform/evidence/evidence.types';
 describe('lineage pages (repository/authority doubles)', () => {
   let time: number, service: LineageService, source: string, rows: { sequence: string; link: EvidenceLink }[], denied: Set<string>;
   let check: jest.Mock, detail: jest.Mock;

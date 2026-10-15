@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import PDFDocument from 'pdfkit';
-import { groundedFields, imageBudget, inspectPdf } from './media-inspection';
+import { groundedFields, imageBudget, inspectPdf } from '../../platform/extraction/media-inspection';
 import { invoiceSuggestion } from '../../../test/ocr.fixtures';
 import { key } from '../../../test/evidence.fixtures';
 const fixture = (name: string) => readFileSync(resolve(__dirname, '../../../../../infra/ocr/fixtures/vn-reviewed-v1/sources', name));

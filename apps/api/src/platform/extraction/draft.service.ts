@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT */
 import { randomUUID } from 'node:crypto';
-import { AiProviderError } from '../../ai/extraction/extraction-provider';
+import { AiProviderError } from './provider.port';
 import { EvidenceService } from '../evidence/evidence.service';
 import { EvidenceAccess, EvidenceContext, EvidenceError, EvidenceRecord, fail } from '../evidence/evidence.types';
 import { contextValid, fingerprint, idempotencyKey, UUID } from '../evidence/file-safety';

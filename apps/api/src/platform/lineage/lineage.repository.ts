@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: MIT */
 import { randomUUID } from 'node:crypto';
 import { PoolClient } from 'pg';
-import { DatabaseService } from '../../database/database.service';
+import { DataPort } from '../data/data.port';
 import { EvidenceContext, fail } from '../evidence/evidence.types';
 import { contextValid, fingerprint, UUID } from '../evidence/file-safety';
 import { LineageEdge, LineageStore, ResourceSnapshot } from './lineage.types';
 export class PostgresLineageStore implements LineageStore {
-  constructor(private readonly db: Pick<DatabaseService, 'query'>) {}
+  constructor(private readonly db: Pick<DataPort, 'query'>) {}
   async watermark(context: EvidenceContext, evidenceId: string) {
     const result = await this.db.query('SELECT COALESCE(MAX(sequence),0)::text AS watermark FROM platform_lineage_links WHERE tenant_id=$1 AND evidence_id=$2', [context.tenantId, evidenceId]);
     return result.rows[0].watermark;

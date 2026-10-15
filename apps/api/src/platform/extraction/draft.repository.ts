@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT */
 import { PoolClient } from 'pg';
-import { DatabaseService } from '../../database/database.service';
+import { DataPort } from '../data/data.port';
 import { CommandIdentity } from '../evidence/evidence.repository';
 import { EvidenceContext, EvidenceRecord, fail } from '../evidence/evidence.types';
 import { DraftRecord } from './draft.types';
@@ -13,7 +13,7 @@ export interface DraftStore {
     work: (record: DraftRecord | undefined, source: EvidenceRecord, client: PoolClient, replay: boolean, cached?: T) => Promise<{ record: DraftRecord; source?: EvidenceRecord; result: T }>): Promise<T>;
 }
 export class PostgresDraftStore implements DraftStore {
-  constructor(private readonly db: Pick<DatabaseService, 'query' | 'transaction'>, private readonly lineage?: DraftLineageSink) {}
+  constructor(private readonly db: Pick<DataPort, 'query' | 'transaction'>, private readonly lineage?: DraftLineageSink) {}
   async read(context: EvidenceContext, id: string) {
     const result = await this.db.query('SELECT data FROM platform_extraction_records WHERE tenant_id=$1 AND id=$2', [context.tenantId, id]);
     return result.rows[0]?.data;

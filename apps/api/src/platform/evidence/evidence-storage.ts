@@ -1,9 +1,12 @@
 /* SPDX-License-Identifier: MIT */
-import { MinioStorageService } from '../../storage/minio-storage.service';
 import { EvidenceContext, EvidenceStorage, fail } from './evidence.types';
 import { contextValid, UUID } from './file-safety';
+export interface PrivateObjectStore {
+  upload(key: string, bytes: Buffer, mediaType: string, checksum: string): Promise<void>;
+  read(key: string): Promise<AsyncIterable<Buffer>>;
+}
 export class PrivateEvidenceStorage implements EvidenceStorage {
-  constructor(private readonly storage: Pick<MinioStorageService, 'upload' | 'read'>) {}
+  constructor(private readonly storage: PrivateObjectStore) {}
   private check(context: EvidenceContext, key: string): void {
     contextValid(context);
     const parts = key.split('/');

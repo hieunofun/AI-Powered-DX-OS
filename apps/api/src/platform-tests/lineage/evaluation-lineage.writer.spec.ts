@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: MIT */
 import { randomUUID } from 'node:crypto';
 import { PoolClient } from 'pg';
-import { EvaluationLineageWriter } from './evaluation-lineage.writer';
-import { ResourceRef } from './lineage.types';
+import { EvaluationLineageWriter } from '../../platform/lineage/evaluation-lineage.writer';
+import { ResourceRef } from '../../platform/lineage/lineage.types';
 import { context, foreign } from '../../../test/evidence.fixtures';
-import { fail } from '../evidence/evidence.types';
+import { fail } from '../../platform/evidence/evidence.types';
 describe('evaluation lineage integration boundary (owner/resource doubles)', () => {
   const client = {} as PoolClient, evidenceId = randomUUID(), sha = 'a'.repeat(64);
   let writer: EvaluationLineageWriter, check: jest.Mock, inspect: jest.Mock, append: jest.Mock;

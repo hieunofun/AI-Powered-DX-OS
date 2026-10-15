@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT */
 import { PoolClient } from 'pg';
-import { ExtractionField, ExtractionSuggestion } from '../../ai/extraction/extraction-provider';
+import { ExtractionField, ExtractionSuggestion } from './provider.port';
 import { EvidenceContext } from '../evidence/evidence.types';
 import type { DocumentText } from './media-inspection';
 export interface DraftCorrection {

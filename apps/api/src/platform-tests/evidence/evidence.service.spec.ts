@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: MIT */
-import { EvidenceService } from './evidence.service';
-import { EvidenceError, ScanResult, fail } from './evidence.types';
-import { boundedBytes, byteLimit, checksum, registration, validateContent } from './file-safety';
-import { PrivateEvidenceStorage } from './evidence-storage';
+import { EvidenceService } from '../../platform/evidence/evidence.service';
+import { EvidenceError, ScanResult, fail } from '../../platform/evidence/evidence.types';
+import { boundedBytes, byteLimit, checksum, registration, validateContent } from '../../platform/evidence/file-safety';
+import { PrivateEvidenceStorage } from '../../platform/evidence/evidence-storage';
 import { context, foreign, key, MemoryEvidenceStorage, MemoryEvidenceStore, metadata, pdf, stream } from '../../../test/evidence.fixtures';
 
 describe('secure evidence boundary (transaction/storage/ACL doubles)', () => {

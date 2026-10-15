@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: MIT */
 import { Request } from 'express';
-import { MembershipEvidenceAccess, MembershipEvidenceResolver } from './verified-evidence-access';
+import { MembershipEvidenceAccess, MembershipEvidenceResolver } from '../../platform/lineage/verified-evidence-access';
 import { context, foreign } from '../../../test/evidence.fixtures';
-import { fail } from '../evidence/evidence.types';
+import { fail } from '../../platform/evidence/evidence.types';
 const request = (headers: Record<string, string>) => ({ header: name => headers[name] } as Request);
 describe('verified evidence context bridge (identity/authority doubles)', () => {
   let verifyToken: jest.Mock, resolve: jest.Mock, authorize: jest.Mock, resolver: MembershipEvidenceResolver;

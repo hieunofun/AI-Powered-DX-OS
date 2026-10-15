@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: MIT */
 import { AiProviderError } from '../../ai/extraction/extraction-provider';
-import { EvidenceService } from '../evidence/evidence.service';
-import { fail } from '../evidence/evidence.types';
-import { DraftService } from './draft.service';
+import { EvidenceService } from '../../platform/evidence/evidence.service';
+import { fail } from '../../platform/evidence/evidence.types';
+import { DraftService } from '../../platform/extraction/draft.service';
 import { InvoiceDraftProfile } from '../../packs/openresolve/extraction/invoice-draft.profile';
 import { InvoiceDraftTarget } from '../../packs/openresolve/extraction/invoice-draft.target';
 import { context, foreign, key, metadata, pdf, stream, MemoryEvidenceStore, MemoryEvidenceStorage } from '../../../test/evidence.fixtures';

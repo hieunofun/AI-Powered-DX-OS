@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: MIT */
 import { randomUUID } from 'node:crypto';
 import { PoolClient } from 'pg';
-import { DraftLineageWriter } from './draft-lineage.writer';
-import { EvidenceRecord } from '../evidence/evidence.types';
-import { DraftRecord } from '../extraction/draft.types';
+import { DraftLineageWriter } from '../../platform/lineage/draft-lineage.writer';
+import { EvidenceRecord } from '../../platform/evidence/evidence.types';
+import { DraftRecord } from '../../platform/extraction/draft.types';
 import { context, foreign, metadata } from '../../../test/evidence.fixtures';
 import { invoiceSuggestion } from '../../../test/ocr.fixtures';
 describe('draft lineage derivation (writer port double)', () => {
