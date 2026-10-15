@@ -58,7 +58,7 @@ export class MemoryOnboardingEngine implements WorkflowEnginePort {
   async tasks(id: string) { return copy(this.taskRow?.processInstanceId === id && !this.historyRow?.endTime ? [this.taskRow] : []); }
   async task(id: string) { return copy(this.taskRow?.id === id && !this.historyRow?.endTime ? this.taskRow : null); }
   async historicTask(id: string) { return copy(this.historyRow?.id === id ? this.historyRow : null); }
-  async identityLinks() { return [{ type: 'candidate', groupId: this.wrongGroup ? 'wrong-group' : this.taskRow.group }]; }
+  async identityLinks() { return [{ type: 'candidate', group: this.wrongGroup ? 'wrong-group' : this.taskRow.group, user: null }]; }
   async claim(id: string, subject: string) {
     this.claims++; if (this.taskRow?.id !== id) throw new EngineError(true); this.taskRow.assignee = subject; this.afterWrite?.();
     if (this.fault === 'claim-after') { this.fault = undefined; throw new EngineError(false); }

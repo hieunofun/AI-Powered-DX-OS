@@ -43,6 +43,10 @@ export class OnboardingWorker {
     if (!task || typeof task.id !== 'string' || !task.id || task.id.length > 200 || task.processInstanceId !== record.workflow.processId || task.taskDefinitionKey !== 'access_review' ||
       record.workflow.taskId && task.id !== record.workflow.taskId) fail('RECONCILIATION_REQUIRED', 409);
   }
+  private candidateProof(record: OnboardingCase, links: any) {
+    const candidates = Array.isArray(links) ? links.filter(link => link.type === 'candidate') : [];
+    if (candidates.length !== 1 || candidates[0].group !== record.binding.workflow.reviewer_group || candidates[0].user) fail('RECONCILIATION_REQUIRED', 409);
+  }
   private async phase(ctx: EvidenceContext, id: string, token: string, phase: WorkflowIntent['phase'], permission: string) {
     return this.change(ctx, id, token, record => { record.intent.phase = phase; }, permission);
   }
@@ -94,7 +98,7 @@ export class OnboardingWorker {
           const tasks = await this.engine.tasks(record.workflow.processId); record = await guard();
           if (!Array.isArray(tasks) || tasks.length !== 1) fail('DEPENDENCY_UNAVAILABLE', 503, true); this.taskProof(record, tasks[0]);
           const links = await this.engine.identityLinks(tasks[0].id); await guard();
-          if (!Array.isArray(links) || !links.some(link => link.type === 'candidate' && link.groupId === record.binding.workflow.reviewer_group)) fail('RECONCILIATION_REQUIRED', 409);
+          this.candidateProof(record, links);
           const finished = await this.change(ctx, id, token, current => {
             current.workflow.taskId = tasks[0].id; current.state = 'AWAITING_APPROVAL'; current.intent.phase = 'DONE'; delete current.intent.lease;
             const operation = current.operations.find(op => op.id === current.intent.operationId); operation.state = 'SUCCEEDED'; operation.updated_at = this.at(); delete operation.error;
@@ -109,7 +113,7 @@ export class OnboardingWorker {
           if (!task.assignee) {
             if (readOnly || !['READY'].includes(record.intent.phase)) fail('RECONCILIATION_REQUIRED', 409);
             const links = await this.engine.identityLinks(task.id); record = await guard();
-            if (!Array.isArray(links) || !links.some(link => link.type === 'candidate' && link.groupId === record.binding.workflow.reviewer_group)) fail('RECONCILIATION_REQUIRED', 409);
+            this.candidateProof(record, links);
             await this.write(ctx, id, token, 'CLAIM_SENT', 'READY', permission, () => this.engine.claim(task.id, record.decision.approver));
             record = await guard(); task = await this.engine.task(record.workflow.taskId); record = await guard(); this.taskProof(record, task);
             if (task.assignee !== record.decision.approver) fail('RECONCILIATION_REQUIRED', 409);

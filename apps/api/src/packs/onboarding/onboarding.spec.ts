@@ -32,6 +32,12 @@ describe('Onboarding state/recovery invariants (labelled SQL/engine/owner double
     f.engine.rows[0].processDefinitionId = randomUUID(); await f.worker().reconcile(processor, id);
     expect((await f.store.read(requester, id)).state).toBe('RECONCILIATION_REQUIRED'); expect(f.engine.starts).toBe(1);
   });
+  test.each(['foreign-group', 'candidate-user', 'additional-group'])('native runtime identity links reject %s', async kind => {
+    const f = onboardingFixture(), id = await f.ready(), expected = f.current.workflow.reviewer_group;
+    f.engine.identityLinks = async () => kind === 'foreign-group' ? [{ type: 'candidate', group: 'foreign', user: null }] : kind === 'candidate-user' ?
+      [{ type: 'candidate', group: expected, user: reviewer.subject }] : [{ type: 'candidate', group: expected, user: null }, { type: 'candidate', group: 'foreign', user: null }];
+    await f.worker().processNext(processor); expect((await f.store.read(requester, id)).state).toBe('RECONCILIATION_REQUIRED'); expect(f.engine.completions).toBe(0);
+  });
   test('save/lineage failure rolls back record, history and idempotency', async () => {
     const f = onboardingFixture(); f.store.failSave = true; await expect(f.create()).rejects.toThrow('Injected');
     expect(f.store.records.size).toBe(0); expect(f.store.commands.size).toBe(0); expect(f.store.history).toHaveLength(0);

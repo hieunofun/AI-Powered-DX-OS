@@ -142,6 +142,19 @@ async function main() {
   });
 }
 main().catch(error => { failed = { code: error.code || error.name, message: error.message }; console.error('FAIL ' + failed.message); process.exitCode = 1; }).finally(async () => {
+  if (f) {
+    try {
+      resources.durableCases = (await f.db.query('SELECT data FROM onboarding_cases WHERE tenant_id=$1 ORDER BY created_at,id LIMIT 20', [f.tenant])).rows.map(row => row.data);
+      if (failed) {
+        resources.nativeDiagnostics = [];
+        for (const record of resources.durableCases.filter(record => record.workflow).slice(0, 5)) {
+          const processes = await f.engineBase.processes(record.workflow.businessKey), tasks = processes.length === 1 ? await f.engineBase.tasks(processes[0].id) : [];
+          const links = tasks.length === 1 ? await f.engineBase.identityLinks(tasks[0].id) : [], historicTask = record.workflow.taskId ? await f.engineBase.historicTask(record.workflow.taskId) : null;
+          resources.nativeDiagnostics.push({ caseId: record.id, processes, tasks, links, historicTask });
+        }
+      }
+    } catch (error) { resources.diagnosticFailure = error.code || error.name; }
+  }
   const sourceHashes = {}; const files = execFileSync('git', ['ls-files', 'apps/api/src/packs/onboarding', 'apps/api/src/platform', 'infra/onboarding', 'database/proposed/issue60-onboarding-pack.sql'], { cwd: root, encoding: 'utf8' }).trim().split(/\r?\n/).filter(Boolean);
   for (const file of files) sourceHashes[file] = createHash('sha256').update(fs.readFileSync(path.join(root, file))).digest('hex');
   const baseline = require('./core-baseline.json'), report = { issue: 60, startedAt, finishedAt: new Date().toISOString(), commit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(),
